@@ -4,6 +4,11 @@
 #include <vector>
 #include <stdio.h>
 #include "tensor.hpp"
+#include <stdlib.h>
+#include "FATFileSystem.h"
+#include "SDBlockDevice.h"
+#include <errno.h>
+#include "tensor.hpp"
 
 using namespace std;
 
@@ -175,25 +180,68 @@ TensorBase<unsigned char> TensorIdxImporter::idxTensor8bit(void) {
     return t;
 }
 
-// Serial pc(USBTX, USBRX, 115200);
+Serial pc(USBTX, USBRX, 115200);
+SDBlockDevice bd(D11, D12, D13, D10);
+FATFileSystem fs("fs");
 
-// int main(int argc, char** argv) {
+void return_error(int ret_val){
+    if (ret_val) {
+      printf(" [**Failure**] %d\r\n", ret_val);
+      printf("Exiting...\r\n");
+      exit(-1);
+    } else {
+      printf("  [DONE]\r\n");
+    }
+}
 
-//     TensorIdxImporter t_import("./idx/uint8_4d_power2.idx");
-//     TensorBase<unsigned char> t = t_import.idxTensor8bit();
+void errno_error(void* ret_val){
+    if (ret_val == NULL) {
+      printf(" [**Failure**] %d \r\n", errno);
+      printf("Exiting...\r\n");
+      exit(-1);
+    } else {
+      printf("  [DONE]\r\n");
+    }
+}
 
-//     //TensorBase<unsigned char> t = idxTensor8bit(header, fp);
-//     printf("something\r\n");
-//     unsigned char* elem = t.getPointer({});
 
-//     printf("size: %d\r\n", (int) t.getSize());
-//     printf("data\r\n");
-//     for(int i = 0; i < t.getSize(); i++) {
-//         printf("%d ", elem[i]);
-//     }
-//     printf("\r\n");
+#define ON_ERR(FUNC, MSG)   printf(" * "); \
+                            printf(MSG); \
+                            return_error(FUNC);
 
-//     return 0;
-// }
-// //csv write
-// //or THE IDX FILE FORMAT
+
+
+int main(int argc, char** argv) {
+
+    int error = 0;
+
+    ON_ERR(fs.mount(&bd), "Mounting the filesystem on \"/fs\". ");
+
+    printf(" * opening idx/uint8_4d_power2.idx");
+    FILE* fp = fopen("/fs/idx/uint8_4d_power2.idx", "r");
+    errno_error(fp);
+
+    TensorIdxImporter t_import(fp);
+    TensorBase<unsigned char> t = t_import.idxTensor8bit();
+
+    ON_ERR(fclose(fp), "Closing file...");
+
+    //TensorBase<unsigned char> t = idxTensor8bit(header, fp);
+    printf("something\r\n");
+    unsigned char* elem = t.getPointer({});
+
+    printf("size: %d\r\n", (int) t.getSize());
+    printf("data\r\n");
+    for(int i = 0; i < t.getSize(); i++) {
+        printf("%d ", elem[i]);
+    }
+    printf("\r\n");
+
+    ON_ERR(fs.unmount(), "Unmounting the filesystem on \"/fs\". ");
+
+    return 0;
+}
+//csv write
+//or THE IDX FILE FORMAT
+
+//TODO   try compiling the SD card example with C++11
