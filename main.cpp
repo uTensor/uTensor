@@ -5,6 +5,8 @@
 #include <stdio.h>
 #include <errno.h>
 #include "tensor.hpp"
+#include "tensorIdxImporter.hpp"
+
 
 
 // template <class T>

@@ -196,7 +196,7 @@ TensorBase<U> TensorIdxImporter::loader(string &filename, int idx_type) {
 
         switch (unit_size) {
             case 2:
-                *(uint16_t *) val = ntoh16((uint16_t) *val);
+                *(uint16_t *) val = ntoh16(*(uint16_t *) val);
                 break;
             case 4:
                 *(uint32_t *) val = ntoh32(*(uint32_t *) val);
@@ -220,6 +220,13 @@ Serial pc(USBTX, USBRX, 115200);
 SDBlockDevice bd(D11, D12, D13, D10);
 FATFileSystem fs("fs");
 
+// int main(int argc, char** argv) {
+//     ON_ERR(fs.mount(&bd), "Mounting the filesystem on \"/fs\". ");
+//     pc.printf("Hello World");
+//     return 0;
+//     //return test(argc, argv);
+// }
+
 int main(int argc, char** argv) {
 
     int error = 0;
@@ -230,22 +237,22 @@ int main(int argc, char** argv) {
 
     TensorIdxImporter t_import;
     //TensorBase<unsigned char> t = t_import.ubyte_import("/fs/idx/uint8_4d_power2.idx");
-    TensorBase<short> t = t_import.short_import("/fs/idx/int16_4d_power2.idx");
+    //TensorBase<short> t = t_import.short_import("/fs/idx/int16_4d_power2.idx");
     //TensorBase<int> t = t_import.int_import("/fs/idx/int32_4d_power2.idx");
-    //TensorBase<float> t = t_import.float_import("/fs/idx/float_4d_power2.idx");
+    TensorBase<float> t = t_import.float_import("/fs/idx/float_4d_power2.idx");
 
     //TensorBase<unsigned char> t = idxTensor8bit(header, fp);
     printf("something\r\n");
     //unsigned char* elem = t.getPointer({});
-    short* elem = t.getPointer({});
+    //short* elem = t.getPointer({});
     //int* elem = t.getPointer({});
-    //float* elem = t.getPointer({});
+    float* elem = t.getPointer({});
 
     printf("size: %d\r\n", (int) t.getSize());
     printf("data\r\n");
     for(int i = 0; i < t.getSize(); i++) {
-        printf("%d ", elem[i]);
-        //printf("%f ", elem[i]);
+        //printf("%d ", elem[i]);
+        printf("%f ", elem[i]);
     }
     printf("\r\n");
 
