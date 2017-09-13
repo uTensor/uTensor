@@ -45,144 +45,6 @@ uint32_t htonl(uint32_t &val) {
     return ret;
 }
 
-//big endian to little endian
-uint32_t ntohl(uint32_t &val) {
-    uint32_t ret = 0;
-    
-    ret |= val >> 24;
-    ret |= (val << 8) >> 16;
-    ret |= (val << 16) >> 8;
-    ret |= val << 24;
-
-    return ret;
-}
-
-uint32_t hton_f2int(float host_val) {
-    uint32_t tmp = *((uint32_t*) &host_val);
-    return htonl(tmp);
-}
-
-float ntoh_int2f(uint32_t net_val) {
-    uint32_t tmp = ntohl(net_val);
-    return *((float *) &tmp);
-}
-
-class TensorIdxImporter {
-    private:
-        FILE *fp;
-        HeaderMeta header;
-        HeaderMeta parseHeader(void);
-        void idxTensor8bitHelper(vector<uint32_t> trace, vector<uint32_t>::iterator it);
-        TensorBase<unsigned char> t;
-        
-    public:
-        TensorIdxImporter(string filename);
-        TensorIdxImporter(FILE *fp);
-        TensorBase<unsigned char> idxTensor8bit(void);
-};
-
-TensorIdxImporter::TensorIdxImporter(string filename) {
-    fp = fopen (filename.c_str(), "r" );
-    if (fp==NULL) {
-        printf("Error opening file\r\n");
-        exit(-1);
-    }
-
-    header = parseHeader();
-}
-
-TensorIdxImporter::TensorIdxImporter(FILE *_fp) {
-    fp = _fp;
-    header = parseHeader();
-}
-
-uint32_t getMagicNumber(unsigned char dtype, unsigned char dim) {
-    uint32_t magic = 0;
-
-    magic = (magic | dtype) << 8;
-    magic = magic | dim;
-
-    return magic;
-}
-
-void printVector(vector<uint32_t> vec) {
-    printf("vector: \r\n");
-    for(uint32_t i:vec) {
-        printf("%d ", i);
-    }
-
-    printf("\r\n");
-
-}
-
-HeaderMeta TensorIdxImporter::parseHeader(void) {
-    unsigned char *buf = (unsigned char*) malloc(sizeof(unsigned char) * 4);
-
-    fread(buf, 1, 4, fp);
-    if(buf[0] != 0 || buf[0] != 0) {
-        printf("Error, header magic number invalid\r\n");
-    }
-
-    HeaderMeta header;
-    header.dataType = buf[2];
-    header.numDim = buf[3];
-
-    for(int i = 0; i < header.numDim; i++) {
-        fread(buf, 1, 4, fp);
-        uint32_t dimSize = ntohl(*(uint32_t*) buf);
-        header.dim.push_back(dimSize);
-    }
-
-    free(buf);
-
-    header.dataPos = ftell(fp);
-    
-    return header;
-}
-
-void TensorIdxImporter::idxTensor8bitHelper(vector<uint32_t> trace, vector<uint32_t>::iterator it) {
-    if(it+1 != header.dim.end()) {
-        for(uint32_t i = 0; i < *it; i++) {
-            auto branch = trace;
-            branch.push_back(i);
-            // printf("%d ", i);
-            idxTensor8bitHelper(branch, it+1);
-        }
-        
-        // printf("\r\n");
-
-    } else {    //last dimension
-        unsigned char* dp = t.getPointer(trace);
-        for(uint32_t i = 0; i < *it; i++) {
-            int val = fgetc(fp);
-            if(val == EOF) {
-                printf("EoF reached\r\n");
-                exit(-1);
-            }
-            dp[i] = (unsigned char) val;
-        }
-        printVector(trace);
-    }
-
-}
-
-TensorBase<unsigned char> TensorIdxImporter::idxTensor8bit(void) {
-    if(header.dataType != idx_ubyte) {
-        printf("The IDX file doesn't contain an unsigned-char tensor\r\n");
-        exit(-1);
-    }
-
-    fseek(fp, header.dataPos, SEEK_SET);
-    t = TensorBase<unsigned char>(header.dim);  //tensor allocated
-    vector<uint32_t> trace;
-    idxTensor8bitHelper(trace, header.dim.begin());
-
-    return t;
-}
-
-Serial pc(USBTX, USBRX, 115200);
-SDBlockDevice bd(D11, D12, D13, D10);
-FATFileSystem fs("fs");
 
 void return_error(int ret_val){
     if (ret_val) {
@@ -209,6 +71,141 @@ void errno_error(void* ret_val){
                             printf(MSG); \
                             return_error(FUNC);
 
+                            
+//big endian to little endian
+uint32_t ntohl(uint32_t &val) {
+    uint32_t ret = 0;
+    
+    ret |= val >> 24;
+    ret |= (val << 8) >> 16;
+    ret |= (val << 16) >> 8;
+    ret |= val << 24;
+
+    return ret;
+}
+
+uint32_t hton_f2int(float host_val) {
+    uint32_t tmp = *((uint32_t*) &host_val);
+    return htonl(tmp);
+}
+
+float ntoh_int2f(uint32_t net_val) {
+    uint32_t tmp = ntohl(net_val);
+    return *((float *) &tmp);
+}
+
+
+uint32_t getMagicNumber(unsigned char dtype, unsigned char dim) {
+    uint32_t magic = 0;
+
+    magic = (magic | dtype) << 8;
+    magic = magic | dim;
+
+    return magic;
+}
+
+void printVector(vector<uint32_t> vec) {
+    printf("vector: \r\n");
+    for(uint32_t i:vec) {
+        printf("%d ", i);
+    }
+
+    printf("\r\n");
+
+}
+
+class TensorIdxImporter {
+    private:
+        FILE *fp;
+        HeaderMeta header;
+        HeaderMeta parseHeader(void);
+        template<typename U>
+        TensorBase<U> loader(string &filename, int idx_type);
+        void open(string filename);
+        //void open(FILE *fp);
+        
+    public:
+        TensorBase<unsigned char> ubyte_import(string filename) { return loader<unsigned char>(filename, idx_ubyte);}
+        TensorBase<char> byte_import(string filename)           { return loader<char>(filename, idx_byte);}
+        TensorBase<short> short_import(string filename)         { return loader<short>(filename, idx_short);}
+        TensorBase<int> int_import(string filename)             { return loader<int>(filename, idx_int);}
+        TensorBase<float> float_import(string filename)         { return loader<float>(filename, idx_float);}
+        //TensorBase<double> double_import(string filename);
+};
+
+// void TensorIdxImporter::open(FILE *_fp) {
+//     fp = _fp;
+//     header = parseHeader();
+// }
+
+HeaderMeta TensorIdxImporter::parseHeader(void) {
+    unsigned char *buf = (unsigned char*) malloc(sizeof(unsigned char) * 4);
+
+    fread(buf, 1, 4, fp);
+    if(buf[0] != 0 || buf[0] != 0) {
+        printf("Error, header magic number invalid\r\n");
+    }
+
+    HeaderMeta header;
+    header.dataType = buf[2];
+    header.numDim = buf[3];
+
+    for(int i = 0; i < header.numDim; i++) {
+        fread(buf, 1, 4, fp);
+        uint32_t dimSize = ntohl(*(uint32_t*) buf);
+        header.dim.push_back(dimSize);
+    }
+
+    free(buf);
+
+    header.dataPos = ftell(fp);
+    
+    return header;
+}
+
+template<typename U>
+TensorBase<U> TensorIdxImporter::loader(string &filename, int idx_type) {
+    fp = fopen (filename.c_str(), "r" );
+    errno_error(fp);
+
+    header = parseHeader();
+
+    fseek(fp, header.dataPos, SEEK_SET);  //need error  handling
+
+    if(header.dataType != idx_type) {
+        printf("TensorIdxImporter: header and tensor type mismatch\r\n");
+        exit(-1);
+    }
+
+    TensorBase<U> t = TensorBase<U>(header.dim);  //tensor allocated
+    const uint8_t unit_size = sizeof(U);
+    U* val = (U *) malloc(unit_size);
+    U* data = t.getPointer({});
+
+    for(int i = 0; i < t.getSize(); i++) {
+        fread(val, unit_size, 1, fp);
+        //val = htonl((uint32_t) buff);  //NT: testing for uint8 only, deference error here
+        data[i] = *val ;
+    }
+
+    free(val);
+
+    ON_ERR(fclose(fp), "Closing file...");
+
+    return t;
+}
+// TensorBase<double> TensorIdxImporter::double_import(string filename) {
+    
+//     open(filename);
+//     t = TensorBase<double>(header.dim);  //tensor allocated
+
+//     return loader(t);
+// }
+
+Serial pc(USBTX, USBRX, 115200);
+SDBlockDevice bd(D11, D12, D13, D10);
+FATFileSystem fs("fs");
+
 
 
 int main(int argc, char** argv) {
@@ -218,13 +215,9 @@ int main(int argc, char** argv) {
     ON_ERR(fs.mount(&bd), "Mounting the filesystem on \"/fs\". ");
 
     printf(" * opening idx/uint8_4d_power2.idx");
-    FILE* fp = fopen("/fs/idx/uint8_4d_power2.idx", "r");
-    errno_error(fp);
 
-    TensorIdxImporter t_import(fp);
-    TensorBase<unsigned char> t = t_import.idxTensor8bit();
-
-    ON_ERR(fclose(fp), "Closing file...");
+    TensorIdxImporter t_import;
+    TensorBase<unsigned char> t = t_import.ubyte_import("/fs/idx/uint8_4d_power2.idx");
 
     //TensorBase<unsigned char> t = idxTensor8bit(header, fp);
     printf("something\r\n");

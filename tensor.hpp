@@ -22,6 +22,7 @@ class TensorBase {
     vector<uint32_t> shape;
     std::shared_ptr<T> data;
     uint32_t total_size;
+    uint16_t unit_size;
 
     public:
     TensorBase(void) {
@@ -35,7 +36,8 @@ class TensorBase {
             total_size = (total_size == 0)? i : total_size *= i;
         }
         
-        data = std::shared_ptr<T> ((T*)malloc(sizeof(T) * total_size), free);
+        unit_size = sizeof(T);
+        data = std::shared_ptr<T> ((T*)malloc(unit_size * total_size), free);
         printf("total size is:%d\r\n", total_size);
     
     }
@@ -46,8 +48,9 @@ class TensorBase {
             shape.push_back(i);
             total_size = (total_size == 0)? i : total_size *= i;
         }
-        
-        data = std::shared_ptr<T> ((T*)malloc(sizeof(T) * total_size), free);
+
+        unit_size = sizeof(T);
+        data = std::shared_ptr<T> ((T*)malloc(unit_size * total_size), free);
         printf("total size is:%d\r\n", total_size);
     
     }
@@ -97,6 +100,10 @@ class TensorBase {
 
     uint32_t getSize() {
         return total_size;
+    }
+
+    uint32_t getSize_in_bytes() {
+        return total_size * unit_size;
     }
 
     //returns the number of dimensions in the tensor
