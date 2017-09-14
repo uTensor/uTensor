@@ -22,37 +22,41 @@ class TensorBase {
     vector<uint32_t> shape;
     std::shared_ptr<T> data;
     uint32_t total_size;
-    uint16_t unit_size;
 
-    public:
+    void init(vector<uint32_t> &v) {
+        total_size = 0;
+        for(auto i:v) {
+            shape.push_back(i);
+            //total_size = (total_size == 0)? i : total_size *= i;
+            if(total_size == 0) {
+                total_size = i;
+            } else {
+                total_size *= i;
+            }
+        }
+
+        
+        data = std::shared_ptr<T> ((T*)malloc(unit_size() * total_size), free);
+        printf("total size is:%d\r\n", (int) total_size);
+    }
+
+
+    public:   
     TensorBase(void) {
         total_size = 0;
     }
 
     TensorBase(initializer_list<uint32_t> l) {
-        total_size = 0;
+        vector<uint32_t> v;
         for(auto i:l) {
-            shape.push_back(i);
-            total_size = (total_size == 0)? i : total_size *= i;
+            v.push_back(i);
         }
-        
-        unit_size = sizeof(T);
-        data = std::shared_ptr<T> ((T*)malloc(unit_size * total_size), free);
-        printf("total size is:%d\r\n", total_size);
-    
+
+        init(v);
     }
 
     TensorBase(vector<uint32_t> v) {
-        total_size = 0;
-        for(auto i:v) {
-            shape.push_back(i);
-            total_size = (total_size == 0)? i : total_size *= i;
-        }
-
-        unit_size = sizeof(T);
-        data = std::shared_ptr<T> ((T*)malloc(unit_size * total_size), free);
-        printf("total size is:%d\r\n", total_size);
-    
+        init(v);
     }
 
     //returns how far a given dimension is apart
@@ -94,20 +98,24 @@ class TensorBase {
         return data.get() + p_offset;
     }
 
-    vector<uint32_t>& getShape() {
+    vector<uint32_t>& getShape(void) {
         return shape;
     }
 
-    uint32_t getSize() {
+    uint32_t getSize(void) {
         return total_size;
     }
 
-    uint32_t getSize_in_bytes() {
-        return total_size * unit_size;
+    uint16_t unit_size(void) {
+        return sizeof(T);
+    }
+
+    uint32_t getSize_in_bytes(void) {
+        return total_size * unit_size();
     }
 
     //returns the number of dimensions in the tensor
-    size_t getDim() {
+    size_t getDim(void) {
         return shape.size();
     }
 

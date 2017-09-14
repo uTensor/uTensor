@@ -37,11 +37,6 @@ uint32_t htonl(uint32_t &val) {
     ret |= (val << 16) >> 8;
     ret |= val << 24;
 
-    // ret |= (val & (mask << 24)) >> 24;
-    // ret |= (val & (mask << 16)) >> 8;
-    // ret |= (val & (mask << 8)) << 8;
-    // ret |= (val & (mask << 0)) << 24;
-
     return ret;
 }
 
@@ -93,15 +88,15 @@ void errno_error(void* ret_val){
 
                         
 
-uint32_t hton_f2int(float host_val) {
-    uint32_t tmp = *((uint32_t*) &host_val);
-    return htonl(tmp);
-}
+// uint32_t hton_f2int(float host_val) {
+//     uint32_t tmp = *((uint32_t*) &host_val);
+//     return htonl(tmp);
+// }
 
-float ntoh_int2f(uint32_t net_val) {
-    uint32_t tmp = ntoh32(net_val);
-    return *((float *) &tmp);
-}
+// float ntoh_int2f(uint32_t net_val) {
+//     uint32_t tmp = ntoh32(net_val);
+//     return *((float *) &tmp);
+// }
 
 
 uint32_t getMagicNumber(unsigned char dtype, unsigned char dim) {
@@ -116,7 +111,7 @@ uint32_t getMagicNumber(unsigned char dtype, unsigned char dim) {
 void printVector(vector<uint32_t> vec) {
     printf("vector: \r\n");
     for(uint32_t i:vec) {
-        printf("%d ", i);
+        printf("%d ", (unsigned int) i);
     }
 
     printf("\r\n");
@@ -187,11 +182,11 @@ TensorBase<U> TensorIdxImporter::loader(string &filename, int idx_type) {
     }
 
     TensorBase<U> t = TensorBase<U>(header.dim);  //tensor allocated
-    const uint8_t unit_size = sizeof(U);
+    const uint8_t unit_size = t.unit_size();
     U* val = (U *) malloc(unit_size);
     U* data = t.getPointer({});
 
-    for(int i = 0; i < t.getSize(); i++) {
+    for(uint32_t i = 0; i < t.getSize(); i++) {
         fread(val, unit_size, 1, fp);
 
         switch (unit_size) {
@@ -220,16 +215,7 @@ Serial pc(USBTX, USBRX, 115200);
 SDBlockDevice bd(D11, D12, D13, D10);
 FATFileSystem fs("fs");
 
-// int main(int argc, char** argv) {
-//     ON_ERR(fs.mount(&bd), "Mounting the filesystem on \"/fs\". ");
-//     pc.printf("Hello World");
-//     return 0;
-//     //return test(argc, argv);
-// }
-
 int main(int argc, char** argv) {
-
-    int error = 0;
 
     ON_ERR(fs.mount(&bd), "Mounting the filesystem on \"/fs\". ");
 
@@ -250,13 +236,15 @@ int main(int argc, char** argv) {
 
     printf("size: %d\r\n", (int) t.getSize());
     printf("data\r\n");
-    for(int i = 0; i < t.getSize(); i++) {
+    for(uint16_t i = 0; i < t.getSize(); i++) {
         //printf("%d ", elem[i]);
         printf("%f ", elem[i]);
     }
     printf("\r\n");
 
     ON_ERR(fs.unmount(), "Unmounting the filesystem on \"/fs\". ");
+    
+    //printf("exiting...\r\n");
 
     return 0;
 }
