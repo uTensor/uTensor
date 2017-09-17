@@ -37,7 +37,7 @@ class TensorBase {
 
         
         data = std::shared_ptr<T> ((T*)malloc(unit_size() * total_size), free);
-        printf("total size is:%d\r\n", (int) total_size);
+        //printf("total size is:%d\r\n", (int) total_size);
     }
 
 
@@ -81,7 +81,7 @@ class TensorBase {
             current_dim++;
         }
 
-        printf("p_offset: %d\r\n", p_offset);
+        //printf("p_offset: %d\r\n", p_offset);
         return data.get() + p_offset;
     }
 

@@ -9,6 +9,7 @@
 #include "SDBlockDevice.h"
 #include <errno.h>
 #include "tensor.hpp"
+#include <test.hpp>
 
 using namespace std;
 
@@ -211,43 +212,112 @@ TensorBase<U> TensorIdxImporter::loader(string &filename, int idx_type) {
     return t;
 }
 
-Serial pc(USBTX, USBRX, 115200);
-SDBlockDevice bd(D11, D12, D13, D10);
-FATFileSystem fs("fs");
+// Serial pc(USBTX, USBRX, 115200);
+// SDBlockDevice bd(D11, D12, D13, D10);
+// // SDBlockDevice bd(PTE3, PTE1, PTE2, PTE4);
+// //SDBlockDevice bd(MBED_CONF_APP_SD_MOSI, MBED_CONF_APP_SD_MISO, MBED_CONF_APP_SD_CLK, MBED_CONF_APP_SD_CS);
+// FATFileSystem fs("fs");
 
-int main(int argc, char** argv) {
+// int main(int argc, char** argv) {
+//     while(1) {
+//         printf("hello world\r\n");
+//         wait(1);
+//     }
+//     return 0;
+// }
 
-    ON_ERR(fs.mount(&bd), "Mounting the filesystem on \"/fs\". ");
+class idxImporterTest : public Test {
 
-    printf(" * opening idx/uint8_4d_power2.idx");
+    private:
+        template<typename U>
+        double sum(TensorBase<U> input) {
+            U* elem = input.getPointer({});
+            double accm = 0.0;
+            for(uint32_t i = 0; i < input.getSize(); i++) {
+                accm += (double) elem[i];
+            }
+        
+            return accm;
+        }
 
-    TensorIdxImporter t_import;
-    //TensorBase<unsigned char> t = t_import.ubyte_import("/fs/idx/uint8_4d_power2.idx");
-    //TensorBase<short> t = t_import.short_import("/fs/idx/int16_4d_power2.idx");
-    //TensorBase<int> t = t_import.int_import("/fs/idx/int32_4d_power2.idx");
-    TensorBase<float> t = t_import.float_import("/fs/idx/float_4d_power2.idx");
+    public:
 
-    //TensorBase<unsigned char> t = idxTensor8bit(header, fp);
-    printf("something\r\n");
-    //unsigned char* elem = t.getPointer({});
-    //short* elem = t.getPointer({});
-    //int* elem = t.getPointer({});
-    float* elem = t.getPointer({});
+        void ucharTest(void) {
+            testStart("uchar import test");
+            TensorIdxImporter t_import;
+            TensorBase<unsigned char> t = t_import.ubyte_import("/fs/idx/uint8_4d_power2.idx");
+            double result = sum<unsigned char>(t);
+            passed(result != 0);
+        }
 
-    printf("size: %d\r\n", (int) t.getSize());
-    printf("data\r\n");
-    for(uint16_t i = 0; i < t.getSize(); i++) {
-        //printf("%d ", elem[i]);
-        printf("%f ", elem[i]);
-    }
-    printf("\r\n");
+        void shortTest(void) {
+            testStart("short import test");
+            TensorIdxImporter t_import;
+            TensorBase<short> t = t_import.short_import("/fs/idx/int16_4d_power2.idx");
+            double result = sum<short>(t);
+            passed(result != 0);
+        }
 
-    ON_ERR(fs.unmount(), "Unmounting the filesystem on \"/fs\". ");
+        void intTest(void) {
+            testStart("int import test");
+            TensorIdxImporter t_import;
+            TensorBase<int> t = t_import.int_import("/fs/idx/int32_4d_power2.idx");
+            double result = sum<int>(t);
+            passed(result != 0);
+        }
+
+        void floatTest(void) {
+            testStart("float import test");
+            TensorIdxImporter t_import;
+            TensorBase<float> t = t_import.float_import("/fs/idx/float_4d_power2.idx");
+            double result = sum<float>(t);
+            passed(result != 0);
+        }
+
+        void runAll(void) {
+            ucharTest();
+            shortTest();
+            intTest();
+            floatTest();
+        }
+
+};
+
+
+// int main(int argc, char** argv) {
+
+//     printf("Tensor Importer: \r\n\r\n");
+
+//     ON_ERR(fs.mount(&bd), "Mounting the filesystem on \"/fs\". ");
+
+//     printf(" * opening idx/uint8_4d_power2.idx");
+
+//     TensorIdxImporter t_import;
+//     //TensorBase<unsigned char> t = t_import.ubyte_import("/fs/idx/uint8_4d_power2.idx");
+//     //TensorBase<short> t = t_import.short_import("/fs/idx/int16_4d_power2.idx");
+//     //TensorBase<int> t = t_import.int_import("/fs/idx/int32_4d_power2.idx");
+//     TensorBase<float> t = t_import.float_import("/fs/idx/float_4d_power2.idx");
+
+//     //TensorBase<unsigned char> t = idxTensor8bit(header, fp);
+//     //unsigned char* elem = t.getPointer({});
+//     //short* elem = t.getPointer({});
+//     //int* elem = t.getPointer({});
+//     float* elem = t.getPointer({});
+
+//     // printf("size: %d\r\n", (int) t.getSize());
+//     // printf("data\r\n");
+//     // for(uint16_t i = 0; i < t.getSize(); i++) {
+//     //     //printf("%d ", elem[i]);
+//     //     printf("%f ", elem[i]);
+//     // }
+//     // printf("\r\n");
+
+//     ON_ERR(fs.unmount(), "Unmounting the filesystem on \"/fs\". ");
     
-    //printf("exiting...\r\n");
+//     //printf("exiting...\r\n");
 
-    return 0;
-}
+//     return 0;
+// }
 //csv write
 //or THE IDX FILE FORMAT
 
