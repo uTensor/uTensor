@@ -18,7 +18,7 @@
 
 template <class T>
 class TensorBase {
-    private:
+    protected:
     vector<uint32_t> shape;
     std::shared_ptr<T> data;
     uint32_t total_size;

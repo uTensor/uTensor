@@ -30,12 +30,12 @@ class HeaderMeta {
 
 //little endian to big endian
 uint32_t htonl(uint32_t &val) {
-    // const uint32_t mask = 0b11111111;
+    const uint32_t mask = 0b11111111;
     uint32_t ret = 0;
     
     ret |= val >> 24;
-    ret |= (val << 8) >> 16;
-    ret |= (val << 16) >> 8;
+    ret |= (val & (mask << 16)) >> 8;
+    ret |= (val & (mask << 8)) << 8;
     ret |= val << 24;
 
     return ret;
@@ -52,11 +52,12 @@ uint16_t ntoh16(uint16_t val) {
 }
 
 uint32_t ntoh32(uint32_t val) {
+    const uint32_t mask = 0b11111111;
     uint32_t ret = 0;
     
     ret |= val >> 24;
-    ret |= (val << 8) >> 16;
-    ret |= (val << 16) >> 8;
+    ret |= (val & (mask << 16)) >> 8;
+    ret |= (val & (mask << 8)) << 8;
     ret |= val << 24;
 
     return ret;
@@ -242,6 +243,20 @@ class idxImporterTest : public Test {
 
     public:
 
+        void ntoh32Test(void) {
+            testStart("ntoh32 test");
+            uint32_t input = 63;
+            uint32_t result = ntoh32(63);
+            // printf("ntoh32Test : \r\n");
+            // printf("input : ");
+            // printBits(sizeof(uint32_t), &input);
+            // printf("result : ");
+            // printBits(sizeof(uint32_t), &result);
+            // printf("\r\n");
+            // printf("\r\n");
+            passed(result == 1056964608);
+        }
+
         void ucharTest(void) {
             testStart("uchar import test");
             TensorIdxImporter t_import;
@@ -271,62 +286,71 @@ class idxImporterTest : public Test {
             TensorIdxImporter t_import;
             TensorBase<float> t = t_import.float_import("/fs/testData/idxImport/float_4d_power2.idx");
             
-            printf("printing float ref: \r\n\r\n");
+            // printf("printing float ref: \r\n\r\n");
 
-            auto shape = t.getShape();
-            double tmp = 1.0;
+            // auto shape = t.getShape();
+            // double tmp = 1.0;
             
-            for(uint16_t i0 = 0; i0 < shape[0]; i0++) {
-                for(uint16_t i1 = 0; i1 < shape[1]; i1++) {
-                    for(uint16_t i2 = 0; i2 < shape[2]; i2++) {
-                        for(uint16_t i3 = 0; i3 < shape[3]; i3++) {
-                            tmp = tmp * -0.5;
-                            printf("%f   ", tmp);
-                        }
-                    }
-                }
-            }
+            // for(uint16_t i0 = 0; i0 < shape[0]; i0++) {
+            //     for(uint16_t i1 = 0; i1 < shape[1]; i1++) {
+            //         for(uint16_t i2 = 0; i2 < shape[2]; i2++) {
+            //             for(uint16_t i3 = 0; i3 < shape[3]; i3++) {
+            //                 tmp = tmp * -0.5;
+            //                 printf("%.8e   ", tmp);
+            //             }
+            //         }
+            //     }
+            //     tmp = 1.0;
+            // }
 
-            tmp = 1.0;
+            // printf("\r\n\r\n");
 
-            printf("\r\n\r\n");
+            // printf("printing float imported: \r\n\r\n");
+            // for(uint16_t i0 = 0; i0 < shape[0]; i0++) {
+            //     for(uint16_t i1 = 0; i1 < shape[1]; i1++) {
+            //         for(uint16_t i2 = 0; i2 < shape[2]; i2++) {
+            //             for(uint16_t i3 = 0; i3 < shape[3]; i3++) {
+            //                 auto val = t.getPointer({i0,i1,i2,i3});
+            //                 printf("%.8e   ", *val);
+            //             }
+            //         }
+            //     }
+            // }
 
-            printf("printing float imported: \r\n\r\n");
-            for(uint16_t i0 = 0; i0 < shape[0]; i0++) {
-                for(uint16_t i1 = 0; i1 < shape[1]; i1++) {
-                    for(uint16_t i2 = 0; i2 < shape[2]; i2++) {
-                        for(uint16_t i3 = 0; i3 < shape[3]; i3++) {
-                            auto val = t.getPointer({i0,i1,i2,i3});
-                            printf("%f   ", *val);
-                        }
-                    }
-                }
-            }
+            // printf("\r\n\r\n");
+
+            // printf("print binary: ");
+            // printBits(sizeof(float), t.getPointer({1,1,1,1}));
+
+            // printf("\r\n\r\n");
 
 
-            printf("printing float diff: \r\n\r\n");
-            for(uint16_t i0 = 0; i0 < shape[0]; i0++) {
-                for(uint16_t i1 = 0; i1 < shape[1]; i1++) {
-                    for(uint16_t i2 = 0; i2 < shape[2]; i2++) {
-                        for(uint16_t i3 = 0; i3 < shape[3]; i3++) {
-                            tmp = tmp * -0.5;
-                            auto val = t.getPointer({i0,i1,i2,i3});
-                            float diff = *val - (float) tmp;
-                            printf("%f   ", diff);
-                        }
-                    }
-                }
-            }
+            // printf("printing float diff: \r\n\r\n");
+            // tmp = 1.0;
+            // for(uint16_t i0 = 0; i0 < shape[0]; i0++) {
+            //     for(uint16_t i1 = 0; i1 < shape[1]; i1++) {
+            //         for(uint16_t i2 = 0; i2 < shape[2]; i2++) {
+            //             for(uint16_t i3 = 0; i3 < shape[3]; i3++) {
+            //                 tmp = tmp * -0.5;
+            //                 auto val = t.getPointer({i0,i1,i2,i3});
+            //                 float diff = *val - (float) tmp;
+            //                 printf("%.8e   ", diff);
+            //             }
+            //         }
+            //     }
+            //     tmp = 1.0;
+            // }
             
-            printf("\r\n\r\n");
+            // printf("\r\n\r\n");
 
             double result = sum<float>(t);
 
-            printf("***floating point test yielded: %f\r\n", (float) result);
-            passed(result == -1.0f);
+            printf("***floating point test yielded: %.8e\r\n", (float) result);
+            passed((float)result == -1.0f);
         }
 
         void runAll(void) {
+            ntoh32Test();
             ucharTest();
             shortTest();
             intTest();
@@ -334,43 +358,3 @@ class idxImporterTest : public Test {
         }
 
 };
-
-
-// int main(int argc, char** argv) {
-
-//     printf("Tensor Importer: \r\n\r\n");
-
-//     ON_ERR(fs.mount(&bd), "Mounting the filesystem on \"/fs\". ");
-
-//     printf(" * opening idx/uint8_4d_power2.idx");
-
-//     TensorIdxImporter t_import;
-//     //TensorBase<unsigned char> t = t_import.ubyte_import("/fs/idx/uint8_4d_power2.idx");
-//     //TensorBase<short> t = t_import.short_import("/fs/idx/int16_4d_power2.idx");
-//     //TensorBase<int> t = t_import.int_import("/fs/idx/int32_4d_power2.idx");
-//     TensorBase<float> t = t_import.float_import("/fs/idx/float_4d_power2.idx");
-
-//     //TensorBase<unsigned char> t = idxTensor8bit(header, fp);
-//     //unsigned char* elem = t.getPointer({});
-//     //short* elem = t.getPointer({});
-//     //int* elem = t.getPointer({});
-//     float* elem = t.getPointer({});
-
-//     // printf("size: %d\r\n", (int) t.getSize());
-//     // printf("data\r\n");
-//     // for(uint16_t i = 0; i < t.getSize(); i++) {
-//     //     //printf("%d ", elem[i]);
-//     //     printf("%f ", elem[i]);
-//     // }
-//     // printf("\r\n");
-
-//     ON_ERR(fs.unmount(), "Unmounting the filesystem on \"/fs\". ");
-    
-//     //printf("exiting...\r\n");
-
-//     return 0;
-// }
-//csv write
-//or THE IDX FILE FORMAT
-
-//TODO   try compiling the SD card example with C++11
