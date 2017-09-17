@@ -245,33 +245,85 @@ class idxImporterTest : public Test {
         void ucharTest(void) {
             testStart("uchar import test");
             TensorIdxImporter t_import;
-            TensorBase<unsigned char> t = t_import.ubyte_import("/fs/idx/uint8_4d_power2.idx");
+            TensorBase<unsigned char> t = t_import.ubyte_import("/fs/testData/idxImport/uint8_4d_power2.idx");
             double result = sum<unsigned char>(t);
-            passed(result != 0);
+            passed(result == 4518);
         }
 
         void shortTest(void) {
             testStart("short import test");
             TensorIdxImporter t_import;
-            TensorBase<short> t = t_import.short_import("/fs/idx/int16_4d_power2.idx");
+            TensorBase<short> t = t_import.short_import("/fs/testData/idxImport/int16_4d_power2.idx");
             double result = sum<short>(t);
-            passed(result != 0);
+            passed(result == 270250);
         }
 
         void intTest(void) {
             testStart("int import test");
             TensorIdxImporter t_import;
-            TensorBase<int> t = t_import.int_import("/fs/idx/int32_4d_power2.idx");
+            TensorBase<int> t = t_import.int_import("/fs/testData/idxImport/int32_4d_power2.idx");
             double result = sum<int>(t);
-            passed(result != 0);
+            passed(result == 5748992600);
         }
 
         void floatTest(void) {
             testStart("float import test");
             TensorIdxImporter t_import;
-            TensorBase<float> t = t_import.float_import("/fs/idx/float_4d_power2.idx");
+            TensorBase<float> t = t_import.float_import("/fs/testData/idxImport/float_4d_power2.idx");
+            
+            printf("printing float ref: \r\n\r\n");
+
+            auto shape = t.getShape();
+            double tmp = 1.0;
+            
+            for(uint16_t i0 = 0; i0 < shape[0]; i0++) {
+                for(uint16_t i1 = 0; i1 < shape[1]; i1++) {
+                    for(uint16_t i2 = 0; i2 < shape[2]; i2++) {
+                        for(uint16_t i3 = 0; i3 < shape[3]; i3++) {
+                            tmp = tmp * -0.5;
+                            printf("%f   ", tmp);
+                        }
+                    }
+                }
+            }
+
+            tmp = 1.0;
+
+            printf("\r\n\r\n");
+
+            printf("printing float imported: \r\n\r\n");
+            for(uint16_t i0 = 0; i0 < shape[0]; i0++) {
+                for(uint16_t i1 = 0; i1 < shape[1]; i1++) {
+                    for(uint16_t i2 = 0; i2 < shape[2]; i2++) {
+                        for(uint16_t i3 = 0; i3 < shape[3]; i3++) {
+                            auto val = t.getPointer({i0,i1,i2,i3});
+                            printf("%f   ", *val);
+                        }
+                    }
+                }
+            }
+
+
+            printf("printing float diff: \r\n\r\n");
+            for(uint16_t i0 = 0; i0 < shape[0]; i0++) {
+                for(uint16_t i1 = 0; i1 < shape[1]; i1++) {
+                    for(uint16_t i2 = 0; i2 < shape[2]; i2++) {
+                        for(uint16_t i3 = 0; i3 < shape[3]; i3++) {
+                            tmp = tmp * -0.5;
+                            auto val = t.getPointer({i0,i1,i2,i3});
+                            float diff = *val - (float) tmp;
+                            printf("%f   ", diff);
+                        }
+                    }
+                }
+            }
+            
+            printf("\r\n\r\n");
+
             double result = sum<float>(t);
-            passed(result != 0);
+
+            printf("***floating point test yielded: %f\r\n", (float) result);
+            passed(result == -1.0f);
         }
 
         void runAll(void) {
