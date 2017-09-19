@@ -8,19 +8,24 @@
 #include "tensorIdxImporter.hpp"
 
 Serial pc(USBTX, USBRX, 115200);
-SDBlockDevice bd(D11, D12, D13, D10);
+//SDBlockDevice bd(D11, D12, D13, D10);
 // SDBlockDevice bd(PTE3, PTE1, PTE2, PTE4);
-//SDBlockDevice bd(MBED_CONF_APP_SD_MOSI, MBED_CONF_APP_SD_MISO, MBED_CONF_APP_SD_CLK, MBED_CONF_APP_SD_CS);
+SDBlockDevice bd(MBED_CONF_APP_SD_MOSI, MBED_CONF_APP_SD_MISO, MBED_CONF_APP_SD_CLK, MBED_CONF_APP_SD_CS);
 FATFileSystem fs("fs");
 
 int main(int argc, char** argv) {
     printf("test start: \r\n");
 
+    ON_ERR(bd.init(), "SDBlockDevice init ");
     ON_ERR(fs.mount(&bd), "Mounting the filesystem on \"/fs\". ");
     printf("fs mounted \r\n");
 
     idxImporterTest test;
     test.runAll();
+
+    ON_ERR(fs.unmount(), "fs unmount ");
+    ON_ERR(bd.deinit(), "SDBlockDevice de-init ");
+    
 
     printf("Test Summaries:\r\n");
     test.printSummary();

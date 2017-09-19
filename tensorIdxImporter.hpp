@@ -261,7 +261,7 @@ class idxImporterTest : public Test {
             testStart("uchar import test");
             TensorIdxImporter t_import;
             TensorBase<unsigned char> t = t_import.ubyte_import("/fs/testData/idxImport/uint8_4d_power2.idx");
-            double result = sum<unsigned char>(t);
+            double result = sum(t);
             passed(result == 4518);
         }
 
@@ -269,7 +269,7 @@ class idxImporterTest : public Test {
             testStart("short import test");
             TensorIdxImporter t_import;
             TensorBase<short> t = t_import.short_import("/fs/testData/idxImport/int16_4d_power2.idx");
-            double result = sum<short>(t);
+            double result = sum(t);
             passed(result == 270250);
         }
 
@@ -277,7 +277,7 @@ class idxImporterTest : public Test {
             testStart("int import test");
             TensorIdxImporter t_import;
             TensorBase<int> t = t_import.int_import("/fs/testData/idxImport/int32_4d_power2.idx");
-            double result = sum<int>(t);
+            double result = sum(t);
             passed(result == 5748992600);
         }
 
@@ -343,7 +343,7 @@ class idxImporterTest : public Test {
             
             // printf("\r\n\r\n");
 
-            double result = sum<float>(t);
+            double result = sum(t);
 
             printf("***floating point test yielded: %.8e\r\n", (float) result);
             passed((float)result == -1.0f);
