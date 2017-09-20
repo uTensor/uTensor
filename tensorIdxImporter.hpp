@@ -126,17 +126,17 @@ class TensorIdxImporter {
         HeaderMeta header;
         HeaderMeta parseHeader(void);
         template<typename U>
-        TensorBase<U> loader(string &filename, int idx_type);
+        Tensor<U> loader(string &filename, int idx_type);
         void open(string filename);
         //void open(FILE *fp);
         
     public:
-        TensorBase<unsigned char> ubyte_import(string filename) { return loader<unsigned char>(filename, idx_ubyte);}
-        TensorBase<char> byte_import(string filename)           { return loader<char>(filename, idx_byte);}
-        TensorBase<short> short_import(string filename)         { return loader<short>(filename, idx_short);}
-        TensorBase<int> int_import(string filename)             { return loader<int>(filename, idx_int);}
-        TensorBase<float> float_import(string filename)         { return loader<float>(filename, idx_float);}
-        //TensorBase<double> double_import(string filename) {};
+        Tensor<unsigned char> ubyte_import(string filename) { return loader<unsigned char>(filename, idx_ubyte);}
+        Tensor<char> byte_import(string filename)           { return loader<char>(filename, idx_byte);}
+        Tensor<short> short_import(string filename)         { return loader<short>(filename, idx_short);}
+        Tensor<int> int_import(string filename)             { return loader<int>(filename, idx_int);}
+        Tensor<float> float_import(string filename)         { return loader<float>(filename, idx_float);}
+        //Tensor<double> double_import(string filename) {};
 };
 
 // void TensorIdxImporter::open(FILE *_fp) {
@@ -170,7 +170,7 @@ HeaderMeta TensorIdxImporter::parseHeader(void) {
 }
 
 template<typename U>
-TensorBase<U> TensorIdxImporter::loader(string &filename, int idx_type) {
+Tensor<U> TensorIdxImporter::loader(string &filename, int idx_type) {
     fp = fopen (filename.c_str(), "r" );
     errno_error(fp);
 
@@ -183,7 +183,7 @@ TensorBase<U> TensorIdxImporter::loader(string &filename, int idx_type) {
         exit(-1);
     }
 
-    TensorBase<U> t = TensorBase<U>(header.dim);  //tensor allocated
+    Tensor<U> t = Tensor<U>(header.dim);  //tensor allocated
     const uint8_t unit_size = t.unit_size();
     U* val = (U *) malloc(unit_size);
     U* data = t.getPointer({});
@@ -231,7 +231,7 @@ class idxImporterTest : public Test {
 
     private:
         template<typename U>
-        double sum(TensorBase<U> input) {
+        double sum(Tensor<U> input) {
             U* elem = input.getPointer({});
             double accm = 0.0;
             for(uint32_t i = 0; i < input.getSize(); i++) {
@@ -260,7 +260,7 @@ class idxImporterTest : public Test {
         void ucharTest(void) {
             testStart("uchar import test");
             TensorIdxImporter t_import;
-            TensorBase<unsigned char> t = t_import.ubyte_import("/fs/testData/idxImport/uint8_4d_power2.idx");
+            Tensor<unsigned char> t = t_import.ubyte_import("/fs/testData/idxImport/uint8_4d_power2.idx");
             double result = sum(t);
             passed(result == 4518);
         }
@@ -268,7 +268,7 @@ class idxImporterTest : public Test {
         void shortTest(void) {
             testStart("short import test");
             TensorIdxImporter t_import;
-            TensorBase<short> t = t_import.short_import("/fs/testData/idxImport/int16_4d_power2.idx");
+            Tensor<short> t = t_import.short_import("/fs/testData/idxImport/int16_4d_power2.idx");
             double result = sum(t);
             passed(result == 270250);
         }
@@ -276,7 +276,7 @@ class idxImporterTest : public Test {
         void intTest(void) {
             testStart("int import test");
             TensorIdxImporter t_import;
-            TensorBase<int> t = t_import.int_import("/fs/testData/idxImport/int32_4d_power2.idx");
+            Tensor<int> t = t_import.int_import("/fs/testData/idxImport/int32_4d_power2.idx");
             double result = sum(t);
             passed(result == 5748992600);
         }
@@ -284,7 +284,7 @@ class idxImporterTest : public Test {
         void floatTest(void) {
             testStart("float import test");
             TensorIdxImporter t_import;
-            TensorBase<float> t = t_import.float_import("/fs/testData/idxImport/float_4d_power2.idx");
+            Tensor<float> t = t_import.float_import("/fs/testData/idxImport/float_4d_power2.idx");
             
             // printf("printing float ref: \r\n\r\n");
 

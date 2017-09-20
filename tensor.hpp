@@ -16,37 +16,48 @@
 
 //using namespace std;
 
-template <class T>
+template <class U>
 class TensorBase {
-    protected:
+public:
     vector<uint32_t> shape;
-    std::shared_ptr<T> data;
+    U* data;
     uint32_t total_size;
 
+    ~TensorBase() {
+        printf("TensorBase destruction..\r\n");
+        free(data);
+    }
+};
+
+template <class T>
+class Tensor {
+    std::shared_ptr<TensorBase<T>> s; //short for states
+
     void init(vector<uint32_t> &v) {
-        total_size = 0;
+        s = std::make_shared<TensorBase<T>>(TensorBase<T>());
+        s->total_size = 0;
         for(auto i:v) {
-            shape.push_back(i);
+            s->shape.push_back(i);
             //total_size = (total_size == 0)? i : total_size *= i;
-            if(total_size == 0) {
-                total_size = i;
+            if(s->total_size == 0) {
+                s->total_size = i;
             } else {
-                total_size *= i;
+                s->total_size *= i;
             }
         }
 
         
-        data = std::shared_ptr<T> ((T*)malloc(unit_size() * total_size), free);
+        s->data = (T*) malloc(unit_size() * s->total_size);
         //printf("total size is:%d\r\n", (int) total_size);
     }
 
 
     public:   
-    TensorBase(void) {
-        total_size = 0;
+    Tensor(void) {
+        s->total_size = 0;
     }
 
-    TensorBase(initializer_list<uint32_t> l) {
+    Tensor(initializer_list<uint32_t> l) {
         vector<uint32_t> v;
         for(auto i:l) {
             v.push_back(i);
@@ -55,14 +66,14 @@ class TensorBase {
         init(v);
     }
 
-    TensorBase(vector<uint32_t> v) {
+    Tensor(vector<uint32_t> v) {
         init(v);
     }
 
     //returns how far a given dimension is apart
     size_t getStride(size_t dim_index) {
         unsigned int size_accm = 1;
-        for(auto it = shape.begin() + dim_index + 1; it != shape.end(); it++) {
+        for(auto it = s->shape.begin() + dim_index + 1; it != s->shape.end(); it++) {
             size_accm *= *it;
         }
 
@@ -82,7 +93,7 @@ class TensorBase {
         }
 
         //printf("p_offset: %d\r\n", p_offset);
-        return data.get() + p_offset;
+        return s->data + p_offset;
     }
 
     T* getPointer(vector<uint32_t> v) {
@@ -95,15 +106,15 @@ class TensorBase {
 
         printf("p_offset: %d\r\n", p_offset);
 
-        return data.get() + p_offset;
+        return s->data + p_offset;
     }
 
     vector<uint32_t>& getShape(void) {
-        return shape;
+        return s->shape;
     }
 
     uint32_t getSize(void) {
-        return total_size;
+        return s->total_size;
     }
 
     uint16_t unit_size(void) {
@@ -111,15 +122,15 @@ class TensorBase {
     }
 
     uint32_t getSize_in_bytes(void) {
-        return total_size * unit_size();
+        return s->total_size * unit_size();
     }
 
     //returns the number of dimensions in the tensor
     size_t getDim(void) {
-        return shape.size();
+        return s->shape.size();
     }
 
-    ~TensorBase() {
+    ~Tensor() {
         // if(data != NULL)
         //     free(data);
 
