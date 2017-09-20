@@ -2,19 +2,10 @@
 #define TENSOR_H
 
 #include "mbed.h"
-#include<memory>
+#include <memory>
 #include <vector>
 #include <initializer_list>
 #include <stdlib.h>
-
-//TODO:
-//Make a Tensor class, a datum class
-//With Vector to hold internal struct
-//Use Variadic functions for APIs
-//Transvers via the lowest dimension
-//Template class for the data types
-
-//using namespace std;
 
 template <class U>
 class TensorBase {
@@ -34,8 +25,10 @@ class Tensor {
     std::shared_ptr<TensorBase<T>> s; //short for states
 
     void init(vector<uint32_t> &v) {
+
         s = std::make_shared<TensorBase<T>>(TensorBase<T>());
         s->total_size = 0;
+        
         for(auto i:v) {
             s->shape.push_back(i);
             //total_size = (total_size == 0)? i : total_size *= i;
@@ -52,7 +45,8 @@ class Tensor {
     }
 
 
-    public:   
+    public:
+
     Tensor(void) {
         s->total_size = 0;
     }

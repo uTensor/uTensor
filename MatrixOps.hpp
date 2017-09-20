@@ -5,7 +5,7 @@
 //http://www.plantation-productions.com/Webster/www.artofasm.com/Linux/HTML/Arraysa2.html
 
 //Assume Tensor index order:  rows, columns | the first 2 dimensions
-typedef TensorBase<unsigned char> Mat
+typedef Tensor<unsigned char> Mat
 
 void printMat(Mat mat) {
     const uint32_t ROWS = mat.getShape()[0];
