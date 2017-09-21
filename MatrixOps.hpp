@@ -1,5 +1,5 @@
-#ifndef MATRIX_OPS_H
-#define MATRIX_OPS_H
+#ifndef UTENSOR_MATRIX_OPS
+#define UTENSOR_MATRIX_OPS
 
 //Useful links
 //http://www.plantation-productions.com/Webster/www.artofasm.com/Linux/HTML/Arraysa2.html

@@ -1,6 +1,7 @@
-#include <string>
+#ifndef UTENSOR_TEST
+#define UTENSOR_TEST
 
-#define MAX(A, B) ((A > B)? A:B)
+#include <string>
 
 class Test {
     
@@ -109,3 +110,5 @@ void printBits(size_t const size, void const * const ptr)
     }
     puts("");
 }
+
+#endif

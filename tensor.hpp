@@ -1,11 +1,12 @@
-#ifndef TENSOR_H
-#define TENSOR_H
+#ifndef UTENSOR_TENSOR_H
+#define UTENSOR_TENSOR_H
 
 #include "mbed.h"
 #include <memory>
 #include <vector>
 #include <initializer_list>
 #include "stdlib.h"
+#include <uTensor_util.hpp>
 
 template <class U>
 class TensorBase {
@@ -15,7 +16,7 @@ public:
     uint32_t total_size;
 
     ~TensorBase() {
-        printf("TensorBase destruction..\r\n");
+        ASSERT("TensorBase destruction..\r\n");
         free(data);
     }
 };
@@ -128,7 +129,7 @@ class Tensor {
         // if(data != NULL)
         //     free(data);
 
-        printf("fuckers\r\n");
+        ASSERT("Tensor Destructed\r\n");
     }
 };
 

@@ -15,6 +15,10 @@
         "sd-cs": {
             "help": "board: cs",
             "value": "D10"
+        },
+        "debug-msg": {
+            "help": "verbose debug messages embedded everywhere in the code",
+            "value": "0"
         }
     },
     "target_overrides": {
