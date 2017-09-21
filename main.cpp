@@ -1,9 +1,8 @@
 #include "mbed.h"
-#include <stdlib.h>
+#include "stdlib.h"
 #include "FATFileSystem.h"
 #include "SDBlockDevice.h"
-#include <stdio.h>
-#include <errno.h>
+#include "stdio.h"
 #include "tensor.hpp"
 #include "tensorIdxImporter.hpp"
 

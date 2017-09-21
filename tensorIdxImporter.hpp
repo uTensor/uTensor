@@ -1,13 +1,8 @@
 #include "mbed.h"
-#include <iostream>
-#include <fstream>
 #include <vector>
 #include <stdio.h>
 #include "tensor.hpp"
 #include <stdlib.h>
-#include "FATFileSystem.h"
-#include "SDBlockDevice.h"
-#include <errno.h>
 #include "tensor.hpp"
 #include <test.hpp>
 

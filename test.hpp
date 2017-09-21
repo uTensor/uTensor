@@ -1,5 +1,6 @@
-#include <algorithm>
 #include <string>
+
+#define MAX(A, B) ((A > B)? A:B)
 
 class Test {
     
@@ -8,7 +9,7 @@ class Test {
             string summary;
 
             void printStatus(string status) {
-                int pLen = max(1, 30 - (int) testName.length());
+                int pLen = MAX(1, 30 - (int) testName.length());
                 string msg = testName;
 
                 for(int i = 0; i < pLen; i++) {

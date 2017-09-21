@@ -5,7 +5,7 @@
 #include <memory>
 #include <vector>
 #include <initializer_list>
-#include <stdlib.h>
+#include "stdlib.h"
 
 template <class U>
 class TensorBase {
