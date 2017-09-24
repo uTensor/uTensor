@@ -6,9 +6,9 @@
 
 ##Build Steps
 
-`mbed compile -m K64F --profile=./build_profile/release.json` to build for K64F
+`mbed compile -t GCC_ARM -m K64F --profile=./build_profile/release.json` to build for K64F
 
-`mbed compile -m K64F --profile=./build_profile/release.json -f` to compile and flash
+`mbed compile -t GCC_ARM -m K64F --profile=./build_profile/release.json -f` to compile and flash
 
 ##Configure
 
