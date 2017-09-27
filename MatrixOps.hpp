@@ -34,6 +34,35 @@ void initMatConst(Mat mat, unsigned char value) {
     }
 }
 
+//implement C = A + B, dim of A should be equal to dim of B
+
+void addMat(Mat A, Mat B, Mat &C) {
+    const uint32_t A_ROWS = A.getShape()[0];
+    const uint32_t A_COLS = A.getShape()[1];
+    const uint32_t B_ROWS = B.getShape()[0];
+    const uint32_t B_COLS = B.getShape()[1];
+    const uint32_t C_ROWS = C.getShape()[0];
+    const uint32_t C_COLS = C.getShape()[1];
+    const uint32_t t_size = C.getSize();
+    unsigned char* A_Data = A.getPointer({});
+    unsigned char* B_Data = B.getPointer({});
+    unsigned char* C_Data = C.getPointer({});
+    if(A_COLS != B_COLS && A_ROWS != B_ROWS) {
+        printf("A and B matrices dimension mismatch\r\n");
+        return;
+    }
+
+    if(C_ROWS != A_ROWS || C_COLS != B_COLS) {
+        printf("output matrix dimension mismatch\r\n");
+        return;
+    }
+    for (int r = 0; r < t_size; r++) {
+      C_Data[r] = A_Data[r] + B_Data[r];
+    }
+    return;
+
+}
+
 void multMat(Mat A, Mat B, Mat C) {
     const uint32_t A_ROWS = A.getShape()[0];
     const uint32_t A_COLS = A.getShape()[1];
