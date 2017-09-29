@@ -10,11 +10,13 @@ import numpy as np
 #file: .../core/kernels/quantized_matmul_op.cc -> REGISTER_KERNEL_BUILDER(Name("QuantizedMatMul")... -> ReferenceGemm
 #file: .../core/kernels/reference_gemm.h -> ReferenceGemm()
 
+#file /usr/local/lib/python3.6/site-packages/tensorflow/python/ops/gen_array_ops.py
+
 with tf.Session() as sess:
 
 
-    a = tf.cast(tf.convert_to_tensor(np.random.rand(10,10) * 2), tf.float32)
-    b = tf.cast(tf.convert_to_tensor(np.random.rand(10,10) * 2), tf.float32)
+    a = tf.cast(tf.convert_to_tensor(np.random.rand(1024,1024) * 10), tf.float32)
+    b = tf.cast(tf.convert_to_tensor(np.random.rand(1024,1) * 10), tf.float32)
 
     a_max = tf.reduce_max(a)
     a_min = tf.reduce_min(a)
@@ -32,23 +34,16 @@ with tf.Session() as sess:
 
     [q_out, min_out, max_out] = gen_math_ops.quantized_mat_mul(q_a, q_b, a_min, a_max, b_min, b_max, Toutput=tf.qint32)
 
-    [r_min_out, r_max_out] = gen_math_ops.requantization_range(q_out, min_out, max_out)
+    [request_min_out, request_max_out] = gen_math_ops.requantization_range(q_out, min_out, max_out)
 
-    [rq_out, q_min, q_max] = gen_math_ops.requantize(q_out, min_out, max_out, r_min_out, r_max_out, tf.quint8)
+    [rq_out, rq_min_out, rq_max_out] = gen_math_ops.requantize(q_out, min_out, max_out, request_min_out, request_max_out, tf.quint8)
 
-    dq_out = gen_array_ops.dequantize(rq_out, q_min, q_max, "MIN_FIRST")
+    dq_out = gen_array_ops.dequantize(rq_out, rq_min_out, rq_max_out, "MIN_FIRST")
 
     reference_out = tf.matmul(a, b)
-    diff = tf.div(reference_out, dq_out)
+    diff = tf.subtract(reference_out, dq_out)
+    diff = tf.reduce_mean(tf.abs(diff))         #average delta per element
     
-    print("A")
-    print(a.eval())
-    print("B")
-    print(b.eval())
-    print("C")
+    print("min_out: ", rq_min_out.eval(), ", max_out: ", rq_max_out.eval())
+    print("diff: ", diff.eval(), ", percent diff: ", diff.eval() / tf.reduce_mean(reference_out).eval() * 100, "%")
 
-    print("Qantized C")
-    print(dq_out.eval())
-    print("min_out", q_min.eval(), ",", "max_out", q_max.eval())
-    print("diff:")
-    print(diff.eval())
