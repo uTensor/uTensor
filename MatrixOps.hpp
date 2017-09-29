@@ -143,7 +143,7 @@ void multMat(Mat A, Mat B, Mat C) {
     }
 
 template <class T1, class T2, class T3>
-void ReferenceGemm(bool transpose_a, bool transpose_b, bool transpose_c,
+void ReferenceGemmuImpl(bool transpose_a, bool transpose_b, bool transpose_c,
                    size_t m, size_t n, size_t k, const T1* a, int32 offset_a,
                    size_t lda, const T2* b, int32 offset_b, size_t ldb, T3* c,
                    int32 shift_c, int32 offset_c, int32 mult_c, size_t ldc) {
