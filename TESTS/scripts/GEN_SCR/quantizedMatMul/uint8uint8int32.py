@@ -22,11 +22,11 @@ with tf.Session() as sess:
 
     a_min = tf.reduce_min(a)
     a_max = tf.reduce_max(a)
-    [q_a, a_min, a_max] = gen_array_ops.quantize_v2(a, a_min, a_max, tf.quint8, "MIN_FIRST")
+    [q_a, a_min, a_max] = gen_array_ops.quantize_v2(a, a_min, a_max, tf.quint8, "MIN_FIRST", name="qA")
     
     b_min = tf.reduce_min(b)
     b_max = tf.reduce_max(b)
-    [q_b, b_min, b_max] = gen_array_ops.quantize_v2(b, b_min, b_max, tf.quint8, "MIN_FIRST")
+    [q_b, b_min, b_max] = gen_array_ops.quantize_v2(b, b_min, b_max, tf.quint8, "MIN_FIRST", name="qB")
 
     print("------- float32 input matrices ------")
     print("a min: ", a_min.eval(), " a max: ", a_max.eval())
@@ -40,22 +40,22 @@ with tf.Session() as sess:
     min_out = 0
     max_out = 0
 
-    [q_out, min_out, max_out] = gen_math_ops.quantized_mat_mul(q_a, q_b, a_min, a_max, b_min, b_max, Toutput=tf.qint32)
+    [q_out, min_out, max_out] = gen_math_ops.quantized_mat_mul(q_a, q_b, a_min, a_max, b_min, b_max, Toutput=tf.qint32, name="qMatMul")
 
     print("------- quantized_mat_mul ------")
     print("min: ", min_out.eval(), " max: ", max_out.eval(), "mean: ", tf.reduce_mean(tf.bitcast(q_out, tf.int32)).eval())
 
-    [request_min_out, request_max_out] = gen_math_ops.requantization_range(q_out, min_out, max_out)
+    [request_min_out, request_max_out] = gen_math_ops.requantization_range(q_out, min_out, max_out, name="rqRange")
 
     print("------- requantization_range ------")
     print("min: ", request_min_out.eval(), " max: ", request_max_out.eval())
 
-    [rq_out, rq_min_out, rq_max_out] = gen_math_ops.requantize(q_out, min_out, max_out, request_min_out, request_max_out, tf.quint8)
+    [rq_out, rq_min_out, rq_max_out] = gen_math_ops.requantize(q_out, min_out, max_out, request_min_out, request_max_out, tf.quint8, name="rQ")
 
     print("------- requantize ------")
     print("min: ", rq_min_out.eval(), " max: ", rq_max_out.eval(), "mean: ", tf.reduce_mean(tf.to_float(tf.bitcast(rq_out, tf.uint8))).eval())
 
-    dq_out = gen_array_ops.dequantize(rq_out, rq_min_out, rq_max_out, "MIN_FIRST")
+    dq_out = gen_array_ops.dequantize(rq_out, rq_min_out, rq_max_out, "MIN_FIRST", name="deQ")
 
     reference_out = tf.matmul(a, b)
     diff = tf.subtract(reference_out, dq_out)
