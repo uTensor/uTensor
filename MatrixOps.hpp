@@ -201,4 +201,30 @@ void ReferenceGemmuImpl(bool transpose_a, bool transpose_b, bool transpose_c,
 }
     
 
+class matrixOpsTest : public Test {
+public:
+    void qMatMul(void) {
+        testStart("Quantized Matrix Mul");
+        TensorIdxImporter t_import;
+        Tensor<unsigned char> a = t_import.ubyte_import("/fs/testData/qMatMul/in/qA_0.idx");
+        Tensor<float> a_min = t_import.float_import("/fs/testData/qMatMul/in/qA_1.idx");
+        Tensor<float> a_max = t_import.float_import("/fs/testData/qMatMul/in/qA_2.idx");
+        Tensor<unsigned char> b = t_import.ubyte_import("/fs/testData/qMatMul/in/qB_0.idx");
+        Tensor<float> a_min = t_import.float_import("/fs/testData/qMatMul/in/qB_1.idx");
+        Tensor<float> a_max = t_import.float_import("/fs/testData/qMatMul/in/qB_2.idx");
+
+        Tensor<int> c = t_import.int_import("/fs/testData/qMatMul/out/qMatMul_0.idx");
+        Tensor<float> c_min = t_import.float_import("/fs/testData/qMatMul/out/qMatMul_1.idx");
+        Tensor<float> c_max = t_import.float_import("/fs/testData/qMatMul/out/qMatMul_2.idx");
+
+        double result = sum(t);
+        passed(result == 4518);
+    }
+
+    void runAll(void) {
+        qMatMul();
+    }
+}
+
+
 #endif

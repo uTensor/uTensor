@@ -15,8 +15,8 @@ import numpy as np
 with tf.Session() as sess:
 
 
-    a = tf.cast(tf.convert_to_tensor(np.random.rand(1024,1024) * 10), tf.float32)
-    b = tf.cast(tf.convert_to_tensor(np.random.rand(1024,1) * 10), tf.float32)
+    a = tf.cast(tf.convert_to_tensor(np.random.rand(128,128) * 10), tf.float32)
+    b = tf.cast(tf.convert_to_tensor(np.random.rand(128,1) * 10), tf.float32)
     # a = tf.cast(tf.convert_to_tensor(np.ones((1024,1024)) * 10), tf.float32)
     # b = tf.cast(tf.convert_to_tensor(np.ones((1024,1)) * 10), tf.float32)
 
