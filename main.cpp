@@ -33,8 +33,10 @@ int main(int argc, char** argv) {
     printf("========= Test Summaries ========= \r\n");
     printf("========= IDX import:\r\n");
     idxTest.printSummary();
-    printf("========= Test Summaries:\r\n");
+    printf("========= Matrix Ops:\r\n");
     matrixTests.printSummary();
+    printf("==================================\r\n");
+    printf("==================================\r\n");
 
     return 0;
 }

@@ -16,7 +16,7 @@ public:
     uint32_t total_size;
 
     ~TensorBase() {
-        ASSERT("TensorBase destruction..\r\n");
+        DEBUG("TensorBase destruction..\r\n");
         free(data);
     }
 };
@@ -129,7 +129,7 @@ class Tensor {
         // if(data != NULL)
         //     free(data);
 
-        ASSERT("Tensor Destructed\r\n");
+        DEBUG("Tensor Destructed\r\n");
     }
 };
 

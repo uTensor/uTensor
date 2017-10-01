@@ -106,7 +106,7 @@ class Test {
             template<typename U>
             double meanAbsErr(Tensor<U> A, Tensor<U> B) {
                 if(A.getSize() != B.getSize()) {
-                    ASSERT("Test.meanAbsErr(): dimension mismatch\r\n");
+                    DEBUG("Test.meanAbsErr(): dimension mismatch\r\n");
                 }
 
                 U* elemA = A.getPointer({});
@@ -124,7 +124,7 @@ class Test {
             template<typename U>
             double meanPercentErr(Tensor<U> A, Tensor<U> B) {
                 if(A.getSize() != B.getSize()) {
-                    ASSERT("Test.meanAbsErr(): dimension mismatch\r\n");
+                    DEBUG("Test.meanAbsErr(): dimension mismatch\r\n");
                 }
 
                 U* elemA = A.getPointer({});

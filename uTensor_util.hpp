@@ -28,13 +28,13 @@ void errno_error(void* ret_val){
                             printf(MSG); \
                             return_error(FUNC);
 
-#define ASSERT(MSG, ...)    printf(MSG, ##__VA_ARGS__);
+#define DEBUG(MSG, ...)    printf(MSG, ##__VA_ARGS__);
 
 #else 
 
 void errno_error(void* ret_val) { /*DOES NOTHING*/}
 #define ON_ERR(FUNC, MSG) FUNC
-#define ASSERT(MSG, ...)
+#define DEBUG(MSG, ...)
 
 #endif
 
