@@ -158,25 +158,12 @@ Tensor<U> TensorIdxImporter::loader(string &filename, IDX_DTYPE idx_type) {
 
 
 class idxImporterTest : public Test {
-
-    private:
-        template<typename U>
-        double sum(Tensor<U> input) {
-            U* elem = input.getPointer({});
-            double accm = 0.0;
-            for(uint32_t i = 0; i < input.getSize(); i++) {
-                accm += (double) elem[i];
-            }
-        
-            return accm;
-        }
-
     public:
 
         void ntoh32Test(void) {
             testStart("ntoh32 test");
             uint32_t input = 63;
-            uint32_t result = ntoh32(63);
+            uint32_t result = ntoh32(input);
             passed(result == 1056964608);
         }
 

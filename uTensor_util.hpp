@@ -1,7 +1,7 @@
 #ifndef UTENSOR_UTIL
 #define UTENSOR_UTIL
 
-#define MAX(A, B) ((A > B)? A:B)
+// #define MAX(A, B) ((A > B)? A:B)
 
 #if MBED_CONF_APP_DEBUG_MSG
 void return_error(int ret_val){
