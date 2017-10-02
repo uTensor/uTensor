@@ -8,7 +8,7 @@
 
 ## Requirement
 
-- [Mbed CLI](https://github.com/ARMmbed/mbed-clihttps://github.com/ARMmbed/mbed-cli)
+- [Mbed CLI](https://github.com/ARMmbed/mbed-cli)
 - [Tensorflow](https://www.tensorflow.org/install/)
 - [tf-node-viewer](https://github.com/neil-tan/tf-node-viewer) (Optional)
 - Mbed-os 5.6+ compatiable [boards](https://os.mbed.com/platforms/?mbed-os=25) with at least 256kb of RAM
