@@ -1,7 +1,7 @@
 #ifndef UTENSOR_UTIL
 #define UTENSOR_UTIL
 
-#define MAX(A, B) ((A > B)? A:B)
+// #define MAX(A, B) ((A > B)? A:B)
 
 #if MBED_CONF_APP_DEBUG_MSG
 void return_error(int ret_val){
@@ -28,13 +28,13 @@ void errno_error(void* ret_val){
                             printf(MSG); \
                             return_error(FUNC);
 
-#define ASSERT(MSG, ...)    printf(MSG, ##__VA_ARGS__);
+#define DEBUG(MSG, ...)    printf(MSG, ##__VA_ARGS__);
 
 #else 
 
 void errno_error(void* ret_val) { /*DOES NOTHING*/}
 #define ON_ERR(FUNC, MSG) FUNC
-#define ASSERT(MSG, ...)
+#define DEBUG(MSG, ...)
 
 #endif
 

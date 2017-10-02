@@ -113,7 +113,7 @@ template<typename U>
 Tensor<U> TensorIdxImporter::loader(string &filename, IDX_DTYPE idx_type) {
     fp = fopen (filename.c_str(), "r" );
 
-    ASSERT("Opening file %s ", filename.c_str());
+    DEBUG("Opening file %s ", filename.c_str());
     errno_error(fp);
 
     header = parseHeader();
@@ -158,25 +158,12 @@ Tensor<U> TensorIdxImporter::loader(string &filename, IDX_DTYPE idx_type) {
 
 
 class idxImporterTest : public Test {
-
-    private:
-        template<typename U>
-        double sum(Tensor<U> input) {
-            U* elem = input.getPointer({});
-            double accm = 0.0;
-            for(uint32_t i = 0; i < input.getSize(); i++) {
-                accm += (double) elem[i];
-            }
-        
-            return accm;
-        }
-
     public:
 
         void ntoh32Test(void) {
             testStart("ntoh32 test");
             uint32_t input = 63;
-            uint32_t result = ntoh32(63);
+            uint32_t result = ntoh32(input);
             passed(result == 1056964608);
         }
 
@@ -211,7 +198,7 @@ class idxImporterTest : public Test {
 
             double result = sum(t);
 
-            ASSERT("***floating point test yielded: %.8e\r\n", (float) result);
+            DEBUG("***floating point test yielded: %.8e\r\n", (float) result);
             passed((float)result == -1.0f);
         }
 

@@ -33,3 +33,6 @@
 
 #OS stuff
 .DS_Store
+
+#Project generated test files
+TESTS/scripts/testData

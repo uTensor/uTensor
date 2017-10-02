@@ -2,6 +2,7 @@
 #define UTENSOR_TEST
 
 #include <string>
+#include <math.h>
 
 class Test {
     
@@ -90,6 +91,52 @@ class Test {
             }
 
             virtual void runAll(void) = 0;
+
+            template<typename U>
+            double sum(Tensor<U> input) {
+                U* elem = input.getPointer({});
+                double accm = 0.0;
+                for(uint32_t i = 0; i < input.getSize(); i++) {
+                    accm += (double) elem[i];
+                }
+            
+                return accm;
+            }
+
+            template<typename U>
+            double meanAbsErr(Tensor<U> A, Tensor<U> B) {
+                if(A.getSize() != B.getSize()) {
+                    DEBUG("Test.meanAbsErr(): dimension mismatch\r\n");
+                }
+
+                U* elemA = A.getPointer({});
+                U* elemB = B.getPointer({});
+
+                double accm = 0.0;
+                for(uint32_t i = 0; i < A.getSize(); i++) {
+                    accm += (double) fabs((float) elemB[i] - (float) elemA[i]);
+                }
+            
+                return accm;
+            }
+
+            //A being the reference
+            template<typename U>
+            double meanPercentErr(Tensor<U> A, Tensor<U> B) {
+                if(A.getSize() != B.getSize()) {
+                    DEBUG("Test.meanAbsErr(): dimension mismatch\r\n");
+                }
+
+                U* elemA = A.getPointer({});
+                U* elemB = B.getPointer({});
+
+                double accm = 0.0;
+                for(uint32_t i = 0; i < A.getSize(); i++) {
+                    accm += (double) fabs(((float) elemB[i] - (float) elemA[i]) / fabs((float) elemA[i]));
+                }
+            
+                return accm;
+            }
 
 };
 
