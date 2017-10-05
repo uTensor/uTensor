@@ -11,7 +11,7 @@ class Test {
             string summary;
 
             void printStatus(string status) {
-                int pLen = MAX(1, 30 - (int) testName.length());
+                int pLen = std::max(1, 30 - (int) testName.length());
                 string msg = testName;
 
                 for(int i = 0; i < pLen; i++) {
