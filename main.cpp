@@ -5,7 +5,7 @@
 #include "stdio.h"
 #include "tensor.hpp"
 #include "tensorIdxImporter.hpp"
-#include "MatrixOps.hpp"
+#include "MatrixTest.hpp"
 
 Serial pc(USBTX, USBRX, 115200);
 SDBlockDevice bd(MBED_CONF_APP_SD_MOSI, MBED_CONF_APP_SD_MISO, MBED_CONF_APP_SD_CLK, MBED_CONF_APP_SD_CS);
