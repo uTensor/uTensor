@@ -51,9 +51,29 @@ public:
         passed(result == 0);
     }
 
+    void reshapeTest(void) {
+        testStart("reshape");
+        TensorIdxImporter t_import;
+
+        //reference inputs
+        Tensor<float> ref_a = t_import.float_import("/fs/testData/ref_reshape/in/Const_0.idx");
+        Tensor<int> ref_dim = t_import.int_import("/fs/testData/ref_reshape/in/Const_1_0.idx");
+
+        //reference outputs
+        Tensor<float> out_ref = t_import.float_import("/fs/testData/ref_reshape/out/ref_reshape_0.idx");
+
+        //modify the checks below:
+        Tensor<float> out(out_ref.getShape());
+
+        double result = meanPercentErr(out_ref, out);
+        //passed(result < 0.0001);
+        passed(result == 0);
+    }
+
     void runAll(void) {
         quantize_v2Test();
         dequantizeTest();
+        reshapeTest();
     }
 };
 
