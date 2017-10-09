@@ -6,23 +6,23 @@
 class NnOpsTest : public Test {
 public:
     void reluTest(void) {
-        testStart("relu");
+        testStart("quantized_relu");
         TensorIdxImporter t_import;
 
         //reference inputs
-        Tensor<float> a = t_import.float_import("/fs/testData/ref_qRelu/in/QuantizeV2_0.idx");
+        Tensor<unsigned char> a = t_import.ubyte_import("/fs/testData/ref_qRelu/in/QuantizeV2_0.idx");
         Tensor<float> min = t_import.float_import("/fs/testData/ref_qRelu/in/QuantizeV2_1.idx");
         Tensor<float> max = t_import.float_import("/fs/testData/ref_qRelu/in/QuantizeV2_2.idx");
 
         //reference outputs
-        Tensor<float> ref_out = t_import.float_import("/fs/testData/ref_qRelu/out/ref_qRelu_0.idx");
+        Tensor<unsigned char> ref_out = t_import.ubyte_import("/fs/testData/ref_qRelu/out/ref_qRelu_0.idx");
         Tensor<float> ref_min = t_import.float_import("/fs/testData/ref_qRelu/out/ref_qRelu_1.idx");
         Tensor<float> ref_max = t_import.float_import("/fs/testData/ref_qRelu/out/ref_qRelu_2.idx");
 
         //Implementation goes here
 
         //modify the checks below:
-        Tensor<float> out(ref_out.getShape());
+        Tensor<unsigned char> out(ref_out.getShape());
         Tensor<float> out_min(ref_out.getShape());
         Tensor<float> out_max(ref_out.getShape());
     

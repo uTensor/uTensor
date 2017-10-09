@@ -67,6 +67,7 @@ public:
         Tensor<int> ref_dim = t_import.int_import("/fs/testData/ref_argmax/in/ref_argmax-dimension_0.idx");
 
         //reference outputs
+        ///NT: FIXME: argmax outputs int64 tensor which isn't supported by int_import.
         Tensor<int> ref_out = t_import.int_import("/fs/testData/ref_argmax/out/ref_argmax_0.idx");
 
         //Implementation goes here
@@ -108,7 +109,7 @@ public:
 
         //reference inputs
         Tensor<float> a = t_import.float_import("/fs/testData/ref_min/in/Const_2_0.idx");
-        Tensor<float> dim = t_import.float_import("/fs/testData/ref_min/in/Const_3_0.idx");
+        Tensor<int> dim = t_import.int_import("/fs/testData/ref_min/in/Const_3_0.idx");
 
         //reference outputs
         Tensor<float> ref_out = t_import.float_import("/fs/testData/ref_min/out/ref_min_0.idx");
@@ -130,7 +131,7 @@ public:
 
         //reference inputs
         Tensor<float> a = t_import.float_import("/fs/testData/ref_max/in/Const_2_0.idx");
-        Tensor<float> dim = t_import.float_import("/fs/testData/ref_max/in/Const_4_0.idx");
+        Tensor<int> dim = t_import.int_import("/fs/testData/ref_max/in/Const_4_0.idx");
 
         //reference outputs
         Tensor<float> ref_out = t_import.float_import("/fs/testData/ref_max/out/ref_max_0.idx");
@@ -149,7 +150,7 @@ public:
     void runAll(void) {
         requantization_rangeTest();
         requantizeTest();
-        argmaxTest();
+        //argmaxTest();
         addTest();
         minTest();
         maxTest();

@@ -8,6 +8,7 @@ void return_error(int ret_val){
     if (ret_val) {
       printf(" [**Failure**] %d\r\n", ret_val);
       printf("Exiting...\r\n");
+      fflush(stdout);      
       exit(-1);
     } else {
       printf("  [DONE]\r\n");
@@ -17,26 +18,41 @@ void return_error(int ret_val){
 void errno_error(void* ret_val){
     if (ret_val == NULL) {
       printf(" [**Failure**] %d \r\n", errno);
-      error("Exiting...\r\n");
+      printf("Exiting...\r\n");
+      fflush(stdout);
+      exit(-1);
     } else {
       printf("  [DONE]\r\n");
     }
 }
 
 
-#define ON_ERR(FUNC, MSG)   printf(" * "); \
-                            printf(MSG); \
-                            return_error(FUNC);
+#define ON_ERR(FUNC, MSG)   {                       \
+                                printf(" * ");      \
+                                printf(MSG);        \
+                                return_error(FUNC); \
+                            }
 
-#define DEBUG(MSG, ...)    printf(MSG, ##__VA_ARGS__);
+#define DEBUG(MSG, ...)     {                               \
+                                printf(MSG, ##__VA_ARGS__); \
+                                fflush(stdout);             \
+                            }
 
-#else 
+#else //MBED_CONF_APP_DEBUG_MSG
 
 void errno_error(void* ret_val) { /*DOES NOTHING*/}
 #define ON_ERR(FUNC, MSG) FUNC
 #define DEBUG(MSG, ...)
 
 #endif
+
+#define ERR_EXIT(MSG, ...)  {                                       \
+                                printf("[Error] %s:%d @%s ", __FILE__, __LINE__, __func__); \
+                                printf(MSG, ##__VA_ARGS__);         \
+                                fflush(stdout);                     \
+                                exit(-1);                           \
+                            }
+
 
 void printVector(vector<uint32_t> vec) {
     printf("vector: \r\n");

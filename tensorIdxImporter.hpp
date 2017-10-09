@@ -119,7 +119,7 @@ Tensor<U> TensorIdxImporter::loader(string &filename, IDX_DTYPE idx_type) {
     header = parseHeader();
 
     if(header.dataType != idx_type) {
-        error("TensorIdxImporter: header and tensor type mismatch\r\n");
+        ERR_EXIT("TensorIdxImporter: header and tensor type mismatch\r\n");
     }
 
     fseek(fp, header.dataPos, SEEK_SET);  //need error  handling
