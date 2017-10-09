@@ -4,11 +4,11 @@
 #include "SDBlockDevice.h"
 #include "stdio.h"
 #include "tensor.hpp"
-#include "tensorIdxImporter.hpp"
-#include "MatrixTest.hpp"
-#include "ArrayOps.hpp"
-#include "MathOps.hpp"
-#include "NnOps.hpp"
+#include "tensorIdxImporterTests.hpp"
+#include "MatrixTests.hpp"
+#include "ArrayTests.hpp"
+#include "MathTests.hpp"
+#include "NnTests.hpp"
 
 Serial pc(USBTX, USBRX, 115200);
 SDBlockDevice bd(MBED_CONF_APP_SD_MOSI, MBED_CONF_APP_SD_MISO, MBED_CONF_APP_SD_CLK, MBED_CONF_APP_SD_CS);
