@@ -6,9 +6,8 @@
 #include <stdio.h>
 #include "tensor.hpp"
 #include <stdlib.h>
-#include <tensor.hpp>
-#include <test.hpp>
-#include <uTensor_util.hpp>
+#include "test.hpp"
+#include "uTensor_util.hpp"
 
 using namespace std;
 

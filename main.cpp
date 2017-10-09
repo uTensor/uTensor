@@ -5,7 +5,7 @@
 #include "stdio.h"
 #include "tensor.hpp"
 #include "tensorIdxImporter.hpp"
-#include "MatrixOps.hpp"
+#include "MatrixTest.hpp"
 #include "ArrayOps.hpp"
 #include "MathOps.hpp"
 #include "NnOps.hpp"

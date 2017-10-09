@@ -2,7 +2,9 @@
 #define UTENSOR_MATRIX_OPS
 
 #include <limits>
-#include "test.hpp"
+#include <cstdlib>
+#include <cmath>
+#include "tensor.hpp"
 
 // Useful links
 // http://www.plantation-productions.com/Webster/www.artofasm.com/Linux/HTML/Arraysa2.html
@@ -262,17 +264,16 @@ void QuantizationRangeForMultiplication(float min_a, float max_a, float min_b,
                                                     // quantize range
   *max_c = c_float_for_one_quant_level * c_highest;
 }
+
 template <class T1, class T2, class Toutput>
 void QuantizedMatMul(Tensor<T1> A, Tensor<T2> B, Tensor<Toutput> C,
                      Tensor<float> mina, Tensor<float> minb, Tensor<float> maxa,
                      Tensor<float> maxb, Tensor<float> outmin,
-                     Tensor<float> outmax) {
+                     Tensor<float> outmax, bool transpose_a = false, bool transpose_b = false) {
   const float min_a = *(mina.getPointer({}));
   const float max_a = *(maxa.getPointer({}));
   const float min_b = *(minb.getPointer({}));
   const float max_b = *(maxb.getPointer({}));
-  bool transpose_a = false;
-  bool transpose_b = false;
 
   const int32_t offset_a = FloatToQuantizedUnclamped<T1>(
       0.0f, min_a, max_a);  // NT: what 0 quantized to; depends on
@@ -315,57 +316,5 @@ void QuantizedMatMul(Tensor<T1> A, Tensor<T2> B, Tensor<Toutput> C,
   *c_max = max_c_value;
 }
 
-class matrixOpsTest : public Test {
- public:
-  void qMatMul(void) {
-    testStart("Quantized Matrix Mul");
-    TensorIdxImporter t_import;
-
-    // reference inputs
-    Tensor<unsigned char> a =
-        t_import.ubyte_import("/fs/testData/qMatMul/in/qA_0.idx");
-    Tensor<float> a_min =
-        t_import.float_import("/fs/testData/qMatMul/in/qA_1.idx");
-    Tensor<float> a_max =
-        t_import.float_import("/fs/testData/qMatMul/in/qA_2.idx");
-    Tensor<unsigned char> b =
-        t_import.ubyte_import("/fs/testData/qMatMul/in/qB_0.idx");
-    Tensor<float> b_min =
-        t_import.float_import("/fs/testData/qMatMul/in/qB_1.idx");
-    Tensor<float> b_max =
-        t_import.float_import("/fs/testData/qMatMul/in/qB_2.idx");
-
-    // reference outputs
-    Tensor<int> c =
-        t_import.int_import("/fs/testData/qMatMul/out/qMatMul_0.idx");
-    Tensor<float> c_min =
-        t_import.float_import("/fs/testData/qMatMul/out/qMatMul_1.idx");
-    Tensor<float> c_max =
-        t_import.float_import("/fs/testData/qMatMul/out/qMatMul_2.idx");
-
-    // actual implementation, uses ReferenceGemm()
-    // See gen_math_op.py:1619
-    // See quantized_matmul_ops.cc:171, 178
-    // Sub-functions: QuantizationRangeForMultiplication,
-    // QuantizationRangeForMultiplication, FloatForOneQuantizedLevel
-
-    Tensor<int> out_c(c.getShape());
-    Tensor<float> out_min(c_min.getShape());
-    Tensor<float> out_max(c_max.getShape());
-    QuantizedMatMul<uint8_t, uint8_t, int>(a, b, out_c, a_min, b_min, a_max,
-                                           b_max, out_min, out_max);
-    //
-    // transpose_a=None, transpose_b=None
-
-    // modify the checks below:
-
-    double result = meanPercentErr(c, out_c) + meanPercentErr(c_min, out_min) +
-                    meanPercentErr(c_max, out_max);
-    // passed(result < 0.0001);
-    passed(result == 0);
-  }
-
-  void runAll(void) { qMatMul(); }
-};
 
 #endif
