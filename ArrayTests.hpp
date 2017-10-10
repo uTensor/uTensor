@@ -53,6 +53,8 @@ public:
         //modify the checks below:
         Tensor<float> out(out_ref.getShape());
 
+        dequantize(a, a_min, a_max, out);
+
         double result = meanPercentErr(out_ref, out);
         //passed(result < 0.0001);
         passed(result == 0);

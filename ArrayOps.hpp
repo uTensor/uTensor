@@ -85,4 +85,48 @@ void QuantizeV2(Tensor<float> input, Tensor<float> _min_range, Tensor<float> _ma
     
 }
 
+template <typename T>
+struct QuantizedToFloatStruct {
+  static constexpr int number_of_bits = sizeof(T) * 8;
+  static constexpr int64 number_of_steps = static_cast<int64>(1)
+                                           << number_of_bits;
+
+  static float lowest_quantized() {
+    return static_cast<float>(std::numeric_limits<T>::lowest());
+  }
+
+  QuantizedToFloatStruct(float range_min, float range_max)
+      : range_min(range_min),
+        range_scale((range_max - range_min) / (number_of_steps - 1.0)),
+        range_min_rounded(range_max == range_min
+                              ? range_min
+                              : round(range_min / range_scale) * range_scale) {}
+
+  const float range_min;
+  const float range_scale;
+  const float range_min_rounded;
+};
+
+//mode = MIN_FIRST
+//name = unspecified
+//dequantize_op.cc: 87
+template <typename T>
+void dequantize(Tensor<T> input, Tensor<float> min_range, Tensor<float> max_range, Tensor<float> output) {
+    float min = *(min_range.getPointer({0}));
+    float max = *(max_range.getPointer({0}));
+    T* input_ptr = input.getPointer({});
+    float* output_ptr = output.getPointer({});
+
+    //quantization_utils.h: 771
+    QuantizedToFloatStruct<T> q2f(min, max);
+
+    //quantization_utils.h: 141
+    for(uint32_t i = 0; i < input.getSize(); i++) {
+        float val = static_cast<float>(input_ptr[i]);
+        output_ptr[i] = ((q2f.range_min_rounded - q2f.lowest_quantized() * q2f.range_scale) + \
+                        val * q2f.range_scale);
+    }
+
+}
+
 #endif  //UTENSOR_ARRAY_OPS
