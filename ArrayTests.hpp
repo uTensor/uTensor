@@ -21,12 +21,17 @@ public:
         Tensor<float> b_min_q_ref = t_import.float_import("/fs/testData/qB/out/qB_1.idx");
         Tensor<float> b_max_q_ref = t_import.float_import("/fs/testData/qB/out/qb_2.idx");
 
-        //Implementation goes here
-
-        //modify the checks below:
         Tensor<unsigned char> b_q(b_q_ref.getShape());
         Tensor<float> b_min_q(b_min_q_ref.getShape());
         Tensor<float> b_max_q(b_max_q_ref.getShape());
+
+        //Implementation goes here
+        QuantizeV2(b, b_min, b_max, b_q, b_min_q, b_max_q);
+
+        // printf("refMin is : %f \r\n", *(b_min_q_ref.getPointer({0})));
+        // printf("outMin is : %f \r\n", *(b_min_q.getPointer({0})));
+        // printf("diff : output(%f), outMin(%f), outMax(%f)\r\n", \
+        //  meanPercentErr(b_q_ref, b_q), meanPercentErr(b_min_q_ref, b_min_q), meanPercentErr(b_max_q_ref, b_max_q));
 
         double result = meanPercentErr(b_q_ref, b_q) + meanPercentErr(b_min_q_ref, b_min_q) + meanPercentErr(b_max_q_ref, b_max_q);
         //passed(result < 0.0001);
@@ -47,6 +52,8 @@ public:
 
         //modify the checks below:
         Tensor<float> out(out_ref.getShape());
+
+        dequantize(a, a_min, a_max, out);
 
         double result = meanPercentErr(out_ref, out);
         //passed(result < 0.0001);

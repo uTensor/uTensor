@@ -54,6 +54,8 @@ void errno_error(void* ret_val) { /*DOES NOTHING*/}
                             }
 
 
+typedef long long int64;
+
 void printVector(vector<uint32_t> vec) {
     printf("vector: \r\n");
     for(uint32_t i:vec) {
