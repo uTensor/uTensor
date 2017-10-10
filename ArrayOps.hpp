@@ -3,6 +3,7 @@
 
 #include <limits>
 #include <algorithm>
+#include <cstring>
 #include <math.h>
 #include "uTensor_util.hpp"
 
@@ -125,6 +126,61 @@ void dequantize(Tensor<T> input, Tensor<float> min_range, Tensor<float> max_rang
         float val = static_cast<float>(input_ptr[i]);
         output_ptr[i] = ((q2f.range_min_rounded - q2f.lowest_quantized() * q2f.range_scale) + \
                         val * q2f.range_scale);
+    }
+
+}
+
+//Pre:
+//output.getShape == shape, or
+//output.getSize() == 0, in which case, a new tensor is allocated and assigned to the referenced output
+//Post:
+//input content copied into output with output.getShape == shape
+
+///NT: This Op hasn't been tested extensively. We will have to increase the test-coverage for this function.
+template <typename T>
+void reshape(Tensor<T> input, Tensor<int> shape, Tensor<T> &output) {
+    vector<uint32_t> dim;
+
+    //validating and inferring dimensions
+    int infer_index = -1;
+    uint32_t dim_rem = input.getSize();
+    int* val = shape.getPointer({});
+    for(uint32_t i = 0; i < shape.getSize(); i++) {
+        if(val[i] == -1) {
+            if(infer_index == -1) {
+                infer_index = i;
+            } else {
+                ERR_EXIT("shape can only contain one inference (-1) at a time");
+            }
+        } else {
+            dim_rem /= val[i];
+        }
+
+        dim.push_back(static_cast<uint32_t>(val[i]));
+    }
+
+    if(infer_index != -1) {
+        dim[infer_index] = dim_rem;
+        dim_rem = 1; // dim_rem / dim_rem = 1
+    }
+
+    if(dim_rem != 1) ERR_EXIT("supplied shape does not match up to input");
+
+
+    T* input_ptr = input.getPointer({});
+    //check if the output dim is valid
+    if(output.getSize() > 0 && dim == output.getShape()) {
+        //copy
+        T* output_ptr = output.getPointer({});
+        std::memcpy(output_ptr, input_ptr, (std::size_t) input.getSize_in_bytes());
+    } else if(output.getSize() > 0 && dim != output.getShape()) {
+        ERR_EXIT("output tensor dimension mismatches supplied shape")
+    } else {
+        //construct a new tensor and copy
+        Tensor<T> tmp(dim);
+        T* output_ptr = tmp.getPointer({});
+        std::memcpy(output_ptr, input_ptr, (std::size_t) input.getSize_in_bytes());
+        output = tmp;
     }
 
 }

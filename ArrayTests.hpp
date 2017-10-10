@@ -74,6 +74,8 @@ public:
         //modify the checks below:
         Tensor<float> out(out_ref.getShape());
 
+        reshape(ref_a, ref_dim, out);
+
         double result = meanPercentErr(out_ref, out);
         //passed(result < 0.0001);
         passed(result == 0);
