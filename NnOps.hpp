@@ -1,0 +1,4 @@
+#ifndef UTENSOR_NN_OPS
+#define UTENSOR_NN_OPS
+
+#endif //UTENSOR_NN_OPS
