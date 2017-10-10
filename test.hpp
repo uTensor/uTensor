@@ -3,6 +3,7 @@
 
 #include <string>
 #include <math.h>
+#include <limits>
 
 class Test {
     
@@ -132,7 +133,13 @@ class Test {
 
                 double accm = 0.0;
                 for(uint32_t i = 0; i < A.getSize(); i++) {
-                    accm += (double) fabs(((float) elemB[i] - (float) elemA[i]) / fabs((float) elemA[i]));
+                    if(elemA[i] != 0.0f) {
+                        accm += (double) fabs(((float) elemB[i] - (float) elemA[i]) / fabs((float) elemA[i]));
+                    } else {
+                        if(elemB[i] != 0) {
+                            accm += std::numeric_limits<float>::quiet_NaN();
+                        }
+                    }
                 }
             
                 return accm;
