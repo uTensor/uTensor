@@ -25,6 +25,7 @@ public:
         //modify the checks below:
         Tensor<float> out_min(ref_min.getShape());
         Tensor<float> out_max(ref_max.getShape());
+        Requantization_Range<int, float>(a, a_min, a_max, out_min, out_max);
 
         double result = meanPercentErr(ref_min, out_min) + meanPercentErr(ref_max, out_max);
         //passed(result < 0.0001);
