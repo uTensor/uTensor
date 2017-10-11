@@ -1,47 +1,10 @@
 #ifndef UTENSOR_ARRAY_OPS
 #define UTENSOR_ARRAY_OPS
 
-#include <limits>
-#include <algorithm>
+#include <cstring>
 #include <math.h>
 #include "uTensor_util.hpp"
-
-//quantization_utils.h:181
-template <typename T>
-struct FloatToQuantizedStruct {
-  static constexpr int number_of_bits = sizeof(T) * 8;
-  static constexpr int64 number_of_steps = static_cast<int64>(1)
-                                           << number_of_bits;
-  static constexpr double range_adjust =
-      (number_of_steps / (number_of_steps - 1.0));
-
-  // Casting QInt32's lowest or highest to a float gives a float that can't be
-  // cast back to int32 or QInt32.  Instead, use bounds that can be converted
-  // back to int32 without going outside the range of an int32.
-  static float lower_bound_float() {
-    return std::max(
-        static_cast<float>(std::numeric_limits<T>::lowest()), -2.147483648e+09f);
-  }
-  static float upper_bound_float() {
-    return std::min(
-        static_cast<float>(std::numeric_limits<T>::max()), +2.147483520e+09f);
-  }
-
-  static float lowest_quantized() {
-    return static_cast<float>(std::numeric_limits<T>::lowest());
-  }
-
-  FloatToQuantizedStruct(float range_min, float range_max)
-      : range_min(range_min),
-        range_scale(range_max == range_min
-                        ? 0.0
-                        : (number_of_steps - 1.0) / (range_max - range_min)),
-        range_min_scaled(round(range_min * range_scale)) {}
-
-  const float range_min;
-  const float range_scale;
-  const float range_min_scaled;
-};
+#include "quantization_utils.hpp"
 
 //T = inferred
 //mode = MIN_FIRST
@@ -85,28 +48,6 @@ void QuantizeV2(Tensor<float> input, Tensor<float> _min_range, Tensor<float> _ma
     
 }
 
-template <typename T>
-struct QuantizedToFloatStruct {
-  static constexpr int number_of_bits = sizeof(T) * 8;
-  static constexpr int64 number_of_steps = static_cast<int64>(1)
-                                           << number_of_bits;
-
-  static float lowest_quantized() {
-    return static_cast<float>(std::numeric_limits<T>::lowest());
-  }
-
-  QuantizedToFloatStruct(float range_min, float range_max)
-      : range_min(range_min),
-        range_scale((range_max - range_min) / (number_of_steps - 1.0)),
-        range_min_rounded(range_max == range_min
-                              ? range_min
-                              : round(range_min / range_scale) * range_scale) {}
-
-  const float range_min;
-  const float range_scale;
-  const float range_min_rounded;
-};
-
 //mode = MIN_FIRST
 //name = unspecified
 //dequantize_op.cc: 87
@@ -125,6 +66,61 @@ void dequantize(Tensor<T> input, Tensor<float> min_range, Tensor<float> max_rang
         float val = static_cast<float>(input_ptr[i]);
         output_ptr[i] = ((q2f.range_min_rounded - q2f.lowest_quantized() * q2f.range_scale) + \
                         val * q2f.range_scale);
+    }
+
+}
+
+//Pre:
+//output.getShape == shape, or
+//output.getSize() == 0, in which case, a new tensor is allocated and assigned to the referenced output
+//Post:
+//input content copied into output with output.getShape == shape
+
+///NT: This Op hasn't been tested extensively. We will have to increase the test-coverage for this function.
+template <typename T>
+void reshape(Tensor<T> input, Tensor<int> shape, Tensor<T> &output) {
+    vector<uint32_t> dim;
+
+    //validating and inferring dimensions
+    int infer_index = -1;
+    uint32_t dim_rem = input.getSize();
+    int* val = shape.getPointer({});
+    for(uint32_t i = 0; i < shape.getSize(); i++) {
+        if(val[i] == -1) {
+            if(infer_index == -1) {
+                infer_index = i;
+            } else {
+                ERR_EXIT("shape can only contain one inference (-1) at a time");
+            }
+        } else {
+            dim_rem /= val[i];
+        }
+
+        dim.push_back(static_cast<uint32_t>(val[i]));
+    }
+
+    if(infer_index != -1) {
+        dim[infer_index] = dim_rem;
+        dim_rem = 1; // dim_rem / dim_rem = 1
+    }
+
+    if(dim_rem != 1) ERR_EXIT("supplied shape does not match up to input");
+
+
+    T* input_ptr = input.getPointer({});
+    //check if the output dim is valid
+    if(output.getSize() > 0 && dim == output.getShape()) {
+        //copy
+        T* output_ptr = output.getPointer({});
+        std::memcpy(output_ptr, input_ptr, (std::size_t) input.getSize_in_bytes());
+    } else if(output.getSize() > 0 && dim != output.getShape()) {
+        ERR_EXIT("output tensor dimension mismatches supplied shape")
+    } else {
+        //construct a new tensor and copy
+        Tensor<T> tmp(dim);
+        T* output_ptr = tmp.getPointer({});
+        std::memcpy(output_ptr, input_ptr, (std::size_t) input.getSize_in_bytes());
+        output = tmp;
     }
 
 }
