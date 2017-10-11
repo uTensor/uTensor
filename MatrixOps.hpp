@@ -1,9 +1,10 @@
 #ifndef UTENSOR_MATRIX_OPS
 #define UTENSOR_MATRIX_OPS
 
-#include <limits>
-#include <cstdlib>
 #include <cmath>
+#include <cstdlib>
+#include <limits>
+#include "quantization_utils.hpp"
 #include "tensor.hpp"
 
 // Useful links
@@ -206,31 +207,6 @@ void ReferenceGemmuImpl(bool transpose_a, bool transpose_b, bool transpose_c,
 }
 
 template <class T>
-int64_t FloatToQuantizedUnclamped(float input, float range_min,
-                                  float range_max) {
-  const int64_t lowest_quantized =
-      static_cast<double>(std::numeric_limits<T>::lowest());
-  if (range_min == range_max) {
-    return lowest_quantized;
-  }
-  const int number_of_bits = sizeof(T) * 8;
-  const int64_t number_of_steps = static_cast<int64_t>(1) << number_of_bits;
-  const double range_adjust = (number_of_steps / (number_of_steps - 1.0));
-  const double range = ((range_max - range_min) * range_adjust);
-  const double range_scale =
-      (number_of_steps /
-       range);  // NT: fractional resolution?  bit per floating-point-increment
-  int64_t quantized =
-      (round(input * range_scale) -
-       round(range_min *
-             range_scale));  // NT: roughly: (input - range_min) * range_scale
-  quantized += lowest_quantized;  // NT: can be a negative number for <signed
-                                  // ...>; zero gets down-shifted to
-                                  // Eigen::NumTraits<T>::lowest()
-  return quantized;  // NT: input<float> qanuntized to a specific range<int64>
-}
-
-template <class T>
 float FloatForOneQuantizedLevel(
     float range_min,
     float
@@ -269,7 +245,8 @@ template <class T1, class T2, class Toutput>
 void QuantizedMatMul(Tensor<T1> A, Tensor<T2> B, Tensor<Toutput> C,
                      Tensor<float> mina, Tensor<float> minb, Tensor<float> maxa,
                      Tensor<float> maxb, Tensor<float> outmin,
-                     Tensor<float> outmax, bool transpose_a = false, bool transpose_b = false) {
+                     Tensor<float> outmax, bool transpose_a = false,
+                     bool transpose_b = false) {
   const float min_a = *(mina.getPointer({}));
   const float max_a = *(maxa.getPointer({}));
   const float min_b = *(minb.getPointer({}));
@@ -315,6 +292,5 @@ void QuantizedMatMul(Tensor<T1> A, Tensor<T2> B, Tensor<Toutput> C,
   float* c_max = outmax.getPointer({});
   *c_max = max_c_value;
 }
-
 
 #endif
