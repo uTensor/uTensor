@@ -57,4 +57,59 @@ void Requantize(Tensor<T1> input, Tensor<T2> in_min, Tensor<T2> in_max,
   float* v_out_max = out_max.getPointer({});
   *v_out_max = r_output_max;
 }
+template<class TIn, class TOut>
+void Add(Tensor<TIn> input, Tensor<TIn> input2, Tensor<TOut> out) {
+  const TIn *p_in = input.getPointer({});
+  const TIn *p_in2 = input2.getPointer({});
+  TOut *p_out = out.getPointer({});
+
+  const uint32_t size = out.getSize();
+  for (uint32_t i = 0; i < size; i++) {
+    p_out[i] = p_in[i] + p_in2[i];
+  }
+}
+template<class TIn, class Td, class TOut>
+void Min(Tensor<TIn> input, Tensor<Td> dim, Tensor<TOut> out) {
+  const TIn *p_in = input.getPointer({});
+  const Td *p_in2 = dim.getPointer({});
+  TOut *p_out = out.getPointer({});
+
+  const uint32_t size = dim.getSize();
+  vector<uint32_t> shape = input.getShape();
+  TOut min = INT_MAX;
+  for (uint32_t i = 0; i < size; i++) {
+    Td n_dim = p_in2[i];
+    uint32_t num = shape[n_dim];
+    uint32_t stride = input.getStride(n_dim);
+    for (uint32_t j = stride; j < stride + num; j++) {
+        if (p_in[j] < min) {
+            min = p_in[j];
+        }
+    }
+    p_out[i] = min;
+    min = INT_MAX;   
+  }
+}
+template<class TIn, class Td, class TOut>
+void Max(Tensor<TIn> input, Tensor<Td> dim, Tensor<TOut> out) {
+  const TIn *p_in = input.getPointer({});
+  const Td *p_in2 = dim.getPointer({});
+  TOut *p_out = out.getPointer({});
+
+  const uint32_t size = dim.getSize();
+  vector<uint32_t> shape = input.getShape();
+  TOut max = INT_MIN;
+  for (uint32_t i = 0; i < size; i++) {
+    Td n_dim = p_in2[i];
+    uint32_t num = shape[n_dim];
+    uint32_t stride = input.getStride(n_dim);
+    for (uint32_t j = stride; j < stride + num; j++) {
+        if (p_in[j] > max) {
+            max = p_in[j];
+        }
+    }
+    p_out[i] = max;
+    max = INT_MIN;
+  }
+}
 #endif  // UTENSOR_MATH_OPS
