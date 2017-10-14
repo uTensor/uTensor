@@ -32,7 +32,7 @@ public:
 
         // printf("refMin is : %f \r\n", *(b_min_q_ref.getPointer({0})));
         // printf("outMin is : %f \r\n", *(b_min_q.getPointer({0})));
-        // printf("diff : output(%f), outMin(%f), outMax(%f)\r\n", \
+        // printf("diff : output(%f), outMin(%f), outMax(%f)\r\n", 
         //  meanPercentErr(b_q_ref, b_q), meanPercentErr(b_min_q_ref, b_min_q), meanPercentErr(b_max_q_ref, b_max_q));
 
         double result = meanPercentErr(b_q_ref, b_q) + meanPercentErr(b_min_q_ref, b_min_q) + meanPercentErr(b_max_q_ref, b_max_q);

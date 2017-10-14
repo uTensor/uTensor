@@ -126,6 +126,7 @@ class MathOpsTest : public Test {
 
     // modify the checks below:
     Tensor<float> out(ref_out.getShape());
+    Add<float, float>(a, b, out);
 
     double result = meanPercentErr(ref_out, out);
     // passed(result < 0.0001);
@@ -150,6 +151,7 @@ class MathOpsTest : public Test {
 
     // modify the checks below:
     Tensor<float> out(ref_out.getShape());
+    Min<float, int, float>(a, dim, out);
 
     double result = meanPercentErr(ref_out, out);
     // passed(result < 0.0001);
@@ -174,6 +176,7 @@ class MathOpsTest : public Test {
 
     // modify the checks below:
     Tensor<float> out(ref_out.getShape());
+    Max<float, int, float>(a, dim, out);
 
     double result = meanPercentErr(ref_out, out);
     // passed(result < 0.0001);
