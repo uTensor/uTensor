@@ -1,16 +1,19 @@
 #ifndef UTENSOR_TEST
 #define UTENSOR_TEST
 
+#include "mbed.h"
 #include <string>
 #include <math.h>
 #include <limits>
 
 class Test {
     
-        protected:
+        private: 
+            Timer timer;
             string testName;
             string summary;
-
+            
+        protected:
             void printStatus(string status) {
                 int pLen = std::max(1, 30 - (int) testName.length());
                 string msg = testName;
@@ -20,17 +23,34 @@ class Test {
                 }
 
                 msg += "[ " + status + " ]";
+                
+                float lapsed_time = timer.read();
+                if(lapsed_time != 0) {
+                    msg += " (" + std::to_string(lapsed_time * 1000) + " ms)";
+                }
+
                 summary += msg + "\r\n";
 
                 if(print_test) printf("%s\r\n", msg.c_str());
             }
 
+            void timer_start() {
+                timer.start();
+            }
+
+            void timer_stop() {
+                timer.stop();
+            }
+
             void testStart(string _testName) {
+                timer.reset();
                 testName = _testName;
                 numTotal++;
             }
 
             void passed(bool res = true) {
+                timer.stop();
+
                 if(!res) {
                     failed();
                     return;
@@ -38,7 +58,7 @@ class Test {
 
                 if(testName == "") {
                     printf("Error: test name not cleared piror to test run\r\n");
-                    exit(1);
+                    exit(-1);
                 }
 
                 numOk++;
@@ -48,9 +68,11 @@ class Test {
             }
 
             void failed() {
+                timer.stop();
+
                 if(testName == "") {
                     printf("Error: testStart is not called prior to test start\r\n");
-                    exit(1);
+                    exit(-1);
                 }
 
                 numFailed++;
@@ -60,6 +82,8 @@ class Test {
             }
 
             void warn() {
+                timer.stop();
+
                 if(testName == "") {
                     printf("Error: testStart is not called prior to test start\r\n");
                     exit(1);

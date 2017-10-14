@@ -30,7 +30,9 @@ class MathOpsTest : public Test {
     // modify the checks below:
     Tensor<float> out_min(ref_min.getShape());
     Tensor<float> out_max(ref_max.getShape());
+    timer_start();
     Requantization_Range<int, float>(a, a_min, a_max, out_min, out_max);
+    timer_stop();
 
     double result =
         meanPercentErr(ref_min, out_min) + meanPercentErr(ref_max, out_max);
@@ -68,8 +70,10 @@ class MathOpsTest : public Test {
     Tensor<float> a_max_q(ref_a_max.getShape());
 
     // Implementation goes here
+    timer_start();
     Requantize<int, float, unsigned char>(a, a_min, a_max, r_a_min, r_a_max,
                                           a_q, a_min_q, a_max_q);
+    timer_stop();
 
     double result = meanPercentErr(ref_a_q, a_q) +
                     meanPercentErr(ref_a_min, a_min_q) +
