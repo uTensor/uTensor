@@ -112,7 +112,7 @@ Tensor<U> TensorIdxImporter::loader(string &filename, IDX_DTYPE idx_type) {
     fp = fopen (filename.c_str(), "r" );
 
     DEBUG("Opening file %s ", filename.c_str());
-    errno_error(fp);
+    if(fp == NULL) ERR_EXIT("Error opening file: %s", filename.c_str());
 
     header = parseHeader();
 

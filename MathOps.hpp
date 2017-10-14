@@ -112,4 +112,46 @@ void Max(Tensor<TIn> input, Tensor<Td> dim, Tensor<TOut> out) {
     max = INT_MIN;
   }
 }
+
+template<class TIn, class TOut>
+void ArgMax(Tensor<TIn> input, Tensor<int> dim, Tensor<TOut> &out) {
+  int dim_reduce = *(dim.getPointer({0}));
+  vector<uint32_t> outShape = input.getShape();
+  outShape.erase(outShape.begin()+dim_reduce);
+
+  if(out.getSize() != 0 && out.getShape() != outShape) {
+    ERR_EXIT("output shape mismatch");
+  }
+
+  if(out.getSize() == 0) {
+    out = Tensor<TOut>(outShape);
+  }
+
+  TIn* inPtr = input.getPointer({});
+  TOut* outPtr = out.getPointer({});
+
+  size_t d_size = input.getShape()[dim_reduce];
+  size_t rem_d_size = out.getSize();
+  uint32_t d_stride = input.getStride(dim_reduce);
+
+  for(size_t i = 0; i < rem_d_size; i++) {
+    TOut max = std::numeric_limits<TOut>::lowest();
+    for(size_t d = 0; d < d_size; d++) {
+      TIn tmp;
+
+      ///NT: probably won't work for dim > 1
+      if(d_stride == 1) {
+        tmp = inPtr[d + i * d_size];
+      } else {
+        tmp = inPtr[d * d_stride + i];
+      }
+
+      //TIn tmp = inPtr[d * d_stride + i * d_size];
+      if(tmp > max) {
+        outPtr[i] = d;
+        max = tmp;
+      }
+    }
+  }
+}
 #endif  // UTENSOR_MATH_OPS
