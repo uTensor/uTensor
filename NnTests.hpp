@@ -21,13 +21,15 @@ public:
         Tensor<float> ref_min = t_import.float_import("/fs/testData/ref_qRelu/out/ref_qRelu_1.idx");
         Tensor<float> ref_max = t_import.float_import("/fs/testData/ref_qRelu/out/ref_qRelu_2.idx");
 
-        //Implementation goes here
-
         //modify the checks below:
         Tensor<unsigned char> out(ref_out.getShape());
         Tensor<float> out_min(ref_out.getShape());
         Tensor<float> out_max(ref_out.getShape());
-    
+
+        timer_start();
+        //Implementation goes here
+        timer_stop();
+
 
         double result = meanPercentErr(ref_out, out) + meanPercentErr(ref_min, out_min) + meanPercentErr(ref_max, out_max);
         //passed(result < 0.0001);
