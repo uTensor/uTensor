@@ -55,6 +55,7 @@ void errno_error(void* ret_val) { /*DOES NOTHING*/}
 
 
 typedef long long int64;
+typedef vector<uint32_t> Shape;
 
 void printVector(vector<uint32_t> vec) {
     printf("vector: \r\n");

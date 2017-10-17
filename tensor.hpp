@@ -133,5 +133,93 @@ class Tensor {
     }
 };
 
+//Usage:
+//Tensor<int> inputTensor({10,10,100,40});
+//vector<uint8_t> permute = {2,3,0,1};
+//
+//permuteIndexTransform trans(inputTensor.getShape(), permute);
+//
+//Tensor<int> outputTensor(trans.getNewShape());  //of shape {100,40,10,10}
+//size_t output_buffer_index = trans[input_buffer_index];
+
+class permuteIndexTransform {
+private:
+    vector<uint8_t> permute;
+    Shape in_shape;
+    Shape out_shape;
+    Shape out_stride;
+
+    void computeOutputShape(void) {
+        out_stride.clear();
+        if(in_shape.empty()) ERR_EXIT("input shape not set");
+        if(permute.empty() || permute.size() != in_shape.size())
+            ERR_EXIT("invalid permute vector");
+
+        for(auto&& curr_axis:permute) {
+            out_shape.push_back(in_shape[curr_axis]);
+        }
+
+    }
+
+    size_t evalStride(size_t dim_index, Shape s) {
+        unsigned int size_accm = 1;
+        for(auto it = s.begin() + dim_index + 1; it != s.end(); it++) {
+            size_accm *= *it;
+        }
+
+        return (size_t) size_accm;
+    }
+
+    void computeOutputStride(void) {
+        out_stride.clear();
+        for(auto curr_axis:permute) {
+            out_stride.push_back(evalStride(curr_axis, out_shape));
+        }
+    }
+
+public:
+    permuteIndexTransform(Shape input_shape, vector<uint8_t> permute) {
+        setInputShape(input_shape);
+        setPermute(permute);
+        apply();
+    }
+
+    vector<uint8_t> getPermute(void) { return permute; }
+    void setPermute(vector<uint8_t> &_permute) { permute = _permute; }
+    void setInputShape(Shape s) { in_shape = s; }
+    Shape getNewShape(void) { return out_shape; }
+
+    void apply(void) {
+        computeOutputShape();
+        computeOutputStride();
+    }
+
+    // size_t forward(size_t index) {
+    //     size_t out_index = 0;
+    //     size_t rem = index;
+
+    //     for(size_t curr_dim = 0; curr_dim < in_shape.size(); curr_dim++) {
+    //         size_t curr_dim_size = in_shape[curr_dim];
+    //         out_index += (rem / curr_dim_size) * out_stride[curr_dim];
+    //         rem = rem % curr_dim_size;
+    //     }
+
+    //     return out_index;
+    // }
+
+    size_t& operator[] (const size_t index)
+    {
+        size_t out_index = 0;
+        size_t rem = index;
+
+        for(size_t curr_dim = 0; curr_dim < in_shape.size(); curr_dim++) {
+            size_t curr_dim_size = in_shape[curr_dim];
+            out_index += (rem / curr_dim_size) * out_stride[curr_dim];
+            rem = rem % curr_dim_size;
+        }
+
+        return out_index;
+    }
+};
 
 #endif
