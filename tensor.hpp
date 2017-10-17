@@ -218,6 +218,8 @@ public:
             rem = rem % curr_dim_size;
         }
 
+        out_index += rem;
+
         return out_index;
     }
 };
