@@ -104,7 +104,7 @@ class Test {
                 return accm;
             }
             template<typename T>
-            bool testshape(vector<T> src, vector<T> res, vector<size_t> permute) {
+            bool testshape(vector<T> src, vector<T> res, vector<uint8_t> permute) {
               bool pass = true;
               for (size_t i = 0; i < permute.size(); i++) {
                   if (src[permute[i]] != res[i]) {

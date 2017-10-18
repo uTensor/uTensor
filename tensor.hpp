@@ -142,8 +142,8 @@ class Tensor {
 
 class permuteIndexTransform {
 private:
-    vector<size_t> permute;
-    vector<size_t> unpermute;
+    vector<uint8_t> permute;
+    vector<uint8_t> unpermute;
     Shape in_shape;
     Shape in_stride;
     Shape out_shape;
@@ -190,17 +190,17 @@ private:
     }
 
 public:
-    permuteIndexTransform(Shape input_shape, vector<size_t> permute) {
+    permuteIndexTransform(Shape input_shape, vector<uint8_t> permute) {
         setInputShape(input_shape);
         setPermute(permute);
         apply();
     }
 
-    vector<size_t> getPermute(void) { return permute; }
-    void setPermute(vector<size_t> &_permute) { 
+    vector<uint8_t> getPermute(void) { return permute; }
+    void setPermute(vector<uint8_t> &_permute) { 
         permute = _permute; 
         unpermute.resize(permute.size());
-        size_t i = 0;
+        uint8_t i = 0;
         for (auto a : permute) {
             unpermute[a] = i;
             i++;

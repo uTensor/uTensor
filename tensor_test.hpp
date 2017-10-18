@@ -72,7 +72,7 @@ class transTest : public Test {
         testStart("transtest");
         Tensor<int> inputTensor({10, 10, 100, 40});
         vector<uint32_t> g = inputTensor.getShape();
-        vector<size_t> permute = {2, 3, 0, 1};
+        vector<uint8_t> permute = {2, 3, 0, 1};
         std::shuffle(permute.begin(), permute.end(), gen);
 
         permuteIndexTransform trans(inputTensor.getShape(), permute);
@@ -89,22 +89,21 @@ class transTest : public Test {
         vector<int> ou_d({2, 2, 3, 5, 6, 6, 4, 5, 7, 5, 1, 9, 1, 3, 2, 2, 5, 3, 3, 6, 3, 4, 9, 2});
 
         Tensor<int> inputTensor({2, 3, 4});
-        vector<size_t> permute = {0, 2, 1};
+        vector<uint8_t> permute = {0, 2, 1};
 
         permuteIndexTransform trans(inputTensor.getShape(), permute);
-        size_t i = 15;
-        size_t o = trans[i];
-        testStart("start");
-        bool res = testval(in_d[i], ou_d[o]);
-        passed(res);
+        size_t i = 0;
+        size_t o = 0;
+        bool res = false;
 
-        res = false;
+        for (uint32_t i = 0; i < in_d.size(); i++) {
+            testStart("test vec 1 for transform");
+            o = trans[i];
+            res = testval(in_d[i], ou_d[o]);
+            passed(res);
+            res = false;
+        }
 
-        testStart("star2");
-        i = 5;
-        o = trans[i];
-        res = testval(in_d[i], ou_d[o]);
-        passed(res);
 
 
         res = false;
@@ -113,23 +112,15 @@ class transTest : public Test {
         vector<int> ou_d2({2, 1, 2, 3, 3, 2, 5, 2, 6, 5, 6, 3, 4, 3, 5, 6, 7, 3, 5, 4, 1, 9, 9, 2});
 
         Tensor<int> inputTensor2({2, 4, 3});
-        vector<size_t> permute2 = {1, 2, 0};
+        vector<uint8_t> permute2 = {1, 2, 0};
         permuteIndexTransform trans2(inputTensor2.getShape(), permute2);
         for (uint32_t i = 0; i < 24; i++) {
-          testStart("star3");
+          testStart("test vec 2 for transform");
           o = trans2[i];
           res = testval(in_d2[i], ou_d2[o]);
           passed(res); 
           res = false;
         }
-
-        res = false;
-        testStart("star4");
-        i = 11;
-        o = trans2[i];
-        res = testval(in_d2[i], ou_d2[o]);
-        passed(res);
-       
 
     }
     void runAll() {
