@@ -25,9 +25,7 @@ template <class T>
 class Tensor {
     std::shared_ptr<TensorBase<T>> s; //short for states
 
-    void init(vector<uint32_t> &v) {
-
-        s = std::make_shared<TensorBase<T>>(TensorBase<T>());
+    void init(vector<uint32_t> &v) { s = std::make_shared<TensorBase<T>>(TensorBase<T>());
         s->total_size = 0;
         
         for(auto i:v) {
@@ -144,8 +142,10 @@ class Tensor {
 
 class permuteIndexTransform {
 private:
-    vector<uint8_t> permute;
+    vector<size_t> permute;
+    vector<size_t> unpermute;
     Shape in_shape;
+    Shape in_stride;
     Shape out_shape;
     Shape out_stride;
 
@@ -170,28 +170,50 @@ private:
         return (size_t) size_accm;
     }
 
+/*    void computeOutputStride(void) {
+        out_stride.clear();
+        for(uint32_t i = 0; i < out_shape.size(); i++) {
+            out_stride.push_back(evalStride(i, out_shape));
+        }
+    }*/
+    void computeInputStride(void) {
+        in_stride.clear();
+        for(uint32_t i = 0; i < in_shape.size(); i++) {
+            in_stride.push_back(evalStride(i, in_shape));
+        }
+    }
     void computeOutputStride(void) {
         out_stride.clear();
-        for(auto curr_axis:permute) {
-            out_stride.push_back(evalStride(curr_axis, out_shape));
+        for(uint32_t i = 0; i < out_shape.size(); i++) {
+            out_stride.push_back(evalStride(i, out_shape));
         }
     }
 
 public:
-    permuteIndexTransform(Shape input_shape, vector<uint8_t> permute) {
+    permuteIndexTransform(Shape input_shape, vector<size_t> permute) {
         setInputShape(input_shape);
         setPermute(permute);
         apply();
     }
 
-    vector<uint8_t> getPermute(void) { return permute; }
-    void setPermute(vector<uint8_t> &_permute) { permute = _permute; }
+    vector<size_t> getPermute(void) { return permute; }
+    void setPermute(vector<size_t> &_permute) { 
+        permute = _permute; 
+        unpermute.resize(permute.size());
+        size_t i = 0;
+        for (auto a : permute) {
+            unpermute[a] = i;
+            i++;
+        }
+    }
+
     void setInputShape(Shape s) { in_shape = s; }
     Shape getNewShape(void) { return out_shape; }
 
     void apply(void) {
         computeOutputShape();
         computeOutputStride();
+        computeInputStride();
     }
 
     // size_t forward(size_t index) {
@@ -207,21 +229,37 @@ public:
     //     return out_index;
     // }
 
-    size_t& operator[] (const size_t index)
+    size_t operator[] (const size_t index)
     {
         size_t out_index = 0;
         size_t rem = index;
 
         for(size_t curr_dim = 0; curr_dim < in_shape.size(); curr_dim++) {
-            size_t curr_dim_size = in_shape[curr_dim];
-            out_index += (rem / curr_dim_size) * out_stride[curr_dim];
-            rem = rem % curr_dim_size;
+            size_t curr_stride = in_stride[curr_dim];
+            out_index += (rem / curr_stride) * out_stride[unpermute[curr_dim]];
+            rem = rem % curr_stride;
         }
 
         out_index += rem;
 
         return out_index;
     }
+     /*size_t operator[] (const size_t index)
+            {
+                size_t out_index = 0;
+                size_t rem = index;
+
+                for(size_t curr_dim = 0; curr_dim < in_shape.size(); curr_dim++) {
+                    size_t curr_dim_size = in_shape[curr_dim];
+
+                    out_index += (rem / curr_dim_size) * out_stride[curr_dim];
+                    rem = rem % curr_dim_size;
+                }
+
+                out_index += rem;
+
+                return out_index;
+            } */
 };
 
 #endif
