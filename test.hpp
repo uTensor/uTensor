@@ -127,6 +127,26 @@ class Test {
             
                 return accm;
             }
+            template<typename T>
+            bool testshape(vector<T> src, vector<T> res, vector<uint8_t> permute) {
+              bool pass = true;
+              for (size_t i = 0; i < permute.size(); i++) {
+                  if (src[permute[i]] != res[i]) {
+                      pass = false;
+                      return pass;
+                  }
+                      
+              }
+              return pass;
+            }
+            template<typename T>
+            bool testval(T src, T res) {
+              bool pass = true;
+              if (src == res) {
+                  return pass;
+              }
+              return false;
+            }
 
             template<typename U>
             double meanAbsErr(Tensor<U> A, Tensor<U> B) {
