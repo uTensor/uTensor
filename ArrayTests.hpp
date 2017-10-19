@@ -26,7 +26,9 @@ public:
         Tensor<float> b_max_q(b_max_q_ref.getShape());
 
         //Implementation goes here
+        timer_start();
         QuantizeV2(b, b_min, b_max, b_q, b_min_q, b_max_q);
+        timer_stop();
 
         // printf("refMin is : %f \r\n", *(b_min_q_ref.getPointer({0})));
         // printf("outMin is : %f \r\n", *(b_min_q.getPointer({0})));
@@ -53,7 +55,9 @@ public:
         //modify the checks below:
         Tensor<float> out(out_ref.getShape());
 
+        timer_start();
         dequantize(a, a_min, a_max, out);
+        timer_stop();
 
         double result = meanPercentErr(out_ref, out);
         //passed(result < 0.0001);
@@ -74,7 +78,9 @@ public:
         //modify the checks below:
         Tensor<float> out(out_ref.getShape());
 
+        timer_start();
         reshape(ref_a, ref_dim, out);
+        timer_stop();
 
         double result = meanPercentErr(out_ref, out);
         //passed(result < 0.0001);

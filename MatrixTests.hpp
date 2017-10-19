@@ -42,8 +42,10 @@ class matrixOpsTest : public Test {
     Tensor<int> out_c(c.getShape());
     Tensor<float> out_min(c_min.getShape());
     Tensor<float> out_max(c_max.getShape());
+    timer_start();
     QuantizedMatMul<uint8_t, uint8_t, int>(a, b, out_c, a_min, b_min, a_max,
                                            b_max, out_min, out_max);
+    timer_stop(); 
     //
     // transpose_a=None, transpose_b=None
 
