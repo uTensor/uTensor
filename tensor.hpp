@@ -226,19 +226,6 @@ class permuteIndexTransform {
     computeInputStride();
   }
 
-  // size_t forward(size_t index) {
-  //     size_t out_index = 0;
-  //     size_t rem = index;
-
-  //     for(size_t curr_dim = 0; curr_dim < in_shape.size(); curr_dim++) {
-  //         size_t curr_dim_size = in_shape[curr_dim];
-  //         out_index += (rem / curr_dim_size) * out_stride[curr_dim];
-  //         rem = rem % curr_dim_size;
-  //     }
-
-  //     return out_index;
-  // }
-
   size_t operator[](const size_t index) {
     size_t out_index = 0;
     size_t rem = index;
@@ -254,22 +241,6 @@ class permuteIndexTransform {
     return out_index;
   }
 
-  /*size_t operator[] (const size_t index)
-         {
-             size_t out_index = 0;
-             size_t rem = index;
-
-             for(size_t curr_dim = 0; curr_dim < in_shape.size(); curr_dim++) {
-                 size_t curr_dim_size = in_shape[curr_dim];
-
-                 out_index += (rem / curr_dim_size) * out_stride[curr_dim];
-                 rem = rem % curr_dim_size;
-             }
-
-             out_index += rem;
-
-             return out_index;
-         } */
 };
 
 #endif

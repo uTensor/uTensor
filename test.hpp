@@ -6,6 +6,7 @@
 #include <string>
 #include <vector>
 #include "mbed.h"
+#include "uTensor_util.hpp"
 
 class Test {
  private:
@@ -52,10 +53,7 @@ class Test {
       return;
     }
 
-    if (testName == "") {
-      printf("Error: test name not cleared piror to test run\r\n");
-      exit(-1);
-    }
+    if (testName == "") ERR_EXIT("Error: test name not cleared piror to test run\r\n");
 
     numOk++;
     printStatus("  OK  ");
@@ -66,10 +64,7 @@ class Test {
   void failed() {
     timer.stop();
 
-    if (testName == "") {
-      printf("Error: testStart is not called prior to test start\r\n");
-      exit(-1);
-    }
+    if (testName == "") ERR_EXIT("Error: testStart is not called prior to test start\r\n");
 
     numFailed++;
     printStatus("** FAILED **");
@@ -80,10 +75,7 @@ class Test {
   void warn() {
     timer.stop();
 
-    if (testName == "") {
-      printf("Error: testStart is not called prior to test start\r\n");
-      exit(1);
-    }
+    if (testName == "") ERR_EXIT("Error: testStart is not called prior to test start\r\n");
 
     numWarn++;
     printStatus(" * WARN * ");
