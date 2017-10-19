@@ -97,7 +97,7 @@ class Tensor {
     return s->data + p_offset;
   }
 
-  vector<uint32_t>& getShape(void) { return s->shape; }
+  vector<uint32_t> getShape(void) { return s->shape; }
 
   uint32_t getSize(void) { return s->total_size; }
 
@@ -116,9 +116,41 @@ class Tensor {
   }
 };
 
-// Usage:
-// Tensor<int> inputTensor({10,10,100,40});
-// vector<uint8_t> permute = {2,3,0,1};
+template <typename Tin, typename Tout>
+Tensor<Tout> TensorCast(Tensor<Tin> input) {
+  Tensor<Tout> output(input.getShape());
+  Tin* inputPrt = input.getPointer({});
+  Tout* outputPrt = output.getPointer({});
+
+  for (uint32_t i = 0; i < input.getSize(); i++) {
+    outputPrt[i] = static_cast<Tout>(inputPrt[i]);
+  }
+
+  return output;
+}
+
+template <typename T>
+Tensor<T> TensorConstant(vector<uint32_t> shape, T c) {
+  Tensor<T> output(shape);
+  T* outPrt = output.getPointer({});
+
+  for (uint32_t i = 0; i < output.getSize(); i++) {
+    outPrt[i] = c;
+  }
+
+  return output;
+}
+
+template <typename T>
+Tensor<T> TensorConstant(initializer_list<uint32_t> l, T c) {
+  vector<uint32_t> v;
+  for (auto i : l) {
+    v.push_back(i);
+  }
+
+  return TensorConstant<T>(v, c);
+}
+
 //
 // permuteIndexTransform trans(inputTensor.getShape(), permute);
 //
