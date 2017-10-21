@@ -23,6 +23,7 @@ int main(int argc, char** argv) {
   ON_ERR(bd.init(), "SDBlockDevice init ");
   ON_ERR(fs.mount(&bd), "Mounting the filesystem on \"/fs\". ");
 
+  /*
   // test running..
   printf("running idx import tests...\r\n");
   idxImporterTest idxTest;
@@ -47,16 +48,19 @@ int main(int argc, char** argv) {
   printf("running tensor tests...\r\n");
   transTest tensort;
   tensort.runAll();
-  // end of test runs
+
+  */
 
   printf("running mlp integration tests...");
   mlpTest mlpIntgTest;
   mlpIntgTest.runAll();
+  // end of test runs
 
   ON_ERR(fs.unmount(), "fs unmount ");
   ON_ERR(bd.deinit(), "SDBlockDevice de-init ");
 
   // print the results
+  /*
   printf("========= Test Summaries ========= \r\n");
   printf("========= IDX import:\r\n");
   idxTest.printSummary();
@@ -70,6 +74,7 @@ int main(int argc, char** argv) {
   nnTests.printSummary();
   printf("========= Trans Ops:\r\n");
   tensort.printSummary();
+  */
   printf("========= MLP integration test:\r\n");
   mlpIntgTest.printSummary();
   printf("==================================\r\n");

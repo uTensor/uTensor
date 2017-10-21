@@ -16,8 +16,10 @@ class TensorBase {
   uint32_t total_size;
 
   ~TensorBase() {
-    DEBUG("TensorBase destruction..\r\n");
-    if(data != nullptr) { free(data); }
+    if(data != nullptr) {
+      free(data);
+      DEBUG("TensorBase memory freed..\r\n");
+    }
   }
 };
 
@@ -40,7 +42,7 @@ class Tensor {
     }
 
     s->data = (T*)malloc(unit_size() * s->total_size);
-    // printf("total size is:%d\r\n", (int) total_size);
+    if(s->data == NULL) ERR_EXIT("ran out of memory for %d malloc", unit_size() * s->total_size);
   }
 
  public:
