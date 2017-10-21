@@ -3,6 +3,7 @@
 
 #include <math.h>
 #include <limits>
+#include "tensor.hpp"
 
 // reference: quantization_utils.h:181
 template <class T>
@@ -17,17 +18,12 @@ int64_t FloatToQuantizedUnclamped(float input, float range_min,
   const int64_t number_of_steps = static_cast<int64_t>(1) << number_of_bits;
   const double range_adjust = (number_of_steps / (number_of_steps - 1.0));
   const double range = ((range_max - range_min) * range_adjust);
-  const double range_scale =
-      (number_of_steps /
-       range);  // NT: fractional resolution?  bit per floating-point-increment
+  const double range_scale = (number_of_steps / range);
   int64_t quantized =
-      (round(input * range_scale) -
-       round(range_min *
-             range_scale));  // NT: roughly: (input - range_min) * range_scale
-  quantized += lowest_quantized;  // NT: can be a negative number for <signed
-                                  // ...>; zero gets down-shifted to
-                                  // Eigen::NumTraits<T>::lowest()
-  return quantized;  // NT: input<float> qanuntized to a specific range<int64>
+      (round(input * range_scale) - round(range_min * range_scale));
+  quantized += lowest_quantized;
+
+  return quantized;
 }
 
 template <class T>
@@ -58,11 +54,11 @@ T FloatToQuantized(float input, float range_min, float range_max) {
   if (std::is_same<T, float>::value) {
     return input;
   }
-  int64 quantized = FloatToQuantizedUnclamped<T>(input, range_min, range_max);
-  const int64 lowest_quantized =
-      static_cast<int64>(std::numeric_limits<T>::min());
+  int64_t quantized = FloatToQuantizedUnclamped<T>(input, range_min, range_max);
+  const int64_t lowest_quantized =
+      static_cast<int64_t>(std::numeric_limits<T>::min());
   const int64 highest_quantized =
-      static_cast<int64>(std::numeric_limits<T>::max());
+      static_cast<int64_t>(std::numeric_limits<T>::max());
   quantized = std::max(quantized, lowest_quantized);
   quantized = std::min(quantized, highest_quantized);
   return static_cast<T>(static_cast<int32_t>(quantized));
@@ -85,8 +81,8 @@ inline void RequantizeManyInNewRange(Tensor<T1> input, uint32_t count,
 template <typename T>
 struct FloatToQuantizedStruct {
   static constexpr int number_of_bits = sizeof(T) * 8;
-  static constexpr int64 number_of_steps = static_cast<int64>(1)
-                                           << number_of_bits;
+  static constexpr int64_t number_of_steps = static_cast<int64_t>(1)
+                                             << number_of_bits;
   static constexpr double range_adjust =
       (number_of_steps / (number_of_steps - 1.0));
 
@@ -121,8 +117,8 @@ struct FloatToQuantizedStruct {
 template <typename T>
 struct QuantizedToFloatStruct {
   static constexpr int number_of_bits = sizeof(T) * 8;
-  static constexpr int64 number_of_steps = static_cast<int64>(1)
-                                           << number_of_bits;
+  static constexpr int64_t number_of_steps = static_cast<int64_t>(1)
+                                             << number_of_bits;
 
   static float lowest_quantized() {
     return static_cast<float>(std::numeric_limits<T>::lowest());
