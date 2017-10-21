@@ -17,7 +17,7 @@ class TensorBase {
 
   ~TensorBase() {
     DEBUG("TensorBase destruction..\r\n");
-    free(data);
+    if(data != nullptr) { free(data); }
   }
 };
 
@@ -44,7 +44,11 @@ class Tensor {
   }
 
  public:
-  Tensor(void) { s->total_size = 0; }
+  Tensor(void) {
+    s = std::make_shared<TensorBase<T>>(TensorBase<T>());
+    s->total_size = 0;
+    s->data = nullptr;
+  }
 
   Tensor(initializer_list<uint32_t> l) {
     vector<uint32_t> v;
@@ -109,9 +113,7 @@ class Tensor {
   size_t getDim(void) { return s->shape.size(); }
 
   ~Tensor() {
-    // if(data != NULL)
-    //     free(data);
-
+    s = nullptr;
     DEBUG("Tensor Destructed\r\n");
   }
 };

@@ -10,6 +10,7 @@
 #include "MathTests.hpp"
 #include "NnTests.hpp"
 #include "tensor_test.hpp"
+#include "mlp_test.hpp"
 
 Serial pc(USBTX, USBRX, 115200);
 SDBlockDevice bd(MBED_CONF_APP_SD_MOSI, MBED_CONF_APP_SD_MISO, MBED_CONF_APP_SD_CLK, MBED_CONF_APP_SD_CS);
@@ -45,6 +46,10 @@ int main(int argc, char** argv) {
     transTest tensort;
     tensort.runAll();
 
+    printf("running mlp integration tests...");
+    mlpTest mlpIntgTest;
+    mlpIntgTest.runAll();
+
     //end of test runs
 
     ON_ERR(fs.unmount(), "fs unmount ");
@@ -64,6 +69,8 @@ int main(int argc, char** argv) {
     nnTests.printSummary();
     printf("========= Trans Ops:\r\n");
     tensort.printSummary();
+    printf("========= mlp integration Ops:\r\n");
+    mlpIntgTest.printSummary();
     printf("==================================\r\n");
     printf("==================================\r\n");
 
