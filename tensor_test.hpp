@@ -10,15 +10,15 @@
 class transTest : public Test {
  public:
   void runShapeTest() {
-    std::random_device rd;
-    std::default_random_engine gen = std::default_random_engine(rd());
     bool res = false;
 
     for (int i = 0; i < 10; i++) {
       testStart("transtest");
-      Tensor<int> inputTensor({10, 10, 100, 40});
+      std::default_random_engine gen;
+      vector<uint32_t> tmp({2, 3, 4, 5});
+      Tensor<int> inputTensor(tmp);
+      vector<uint8_t> permute = {2, 3, 1, 0};
       vector<uint32_t> g = inputTensor.getShape();
-      vector<uint8_t> permute = {2, 3, 0, 1};
       std::shuffle(permute.begin(), permute.end(), gen);
 
       permuteIndexTransform trans(inputTensor.getShape(), permute);
@@ -27,7 +27,7 @@ class transTest : public Test {
       vector<uint32_t> s = output.getShape();
       res = testshape<uint32_t>(g, s, permute);
       if (!res) {
-        failed();
+        passed(res);
       }
     }
     passed(res);
@@ -44,15 +44,15 @@ class transTest : public Test {
     vector<uint8_t> permute = {0, 2, 1};
 
     permuteIndexTransform trans(inputTensor.getShape(), permute);
-    size_t o = 0;
+    size_t out_index = 0;
     bool res = false;
 
     for (uint32_t i = 0; i < input_1.size(); i++) {
       testStart("test vec 1 for transform");
-      o = trans[i];
-      res = testval(input_1[i], output_1[o]);
+      out_index = trans[i];
+      res = testval(input_1[i], output_1[out_index]);
       if (!res) {
-        failed();
+        passed(res);
       }
     }
     passed(res);
@@ -71,10 +71,10 @@ class transTest : public Test {
     permuteIndexTransform trans2(inputTensor2.getShape(), permute2);
     for (uint32_t i = 0; i < input_2.size(); i++) {
       testStart("test vec 2 for transform");
-      o = trans2[i];
-      res = testval(input_2[i], output_2[o]);
+      out_index = trans2[i];
+      res = testval(input_2[i], output_2[out_index]);
       if (!res) {
-        failed();
+        passed(res);
       }
     }
     passed(res);
@@ -91,17 +91,17 @@ class transTest : public Test {
     permuteIndexTransform trans3(inputTensor3.getShape(), permute3);
     for (uint32_t i = 0; i < input_3.size(); i++) {
       testStart("test vec 4d for transform");
-      o = trans3[i];
-      res = testval(input_3[i], output_3[o]);
+      out_index = trans3[i];
+      res = testval(input_3[i], output_3[out_index]);
       if (!res) {
-        failed();
+        passed(res);
       }
     }
     passed(res);
   }
   void runAll() {
-    runShapeTest();
     runPermuteTest();
+    runShapeTest();
   }
 };
 
