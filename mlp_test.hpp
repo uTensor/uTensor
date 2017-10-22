@@ -88,8 +88,8 @@ public:
     DEBUG("all QuantizedMatMul input imported...\r\n");
 
     //output
-    uint32_t out_row = (b.getShape())[1];
     uint32_t out_col = (a.getShape())[0];
+    uint32_t out_row = (b.getShape())[1];
     Tensor<int> out_c({out_col, out_row});
 
     printf("a[0] = %d, a[1] = %d, b[0] = %d, b[1] = %d\r\n", (a.getShape())[0], (a.getShape())[1],
@@ -100,8 +100,8 @@ public:
     Tensor<float> matmul_out_min({1});
     Tensor<float> matmul_out_max({1});
 
-    QuantizedMatMul<uint8_t, uint8_t, int>(b, a, out_c, b_min, a_min, b_max,
-      a_max, matmul_out_min, matmul_out_max);
+    QuantizedMatMul<uint8_t, uint8_t, int>(a, b, out_c, a_min, b_min, a_max,
+      b_max, matmul_out_min, matmul_out_max);
     //clean up
     a.~Tensor();
     b.~Tensor();
