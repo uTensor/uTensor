@@ -186,6 +186,25 @@ public:
     reqnt_out_min.~Tensor();
     reqnt_out_max.~Tensor();
 
+    Tensor<float> ref_deqnt_out = t_import.float_import("/fs/testData/mlpTest/runQntDeqntLayerZ/import-MatMul_0.idx");
+    double temp;
+    if(temp = meanPercentErr(ref_deqnt_out, deqnt_out) > 0) {
+      printf("dequantize failed (%.6f)\r\n", temp);
+      float* ref_ptr = ref_deqnt_out.getPointer({});
+      float* test_ptr = deqnt_out.getPointer({});
+      for(uint32_t i; i < ref_deqnt_out.getSize(); i++) {
+        if(ref_ptr[i] != test_ptr[i]) {
+          printf("%d: %.3f != %.3f, diff: %.8f%%\r\n", i, ref_ptr[i], test_ptr[i], test_ptr[i]/ref_ptr[i]);
+        } else {
+          printf("%d: %.3f == %.3f\r\n", i, ref_ptr[i], test_ptr[i]);
+        }
+      }
+      failed();
+      return;
+    } else {
+        printf("dequantize passed\r\n");
+    }
+
     DEBUG("dequantize completed!\r\n");
 
     //input

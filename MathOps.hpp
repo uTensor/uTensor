@@ -40,6 +40,7 @@ void Requantization_Range(Tensor<T1> input, Tensor<T2> min, Tensor<T2> max,
   float* c_max = out_max.getPointer({});
   *c_max = used_max;
 }
+
 template <class T1, class T2, class Toutput>
 void Requantize(Tensor<T1> input, Tensor<T2> in_min, Tensor<T2> in_max,
                 Tensor<T2> r_min, Tensor<T2> r_max, Tensor<Toutput> output,
@@ -48,15 +49,21 @@ void Requantize(Tensor<T1> input, Tensor<T2> in_min, Tensor<T2> in_max,
   const float input_max = in_max.getPointer({})[0];
   const float r_output_min = r_min.getPointer({})[0];
   const float r_output_max = r_max.getPointer({})[0];
+  T1 *input_ptr = input.getPointer({});
+  Toutput *out_ptr = output.getPointer({});
 
-  RequantizeManyInNewRange<T1, Toutput>(input, input.getSize(), input_min,
-                                        input_max, r_output_min, r_output_max,
-                                        output);
+  // RequantizeManyInNewRange<T1, Toutput>(input, input.getSize(), input_min,
+  //                                       input_max, r_output_min, r_output_max,
+  //                                       output);
+  RequantizeManyInNewRangeReference(input_ptr, input.getSize(),input_min,
+    input_max, r_output_min, r_output_max, out_ptr);
+
   float* v_out_min = out_min.getPointer({});
   *v_out_min = r_output_min;
   float* v_out_max = out_max.getPointer({});
   *v_out_max = r_output_max;
 }
+
 template <class TIn, class TOut>
 void Add(Tensor<TIn> input, Tensor<TIn> input2, Tensor<TOut> out) {
   const TIn* p_in = input.getPointer({});

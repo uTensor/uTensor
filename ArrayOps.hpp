@@ -67,6 +67,18 @@ void dequantize(Tensor<T> input, Tensor<float> min_range, Tensor<float> max_rang
         output_ptr[i] = ((q2f.range_min_rounded - q2f.lowest_quantized() * q2f.range_scale) + \
                         val * q2f.range_scale);
     }
+/*
+  number_of_steps = 1 << (# of bits in T)
+  range_adjust = number_of_steps / (number_of_steps - 1)
+  range = (range_max - range_min) * range_adjust
+  range_scale = range / number_of_steps
+  const double offset_input = static_cast<double>(input) - lowest_quantized;
+  result = range_min + ((input - numeric_limits<T>::min()) * range_scale)
+*/
+
+    // for(uint32_t i = 0; i < input.getSize(); i++) {
+    //     output_ptr[i] = QuantizedToFloat(input_ptr[i], min, max);
+    // }
 
 }
 

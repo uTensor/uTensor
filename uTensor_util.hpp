@@ -59,7 +59,6 @@ void errno_error(void* ret_val) { /*DOES NOTHING*/
     exit(-1);                                                   \
   }
 
-typedef long long int64;
 typedef std::vector<uint32_t> Shape;
 
 void printVector(std::vector<uint32_t> vec) {

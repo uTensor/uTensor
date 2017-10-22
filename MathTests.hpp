@@ -118,7 +118,26 @@ class MathOpsTest : public Test {
                                           a_q, a_min_q, a_max_q);
     timer_stop();
 
-    double result = meanPercentErr(ref_a_q, a_q) +
+    double result;
+    if(result = meanPercentErr(ref_a_q, a_q) != 0) {
+        printf("Requantize a_q failed (%d)\r\n", result);
+        unsigned char* ref_ptr = ref_a_q.getPointer({});
+        unsigned char* test_ptr = a_q.getPointer({});
+        for(uint32_t i = 0; i < ref_a_q.getSize(); i++) {
+            if(ref_ptr[i] != test_ptr[i]) {
+                printf("%d: %d != %d\r\n", i, ref_ptr[i], test_ptr[i]);
+            } else {
+                printf("%d: %d == %d\r\n", i, ref_ptr[i], test_ptr[i]);
+            }
+        }
+    }
+
+
+    if(result = meanPercentErr(ref_a_min, a_min_q) != 0) printf("Requantize a_min_q failed (%d)\r\n", result);
+
+    if(result = meanPercentErr(ref_a_max, a_max_q) != 0) printf("Requantize a_max_q failed (%d)\r\n", result);
+
+    result = meanPercentErr(ref_a_q, a_q) +
                     meanPercentErr(ref_a_min, a_min_q) +
                     meanPercentErr(ref_a_max, a_max_q);
     // passed(result < 0.0001);
