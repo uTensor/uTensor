@@ -82,6 +82,49 @@ class MathOpsTest : public Test {
     passed(result == 0);
   }
 
+  void requantizeTest2(void) {
+    testStart("requantize2");
+    TensorIdxImporter t_import;
+
+    // reference inputs
+    Tensor<int> a = t_import.int_import("/fs/testData/import-MatMul_eightbit_requantize/in/import-MatMul_eightbit_quantized_mat_mul_0.idx");
+    Tensor<float> a_min =
+        t_import.float_import("/fs/testData/import-MatMul_eightbit_requantize/in/import-MatMul_eightbit_quantized_mat_mul_1.idx");
+    Tensor<float> a_max =
+        t_import.float_import("/fs/testData/import-MatMul_eightbit_requantize/in/import-MatMul_eightbit_quantized_mat_mul_2.idx");
+    Tensor<float> r_a_min =
+        t_import.float_import("/fs/testData/import-MatMul_eightbit_requantize/in/import-MatMul_eightbit_requant_range_0.idx");
+    Tensor<float> r_a_max =
+        t_import.float_import("/fs/testData/import-MatMul_eightbit_requantize/in/import-MatMul_eightbit_requant_range_1.idx");
+    // tf.quint8
+
+    // reference outputs
+    Tensor<unsigned char> ref_a_q =
+        t_import.ubyte_import("/fs/testData/import-MatMul_eightbit_requantize/out/import-MatMul_eightbit_requantize_0.idx");
+    Tensor<float> ref_a_min =
+        t_import.float_import("/fs/testData/import-MatMul_eightbit_requantize/out/import-MatMul_eightbit_requantize_1.idx");
+    Tensor<float> ref_a_max =
+        t_import.float_import("/fs/testData/import-MatMul_eightbit_requantize/out/import-MatMul_eightbit_requantize_2.idx");
+
+    
+    // modify the checks below:
+    Tensor<unsigned char> a_q(ref_a_q.getShape());
+    Tensor<float> a_min_q(ref_a_min.getShape());
+    Tensor<float> a_max_q(ref_a_max.getShape());
+
+    // Implementation goes here
+    timer_start();
+    Requantize<int, float, unsigned char>(a, a_min, a_max, r_a_min, r_a_max,
+                                          a_q, a_min_q, a_max_q);
+    timer_stop();
+
+    double result = meanPercentErr(ref_a_q, a_q) +
+                    meanPercentErr(ref_a_min, a_min_q) +
+                    meanPercentErr(ref_a_max, a_max_q);
+    // passed(result < 0.0001);
+    passed(result == 0);
+  }
+
   void argmaxTest(void) {  // NT: WIP   do not use t_import int 64 here
     testStart("argmax");
     TensorIdxImporter t_import;
@@ -227,6 +270,7 @@ class MathOpsTest : public Test {
     argmaxTest2();
     requantization_rangeTest();
     requantizeTest();
+    requantizeTest2();
     addTest();
     minTest();
     maxTest();

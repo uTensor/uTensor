@@ -72,43 +72,59 @@ public:
 
     //quantized matrix multiplication
     //input
-    Tensor<unsigned char> a =
+    Tensor<unsigned char> x =
       t_import.ubyte_import("/fs/testData/mlpTest/runQntDeqntLayerZ/in/import-MatMul_eightbit_quantize_Placeholder_0.idx");
-    Tensor<float> a_min =
+    Tensor<float> x_min =
       t_import.float_import("/fs/testData/mlpTest/runQntDeqntLayerZ/in/import-MatMul_eightbit_quantize_Placeholder_1.idx");
-    Tensor<float> a_max =
+    Tensor<float> x_max =
       t_import.float_import("/fs/testData/mlpTest/runQntDeqntLayerZ/in/import-MatMul_eightbit_quantize_Placeholder_2.idx");
-    Tensor<unsigned char> b =
+    Tensor<unsigned char> w =
       t_import.ubyte_import("/fs/testData/mlpTest/runQntDeqntLayerZ/in/import-Variable_quint8_const_0.idx");
-    Tensor<float> b_min =
+    Tensor<float> w_min =
       t_import.float_import("/fs/testData/mlpTest/runQntDeqntLayerZ/in/import-Variable_min_0.idx");
-    Tensor<float> b_max =
+    Tensor<float> w_max =
       t_import.float_import("/fs/testData/mlpTest/runQntDeqntLayerZ/in/import-Variable_max_0.idx");
 
     DEBUG("all QuantizedMatMul input imported...\r\n");
 
     //output
-    uint32_t out_col = (a.getShape())[0];
-    uint32_t out_row = (b.getShape())[1];
+    uint32_t out_col = (x.getShape())[0];
+    uint32_t out_row = (w.getShape())[1];
     Tensor<int> out_c({out_col, out_row});
 
-    printf("a[0] = %d, a[1] = %d, b[0] = %d, b[1] = %d\r\n", (a.getShape())[0], (a.getShape())[1],
-    (b.getShape())[0], (b.getShape())[1]);
-    printf("c[0] = %d, c[1] = %d\r\n", (out_c.getShape())[0], (out_c.getShape())[1]);
-    fflush(stdout);
+    // printf("x[0] = %d, x[1] = %d, b[0] = %d, b[1] = %d\r\n", (x.getShape())[0], (x.getShape())[1],
+    // (w.getShape())[0], (w.getShape())[1]);
+    // printf("c[0] = %d, c[1] = %d\r\n", (out_c.getShape())[0], (out_c.getShape())[1]);
+    // fflush(stdout);
 
     Tensor<float> matmul_out_min({1});
     Tensor<float> matmul_out_max({1});
 
-    QuantizedMatMul<uint8_t, uint8_t, int>(a, b, out_c, a_min, b_min, a_max,
-      b_max, matmul_out_min, matmul_out_max);
+    QuantizedMatMul<uint8_t, uint8_t, int>(x, w, out_c, x_min, w_min, x_max,
+      w_max, matmul_out_min, matmul_out_max);
     //clean up
-    a.~Tensor();
-    b.~Tensor();
-    a_min.~Tensor();
-    b_min.~Tensor();
-    a_max.~Tensor();
-    b_max.~Tensor();
+    x.~Tensor();
+    w.~Tensor();
+    x_min.~Tensor();
+    w_min.~Tensor();
+    x_max.~Tensor();
+    w_max.~Tensor();
+
+    Tensor<int> ref_out_c =
+    t_import.int_import("/fs/testData/mlpTest/runQntDeqntLayerZ/import-MatMul_eightbit_quantized_mat_mul_0.idx");
+  Tensor<float> ref_matmul_out_min =
+    t_import.float_import("/fs/testData/mlpTest/runQntDeqntLayerZ/import-MatMul_eightbit_quantized_mat_mul_1.idx");
+  Tensor<float> ref_matmul_out_max =
+    t_import.float_import("/fs/testData/mlpTest/runQntDeqntLayerZ/import-MatMul_eightbit_quantized_mat_mul_2.idx");
+
+    double temp_result = (meanPercentErr(ref_out_c, out_c) + meanPercentErr(ref_matmul_out_min, matmul_out_min) + meanPercentErr(ref_matmul_out_max, matmul_out_max));
+    if(temp_result > 0) {
+        printf("matrix mul failed\r\n");
+        failed();
+        return;
+      } else {
+        printf("matrix mul passed\r\n");
+      }
 
     DEBUG("QuantizedMatMul completed!\r\n");
 
@@ -116,6 +132,20 @@ public:
     Tensor<float> req_out_min({1});
     Tensor<float> req_out_max({1});
     Requantization_Range<int, float>(out_c, matmul_out_min, matmul_out_max, req_out_min, req_out_max);
+
+    Tensor<float> ref_req_out_min =
+      t_import.float_import("/fs/testData/mlpTest/runQntDeqntLayerZ/import-MatMul_eightbit_requant_range_0.idx");
+    Tensor<float> ref_req_out_max =
+      t_import.float_import("/fs/testData/mlpTest/runQntDeqntLayerZ/import-MatMul_eightbit_requant_range_1.idx");
+
+    temp_result = (meanPercentErr(ref_req_out_min, req_out_min) + meanPercentErr(ref_req_out_max, req_out_max));
+      if(temp_result > 0) {
+          printf("Requantization_Range failed\r\n");
+          failed();
+          return;
+      } else {
+          printf("Requantization_Range passed\r\n");
+      }
 
     DEBUG("Requantization_Range completed!\r\n");
 
@@ -131,11 +161,27 @@ public:
     req_out_min.~Tensor();
     req_out_max.~Tensor();
 
+    Tensor<unsigned char> ref_reqnt_out =
+    t_import.ubyte_import("/fs/testData/mlpTest/runQntDeqntLayerZ/import-MatMul_eightbit_requantize_0.idx");
+  Tensor<float> ref_reqnt_out_min =
+    t_import.float_import("/fs/testData/mlpTest/runQntDeqntLayerZ/import-MatMul_eightbit_requantize_1.idx");
+  Tensor<float> ref_reqnt_out_max =
+    t_import.float_import("/fs/testData/mlpTest/runQntDeqntLayerZ/import-MatMul_eightbit_requantize_2.idx");
+
+    temp_result = (meanPercentErr(ref_reqnt_out, reqnt_out) + meanPercentErr(ref_reqnt_out_min, reqnt_out_min) + meanPercentErr(ref_reqnt_out_max, reqnt_out_max));
+    if(temp_result > 0) {
+        printf("Requantize failed\r\n");
+        failed();
+        return;
+    } else {
+        printf("Requantize passed\r\n");
+    }
+
     DEBUG("Requantize completed!\r\n");
 
     //output
     Tensor<float> deqnt_out(out_c.getShape());
-    dequantize(out_c, reqnt_out_min, reqnt_out_max, deqnt_out);
+    dequantize(reqnt_out, reqnt_out_min, reqnt_out_max, deqnt_out);
     out_c.~Tensor();
     reqnt_out_min.~Tensor();
     reqnt_out_max.~Tensor();
