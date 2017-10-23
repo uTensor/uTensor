@@ -91,7 +91,7 @@ void dequantize(Tensor<T> input, Tensor<float> min_range, Tensor<float> max_rang
 ///NT: This Op hasn't been tested extensively. We will have to increase the test-coverage for this function.
 template <typename T>
 void reshape(Tensor<T> input, Tensor<int> shape, Tensor<T> &output) {
-    vector<uint32_t> dim;
+    Shape dim;
 
     //validating and inferring dimensions
     int infer_index = -1;
