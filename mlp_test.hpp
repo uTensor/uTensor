@@ -119,11 +119,11 @@ public:
 
     double temp_result = (meanPercentErr(ref_out_c, out_c) + meanPercentErr(ref_matmul_out_min, matmul_out_min) + meanPercentErr(ref_matmul_out_max, matmul_out_max));
     if(temp_result > 0) {
-        printf("matrix mul failed\r\n");
+        DEBUG("matrix mul failed\r\n");
         failed();
         return;
       } else {
-        printf("matrix mul passed\r\n");
+        DEBUG("matrix mul passed\r\n");
       }
 
     DEBUG("QuantizedMatMul completed!\r\n");
@@ -140,11 +140,11 @@ public:
 
     temp_result = (meanPercentErr(ref_req_out_min, req_out_min) + meanPercentErr(ref_req_out_max, req_out_max));
       if(temp_result > 0) {
-          printf("Requantization_Range failed\r\n");
-          failed();
-          return;
+        DEBUG("Requantization_Range failed\r\n");
+        failed();
+        return;
       } else {
-          printf("Requantization_Range passed\r\n");
+        DEBUG("Requantization_Range passed\r\n");
       }
 
     DEBUG("Requantization_Range completed!\r\n");
@@ -170,11 +170,11 @@ public:
 
     temp_result = (meanPercentErr(ref_reqnt_out, reqnt_out) + meanPercentErr(ref_reqnt_out_min, reqnt_out_min) + meanPercentErr(ref_reqnt_out_max, reqnt_out_max));
     if(temp_result > 0) {
-        printf("Requantize failed\r\n");
-        failed();
-        return;
+      DEBUG("Requantize failed\r\n");
+      failed();
+      return;
     } else {
-        printf("Requantize passed\r\n");
+      DEBUG("Requantize passed\r\n");
     }
 
     DEBUG("Requantize completed!\r\n");
@@ -194,15 +194,15 @@ public:
       float* test_ptr = deqnt_out.getPointer({});
       for(uint32_t i; i < ref_deqnt_out.getSize(); i++) {
         if(ref_ptr[i] != test_ptr[i]) {
-          printf("%d: %.3f != %.3f, diff: %.8f%%\r\n", i, ref_ptr[i], test_ptr[i], test_ptr[i]/ref_ptr[i]);
+          DEBUG("%d: %.3f != %.3f, diff: %.8f%%\r\n", i, ref_ptr[i], test_ptr[i], test_ptr[i]/ref_ptr[i]);
         } else {
-          printf("%d: %.3f == %.3f\r\n", i, ref_ptr[i], test_ptr[i]);
+          DEBUG("%d: %.3f == %.3f\r\n", i, ref_ptr[i], test_ptr[i]);
         }
       }
       failed();
       return;
     } else {
-        printf("dequantize passed\r\n");
+      DEBUG("dequantize passed\r\n");
     }
 
     DEBUG("dequantize completed!\r\n");
@@ -222,7 +222,7 @@ public:
 
     double result = meanPercentErr(ref_z, output_z);
 
-    passed(result == 0);
+    passed(result < 0.0001);
 
   }
 

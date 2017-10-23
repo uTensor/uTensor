@@ -136,7 +136,7 @@ class Test {
   template <typename U>
   double meanAbsErr(Tensor<U> A, Tensor<U> B) {
     if (A.getSize() != B.getSize()) {
-      DEBUG("Test.meanAbsErr(): dimension mismatch\r\n");
+      ERR_EXIT("Test.meanAbsErr(): dimension mismatch\r\n");
     }
 
     U* elemA = A.getPointer({});
@@ -152,9 +152,9 @@ class Test {
 
   // A being the reference
   template <typename U>
-  double meanPercentErr(Tensor<U> A, Tensor<U> B) {
+  double sumPercentErr(Tensor<U> A, Tensor<U> B) {
     if (A.getSize() != B.getSize()) {
-      DEBUG("Test.meanAbsErr(): dimension mismatch\r\n");
+      ERR_EXIT("Test.sumPercentErr(): dimension mismatch\r\n");
     }
 
     U* elemA = A.getPointer({});
@@ -171,8 +171,12 @@ class Test {
         }
       }
     }
+  }
 
-    return accm;
+  template <typename U>
+  double meanPercentErr(Tensor<U> A, Tensor<U> B) {
+    double sum = sumPercentErr(A, B);
+    return sum / A.getSize();
   }
 };
 

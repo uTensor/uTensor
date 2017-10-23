@@ -41,9 +41,9 @@ int main(int argc, char** argv) {
   MathOpsTest mathTests;
   mathTests.runAll();
 
-  printf("running nn op tests...\r\n");
-  NnOpsTest nnTests;
-  nnTests.runAll();
+  // printf("running nn op tests...\r\n");
+  // NnOpsTest nnTests;
+  // nnTests.runAll();
 
   printf("running tensor tests...\r\n");
   transTest tensort;
@@ -68,8 +68,8 @@ int main(int argc, char** argv) {
   arrayTests.printSummary();
   printf("========= Math Ops:\r\n");
   mathTests.printSummary();
-  printf("========= NN Ops:\r\n");
-  nnTests.printSummary();
+  // printf("========= NN Ops:\r\n");
+  // nnTests.printSummary();
   printf("========= Trans Ops:\r\n");
   tensort.printSummary();
   printf("========= MLP integration test:\r\n");
