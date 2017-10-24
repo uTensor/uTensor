@@ -42,7 +42,7 @@ class Tensor {
     }
 
     s->data = (T*)malloc(unit_size() * s->total_size);
-    if(s->data == NULL) ERR_EXIT("ran out of memory for %d malloc", unit_size() * s->total_size);
+    if(s->data == NULL) ERR_EXIT("ran out of memory for %lu malloc", unit_size() * s->total_size);
   }
 
  public:
@@ -252,7 +252,7 @@ void printDim(Tensor<T> t) {
   printf("Dimension: ");
   Shape s = t.getShape();
   for(auto d:s) {
-    printf("[%d] ", d);
+    printf("[%lu] ", d);
   }
   printf("\r\n");
 }

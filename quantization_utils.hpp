@@ -109,7 +109,7 @@ inline void RequantizeManyInNewRangeReference(const int* input, int32_t count,
       // that could be easily adapted for a SIMD implementation. It should also be
       // possible to perform all the calculations in 32-bit rather than 64, but
       // that's not been implemented yet.
-      for (size_t index = 0; index < count; ++index) {
+      for (int32_t index = 0; index < count; ++index) {
         const int64_t input_value = static_cast<int64_t>(input[index]);
         const int64_t fp_value =
         ((input_value * range_scale_fp) >> 32) + input_offset_fp;

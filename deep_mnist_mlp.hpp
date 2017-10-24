@@ -56,7 +56,7 @@ void ReluLayer(Tensor<unsigned char> x, Tensor<float> x_min, Tensor<float> x_max
   
     uint32_t out_col = (x.getShape())[0];
     uint32_t out_row = (w.getShape())[1];
-    printf("x.shape: %d, %d  w.shape: %d, %d\r\n", (x.getShape())[0], (x.getShape())[1], (w.getShape())[0], (w.getShape())[1]);
+    printf("x.shape: %lu, %lu  w.shape: %lu, %lu\r\n", (x.getShape())[0], (x.getShape())[1], (w.getShape())[0], (w.getShape())[1]);
     fflush(stdout);
     Tensor<int> out_c({out_col, out_row});
 

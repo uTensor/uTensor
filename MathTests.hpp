@@ -119,23 +119,23 @@ class MathOpsTest : public Test {
     timer_stop();
 
     double result;
-    if(result = meanPercentErr(ref_a_q, a_q) != 0) {
-        printf("Requantize a_q failed (%d)\r\n", result);
+    if((result = meanPercentErr(ref_a_q, a_q)) != 0) {
+        printf("Requantize a_q failed (%.6f)\r\n", result);
         unsigned char* ref_ptr = ref_a_q.getPointer({});
         unsigned char* test_ptr = a_q.getPointer({});
         for(uint32_t i = 0; i < ref_a_q.getSize(); i++) {
             if(ref_ptr[i] != test_ptr[i]) {
-                printf("%d: %d != %d\r\n", i, ref_ptr[i], test_ptr[i]);
+                printf("%lu: %d != %d\r\n", i, ref_ptr[i], test_ptr[i]);
             } else {
-                printf("%d: %d == %d\r\n", i, ref_ptr[i], test_ptr[i]);
+                printf("%lu: %d == %d\r\n", i, ref_ptr[i], test_ptr[i]);
             }
         }
     }
 
 
-    if(result = meanPercentErr(ref_a_min, a_min_q) != 0) printf("Requantize a_min_q failed (%d)\r\n", result);
+    if((result = meanPercentErr(ref_a_min, a_min_q)) != 0) printf("Requantize a_min_q failed (%.6f)\r\n", result);
 
-    if(result = meanPercentErr(ref_a_max, a_max_q) != 0) printf("Requantize a_max_q failed (%d)\r\n", result);
+    if((result = meanPercentErr(ref_a_max, a_max_q)) != 0) printf("Requantize a_max_q failed (%.6f)\r\n", result);
 
     result = meanPercentErr(ref_a_q, a_q) +
                     meanPercentErr(ref_a_min, a_min_q) +
