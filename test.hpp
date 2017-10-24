@@ -171,6 +171,7 @@ class Test {
         }
       }
     }
+    return accm;
   }
 
   template <typename U>

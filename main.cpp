@@ -24,7 +24,8 @@ int main(int argc, char** argv) {
   ON_ERR(bd.init(), "SDBlockDevice init ");
   ON_ERR(fs.mount(&bd), "Mounting the filesystem on \"/fs\". ");
 
-  runMLP();
+//  runMLP();
+  runPred();
 
   ON_ERR(fs.unmount(), "fs unmount ");
   ON_ERR(bd.deinit(), "SDBlockDevice de-init ");
