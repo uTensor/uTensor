@@ -247,4 +247,14 @@ class permuteIndexTransform {
 
 };
 
+template <typename T>
+void printDim(Tensor<T> t) {
+  printf("Dimension: ");
+  Shape s = t.getShape();
+  for(auto d:s) {
+    printf("[%d] ", d);
+  }
+  printf("\r\n");
+}
+
 #endif

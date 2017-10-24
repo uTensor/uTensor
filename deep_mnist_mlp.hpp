@@ -15,16 +15,20 @@ void tensorChkAlloc(Tensor<T> &t, Shape dim) {
 void tensorQuantize(Tensor<float> input, Tensor<unsigned char> &output,
   Tensor<float> &out_min, Tensor<float> &out_max) {
 
-    Tensor<int> reshape_shape({2});
-    *(reshape_shape.getPointer({0})) = 1;  ///NT: WTF am I doing?
-    *(reshape_shape.getPointer({1})) = -1;
+    Tensor<int> reshape_shape({1});
+    *(reshape_shape.getPointer({0})) = -1;  ///NT: WTF am I doing?
+
     Tensor<int> reduce_dim({1});
     *(reduce_dim.getPointer({0})) = 0;
+
+    Shape input_shape = input.getShape();
 
     Tensor<float> reshape_out;
     reshape(input, reshape_shape, reshape_out);
     input.~Tensor();
-    
+
+    printf("reshape_out ");
+    printDim(reshape_out);
 
     Tensor<float> min_out({1});
     Min(reshape_out, reduce_dim, min_out);
@@ -32,9 +36,12 @@ void tensorQuantize(Tensor<float> input, Tensor<unsigned char> &output,
     Tensor<float> max_out({1});
     Max(reshape_out, reduce_dim, max_out);
 
-    tensorChkAlloc(output, reshape_out.getShape());
-    uint32_t reshape_out0 = (reshape_out.getShape())[0];
-    uint32_t reshape_out1 = (reshape_out.getShape())[1];
+    float *debug_min = min_out.getPointer({0});
+    float *debug_max = max_out.getPointer({0});
+    printf("debug min: %.4f\r\n", *debug_min);
+    printf("debug max: %.4f\r\n", *debug_max);
+
+    tensorChkAlloc(output, input_shape);
     Shape shape_one;
     shape_one.push_back(1);
     tensorChkAlloc(out_min, shape_one);
@@ -86,6 +93,7 @@ void ReluLayer(Tensor<unsigned char> x, Tensor<float> x_min, Tensor<float> x_max
     req_out_max.~Tensor();
 
     Tensor<float> deqnt_out;
+    tensorChkAlloc(deqnt_out, reqnt_out.getShape());
     dequantize(reqnt_out, reqnt_out_min, reqnt_out_max, deqnt_out);
     reqnt_out.~Tensor();
 
@@ -116,7 +124,13 @@ void runMLP(void) {
   Tensor<float> x_min;
   Tensor<float> x_max;
 
+  printf("x ");
+  printDim(x);
+
   tensorQuantize(x, x_quantized, x_min, x_max);
+
+  printf("x_quantized ");
+  printDim(x_quantized);
 
   Tensor<unsigned char> w = t_import.ubyte_import("/fs/testData/deep_mlp/import-Variable_quint8_const_0.idx");
   Tensor<float> w_min = t_import.float_import("/fs/testData/deep_mlp/import-Variable_min_0.idx");
@@ -148,9 +162,9 @@ void runMLP(void) {
   result += Test::meanPercentErr(ref_relu_max2, relu_max2);
 
   if(result < 0.0001) {
-    printf("\r\nPASSED %.8\r\n", result);
+    printf("\r\nPASSED %.8f\r\n", result);
   } else {
-    printf("\r\nFAILED %.8\r\n", result);
+    printf("\r\nFAILED %.8f\r\n", result);
   }
 
 
