@@ -11,6 +11,9 @@
 #include "tensor.hpp"
 #include "tensorIdxImporterTests.hpp"
 #include "tensor_test.hpp"
+#include "mlp_test.hpp"
+
+#include "deep_mnist_mlp.hpp"
 
 Serial pc(USBTX, USBRX, 115200);
 SDBlockDevice bd(MBED_CONF_APP_SD_MOSI, MBED_CONF_APP_SD_MISO,
@@ -18,9 +21,21 @@ SDBlockDevice bd(MBED_CONF_APP_SD_MOSI, MBED_CONF_APP_SD_MISO,
 FATFileSystem fs("fs");
 
 int main(int argc, char** argv) {
+  ON_ERR(bd.init(), "SDBlockDevice init ");
+  ON_ERR(fs.mount(&bd), "Mounting the filesystem on \"/fs\". ");
+
+  runMLP();
+
+  ON_ERR(fs.unmount(), "fs unmount ");
+  ON_ERR(bd.deinit(), "SDBlockDevice de-init ");
+}
+
+#if 0
+int main(int argc, char** argv) {
   printf("test start: \r\n");
   ON_ERR(bd.init(), "SDBlockDevice init ");
   ON_ERR(fs.mount(&bd), "Mounting the filesystem on \"/fs\". ");
+
 
   // test running..
   printf("running idx import tests...\r\n");
@@ -39,19 +54,24 @@ int main(int argc, char** argv) {
   MathOpsTest mathTests;
   mathTests.runAll();
 
-  printf("running nn op tests...\r\n");
-  NnOpsTest nnTests;
-  nnTests.runAll();
+  // printf("running nn op tests...\r\n");
+  // NnOpsTest nnTests;
+  // nnTests.runAll();
 
   printf("running tensor tests...\r\n");
   transTest tensort;
   tensort.runAll();
+
+  printf("running mlp integration tests...");
+  mlpTest mlpIntgTest;
+  mlpIntgTest.runAll();
   // end of test runs
 
   ON_ERR(fs.unmount(), "fs unmount ");
   ON_ERR(bd.deinit(), "SDBlockDevice de-init ");
 
   // print the results
+
   printf("========= Test Summaries ========= \r\n");
   printf("========= IDX import:\r\n");
   idxTest.printSummary();
@@ -61,12 +81,15 @@ int main(int argc, char** argv) {
   arrayTests.printSummary();
   printf("========= Math Ops:\r\n");
   mathTests.printSummary();
-  printf("========= NN Ops:\r\n");
-  nnTests.printSummary();
+  // printf("========= NN Ops:\r\n");
+  // nnTests.printSummary();
   printf("========= Trans Ops:\r\n");
   tensort.printSummary();
+  printf("========= MLP integration test:\r\n");
+  mlpIntgTest.printSummary();
   printf("==================================\r\n");
   printf("==================================\r\n");
 
   return 0;
 }
+#endif

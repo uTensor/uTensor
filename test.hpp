@@ -134,9 +134,9 @@ class Test {
   }
 
   template <typename U>
-  double meanAbsErr(Tensor<U> A, Tensor<U> B) {
+  static double meanAbsErr(Tensor<U> A, Tensor<U> B) {
     if (A.getSize() != B.getSize()) {
-      DEBUG("Test.meanAbsErr(): dimension mismatch\r\n");
+      ERR_EXIT("Test.meanAbsErr(): dimension mismatch\r\n");
     }
 
     U* elemA = A.getPointer({});
@@ -152,9 +152,9 @@ class Test {
 
   // A being the reference
   template <typename U>
-  double meanPercentErr(Tensor<U> A, Tensor<U> B) {
+  static double sumPercentErr(Tensor<U> A, Tensor<U> B) {
     if (A.getSize() != B.getSize()) {
-      DEBUG("Test.meanAbsErr(): dimension mismatch\r\n");
+      ERR_EXIT("Test.sumPercentErr(): dimension mismatch\r\n");
     }
 
     U* elemA = A.getPointer({});
@@ -174,6 +174,12 @@ class Test {
 
     return accm;
   }
+
+  template <typename U>
+  static double meanPercentErr(Tensor<U> A, Tensor<U> B) {
+    double sum = sumPercentErr(A, B);
+    return sum / A.getSize();
+  }
 };
 
 // https://stackoverflow.com/questions/111928/is-there-a-printf-converter-to-print-in-binary-format
@@ -185,7 +191,7 @@ void printBits(size_t const size, void const* const ptr) {
   for (i = size - 1; i >= 0; i--) {
     for (j = 7; j >= 0; j--) {
       byte = (b[i] >> j) & 1;
-      printf("%u", byte);
+      printf("%d", byte);
     }
   }
   puts("");

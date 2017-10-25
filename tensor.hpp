@@ -16,8 +16,10 @@ class TensorBase {
   uint32_t total_size;
 
   ~TensorBase() {
-    DEBUG("TensorBase destruction..\r\n");
-    free(data);
+    if(data != nullptr) {
+      free(data);
+      DEBUG("TensorBase memory freed..\r\n");
+    }
   }
 };
 
@@ -40,11 +42,15 @@ class Tensor {
     }
 
     s->data = (T*)malloc(unit_size() * s->total_size);
-    // printf("total size is:%d\r\n", (int) total_size);
+    if(s->data == NULL) ERR_EXIT("ran out of memory for %lu malloc", unit_size() * s->total_size);
   }
 
  public:
-  Tensor(void) { s->total_size = 0; }
+  Tensor(void) {
+    s = std::make_shared<TensorBase<T>>(TensorBase<T>());
+    s->total_size = 0;
+    s->data = nullptr;
+  }
 
   Tensor(initializer_list<uint32_t> l) {
     vector<uint32_t> v;
@@ -109,9 +115,7 @@ class Tensor {
   size_t getDim(void) { return s->shape.size(); }
 
   ~Tensor() {
-    // if(data != NULL)
-    //     free(data);
-
+    s = nullptr;
     DEBUG("Tensor Destructed\r\n");
   }
 };
@@ -242,5 +246,15 @@ class permuteIndexTransform {
   }
 
 };
+
+template <typename T>
+void printDim(Tensor<T> t) {
+  printf("Dimension: ");
+  Shape s = t.getShape();
+  for(auto d:s) {
+    printf("[%lu] ", d);
+  }
+  printf("\r\n");
+}
 
 #endif
