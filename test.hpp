@@ -190,7 +190,7 @@ void printBits(size_t const size, void const* const ptr) {
   for (i = size - 1; i >= 0; i--) {
     for (j = 7; j >= 0; j--) {
       byte = (b[i] >> j) & 1;
-      printf("%u", byte);
+      printf("%d", byte);
     }
   }
   puts("");

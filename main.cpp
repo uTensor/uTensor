@@ -24,7 +24,10 @@ int main(int argc, char** argv) {
   ON_ERR(bd.init(), "SDBlockDevice init ");
   ON_ERR(fs.mount(&bd), "Mounting the filesystem on \"/fs\". ");
 
-//  runMLP();
+  printf("Deep MLP on Mbed (Trained with Tensorflow)\r\n\r\n");
+  printf("running input and Relu layers...\r\n");
+  runMLP();
+  printf("running output layer...\r\n");
   runPred();
 
   ON_ERR(fs.unmount(), "fs unmount ");

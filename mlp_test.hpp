@@ -188,7 +188,7 @@ public:
 
     Tensor<float> ref_deqnt_out = t_import.float_import("/fs/testData/mlpTest/runQntDeqntLayerZ/import-MatMul_0.idx");
     double temp;
-    if(temp = meanPercentErr(ref_deqnt_out, deqnt_out) > 0) {
+    if((temp = meanPercentErr(ref_deqnt_out, deqnt_out)) > 0) {
       printf("dequantize failed (%.6f)\r\n", temp);
       float* ref_ptr = ref_deqnt_out.getPointer({});
       float* test_ptr = deqnt_out.getPointer({});
