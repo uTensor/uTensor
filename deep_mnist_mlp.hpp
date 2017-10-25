@@ -1,6 +1,11 @@
 #include "mbed.h"
 #include "tensor.hpp"
 #include "test.hpp"
+#include "tensorIdxImporter.hpp"
+#include "MathOps.hpp"
+#include "MatrixOps.hpp"
+#include "NNOps.hpp"
+#include "ArrayOps.hpp"
 #include "uTensor_util.hpp"
 
 template <typename T>
@@ -36,8 +41,8 @@ void tensorQuantize(Tensor<float> input, Tensor<unsigned char> &output,
     Tensor<float> max_out({1});
     Max(reshape_out, reduce_dim, max_out);
 
-    float *debug_min = min_out.getPointer({0});
-    float *debug_max = max_out.getPointer({0});
+    //float *debug_min = min_out.getPointer({0});
+    //float *debug_max = max_out.getPointer({0});
     // printf("debug min: %.4f\r\n", *debug_min);
     // printf("debug max: %.4f\r\n", *debug_max);
 
@@ -115,7 +120,7 @@ void ReluLayer(Tensor<unsigned char> x, Tensor<float> x_min, Tensor<float> x_max
 }
 
 void PredLayer(Tensor<unsigned char> input, Tensor<float> input_min,
-               Tensor<float> input_max, Tensor<int> output) {
+               Tensor<float> input_max, Tensor<int> &output) {
   TensorIdxImporter t_import;
   Tensor<unsigned char> w = t_import.ubyte_import(
       "/fs/testData/deep_mlp/runPredLayer/MatMul_2_eightbit_quantized_mat_mul/"
@@ -293,10 +298,10 @@ void runPred(void) {
   }
 }
 
-void runMLP(void) {
+int runMLP(string inputIdxFile) {
   TensorIdxImporter t_import;
   Tensor<float> x =
-      t_import.float_import("/fs/testData/deep_mlp/import-Placeholder_0.idx");
+      t_import.float_import(inputIdxFile);
   Tensor<unsigned char> x_quantized;
   Tensor<float> x_min;
   Tensor<float> x_max;
@@ -336,22 +341,30 @@ void runMLP(void) {
             relu_min2, relu_max2);
   w.~Tensor();
 
-  Tensor<unsigned char> ref_relu_output2 = t_import.ubyte_import(
-      "/fs/testData/deep_mlp/out/import-Relu_1_eightbit_quantized_0.idx");
-  Tensor<float> ref_relu_min2 = t_import.float_import(
-      "/fs/testData/deep_mlp/out/import-Relu_1_eightbit_quantized_1.idx");
-  Tensor<float> ref_relu_max2 = t_import.float_import(
-      "/fs/testData/deep_mlp/out/import-Relu_1_eightbit_quantized_2.idx");
 
-  double result = Test::meanPercentErr(ref_relu_output2, relu_output2);
-  result += Test::meanPercentErr(ref_relu_min2, relu_min2);
-  result += Test::meanPercentErr(ref_relu_max2, relu_max2);
+  Tensor<int> pred;
+  PredLayer(relu_output2, relu_min2, relu_max2, pred);
+  relu_output2.~Tensor();
 
-  if(result < 0.0001) {
+
+  Tensor<float> ref_out = t_import.float_import(
+    "/fs/testData/deep_mlp/runPredLayer/y_pred/outputs/y_pred_0.idx");
+  Tensor<int> ref_pred = TensorCast<float, int>(ref_out);
+
+//   printf("pred dim: ");
+//   printDim(pred);
+//   printf("ref_pred dim: ");
+//   printDim(ref_pred);
+//   fflush(stdout);
+
+  double result = Test::meanPercentErr(ref_pred, pred);
+  
+  if (result < 0.0001) {
     printf("PASSED %.8f\r\n\r\n", result);
   } else {
     printf("FAILED %.8f\r\n\r\n", result);
   }
 
+  return *(pred.getPointer({0}));
   // output layer
 }
