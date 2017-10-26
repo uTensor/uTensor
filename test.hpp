@@ -167,7 +167,7 @@ class Test {
                              fabs((float)elemA[i]));
       } else {
         if (elemB[i] != 0) {
-          accm += std::numeric_limits<float>::quiet_NaN();
+          accm += elemB[i];
         }
       }
     }
