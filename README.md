@@ -10,7 +10,7 @@
 
 - [Mbed CLI](https://github.com/ARMmbed/mbed-cli)
 - [Tensorflow](https://www.tensorflow.org/install/)
-- [tf-node-viewer](https://github.com/neil-tan/tf-node-viewer) (Optional)
+- [tf-node-viewer](https://github.com/neil-tan/tf-node-viewer) (Optional, for graph-weight extraction)
 - Mbed-os 5.6+ compatiable [boards](https://os.mbed.com/platforms/?mbed-os=25) with at least 256kb of RAM
 - SD Card (Must be LESS than 32 GB)
 - SD Card reader for the board (Optional if built into the board)
@@ -28,9 +28,8 @@ See mbed_app.json
 ## Build Steps
 
 1. Clone the repository
-2. In the project folder, run `mbed new .`
-3. Run `mbed deploy` to download all referenced libraries
-4. Insert the prepared SD card to the board (see SD Card Preparation Section)
+2. Run `mbed deploy` to download all referenced libraries
+3. Insert the prepared SD card to the board (see SD Card Preparation Section)
 4. Use `mbed compile -t GCC_ARM -m NUCLEO_F767ZI --profile=./build_profile/release.json` to build for ST NUCLEO F767ZI. Or, `mbed compile -t GCC_ARM -m NUCLEO_F767ZI --profile=./build_profile/release.json -f` to compile and flash
 
 ## SD Card Preparation
@@ -40,3 +39,15 @@ The test data has to be loaded to the SD card for the default binary to run:
 2. Run `python3 compileTestData.py`. This will create `[project]\TESTS\scripts\testData` directory.
 3. Copy `[project]\TESTS\scripts\testData` to the root of your SD card.
 
+## Expected Output
+The quantized weight and input data are stored in the SD. Setting the serial baud rate to 115200, here is what you should see:
+
+```
+Deep MLP on Mbed (Trained with Tensorflow)
+
+running deep-mlp...
+PASSED 0.00000000
+
+prediction: 7
+```
+Currently, the binary runs the first sample of the [MNIST dataset](http://yann.lecun.com/exdb/mnist/) which contains a handwritten digit of number 7. It is a 3-layer Relu based MLP, see the related Tensorflow script [here](https://github.com/neil-tan/tf-node-viewer/blob/master/deep_mlp.py).
