@@ -101,7 +101,7 @@ void QuantizationRangeForMultiplication(float min_a, float max_a, float min_b,
 }
 
 template <class T1, class T2, class Toutput>
-void QuantizedMatMul(Tensor<T1> A, Tensor<T2> B, Tensor<Toutput> C,
+void QuantizedMatMul(Tensor<T1> A, Tensor<T2> B, Tensor<Toutput> &C,
                      Tensor<float> mina, Tensor<float> minb, Tensor<float> maxa,
                      Tensor<float> maxb, Tensor<float> outmin,
                      Tensor<float> outmax, bool transpose_a = false,
@@ -110,6 +110,12 @@ void QuantizedMatMul(Tensor<T1> A, Tensor<T2> B, Tensor<Toutput> C,
   const float max_a = *(maxa.getPointer({}));
   const float min_b = *(minb.getPointer({}));
   const float max_b = *(maxb.getPointer({}));
+
+  //auto tensor allocation
+  Shape c_shape;
+  c_shape.push_back((A.getShape())[0]);
+  c_shape.push_back((B.getShape())[1]);
+  tensorChkAlloc(C, c_shape);
 
   const int32_t offset_a = FloatToQuantizedUnclamped<T1>(
       0.0f, min_a, max_a);  // NT: what 0 quantized to; depends on

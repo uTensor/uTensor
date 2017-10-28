@@ -257,4 +257,12 @@ void printDim(Tensor<T> t) {
   printf("\r\n");
 }
 
+template <typename T>
+void tensorChkAlloc(Tensor<T> &t, Shape dim) {
+  if (t.getSize() == 0) {
+    t = Tensor<T>(dim);
+  } else if (t.getShape() != dim) {
+    ERR_EXIT("Dim mismatched...\r\n");
+  }
+}
 #endif

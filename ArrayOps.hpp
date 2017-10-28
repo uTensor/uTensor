@@ -52,9 +52,13 @@ void QuantizeV2(Tensor<float> input, Tensor<float> _min_range, Tensor<float> _ma
 //name = unspecified
 //dequantize_op.cc: 87
 template <typename T>
-void dequantize(Tensor<T> input, Tensor<float> min_range, Tensor<float> max_range, Tensor<float> output) {
+void dequantize(Tensor<T> input, Tensor<float> min_range, Tensor<float> max_range, Tensor<float> &output) {
     float min = *(min_range.getPointer({0}));
     float max = *(max_range.getPointer({0}));
+      //auto tensor allocation
+    Shape out_shape;
+    tensorChkAlloc(output, input.getShape());
+
     T* input_ptr = input.getPointer({});
     float* output_ptr = output.getPointer({});
 
