@@ -65,9 +65,13 @@ void Requantize(Tensor<T1> input, Tensor<T2> in_min, Tensor<T2> in_max,
 }
 
 template <class TIn, class TOut>
-void Add(Tensor<TIn> input, Tensor<TIn> input2, Tensor<TOut> out) {
+void Add(Tensor<TIn> input, Tensor<TIn> input2, Tensor<TOut> &out) {
   const TIn* p_in = input.getPointer({});
   const TIn* p_in2 = input2.getPointer({});
+
+  //auto shape
+  tensorChkAlloc(out, input.getShape());
+
   TOut* p_out = out.getPointer({});
 
   const uint32_t size = out.getSize();
