@@ -4,7 +4,7 @@
 #include "tensorIdxImporter.hpp"
 #include "MathOps.hpp"
 #include "MatrixOps.hpp"
-#include "NNOps.hpp"
+#include "NnOps.hpp"
 #include "ArrayOps.hpp"
 #include "uTensor_util.hpp"
 
