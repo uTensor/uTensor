@@ -50,4 +50,9 @@ PASSED 0.00000000
 
 prediction: 7
 ```
-Currently, the binary runs the first sample of the [MNIST dataset](http://yann.lecun.com/exdb/mnist/) which contains a handwritten digit of number 7. It is a 3-layer Relu based MLP, see the related Tensorflow script [here](https://github.com/neil-tan/tf-node-viewer/blob/master/deep_mlp.py).
+Currently, the binary runs the first sample of the [MNIST dataset](http://yann.lecun.com/exdb/mnist/) which contains a handwritten digit of number 7. Ths network architecture is a 3-layer Relu based MLP, as shown below:
+
+![alt text](https://raw.githubusercontent.com/dmlc/web-data/master/mxnet/image/mlp_mnist.png "mxnet Handwritten Digit Recognition")
+
+
+ The related Tensorflow training script please refer to the [node-viewer](https://github.com/neil-tan/tf-node-viewer/blob/master/deep_mlp.py) project.
