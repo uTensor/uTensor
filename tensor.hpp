@@ -2,10 +2,10 @@
 #define UTENSOR_TENSOR_H
 
 #include <initializer_list>
-#include <memory> // shared_ptr, make_shared
+#include <memory>
 #include <uTensor_util.hpp>
 #include <vector>
-#include "mbed.h" // Serial, AnalogIN
+#include "mbed.h"
 #include "stdlib.h"
 
 template <typename U>
@@ -44,9 +44,9 @@ class TensorBase {
 private:
   void init(vector<uint32_t> v) {
     shape = v;
-    size_t num_elems = static_cast<size_t>(_reduce_mul(v));
-    data = (U*) malloc(sizeof(U)*num_elems);
     total_size = _reduce_mul(v);
+    size_t num_elems = static_cast<size_t>(total_size);
+    data = (U*) malloc(sizeof(U)*num_elems);
   }
 };
 
@@ -270,4 +270,4 @@ class permuteIndexTransform {
 
 };
 
-#endif
+#endif  //UTENSOR_TENSOR_H
