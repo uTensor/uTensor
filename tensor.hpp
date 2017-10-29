@@ -3,15 +3,20 @@
 
 #include <initializer_list>
 #include <memory>
-#include <uTensor_util.hpp>
+#include "uTensor_util.hpp"
 #include <vector>
-#include "mbed.h"
 #include "stdlib.h"
+#include <iostream>
+
+class Object {
+    virtual void initialize() = 0;
+    virtual void deinitialize() = 0;
+};
 
 template <class U>
 class TensorBase {
  public:
-  vector<uint32_t> shape;
+     std::vector<uint32_t> shape;
   U* data;
   uint32_t total_size;
 
@@ -24,11 +29,11 @@ class TensorBase {
 };
 
 template <class T>
-class Tensor {
+class Tensor : Object {
   std::shared_ptr<TensorBase<T>> s;  // short for states
 
-  void init(vector<uint32_t>& v) {
-    s = std::make_shared<TensorBase<T>>(TensorBase<T>());
+  void init(std::vector<uint32_t>& v) {
+    s = std::make_shared<TensorBase<T>>();
     s->total_size = 0;
 
     for (auto i : v) {
@@ -47,13 +52,13 @@ class Tensor {
 
  public:
   Tensor(void) {
-    s = std::make_shared<TensorBase<T>>(TensorBase<T>());
+    s = std::make_shared<TensorBase<T>>();
     s->total_size = 0;
     s->data = nullptr;
   }
 
-  Tensor(initializer_list<uint32_t> l) {
-    vector<uint32_t> v;
+  Tensor(std::initializer_list<uint32_t> l) {
+      std::vector<uint32_t> v;
     for (auto i : l) {
       v.push_back(i);
     }
@@ -61,7 +66,7 @@ class Tensor {
     init(v);
   }
 
-  Tensor(vector<uint32_t> v) { init(v); }
+  Tensor(std::vector<uint32_t> v) { init(v); }
 
   // returns how far a given dimension is apart
   size_t getStride(size_t dim_index) {
@@ -78,7 +83,7 @@ class Tensor {
   // POST:     When a degenerative index is supplied, the pointer
   //          lowest specified dimension is returned.
   //          Otherwise, return the pointer to the specific element.
-  T* getPointer(initializer_list<size_t> l) {
+  T* getPointer(std::initializer_list<size_t> l) {
     size_t p_offset = 0;
     signed short current_dim = 0;
     for (auto i : l) {
@@ -90,7 +95,7 @@ class Tensor {
     return s->data + p_offset;
   }
 
-  T* getPointer(vector<uint32_t> v) {
+  T* getPointer(std::vector<uint32_t> v) {
     size_t p_offset = 0;
     signed short current_dim = 0;
     for (auto i : v) {
@@ -103,7 +108,7 @@ class Tensor {
     return s->data + p_offset;
   }
 
-  vector<uint32_t> getShape(void) { return s->shape; }
+  std::vector<uint32_t> getShape(void) { return s->shape; }
 
   uint32_t getSize(void) { return s->total_size; }
 
@@ -118,8 +123,26 @@ class Tensor {
     s = nullptr;
     DEBUG("Tensor Destructed\r\n");
   }
+  virtual T* read(size_t offset, size_t ele) {}
+  virtual T* write(size_t offset, size_t ele) {}
 };
 
+template<class T>
+class RamTensor : public Tensor<T> {
+    //need deep copy
+    public:
+        RamTensor() : Tensor<T>() { std::cout << "ramtensor " << std::endl;
+            cursor = nullptr;}
+    virtual T* read(size_t offset, size_t ele) override {
+        T* ptr = cursor + offset;
+        return ptr; 
+    };
+    virtual T* write(size_t offset, size_t ele) override {};
+    virtual void initialize() override {};
+    virtual void deinitialize() override {};
+    private:
+    T* cursor;
+};
 template <typename Tin, typename Tout>
 Tensor<Tout> TensorCast(Tensor<Tin> input) {
   Tensor<Tout> output(input.getShape());
@@ -134,7 +157,7 @@ Tensor<Tout> TensorCast(Tensor<Tin> input) {
 }
 
 template <typename T>
-Tensor<T> TensorConstant(vector<uint32_t> shape, T c) {
+Tensor<T> TensorConstant(std::vector<uint32_t> shape, T c) {
   Tensor<T> output(shape);
   T* outPrt = output.getPointer({});
 
@@ -146,8 +169,8 @@ Tensor<T> TensorConstant(vector<uint32_t> shape, T c) {
 }
 
 template <typename T>
-Tensor<T> TensorConstant(initializer_list<uint32_t> l, T c) {
-  vector<uint32_t> v;
+Tensor<T> TensorConstant(std::initializer_list<uint32_t> l, T c) {
+    std::vector<uint32_t> v;
   for (auto i : l) {
     v.push_back(i);
   }
@@ -163,8 +186,8 @@ Tensor<T> TensorConstant(initializer_list<uint32_t> l, T c) {
 
 class permuteIndexTransform {
  private:
-  vector<uint8_t> permute;
-  vector<uint8_t> depermute;
+     std::vector<uint8_t> permute;
+     std::vector<uint8_t> depermute;
   Shape in_shape;
   Shape in_stride;
   Shape out_shape;
@@ -204,14 +227,14 @@ class permuteIndexTransform {
   }
 
  public:
-  permuteIndexTransform(Shape input_shape, vector<uint8_t> permute) {
+  permuteIndexTransform(Shape input_shape, std::vector<uint8_t> permute) {
     setInputShape(input_shape);
     setPermute(permute);
     apply();
   }
 
-  vector<uint8_t> getPermute(void) { return permute; }
-  void setPermute(vector<uint8_t>& _permute) {
+  std::vector<uint8_t> getPermute(void) { return permute; }
+  void setPermute(std::vector<uint8_t>& _permute) {
     permute = _permute;
     depermute.resize(permute.size());
     uint8_t i = 0;
