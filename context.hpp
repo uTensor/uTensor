@@ -72,47 +72,42 @@ class Context : uTensor {
 protected:
   vector<Operator> op_list;
   std::unordered_map<TensorBase*, int> tensor_refs;
-  uint8_t tmp_input_count;
-  uint8_t tmp_output_count;
-  vector<TensorBase*> tmp_input_list;
-  vector<TensorBase*> tmp_output_list;
 
-  void runOp(Operator &op);
-  void initOpTensors(Operator &op);
-  void deinitOpTensors(Operator &op);
-  void injectOp(void);
+  void initOpTensors(vector<TensorBase*> &t_list);
+  void deinitTensors(vector<TensorBase*> &t_list);
+  void registerInputTensors(vector<TensorBase*> &t_list);
+  void registerOutputTensors(vector<TensorBase*> &t_list);
+  void decreRefCount(vector<TensorBase*> &t_list);
+  
+  //void unref2nullTensors(vector<TensorBase*> &t_list);
+  //replace non-referenced output to null-tensors
 
 public:
   Context() {
     tmp_input_count = 0;
     tmp_output_count = 0;
   }
-  void addOp(Operator op);
-  void addInputs(Operator op);
-  void push(void);
-  vector<TensorBase*> Context::getOutputs(void);
+
+  void push(Operator op, vector<TensorBase*> _inputs, vector<TensorBase*> _outputs);
   int run(void);
 };
 
-
-void Context::addOp(Operator &op) {
-  if(tmp_input_count != 0) {
+void push(Operator op, vector<TensorBase*> _inputs, vector<TensorBase*> _outputs) {
+  if(op.getInputCount() != _inputs.size()) {
     ERR_EXIT("valid number of inputs\r\n");
   }
-  if(tmp_output_count != 0) {
-    ERR_EXIT("valid number of outputs\r\n");
+  if(op.getOutputCount() != _outputs.size()) {
+    ERR_EXIT("valid number of output\r\n");
   }
 
   op_list.push_back(op);
-  tmp_input_count = op.getInputCount();
-  tmp_output_count = op.getOutputCount();
+  registerInputTensors(_inputs);
+  registerOutputTensors(_outputs);
+
 }
 
-void Context::addInputs(vector<TensorBase*> t_list) {
-  int tmp_input_count = tmp_input_count - t_list.size();
-  if(tmp_input_count < 0) ERR_EXIT("supplied too many inputs");
-  tmp_input_list.insert(tmp_input_list.end(), t_list.begin(), t_list.end());
 
+void Context::registerInputTensors(vector<TensorBase*> &t_list) {
   for(auto t:t_list) {
     auto ref_count = tensor_refs.find(t);
     if(ref_count == tensor_refs.end()) {
@@ -121,47 +116,59 @@ void Context::addInputs(vector<TensorBase*> t_list) {
       tensor_refs[t]++;
     }
   }
-
 }
 
-void Context::push(void) {
-  if(tmp_input_count != 0 &&
-      tmp_output_count != 0) {
-    ERR_EXIT("valid number of inputs/outputs\r\n");
+void Context::registerOutputTensors(vector<TensorBase*> &t_list) {
+  for(auto t:t_list) {
+    auto ref_count = tensor_refs.find(t);
+    if(ref_count == tensor_refs.end()) {
+      tensor_refs[t] = 0;
+    }
   }
-
-  auto op = op_list.back();  
-  op.setInputs(tmp_input_list);
-  op.setOutputs(tmp_output_list);
-
-  tmp_input_list.empty();
-  tmp_output_list.empty();
-  tmp_input_count = 0;
-  tmp_output_count = 0;
 }
 
-vector<TensorBase*> Context::getOutputs(void) {
 
+void Context::initOpTensors(vector<TensorBase*> &t_list) {
+  for(auto t:t_list) {
+    t.inFocus();
+  }
 }
 
-void Context::runOp(Operator &op) {
+void Context::deinitTensors(vector<TensorBase*> &t_list) {
+  for(auto t:t_list) {
+    t.deFocus();
+  }
+}
 
+void Context::deinitTensors(vector<TensorBase*> &t_list) {
+  for(auto t:t_list) {
+    t.deFocus();
+  }
+}
+
+void Context::decreRefCount(vector<TensorBase*> &t_list) {
+  for(auto t:t_list) {
+    tensor_refs[t] = tensor_refs[t] - 1;
+    if(tensor_refs[t] < 1) {
+      t.~Tensor();
+    }
 }
 
 int Context::run(void) {
-  tensorCleanup();
+  //unref2nullTensors();
 
   for(auto op:op_list) {
-    initOpTensors(op.getInputs());
-    initOpTensors(op.getOutputs());
+    initTensors(op.getInputs());
+    initTensors(op.getOutputs());
 
-    runOp(op);
+    op.init();
+    op.compute();
+    op.deinit();
 
     deinitOpTensors(op.getInputs());
     deinitOpTensors(op.getOutputs());
 
     decreRefCount(op.getInputs());
-    tensorCleanup();
   }
 }
 
