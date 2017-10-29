@@ -6,56 +6,57 @@
 #include "tensor.hpp"
 
 typedef long long TensorPtr;
+typedef vector<TensorBase*> TList;
 
 class uTensor {
-  virtual void init(Context ctx) {};
   virtual void inFocus() {};
   virtual void deFocus() {};
-  virtual void finalize() {};
   virtual ~uTensor() = 0;
-}
+};
 
 //isType() https://stackoverflow.com/questions/9974596/how-to-check-whether-two-pointers-point-to-the-same-object-or-not
 //double dispatch
 
 //new vs stack
-class Operator : uTensor {
+class Operator {
 protected:
   //setup input/output info in derived constructors
-  vector<TensorBase*> inputs;
+  TList inputs;
   vector<DType> dtype_in;
-  vector<TensorBase*> outputs;
+  TList outputs;
   vector<DType> dtype_out;
 public:
   virtual void compute() = 0;
 
-  void setInputs(vector<TensorBase*> &_inputs) {
+  void setInputs(TList &_inputs) {
     if(_inputs.size() != inputs.size()) ERR_EXIT("Input Tensor list mismatched...");
 
     for(uint8_t i = 0; i < input.size(); i++) {
-      if(dtype_in[i] == inputs.getType()) {
-        input[i] = _inputs[i];
-      } else {
+      if(dtype_in[i] != inputs.getType()) {
         ERR_EXIT("Tensor Type mismatched...");
       }
+
+      input[i] = _inputs[i];
     }
   }
 
-  void setOutputs(vector<TensorBase*> &_outputs) {
+  void setOutputs(TList &_outputs) {
     if(_outputs.size() != outputs.size()) ERR_EXIT("Input Tensor list mismatched...");
 
     for(uint8_t i = 0; i < output.size(); i++) {
+      if(dtype_out[i].getType() != output[i].getType()) {
+        ERR_EXIT("Tensor Type mismatched...");
+      }
+
       output[i] = _output[i]
-      if(_output[i] == nullptr) continue;
-      if(dtype_out[i].getType() != output[i].getType()) ERR_EXIT("Tensor Type mismatched...");
     }
   }
 
-  vector<TensorBase*> getInputs(void) {
+  TList getInputs(void) {
     return inputs;
   }
 
-  vector<TensorBase*> getOutputs(void) {
+  TList getOutputs(void) {
     return outputs;
   }
 };
@@ -83,16 +84,11 @@ protected:
   //replace non-referenced output to null-tensors
 
 public:
-  Context() {
-    tmp_input_count = 0;
-    tmp_output_count = 0;
-  }
-
-  void push(Operator op, vector<TensorBase*> _inputs, vector<TensorBase*> _outputs);
+  void push(Operator op, TList _inputs, TList _outputs);
   int run(void);
 };
 
-void push(Operator op, vector<TensorBase*> _inputs, vector<TensorBase*> _outputs) {
+void push(Operator op, TList _inputs, TList _outputs) {
   if(op.getInputCount() != _inputs.size()) {
     ERR_EXIT("valid number of inputs\r\n");
   }
@@ -107,7 +103,7 @@ void push(Operator op, vector<TensorBase*> _inputs, vector<TensorBase*> _outputs
 }
 
 
-void Context::registerInputTensors(vector<TensorBase*> &t_list) {
+void Context::registerInputTensors(TList &t_list) {
   for(auto t:t_list) {
     auto ref_count = tensor_refs.find(t);
     if(ref_count == tensor_refs.end()) {
@@ -118,7 +114,7 @@ void Context::registerInputTensors(vector<TensorBase*> &t_list) {
   }
 }
 
-void Context::registerOutputTensors(vector<TensorBase*> &t_list) {
+void Context::registerOutputTensors(TList &t_list) {
   for(auto t:t_list) {
     auto ref_count = tensor_refs.find(t);
     if(ref_count == tensor_refs.end()) {
