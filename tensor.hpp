@@ -2,11 +2,20 @@
 #define UTENSOR_TENSOR_H
 
 #include <initializer_list>
-#include <memory>
+#include <memory> // shared_ptr, make_shared
 #include <uTensor_util.hpp>
 #include <vector>
-#include "mbed.h"
+#include "mbed.h" // Serial, AnalogIN
 #include "stdlib.h"
+
+template <typename U>
+static U _reduce_mul(vector<U> v) {
+  U acc = 1;
+  for (auto d : v) {
+    acc *= d;
+  }
+  return acc;
+}
 
 template <class U>
 class TensorBase {
@@ -15,11 +24,29 @@ class TensorBase {
   U* data;
   uint32_t total_size;
 
-  ~TensorBase() {
-    if(data != nullptr) {
-      free(data);
-      DEBUG("TensorBase memory freed..\r\n");
+  TensorBase(vector<uint32_t> v) {
+    init(v);
+  }
+
+  TensorBase(initializer_list<uint32_t> l) {
+    vector<uint32_t> v;
+    v.reserve(l.size());
+    for (auto d : l) {
+      v.push_back(d);
     }
+    init(v);
+  }
+
+  ~TensorBase() {
+    DEBUG("TensorBase destruction..\r\n");
+    free(data);
+  }
+private:
+  void init(vector<uint32_t> v) {
+    shape = v;
+    size_t num_elems = static_cast<size_t>(_reduce_mul(v));
+    data = (U*) malloc(sizeof(U)*num_elems);
+    total_size = _reduce_mul(v);
   }
 };
 
@@ -27,41 +54,35 @@ template <class T>
 class Tensor {
   std::shared_ptr<TensorBase<T>> s;  // short for states
 
-  void init(vector<uint32_t>& v) {
-    s = std::make_shared<TensorBase<T>>(TensorBase<T>());
-    s->total_size = 0;
-
-    for (auto i : v) {
-      s->shape.push_back(i);
-      // total_size = (total_size == 0)? i : total_size *= i;
-      if (s->total_size == 0) {
-        s->total_size = i;
-      } else {
-        s->total_size *= i;
-      }
-    }
-
-    s->data = (T*)malloc(unit_size() * s->total_size);
-    if(s->data == NULL) ERR_EXIT("ran out of memory for %lu malloc", unit_size() * s->total_size);
-  }
-
  public:
   Tensor(void) {
-    s = std::make_shared<TensorBase<T>>(TensorBase<T>());
-    s->total_size = 0;
-    s->data = nullptr;
+    s = make_shared<TensorBase<T>>({0});
+  }
+  Tensor(initializer_list<uint32_t> l){
+    s = make_shared<TensorBase<T>>(l);
+  }
+  Tensor(vector<uint32_t> v) {
+    s = make_shared<TensorBase<T>>(v);
   }
 
-  Tensor(initializer_list<uint32_t> l) {
-    vector<uint32_t> v;
-    for (auto i : l) {
-      v.push_back(i);
+  Tensor(initializer_list<T> data, initializer_list<uint32_t> shape) {
+    s = make_shared<TensorBase<T>>(shape);
+    // populate data
+    size_t offset = 0;
+    for (auto d : data) {
+      *(s->data+offset) = d;
+      offset++;
     }
-
-    init(v);
   }
 
-  Tensor(vector<uint32_t> v) { init(v); }
+  Tensor(vector<T> data, initializer_list<uint32_t> shape) {
+    s = make_shared<TensorBase<T>>(shape);
+    size_t offset = 0;
+    for (auto d : data) {
+      *(s->data+offset) = d;
+      offset++;
+    }
+  }
 
   // returns how far a given dimension is apart
   size_t getStride(size_t dim_index) {
@@ -115,7 +136,9 @@ class Tensor {
   size_t getDim(void) { return s->shape.size(); }
 
   ~Tensor() {
-    s = nullptr;
+    // if(data != NULL)
+    //     free(data);
+
     DEBUG("Tensor Destructed\r\n");
   }
 };
@@ -247,22 +270,4 @@ class permuteIndexTransform {
 
 };
 
-template <typename T>
-void printDim(Tensor<T> t) {
-  printf("Dimension: ");
-  Shape s = t.getShape();
-  for(auto d:s) {
-    printf("[%lu] ", d);
-  }
-  printf("\r\n");
-}
-
-template <typename T>
-void tensorChkAlloc(Tensor<T> &t, Shape dim) {
-  if (t.getSize() == 0) {
-    t = Tensor<T>(dim);
-  } else if (t.getShape() != dim) {
-    ERR_EXIT("Dim mismatched...\r\n");
-  }
-}
 #endif
