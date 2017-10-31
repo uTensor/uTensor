@@ -35,9 +35,10 @@ See mbed_app.json
 ## SD Card Preparation
 The test data has to be loaded to the SD card for the default binary to run:
 
+1. Install python dependencies `pip install -r requirements.txt` (Note: may have to use `pip3`)
 1. Go to the `[project]\TESTS\scripts` folder
-2. Run `python3 compileTestData.py`. This will create `[project]\TESTS\scripts\testData` directory.
-3. Copy `[project]\TESTS\scripts\testData` to the root of your SD card.
+1. Run `python3 compileTestData.py`. This will create `[project]\TESTS\scripts\testData` directory.
+1. Copy `[project]\TESTS\scripts\testData` to the root of your SD card.
 
 ## Expected Output
 The quantized weight and input data are stored in the SD. Setting the serial baud rate to 115200, here is what you should see:
