@@ -14,7 +14,7 @@
 class Context : uTensor {
 protected:
   vector<Operator> op_list;
-  bool del_after_op;
+  bool del_onsight;
   //std::unordered_map<Tensor*> TensorList;  //all tensors alive  //kill all unused if malloc failed?
   //uint32_t m_size; //remaining memory size
   //void registerTensor(Tensor* t);
