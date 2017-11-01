@@ -150,20 +150,23 @@ class RamTensor : public Tensor {
     }*/
   // virtual void* read(size_t offset, size_t ele) override{};
   virtual void* write(size_t offset, size_t ele) override{};
-  virtual uint16_t unit_size(void) override { std::cout << "my unit size" << std::endl; return sizeof(T); }
+  virtual uint16_t unit_size(void) override {
+    std::cout << "my unit size" << std::endl;
+    return sizeof(T);
+  }
   ~RamTensor() { std::cout << "i am ramtensor destructor" << std::endl; }
 
  private:
   T* cursor;
 };
 
-/*template <typename Tin, typename Tout>
-Tensor<Tout> TensorCast(Tensor<Tin> input) {
-  Tensor<Tout> output(input.getShape());
-  Tin* inputPrt = input.getPointer({});
-  Tout* outputPrt = output.getPointer({});
+template <typename Tin, typename Tout>
+Tensor* TensorCast(Tensor* input) {
+  Tensor* output = new RamTensor<Tout>(input->getShape());
+  Tin* inputPrt = input->read<Tin>({});
+  Tout* outputPrt = output->read<Tout>({});
 
-  for (uint32_t i = 0; i < input.getSize(); i++) {
+  for (uint32_t i = 0; i < input->getSize(); i++) {
     outputPrt[i] = static_cast<Tout>(inputPrt[i]);
   }
 
@@ -171,11 +174,11 @@ Tensor<Tout> TensorCast(Tensor<Tin> input) {
 }
 
 template <typename T>
-Tensor<T> TensorConstant(std::vector<uint32_t> shape, T c) {
-  Tensor<T> output(shape);
-  T* outPrt = output.getPointer({});
+Tensor* TensorConstant(std::vector<uint32_t> shape, T c) {
+  Tensor* output = new RamTensor<T>(shape);
+  T* outPrt = output->read<T>({});
 
-  for (uint32_t i = 0; i < output.getSize(); i++) {
+  for (uint32_t i = 0; i < output->getSize(); i++) {
     outPrt[i] = c;
   }
 
@@ -183,8 +186,8 @@ Tensor<T> TensorConstant(std::vector<uint32_t> shape, T c) {
 }
 
 template <typename T>
-Tensor<T> TensorConstant(std::initializer_list<uint32_t> l, T c) {
-    std::vector<uint32_t> v;
+Tensor* TensorConstant(std::initializer_list<uint32_t> l, T c) {
+  std::vector<uint32_t> v;
   for (auto i : l) {
     v.push_back(i);
   }
@@ -200,8 +203,8 @@ Tensor<T> TensorConstant(std::initializer_list<uint32_t> l, T c) {
 
 class permuteIndexTransform {
  private:
-     std::vector<uint8_t> permute;
-     std::vector<uint8_t> depermute;
+  std::vector<uint8_t> permute;
+  std::vector<uint8_t> depermute;
   Shape in_shape;
   Shape in_stride;
   Shape out_shape;
@@ -281,25 +284,24 @@ class permuteIndexTransform {
 
     return out_index;
   }
-
 };
 
 template <typename T>
-void printDim(Tensor<T> t) {
+void printDim(Tensor* t) {
   printf("Dimension: ");
-  Shape s = t.getShape();
-  for(auto d:s) {
+  Shape s = t->getShape();
+  for (auto d : s) {
     printf("[%lu] ", d);
   }
   printf("\r\n");
 }
 
 template <typename T>
-void tensorChkAlloc(Tensor<T> &t, Shape dim) {
-  if (t.getSize() == 0) {
-    t = Tensor<T>(dim);
-  } else if (t.getShape() != dim) {
+void tensorChkAlloc(Tensor* t, Shape dim) {
+  if (t->getSize() == 0) {
+    t = new RamTensor<T>(dim);
+  } else if (t->getShape() != dim) {
     ERR_EXIT("Dim mismatched...\r\n");
   }
-}*/
+}
 #endif
