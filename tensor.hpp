@@ -2,71 +2,44 @@
 #define UTENSOR_TENSOR_H
 
 #include <initializer_list>
+#include <iostream>
 #include <memory>
-#include "uTensor_util.hpp"
 #include <vector>
 #include "stdlib.h"
-#include <iostream>
+#include "uTensor_util.hpp"
 
-class Object {
-    virtual void initialize() = 0;
-    virtual void deinitialize() = 0;
+class uTensor {
+  virtual void inFocus(){};
+  virtual void deFocus(){};
+
+ public:
+  virtual ~uTensor() = 0;
 };
 
-template <class U>
+uTensor::~uTensor() {}
 class TensorBase {
  public:
-     std::vector<uint32_t> shape;
-  U* data;
+  std::vector<uint32_t> shape;
+  void* data;
   uint32_t total_size;
 
   ~TensorBase() {
-    if(data != nullptr) {
+    if (data != nullptr) {
+      std::cout << "i am tensorbase destructor " << std::endl;
       free(data);
       DEBUG("TensorBase memory freed..\r\n");
     }
   }
 };
 
-template <class T>
-class Tensor : Object {
-  std::shared_ptr<TensorBase<T>> s;  // short for states
+class Tensor : uTensor {
+  virtual void* read(std::initializer_list<uint32_t> l) { return nullptr; }
+  virtual void* write(size_t offset, size_t ele) { return nullptr; }
 
-  void init(std::vector<uint32_t>& v) {
-    s = std::make_shared<TensorBase<T>>();
-    s->total_size = 0;
-
-    for (auto i : v) {
-      s->shape.push_back(i);
-      // total_size = (total_size == 0)? i : total_size *= i;
-      if (s->total_size == 0) {
-        s->total_size = i;
-      } else {
-        s->total_size *= i;
-      }
-    }
-
-    s->data = (T*)malloc(unit_size() * s->total_size);
-    if(s->data == NULL) ERR_EXIT("ran out of memory for %lu malloc", unit_size() * s->total_size);
-  }
-
+ protected:
+  std::shared_ptr<TensorBase> s;  // short for states
  public:
-  Tensor(void) {
-    s = std::make_shared<TensorBase<T>>();
-    s->total_size = 0;
-    s->data = nullptr;
-  }
-
-  Tensor(std::initializer_list<uint32_t> l) {
-      std::vector<uint32_t> v;
-    for (auto i : l) {
-      v.push_back(i);
-    }
-
-    init(v);
-  }
-
-  Tensor(std::vector<uint32_t> v) { init(v); }
+  Tensor(void) { std::cout << "tensor constructor " << std::endl; }
 
   // returns how far a given dimension is apart
   size_t getStride(size_t dim_index) {
@@ -78,12 +51,80 @@ class Tensor : Object {
 
     return (size_t)size_accm;
   }
+  template <class T>
+  void init(std::vector<uint32_t>& v) {
+    std::cout << "initialize with type" << std::endl;
+    s = std::make_shared<TensorBase>();
+    s->total_size = 0;
+
+    for (auto i : v) {
+      s->shape.push_back(i);
+      if (s->total_size == 0) {
+        s->total_size = i;
+      } else {
+        s->total_size *= i;
+      }
+    }
+
+    s->data = (void*)malloc(unit_size() * s->total_size);
+    if (s->data == NULL)
+      ERR_EXIT("ran out of memory for %lu malloc", unit_size() * s->total_size);
+  }
+
+  std::vector<uint32_t> getShape(void) { return s->shape; }
+
+  uint32_t getSize(void) { return s->total_size; }
+
+  virtual uint16_t unit_size(void) {}
+
+  uint32_t getSize_in_bytes(void) { return s->total_size * unit_size(); }
+
+  // returns the number of dimensions in the tensor
+  size_t getDim(void) { return s->shape.size(); }
+
+  template <class T>
+  T* read(std::initializer_list<uint32_t> l) {
+    return (T*)read(l);
+  }
+
+  ~Tensor() {
+    s = nullptr;
+    std::cout << "i am tensor destructor " << std::endl;
+    DEBUG("Tensor Destructed\r\n");
+  }
+};
+
+template <class T>
+class RamTensor : public Tensor {
+  // need deep copy
+ public:
+  RamTensor() : Tensor() {
+    std::cout << "ramtensor " << std::endl;
+    std::vector<uint32_t> v(3, 3);
+    Tensor::init<T>(v);
+    cursor = nullptr;
+  }
+
+  RamTensor(std::initializer_list<uint32_t> l) : Tensor() {
+    std::cout << "ram con " << std::endl;
+    std::vector<uint32_t> v;
+    for (auto i : l) {
+      v.push_back(i);
+    }
+
+    Tensor::init<T>(v);
+  }
+
+  RamTensor(std::vector<uint32_t>& v) : Tensor() {
+    std::cout << "2 ram con " << std::endl;
+    Tensor::init<T>(v);
+  }
 
   // PRE:      l, initization list, specifying the element/dimension
   // POST:     When a degenerative index is supplied, the pointer
   //          lowest specified dimension is returned.
   //          Otherwise, return the pointer to the specific element.
-  T* getPointer(std::initializer_list<size_t> l) {
+  virtual void* read(std::initializer_list<uint32_t> l) override {
     size_t p_offset = 0;
     signed short current_dim = 0;
     for (auto i : l) {
@@ -92,58 +133,31 @@ class Tensor : Object {
     }
 
     // printf("p_offset: %d\r\n", p_offset);
-    return s->data + p_offset;
+    return (void*)((T*)s->data + p_offset);
   }
 
-  T* getPointer(std::vector<uint32_t> v) {
-    size_t p_offset = 0;
-    signed short current_dim = 0;
-    for (auto i : v) {
-      p_offset += i * getStride(current_dim);
-      current_dim++;
-    }
+  /*  T* getPointer(std::vector<uint32_t> v) {
+      size_t p_offset = 0;
+      signed short current_dim = 0;
+      for (auto i : v) {
+        p_offset += i * getStride(current_dim);
+        current_dim++;
+      }
 
-    printf("p_offset: %d\r\n", p_offset);
+      printf("p_offset: %d\r\n", p_offset);
 
-    return s->data + p_offset;
-  }
+      return s->data + p_offset;
+    }*/
+  // virtual void* read(size_t offset, size_t ele) override{};
+  virtual void* write(size_t offset, size_t ele) override{};
+  virtual uint16_t unit_size(void) override { std::cout << "my unit size" << std::endl; return sizeof(T); }
+  ~RamTensor() { std::cout << "i am ramtensor destructor" << std::endl; }
 
-  std::vector<uint32_t> getShape(void) { return s->shape; }
-
-  uint32_t getSize(void) { return s->total_size; }
-
-  uint16_t unit_size(void) { return sizeof(T); }
-
-  uint32_t getSize_in_bytes(void) { return s->total_size * unit_size(); }
-
-  // returns the number of dimensions in the tensor
-  size_t getDim(void) { return s->shape.size(); }
-
-  ~Tensor() {
-    s = nullptr;
-    DEBUG("Tensor Destructed\r\n");
-  }
-  virtual T* read(size_t offset, size_t ele) {}
-  virtual T* write(size_t offset, size_t ele) {}
+ private:
+  T* cursor;
 };
 
-template<class T>
-class RamTensor : public Tensor<T> {
-    //need deep copy
-    public:
-        RamTensor() : Tensor<T>() { std::cout << "ramtensor " << std::endl;
-            cursor = nullptr;}
-    virtual T* read(size_t offset, size_t ele) override {
-        T* ptr = cursor + offset;
-        return ptr; 
-    };
-    virtual T* write(size_t offset, size_t ele) override {};
-    virtual void initialize() override {};
-    virtual void deinitialize() override {};
-    private:
-    T* cursor;
-};
-template <typename Tin, typename Tout>
+/*template <typename Tin, typename Tout>
 Tensor<Tout> TensorCast(Tensor<Tin> input) {
   Tensor<Tout> output(input.getShape());
   Tin* inputPrt = input.getPointer({});
@@ -287,5 +301,5 @@ void tensorChkAlloc(Tensor<T> &t, Shape dim) {
   } else if (t.getShape() != dim) {
     ERR_EXIT("Dim mismatched...\r\n");
   }
-}
+}*/
 #endif
