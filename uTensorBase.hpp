@@ -3,8 +3,7 @@
 
 #include "tensor.hpp"
 
-typedef long long TensorPtr;
-typedef vector<TensorBase*> TList;
+typedef vector<Tensor*> TList;
 
 class uTensor {
   virtual void inFocus() {};
