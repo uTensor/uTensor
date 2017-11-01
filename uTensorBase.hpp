@@ -3,7 +3,6 @@
 
 #include "tensor.hpp"
 
-typedef long long TensorPtr;
 typedef vector<Tensor*> TList;
 
 class uTensor {
