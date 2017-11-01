@@ -33,16 +33,16 @@ class TensorIdxImporter {
         HeaderMeta header;
         HeaderMeta parseHeader(void);
         template<typename U>
-        Tensor<U> loader(string &filename, IDX_DTYPE idx_type);
+        Tensor* loader(string &filename, IDX_DTYPE idx_type);
         void open(string filename);
         //void open(FILE *fp);
         
     public:
-        Tensor<unsigned char> ubyte_import(string filename) { return loader<unsigned char>(filename, IDX_DTYPE::idx_ubyte);}
-        Tensor<char> byte_import(string filename)           { return loader<char>(filename, IDX_DTYPE::idx_byte);}
-        Tensor<short> short_import(string filename)         { return loader<short>(filename, IDX_DTYPE::idx_short);}
-        Tensor<int> int_import(string filename)             { return loader<int>(filename, IDX_DTYPE::idx_int);}
-        Tensor<float> float_import(string filename)         { return loader<float>(filename, IDX_DTYPE::idx_float);}
+        Tensor* ubyte_import(string filename) { return loader<unsigned char>(filename, IDX_DTYPE::idx_ubyte);}
+        Tensor* byte_import(string filename)           { return loader<char>(filename, IDX_DTYPE::idx_byte);}
+        Tensor* short_import(string filename)         { return loader<short>(filename, IDX_DTYPE::idx_short);}
+        Tensor* int_import(string filename)             { return loader<int>(filename, IDX_DTYPE::idx_int);}
+        Tensor* float_import(string filename)         { return loader<float>(filename, IDX_DTYPE::idx_float);}
         uint32_t getMagicNumber(unsigned char dtype, unsigned char dim);
         uint8_t getIdxDTypeSize(IDX_DTYPE dtype) ;
         //Tensor<double> double_import(string filename) {};
@@ -108,7 +108,7 @@ HeaderMeta TensorIdxImporter::parseHeader(void) {
 }
 
 template<typename U>
-Tensor<U> TensorIdxImporter::loader(string &filename, IDX_DTYPE idx_type) {
+Tensor* TensorIdxImporter::loader(string &filename, IDX_DTYPE idx_type) {
     fp = fopen (filename.c_str(), "r" );
 
     DEBUG("Opening file %s ", filename.c_str());
@@ -122,13 +122,13 @@ Tensor<U> TensorIdxImporter::loader(string &filename, IDX_DTYPE idx_type) {
 
     fseek(fp, header.dataPos, SEEK_SET);  //need error  handling
 
-    Tensor<U> t = Tensor<U>(header.dim);  //tensor allocated
-    const uint8_t unit_size = t.unit_size();
+    Tensor* t = new RamTensor<U>(header.dim);  //tensor allocated
+    const uint8_t unit_size = t->unit_size();
 
     U* val = (U *) malloc(unit_size);
-    U* data = t.getPointer({});
+    U* data = t->read<U>({});
 
-    for(uint32_t i = 0; i < t.getSize(); i++) {
+    for(uint32_t i = 0; i < t->getSize(); i++) {
         fread(val, unit_size, 1, fp);
 
         switch (unit_size) {
