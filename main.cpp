@@ -1,4 +1,3 @@
-#include <random>
 #include "FATFileSystem.h"
 #include "SDBlockDevice.h"
 #include "mbed.h"
@@ -6,6 +5,7 @@
 #include "uTensor_util.hpp"
 #include "tensor.hpp"
 #include "tensorIdxImporterTests.hpp"
+#include "context.hpp"
 //#include "deep_mnist_mlp.hpp"
 
 Serial pc(USBTX, USBRX, 115200);
@@ -33,8 +33,12 @@ int main(int argc, char** argv) {
    idxTest.printSummary();
    printf("Matrix: \r\n");
 //   matrixTests.printSummary();
+
+  Context ctx;
   //In [24]: tf.get_default_graph().get_tensor_by_name("import/y_pred:0").eval(feed_dict={x: mnist.test.images[0:1]})
   //Out[24]: array([7])
+
+  printf("\r\ndone...\r\n");
 
   ON_ERR(fs.unmount(), "fs unmount ");
   ON_ERR(bd.deinit(), "SDBlockDevice de-init ");
