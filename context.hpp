@@ -99,6 +99,8 @@ int Context::run(void) {
 
     dcrRefCount(op->getInputs());
   }
+
+  return 0;
 }
 
 #endif // UTENSOR_CTX_H

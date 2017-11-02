@@ -106,7 +106,7 @@ class Test {
 
   template<typename U>
   double sum(Tensor* input) {
-    U* elem = input->read<U>({});
+    U* elem = input->read<U>(0, 0);
     double accm = 0.0;
     for (uint32_t i = 0; i < input->getSize(); i++) {
       accm += (double)elem[i];
@@ -140,8 +140,8 @@ class Test {
       ERR_EXIT("Test.meanAbsErr(): dimension mismatch\r\n");
     }
 
-    U* elemA = A->read<U>({});
-    U* elemB = B->read<U>({});
+    U* elemA = A->read<U>(0, 0);
+    U* elemB = B->read<U>(0, 0);
 
     double accm = 0.0;
     for (uint32_t i = 0; i < A->getSize(); i++) {
@@ -158,8 +158,8 @@ class Test {
       ERR_EXIT("Test.sumPercentErr(): dimension mismatch\r\n");
     }
 
-    U* elemA = A->read<U>({});
-    U* elemB = B->read<U>({});
+    U* elemA = A->read<U>(0, 0);
+    U* elemB = B->read<U>(0, 0);
 
     double accm = 0.0;
     for (uint32_t i = 0; i < A->getSize(); i++) {

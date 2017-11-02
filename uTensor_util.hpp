@@ -18,16 +18,16 @@ void return_error(int ret_val) {
   }
 }
 
-void errno_error(void* ret_val) {
-  if (ret_val == NULL) {
-    printf(" [**Failure**] %d \r\n", errno);
-    printf("Exiting...\r\n");
-    fflush(stdout);
-    exit(-1);
-  } else {
-    printf("  [DONE]\r\n");
-  }
-}
+// void errno_error(void* ret_val) {
+//   if (ret_val == NULL) {
+//     printf(" [**Failure**] %d \r\n", errno);
+//     printf("Exiting...\r\n");
+//     fflush(stdout);
+//     exit(-1);
+//   } else {
+//     printf("  [DONE]\r\n");
+//   }
+// }
 
 #define ON_ERR(FUNC, MSG) \
   {                       \
@@ -44,8 +44,9 @@ void errno_error(void* ret_val) {
 
 #else  // MBED_CONF_APP_DEBUG_MSG
 
-void errno_error(void* ret_val) { /*DOES NOTHING*/
-}
+// void errno_error(void* ret_val) { /*DOES NOTHING*/
+// }
+
 #define ON_ERR(FUNC, MSG) FUNC
 #define DEBUG(MSG, ...)
 
