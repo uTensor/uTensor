@@ -24,7 +24,15 @@ int main(int argc, char** argv) {
  // printf("prediction: %d\r\n", prediction);
    idxImporterTest idxTest;
    idxTest.runAll();
+
+
+   printf("running matrix test ...\r\n");
+//   matrixOpsTest matrixTests;
+//   matrixTests.runAll();
+   printf("IDX import:\r\n");
    idxTest.printSummary();
+   printf("Matrix: \r\n");
+//   matrixTests.printSummary();
   //In [24]: tf.get_default_graph().get_tensor_by_name("import/y_pred:0").eval(feed_dict={x: mnist.test.images[0:1]})
   //Out[24]: array([7])
 
