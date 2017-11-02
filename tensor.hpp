@@ -85,6 +85,11 @@ class Tensor : uTensor {
     return (T*)read(offset, ele);
   }
 
+  template <class T>
+  T* write(size_t offset, size_t ele) {
+    return (const T*)write(offset, ele);
+  }
+
   ~Tensor() {
     s = nullptr;
     DEBUG("Tensor Destructed\r\n");
@@ -121,6 +126,11 @@ class RamTensor : public Tensor {
   virtual void* read(size_t offset, size_t ele) override {
     return (void *)((T*)s->data + offset);
   }
+  virtual void* write(size_t offset, size_t ele) override {
+    return (void*)((T*)s->data + offset);
+  }
+
+
   /*virtual void* read(std::initializer_list<uint32_t> l) override {
     size_t p_offset = 0;
     signed short current_dim = 0;
@@ -146,9 +156,6 @@ class RamTensor : public Tensor {
       return s->data + p_offset;
     }*/
   // virtual void* read(size_t offset, size_t ele) override{};
-  virtual void* write(size_t offset, size_t ele) override{
-    return (void *)((T*)s->data + offset);
-  };
   virtual uint16_t unit_size(void) override {
     return sizeof(T);
   }
