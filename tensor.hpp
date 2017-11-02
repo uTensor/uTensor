@@ -25,7 +25,6 @@ class TensorBase {
 
   ~TensorBase() {
     if (data != nullptr) {
-      std::cout << "i am tensorbase destructor " << std::endl;
       free(data);
       DEBUG("TensorBase memory freed..\r\n");
     }
@@ -33,13 +32,13 @@ class TensorBase {
 };
 
 class Tensor : uTensor {
-  virtual void* read(std::initializer_list<uint32_t> l) { return nullptr; }
+  virtual void* read(size_t offset, size_t ele) { return nullptr; }
   virtual void* write(size_t offset, size_t ele) { return nullptr; }
 
  protected:
   std::shared_ptr<TensorBase> s;  // short for states
  public:
-  Tensor(void) { std::cout << "tensor constructor " << std::endl; }
+  Tensor(void) {}
 
   // returns how far a given dimension is apart
   size_t getStride(size_t dim_index) {
@@ -53,7 +52,6 @@ class Tensor : uTensor {
   }
   template <class T>
   void init(std::vector<uint32_t>& v) {
-    std::cout << "initialize with type" << std::endl;
     s = std::make_shared<TensorBase>();
     s->total_size = 0;
 
@@ -83,13 +81,12 @@ class Tensor : uTensor {
   size_t getDim(void) { return s->shape.size(); }
 
   template <class T>
-  T* read(std::initializer_list<uint32_t> l) {
-    return (T*)read(l);
+  T* read(size_t offset, size_t ele) {
+    return (T*)read(offset, ele);
   }
 
   ~Tensor() {
     s = nullptr;
-    std::cout << "i am tensor destructor " << std::endl;
     DEBUG("Tensor Destructed\r\n");
   }
 };
@@ -99,14 +96,12 @@ class RamTensor : public Tensor {
   // need deep copy
  public:
   RamTensor() : Tensor() {
-    std::cout << "ramtensor " << std::endl;
     std::vector<uint32_t> v(3, 3);
     Tensor::init<T>(v);
     cursor = nullptr;
   }
 
   RamTensor(std::initializer_list<uint32_t> l) : Tensor() {
-    std::cout << "ram con " << std::endl;
     std::vector<uint32_t> v;
     for (auto i : l) {
       v.push_back(i);
@@ -116,7 +111,6 @@ class RamTensor : public Tensor {
   }
 
   RamTensor(std::vector<uint32_t>& v) : Tensor() {
-    std::cout << "2 ram con " << std::endl;
     Tensor::init<T>(v);
   }
 
@@ -124,7 +118,10 @@ class RamTensor : public Tensor {
   // POST:     When a degenerative index is supplied, the pointer
   //          lowest specified dimension is returned.
   //          Otherwise, return the pointer to the specific element.
-  virtual void* read(std::initializer_list<uint32_t> l) override {
+  virtual void* read(size_t offset, size_t ele) override {
+    return (void *)((T*)s->data + offset);
+  }
+  /*virtual void* read(std::initializer_list<uint32_t> l) override {
     size_t p_offset = 0;
     signed short current_dim = 0;
     for (auto i : l) {
@@ -136,7 +133,7 @@ class RamTensor : public Tensor {
     return (void*)((T*)s->data + p_offset);
   }
 
-  /*  T* getPointer(std::vector<uint32_t> v) {
+    T* getPointer(std::vector<uint32_t> v) {
       size_t p_offset = 0;
       signed short current_dim = 0;
       for (auto i : v) {
@@ -149,12 +146,13 @@ class RamTensor : public Tensor {
       return s->data + p_offset;
     }*/
   // virtual void* read(size_t offset, size_t ele) override{};
-  virtual void* write(size_t offset, size_t ele) override{};
+  virtual void* write(size_t offset, size_t ele) override{
+    return (void *)((T*)s->data + offset);
+  };
   virtual uint16_t unit_size(void) override {
-    std::cout << "my unit size" << std::endl;
     return sizeof(T);
   }
-  ~RamTensor() { std::cout << "i am ramtensor destructor" << std::endl; }
+  ~RamTensor() {}
 
  private:
   T* cursor;
@@ -163,7 +161,7 @@ class RamTensor : public Tensor {
 template <typename Tin, typename Tout>
 Tensor* TensorCast(Tensor* input) {
   Tensor* output = new RamTensor<Tout>(input->getShape());
-  Tin* inputPrt = input->read<Tin>({});
+  Tin* inputPrt = input->read<Tin>(0, 0);
   Tout* outputPrt = output->read<Tout>({});
 
   for (uint32_t i = 0; i < input->getSize(); i++) {
@@ -176,7 +174,7 @@ Tensor* TensorCast(Tensor* input) {
 template <typename T>
 Tensor* TensorConstant(std::vector<uint32_t> shape, T c) {
   Tensor* output = new RamTensor<T>(shape);
-  T* outPrt = output->read<T>({});
+  T* outPrt = output->read<T>(0, 0);
 
   for (uint32_t i = 0; i < output->getSize(); i++) {
     outPrt[i] = c;
