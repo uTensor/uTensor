@@ -136,7 +136,7 @@ Tensor* TensorIdxImporter::loader(string& filename, IDX_DTYPE idx_type) {
   const uint8_t unit_size = t->unit_size();
 
   U* val = (U*)malloc(unit_size);
-  U* data = t->read<U>({});
+  U* data = t->read<U>(0, 0);
 
   for (uint32_t i = 0; i < t->getSize(); i++) {
     fread(val, unit_size, 1, fp);
