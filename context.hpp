@@ -1,6 +1,9 @@
 #ifndef UTENSOR_CTX_H
 #define UTENSOR_CTX_H
 
+#include "uTensorBase.hpp"
+#include "stdio.h"
+
 //#include <list>
 
 //TODO: how do we deal with dangling tensors?
@@ -11,45 +14,46 @@
 //      tensors can be all pointers here, but destructors has to set data to nullptr
 //      push(op, input_t_list, output_t_list)  or  push(op, init-list, init-list)
 //      TensorListModifierOp
-class Context : uTensor {
+class Context : public uTensor {
 protected:
-  vector<Operator> op_list;
+  vector<Operator*> op_list;
   bool del_onsight;
   //std::unordered_map<Tensor*> TensorList;  //all tensors alive  //kill all unused if malloc failed?
   //uint32_t m_size; //remaining memory size
   //void registerTensor(Tensor* t);
   //void gc(void); //garbage collector, delete any tracked unreferenced tensor
 
-  void initOpTensors(TList &t_list);
-  void deinitTensors(TList &t_list);
-  void updateInputTensorRef(TList &t_list);
-  void dcrRefCount(TList &t_list);
+  void initTensors(const TList &t_list);
+  void deinitTensors(const TList &t_list);
+  void updateInputTensorRef(const TList &t_list);
+  void dcrRefCount(TList t_list);
 
 public:
-  void push(Operator op, TList &_inputs, TList &_outputs);
+  void push(Operator *op, TList &_inputs, TList &_outputs);
   int run(void);
+
+  Context() {
+    del_onsight = true;
+  }
 };
 
-Context() {
-  del_onsight = true;
-}
 
-void Context::push(Operator op, TList &_inputs, TList &_outputs) {
-  if(op.getInputCount() != _inputs.size()) {
+void Context::push(Operator *op, TList &_inputs, TList &_outputs) {
+  if(op->getInputs().size() != _inputs.size()) {
     ERR_EXIT("valid number of inputs\r\n");
   }
-  if(op.getOutputCount() != _outputs.size()) {
+  if(op->getOutputs().size() != _outputs.size()) {
     ERR_EXIT("valid number of output\r\n");
   }
 
-  op.setInputs(_inputs);
-  op.setOutputs(_outputs);
+  op->setInputs(_inputs);
+  op->setOutputs(_outputs);
   op_list.push_back(op);
   updateInputTensorRef(_inputs);
 
 }
 
-void Context::updateInputTensorRef(TList &t_list) {
+void Context::updateInputTensorRef(const TList &t_list) {
   for(auto t:t_list) {
     t->incrRef();  //if an initial ref value is supplied to the tensor at compile time
                     //then this function does nothing
@@ -58,41 +62,42 @@ void Context::updateInputTensorRef(TList &t_list) {
   }
 }
 
-void Context::initOpTensors(vector<Tensor*> &t_list) {
+void Context::initTensors(const TList &t_list) {
   for(auto t:t_list) {
     t->inFocus();
   }
 }
 
-void Context::deinitTensors(vector<Tensor*> &t_list) {
+void Context::deinitTensors(const TList &t_list) {
   for(auto t:t_list) {
     t->deFocus();
   }
 }
 
-void Context::dcrRefCount(vector<Tensor*> &t_list) {
+void Context::dcrRefCount(TList t_list) {
   for(auto t:t_list) {
     t->dcrRef();
     if(t->getRef() < 1 && del_onsight) {
       delete t;
     }
+  }
 }
 
 int Context::run(void) {
   //unref2nullTensors();
 
   for(auto op:op_list) {
-    initTensors(op.getInputs());
-    initTensors(op.getOutputs());
+    initTensors(op->getInputs());
+    initTensors(op->getOutputs());
 
-    op.init();
-    op.compute();
-    op.deinit();
+    op->inFocus();
+    op->compute();
+    op->deFocus();
 
-    deinitOpTensors(op.getInputs());
-    deinitOpTensors(op.getOutputs());
+    deinitTensors(op->getInputs());
+    deinitTensors(op->getOutputs());
 
-    decreRefCount(op.getInputs());
+    dcrRefCount(op->getInputs());
   }
 }
 

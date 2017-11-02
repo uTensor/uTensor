@@ -8,13 +8,22 @@
 #include "stdlib.h"
 #include "uTensor_util.hpp"
 
+enum class DType : char { 
+  uint8,
+  int8,
+  uint16,
+  int32,
+  flt,
+  dbl,
+};
+
 class uTensor {
+ public:
   virtual void inFocus(){};
   virtual void deFocus(){};
-
- public:
   virtual ~uTensor() = 0;
 };
+
 
 uTensor::~uTensor() {}
 class TensorBase {
@@ -22,6 +31,9 @@ class TensorBase {
   std::vector<uint32_t> shape;
   void* data;
   uint32_t total_size;
+  DType dtype;
+  uint16_t ref_count;
+  bool allow_runtime_ref_inc;  //to support compile-time ref count
 
   ~TensorBase() {
     if (data != nullptr) {
@@ -32,14 +44,16 @@ class TensorBase {
   }
 };
 
-class Tensor : uTensor {
+class Tensor : public uTensor {
   virtual void* read(std::initializer_list<uint32_t> l) { return nullptr; }
   virtual void* write(size_t offset, size_t ele) { return nullptr; }
 
  protected:
   std::shared_ptr<TensorBase> s;  // short for states
  public:
-  Tensor(void) { std::cout << "tensor constructor " << std::endl; }
+  Tensor(void) {
+    std::cout << "tensor constructor " << std::endl;
+  }
 
   // returns how far a given dimension is apart
   size_t getStride(size_t dim_index) {
@@ -69,6 +83,9 @@ class Tensor : uTensor {
     s->data = (void*)malloc(unit_size() * s->total_size);
     if (s->data == NULL)
       ERR_EXIT("ran out of memory for %lu malloc", unit_size() * s->total_size);
+
+    s->ref_count = 0;
+    s->allow_runtime_ref_inc = false;
   }
 
   std::vector<uint32_t> getShape(void) { return s->shape; }
@@ -87,6 +104,31 @@ class Tensor : uTensor {
     return (T*)read(l);
   }
 
+  DType getDType(void) {
+    return s->dtype;
+  }
+
+  uint16_t incrRef() {
+    if(s->allow_runtime_ref_inc) {
+      s->ref_count += 1;
+    }
+
+    return s->ref_count;
+  }
+
+  uint16_t dcrRef() {
+    s->ref_count -= 1;
+    return s->ref_count;
+  }
+
+  uint16_t getRef() {
+    return s->ref_count;
+  }
+
+  bool is_ref_runtime(void) {
+    return s->allow_runtime_ref_inc;
+  }
+
   ~Tensor() {
     s = nullptr;
     std::cout << "i am tensor destructor " << std::endl;
@@ -103,6 +145,7 @@ class RamTensor : public Tensor {
     std::vector<uint32_t> v(3, 3);
     Tensor::init<T>(v);
     cursor = nullptr;
+    //dtype = something...
   }
 
   RamTensor(std::initializer_list<uint32_t> l) : Tensor() {
