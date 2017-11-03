@@ -12,25 +12,25 @@ class matrixOpsTest : public Test {
     TensorIdxImporter t_import;
 
     // reference inputs
-    Tensor<unsigned char> a =
+    Tensor* a =
         t_import.ubyte_import("/fs/testData/qMatMul/in/qA_0.idx");
-    Tensor<float> a_min =
+    Tensor* a_min =
         t_import.float_import("/fs/testData/qMatMul/in/qA_1.idx");
-    Tensor<float> a_max =
+    Tensor* a_max =
         t_import.float_import("/fs/testData/qMatMul/in/qA_2.idx");
-    Tensor<unsigned char> b =
+    Tensor* b =
         t_import.ubyte_import("/fs/testData/qMatMul/in/qB_0.idx");
-    Tensor<float> b_min =
+    Tensor* b_min =
         t_import.float_import("/fs/testData/qMatMul/in/qB_1.idx");
-    Tensor<float> b_max =
+    Tensor* b_max =
         t_import.float_import("/fs/testData/qMatMul/in/qB_2.idx");
 
     // reference outputs
-    Tensor<int> c =
+    Tensor* c =
         t_import.int_import("/fs/testData/qMatMul/out/qMatMul_0.idx");
-    Tensor<float> c_min =
+    Tensor* c_min =
         t_import.float_import("/fs/testData/qMatMul/out/qMatMul_1.idx");
-    Tensor<float> c_max =
+    Tensor* c_max =
         t_import.float_import("/fs/testData/qMatMul/out/qMatMul_2.idx");
 
     // actual implementation, uses ReferenceGemm()
@@ -39,9 +39,9 @@ class matrixOpsTest : public Test {
     // Sub-functions: QuantizationRangeForMultiplication,
     // QuantizationRangeForMultiplication, FloatForOneQuantizedLevel
 
-    Tensor<int> out_c(c.getShape());
-    Tensor<float> out_min(c_min.getShape());
-    Tensor<float> out_max(c_max.getShape());
+    Tensor* out_c = new RamTensor<int>(c->getShape());
+    Tensor* out_min = new RamTensor<float>(c_min->getShape());
+    Tensor* out_max = new RamTensor<float>(c_max->getShape());
     timer_start();
     QuantizedMatMul<uint8_t, uint8_t, int>(a, b, out_c, a_min, b_min, a_max,
                                            b_max, out_min, out_max);
@@ -51,8 +51,8 @@ class matrixOpsTest : public Test {
 
     // modify the checks below:
 
-    double result = meanPercentErr(c, out_c) + meanPercentErr(c_min, out_min) +
-                    meanPercentErr(c_max, out_max);
+    double result = meanPercentErr<int>(c, out_c) + meanPercentErr<float>(c_min, out_min) +
+                    meanPercentErr<float>(c_max, out_max);
     // passed(result < 0.0001);
     passed(result == 0);
   }

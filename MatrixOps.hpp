@@ -101,21 +101,21 @@ void QuantizationRangeForMultiplication(float min_a, float max_a, float min_b,
 }
 
 template <class T1, class T2, class Toutput>
-void QuantizedMatMul(Tensor<T1> A, Tensor<T2> B, Tensor<Toutput> &C,
-                     Tensor<float> mina, Tensor<float> minb, Tensor<float> maxa,
-                     Tensor<float> maxb, Tensor<float> outmin,
-                     Tensor<float> outmax, bool transpose_a = false,
+void QuantizedMatMul(Tensor* A, Tensor* B, Tensor* C,
+                     Tensor* mina, Tensor* minb, Tensor* maxa,
+                     Tensor* maxb, Tensor* outmin,
+                     Tensor* outmax, bool transpose_a = false,
                      bool transpose_b = false) {
-  const float min_a = *(mina.getPointer({}));
-  const float max_a = *(maxa.getPointer({}));
-  const float min_b = *(minb.getPointer({}));
-  const float max_b = *(maxb.getPointer({}));
+  const float min_a = *(mina->read<float>(0, 0));
+  const float max_a = *(maxa->read<float>(0, 0));
+  const float min_b = *(minb->read<float>(0, 0));
+  const float max_b = *(maxb->read<float>(0, 0));
 
   //auto tensor allocation
   Shape c_shape;
-  c_shape.push_back((A.getShape())[0]);
-  c_shape.push_back((B.getShape())[1]);
-  tensorChkAlloc(C, c_shape);
+  c_shape.push_back((A->getShape())[0]);
+  c_shape.push_back((B->getShape())[1]);
+  tensorChkAlloc<Toutput>(C, c_shape);
 
   const int32_t offset_a = FloatToQuantizedUnclamped<T1>(
       0.0f, min_a, max_a);  // NT: what 0 quantized to; depends on
@@ -131,16 +131,16 @@ void QuantizedMatMul(Tensor<T1> A, Tensor<T2> B, Tensor<Toutput> &C,
   int a_dim_remaining = 1 - first;
   int b_dim_remaining = 1 - second;
 
-  T1* A_Data = A.getPointer({});
-  T2* B_Data = B.getPointer({});
-  Toutput* C_Data = C.getPointer({});
+  T1* A_Data = A->read<T1>(0, 0);
+  T2* B_Data = B->read<T2>(0, 0);
+  Toutput* C_Data = C->write<Toutput>(0, 0);
 
   const bool transpose_c = false;
-  const size_t m = A.getShape()[a_dim_remaining];
-  const size_t n = B.getShape()[b_dim_remaining];
-  const size_t k = A.getShape()[first];
-  const size_t lda = A.getShape()[1];
-  const size_t ldb = B.getShape()[1];
+  const size_t m = A->getShape()[a_dim_remaining];
+  const size_t n = B->getShape()[b_dim_remaining];
+  const size_t k = A->getShape()[first];
+  const size_t lda = A->getShape()[1];
+  const size_t ldb = B->getShape()[1];
   const size_t ldc = n;
 
   ReferenceGemmuImpl<T1, T2, Toutput>(
@@ -152,9 +152,9 @@ void QuantizedMatMul(Tensor<T1> A, Tensor<T2> B, Tensor<Toutput> &C,
   QuantizationRangeForMultiplication<T1, T2, Toutput>(
       min_a, max_a, min_b, max_b, &min_c_value, &max_c_value);
 
-  float* c_min = outmin.getPointer({});
+  float* c_min = outmin->read<float>(0, 0);
   *c_min = min_c_value;
-  float* c_max = outmax.getPointer({});
+  float* c_max = outmax->read<float>(0, 0);
   *c_max = max_c_value;
 }
 
