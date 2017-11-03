@@ -102,7 +102,7 @@ class Tensor : public uTensor {
 
   template <class T>
   T* write(size_t offset, size_t ele) {
-    return (const T*)write(offset, ele);
+    return (T*)write(offset, ele);
   }
 
   DType getDType(void) {
@@ -141,9 +141,6 @@ class RamTensor : public Tensor {
   // need deep copy
  public:
   RamTensor() : Tensor() {
-    std::vector<uint32_t> v(3, 3);  ///NT: why (3,3)?
-    Tensor::init<T>(v);
-    cursor = nullptr;
     //dtype = something...
   }
 
@@ -156,7 +153,7 @@ class RamTensor : public Tensor {
     Tensor::init<T>(v);
   }
 
-  RamTensor(std::vector<uint32_t>& v) : Tensor() {
+  RamTensor(std::vector<uint32_t> v) : Tensor() {
     Tensor::init<T>(v);
   }
 
@@ -202,8 +199,6 @@ class RamTensor : public Tensor {
   }
   ~RamTensor() {}
 
- private:
-  T* cursor;
 };
 
 template <typename Tin, typename Tout>
