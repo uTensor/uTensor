@@ -65,12 +65,12 @@ T FloatToQuantized(float input, float range_min, float range_max) {
 }
 
 template <class T1, class T2>
-inline void RequantizeManyInNewRange(Tensor<T1> input, uint32_t count,
+inline void RequantizeManyInNewRange(Tensor* input, uint32_t count,
                                      float min_input, float max_input,
                                      float min_output, float max_output,
-                                     Tensor<T2> output) {
-  T1 *in_ptr = input.getPointer({});
-  T2 *out_ptr = output.getPointer({});
+                                     Tensor* output) {
+  T1 *in_ptr = input->read<T1>(0, 0);
+  T2 *out_ptr = output->read<T2>(0, 0);
   for (size_t index = 0; index < count; ++index) {
     const float input_float =
         QuantizedToFloat<T1>(in_ptr[index], min_input, max_input);
