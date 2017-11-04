@@ -12,36 +12,45 @@ class NnOpsTest : public Test {
     TensorIdxImporter t_import;
 
     // reference inputs
-    Tensor<unsigned char> a =
+    Tensor* a =
         t_import.ubyte_import("/fs/testData/ref_qRelu/in/QuantizeV2_0.idx");
-    Tensor<float> min =
+    Tensor* min =
         t_import.float_import("/fs/testData/ref_qRelu/in/QuantizeV2_1.idx");
-    Tensor<float> max =
+    Tensor* max =
         t_import.float_import("/fs/testData/ref_qRelu/in/QuantizeV2_2.idx");
 
     // reference outputs
-    Tensor<unsigned char> ref_out =
+    Tensor* ref_out =
         t_import.ubyte_import("/fs/testData/ref_qRelu/out/ref_qRelu_0.idx");
-    Tensor<float> ref_min =
+    Tensor* ref_min =
         t_import.float_import("/fs/testData/ref_qRelu/out/ref_qRelu_1.idx");
-    Tensor<float> ref_max =
+    Tensor* ref_max =
         t_import.float_import("/fs/testData/ref_qRelu/out/ref_qRelu_2.idx");
 
     // modify the checks below:
-    Tensor<unsigned char> out(ref_out.getShape());
-    Tensor<float> out_min(ref_out.getShape());
-    Tensor<float> out_max(ref_out.getShape());
+    Tensor* out = new RamTensor<unsigned char>(ref_out->getShape());
+    Tensor* out_min = new RamTensor<float>(ref_min->getShape());
+    Tensor* out_max = new RamTensor<float>(ref_max->getShape());
 
     timer_start();
     Relu<unsigned char, float, unsigned char>(a, min, max, out, out_min,
                                               out_max);
     timer_stop();
 
-    double result = meanPercentErr(ref_out, out) +
-                    meanPercentErr(ref_min, out_min) +
-                    meanPercentErr(ref_max, out_max);
+    double result = meanPercentErr<unsigned char>(ref_out, out) +
+                    meanPercentErr<float>(ref_min, out_min) +
+                    meanPercentErr<float>(ref_max, out_max);
     // passed(result < 0.0001);
     passed(result == 0);
+    delete a;
+    delete min;
+    delete max;
+    delete ref_out;
+    delete ref_min;
+    delete ref_max;
+    delete out;
+    delete out_min;
+    delete out_max;
   }
 
   void runAll(void) { reluTest(); }
