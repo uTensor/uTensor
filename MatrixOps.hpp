@@ -158,4 +158,17 @@ void QuantizedMatMul(Tensor* A, Tensor* B, Tensor* C,
   *c_max = max_c_value;
 }
 
+class QntMatMulOp : public Operator{
+public:
+  QntMatMulOp() {
+    n_inputs = 6;
+    n_outputs = 3;
+  }
+  virtual void compute() override {
+    QuantizedMatMul<uint8_t, uint8_t, int>(inputs[0], inputs[3],
+      outputs[0], inputs[1], inputs[4], inputs[2], inputs[5],
+      outputs[1], outputs[2]);
+  }
+};
+
 #endif
