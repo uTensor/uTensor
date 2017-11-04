@@ -9,6 +9,7 @@
 #include "MatrixTests.hpp"
 #include "ArrayTests.hpp"
 #include "MathTests.hpp"
+#include "NnTests.hpp"
 //#include "deep_mnist_mlp.hpp"
 
 Serial pc(USBTX, USBRX, 115200);
@@ -47,6 +48,12 @@ int main(int argc, char** argv) {
    mathTests.runAll();
    printf("Math result...\r\n");
    mathTests.printSummary();
+
+   printf("NnOpS: \r\n");
+   NnOpsTest nnTest;
+   nnTest.runAll();
+   printf("Nn Ops result...\r\n");
+   nnTest.printSummary();
 
   Context ctx;
   //In [24]: tf.get_default_graph().get_tensor_by_name("import/y_pred:0").eval(feed_dict={x: mnist.test.images[0:1]})
