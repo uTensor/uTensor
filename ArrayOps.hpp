@@ -57,7 +57,7 @@ void dequantize(Tensor* input, Tensor* min_range, Tensor* max_range, Tensor* out
     float max = *(max_range->read<float>(0, 0));
       //auto tensor allocation
     Shape out_shape;
-    tensorChkAlloc<float>(output, input->getShape());
+    tensorChkAlloc<float>(&output, input->getShape());
 
     T* input_ptr = input->read<T>(0, 0);
     float* output_ptr = output->write<float>(0, 0);
