@@ -4,7 +4,7 @@
 
   uTensor is an extreme light-weight Deep-Learning Inference framework built on mbed and Tensorflow.
 
-  This project is under going constant development.
+  This project is under going constant development. The development is running on develop branch.
 
 ## Requirement
 
