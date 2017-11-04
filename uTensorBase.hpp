@@ -14,44 +14,35 @@ protected:
   //setup input/output info in derived constructors
   //ref count?
   TList inputs;
-  vector<DType> dtype_in;
+  uint8_t n_inputs;
   TList outputs;
-  vector<DType> dtype_out;
+  uint8_t n_outputs;
+
 public:
   virtual void compute() = 0;
+  void setInputs(TList &_inputs);
+  void setOutputs(TList &_outputs);
+  TList getInputs(void) { return inputs; }
+  TList getOutputs(void) { return outputs;}
+  uint8_t getNumInputs(void) { return n_inputs; }
+  uint8_t getNumOutputs(void) { return n_outputs; }
 
-  void setInputs(TList &_inputs) {
-    if(_inputs.size() != inputs.size()) ERR_EXIT("Input Tensor list mismatched...");
-
-    for(uint8_t i = 0; i < inputs.size(); i++) {
-      if(dtype_in[i] != inputs[i]->getDType()) {
-        ERR_EXIT("Tensor Type mismatched...");
-      }
-
-      inputs[i] = _inputs[i];
-    }
-  }
-
-  void setOutputs(TList &_outputs) {
-    if(_outputs.size() != outputs.size()) ERR_EXIT("Input Tensor list mismatched...");
-
-    for(uint8_t i = 0; i < outputs.size(); i++) {
-      if(dtype_out[i] != outputs[i]->getDType()) {
-        ERR_EXIT("Tensor Type mismatched...");
-      }
-
-      outputs[i] = _outputs[i];
-    }
-  }
-
-  TList getInputs(void) {
-    return inputs;
-  }
-
-  TList getOutputs(void) {
-    return outputs;
+  Operator() {
+    n_inputs = 0;  //overridden by constructor
+    n_outputs = 0;
   }
 };
 
+void Operator::setInputs(TList &_inputs) {
+  if(_inputs.size() != n_inputs) ERR_EXIT("Input Tensor list mismatched...");
+
+  inputs = _inputs;
+}
+
+void Operator::setOutputs(TList &_outputs) {
+  if(_outputs.size() != n_outputs) ERR_EXIT("Input Tensor list mismatched...");
+
+  outputs = _outputs;
+}
 
 #endif //UTENSOR_BASE_H

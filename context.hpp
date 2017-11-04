@@ -30,7 +30,7 @@ protected:
 
 public:
   void push(Operator *op, TList &_inputs, TList &_outputs);
-  int run(void);
+  int eval(void);
 
   Context() {
     del_onsight = true;
@@ -39,10 +39,10 @@ public:
 
 
 void Context::push(Operator *op, TList &_inputs, TList &_outputs) {
-  if(op->getInputs().size() != _inputs.size()) {
+  if(op->getNumInputs() != _inputs.size()) {
     ERR_EXIT("valid number of inputs\r\n");
   }
-  if(op->getOutputs().size() != _outputs.size()) {
+  if(op->getNumOutputs() != _outputs.size()) {
     ERR_EXIT("valid number of output\r\n");
   }
 
@@ -83,7 +83,7 @@ void Context::dcrRefCount(TList t_list) {
   }
 }
 
-int Context::run(void) {
+int Context::eval(void) {
   //unref2nullTensors();
 
   for(auto op:op_list) {
@@ -98,6 +98,11 @@ int Context::run(void) {
     deinitTensors(op->getOutputs());
 
     dcrRefCount(op->getInputs());
+
+    op->dcrRef();
+    if(op->getRef() < 1 && del_onsight) {
+      delete op;
+    }
   }
 
   return 0;

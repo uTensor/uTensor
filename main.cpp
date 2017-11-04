@@ -11,6 +11,7 @@
 #include "MathTests.hpp"
 #include "NnTests.hpp"
 #include "tensor_test.hpp"
+#include "context_test.hpp"
 //#include "deep_mnist_mlp.hpp"
 
 Serial pc(USBTX, USBRX, 115200);
@@ -56,12 +57,17 @@ int main(int argc, char** argv) {
    printf("Nn Ops result...\r\n");
    nnTest.printSummary();
 
-   printf("Trans test: \r\n");
+   printf("Transformation test: \r\n");
    transTest tTest;
    tTest.runAll();
-   printf("Trans result...\r\n");
+   printf("Transformation result...\r\n");
    tTest.printSummary();
-  Context ctx;
+
+   printf("Context test: \r\n");
+   contextTest ctxTest;
+   ctxTest.runAll();
+   printf("Context result...\r\n");
+   ctxTest.printSummary();
   //In [24]: tf.get_default_graph().get_tensor_by_name("import/y_pred:0").eval(feed_dict={x: mnist.test.images[0:1]})
   //Out[24]: array([7])
 
