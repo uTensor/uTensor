@@ -205,7 +205,7 @@ template <typename Tin, typename Tout>
 Tensor* TensorCast(Tensor* input) {
   Tensor* output = new RamTensor<Tout>(input->getShape());
   Tin* inputPrt = input->read<Tin>(0, 0);
-  Tout* outputPrt = output->read<Tout>({});
+  Tout* outputPrt = output->read<Tout>(0, 0);
 
   for (uint32_t i = 0; i < input->getSize(); i++) {
     outputPrt[i] = static_cast<Tout>(inputPrt[i]);
@@ -338,10 +338,10 @@ void printDim(Tensor* t) {
 }
 
 template <typename T>
-void tensorChkAlloc(Tensor* t, Shape dim) {
-  if (t->getSize() == 0) {
-    t = new RamTensor<T>(dim);
-  } else if (t->getShape() != dim) {
+void tensorChkAlloc(Tensor** t, Shape dim) {
+  if ((*t)->getSize() == 0) {
+    *t = new RamTensor<T>(dim);
+  } else if ((*t)->getShape() != dim) {
     ERR_EXIT("Dim mismatched...\r\n");
   }
 }
