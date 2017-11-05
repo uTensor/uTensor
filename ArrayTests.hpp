@@ -56,7 +56,7 @@ public:
         Tensor* out = new RamTensor<float>(out_ref->getShape());
 
         timer_start();
-        dequantize<unsigned char>(a, a_min, a_max, out);
+        dequantize<unsigned char>(a, a_min, a_max, &out);
         timer_stop();
 
         double result = meanPercentErr<float>(out_ref, out);
