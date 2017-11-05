@@ -94,7 +94,7 @@ void dequantize(Tensor* input, Tensor* min_range, Tensor* max_range, Tensor* out
 
 ///NT: This Op hasn't been tested extensively. We will have to increase the test-coverage for this function.
 template <typename T>
-void reshape(Tensor* input, Tensor* shape, Tensor* output) {
+void reshape(Tensor* input, Tensor* shape, Tensor** output) {
     Shape dim;
 
     //validating and inferring dimensions
@@ -125,18 +125,18 @@ void reshape(Tensor* input, Tensor* shape, Tensor* output) {
 
     T* input_ptr = input->read<T>(0, 0);
     //check if the output dim is valid
-    if(output->getSize() > 0 && dim == output->getShape()) {
+    if(*output && (*output)->getSize() > 0 && dim == (*output)->getShape()) {
         //copy
-        T* output_ptr = output->read<T>(0, 0);
+        T* output_ptr = (*output)->read<T>(0, 0);
         std::memcpy(output_ptr, input_ptr, (std::size_t) input->getSize_in_bytes());
-    } else if(output->getSize() > 0 && dim != output->getShape()) {
+    } else if(*output && (*output)->getSize() > 0 && dim != (*output)->getShape()) {
         ERR_EXIT("output tensor dimension mismatches supplied shape")
     } else {
         //construct a new tensor and copy
         Tensor* tmp = new RamTensor<T>(dim);
         T* output_ptr = tmp->write<T>(0, 0);
         std::memcpy(output_ptr, input_ptr, (std::size_t) input->getSize_in_bytes());
-        output = tmp;
+        *output = tmp;
     }
 
 }

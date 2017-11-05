@@ -12,6 +12,7 @@
 #include "NnTests.hpp"
 #include "tensor_test.hpp"
 #include "context_test.hpp"
+#include "mlp_test.hpp"
 //#include "deep_mnist_mlp.hpp"
 
 Serial pc(USBTX, USBRX, 115200);
@@ -28,7 +29,7 @@ int main(int argc, char** argv) {
 
  // int prediction = runMLP("/fs/testData/deep_mlp/import-Placeholder_0.idx");
  // printf("prediction: %d\r\n", prediction);
-   idxImporterTest idxTest;
+/*   idxImporterTest idxTest;
    idxTest.runAll();
 
 
@@ -67,7 +68,14 @@ int main(int argc, char** argv) {
    contextTest ctxTest;
    ctxTest.runAll();
    printf("Context result...\r\n");
-   ctxTest.printSummary();
+   ctxTest.printSummary();*/
+
+
+   printf("mlp test: \r\n");
+   mlpTest mlpt;
+   mlpt.runAll();
+   printf("mlp result...\r\n");
+   mlpt.printSummary();
   //In [24]: tf.get_default_graph().get_tensor_by_name("import/y_pred:0").eval(feed_dict={x: mnist.test.images[0:1]})
   //Out[24]: array([7])
 
