@@ -101,7 +101,7 @@ void QuantizationRangeForMultiplication(float min_a, float max_a, float min_b,
 }
 
 template <class T1, class T2, class Toutput>
-void QuantizedMatMul(Tensor* A, Tensor* B, Tensor* C,
+void QuantizedMatMul(Tensor* A, Tensor* B, Tensor** C,
                      Tensor* mina, Tensor* minb, Tensor* maxa,
                      Tensor* maxb, Tensor* outmin,
                      Tensor* outmax, bool transpose_a = false,
@@ -115,7 +115,7 @@ void QuantizedMatMul(Tensor* A, Tensor* B, Tensor* C,
   Shape c_shape;
   c_shape.push_back((A->getShape())[0]);
   c_shape.push_back((B->getShape())[1]);
-  tensorChkAlloc<Toutput>(&C, c_shape);
+  tensorChkAlloc<Toutput>(C, c_shape);
 
   const int32_t offset_a = FloatToQuantizedUnclamped<T1>(
       0.0f, min_a, max_a);  // NT: what 0 quantized to; depends on
@@ -133,7 +133,7 @@ void QuantizedMatMul(Tensor* A, Tensor* B, Tensor* C,
 
   T1* A_Data = A->read<T1>(0, 0);
   T2* B_Data = B->read<T2>(0, 0);
-  Toutput* C_Data = C->write<Toutput>(0, 0);
+  Toutput* C_Data = (*C)->write<Toutput>(0, 0);
 
   const bool transpose_c = false;
   const size_t m = A->getShape()[a_dim_remaining];
@@ -166,7 +166,7 @@ public:
   }
   virtual void compute() override {
     QuantizedMatMul<uint8_t, uint8_t, int>(inputs[0], inputs[3],
-      outputs[0], inputs[1], inputs[4], inputs[2], inputs[5],
+     &(outputs[0]), inputs[1], inputs[4], inputs[2], inputs[5],
       outputs[1], outputs[2]);
   }
 };
