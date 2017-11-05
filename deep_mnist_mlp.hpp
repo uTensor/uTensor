@@ -8,165 +8,167 @@
 #include "ArrayOps.hpp"
 #include "uTensor_util.hpp"
 
-void tensorQuantize(Tensor<float> input, Tensor<unsigned char> &output,
-  Tensor<float> &out_min, Tensor<float> &out_max) {
+template <class T1, class T2, class T3, class T4>
+void tensorQuantize(Tensor* input, Tensor** output,
+  Tensor** out_min, Tensor** out_max) {
 
     //reshape
-    Tensor<int> reshape_shape({1});
-    Tensor<int> reduce_dim({1});
-    Shape input_shape = input.getShape();
-    Tensor<float> reshape_out;
+    Tensor* reshape_shape = new RamTensor<int>({1});
+    Tensor* reduce_dim = new RamTensor<int>({1});
+    Shape input_shape = input->getShape();
+    Tensor* reshape_out = nullptr;
 
-    *(reshape_shape.getPointer({0})) = -1;
-    *(reduce_dim.getPointer({0})) = 0;
+    *(reshape_shape->read<int>(0, 0)) = -1;
+    *(reduce_dim->read<int>(0, 0)) = 0;
 
-    reshape(input, reshape_shape, reshape_out);
-
-    input.~Tensor();
+    reshape<float>(input, reshape_shape, &reshape_out);
 
     //Min and Max of (reshaped) input
-    Tensor<float> min_out({1});
-    Tensor<float> max_out({1});
-    Min(reshape_out, reduce_dim, min_out);
-    Max(reshape_out, reduce_dim, max_out);
+    Tensor* min_out = new RamTensor<float>({1});
+    Tensor* max_out = new RamTensor<float>({1});
+    Min<float, int, float>(reshape_out, reduce_dim, min_out);
+    Max<float, int, float>(reshape_out, reduce_dim, max_out);
 
-    tensorChkAlloc(output, input_shape);
+    tensorChkAlloc<T2>(output, input->getShape());
+    delete input;
     Shape shape_one;
     shape_one.push_back(1);
-    tensorChkAlloc(out_min, shape_one);
-    tensorChkAlloc(out_max, shape_one);
+    tensorChkAlloc<T3>(out_min, shape_one);
+    tensorChkAlloc<T4>(out_max, shape_one);
 
-    QuantizeV2(reshape_out, min_out, max_out, output, out_min, out_max);
+    QuantizeV2<T2>(reshape_out, min_out, max_out, *output, *out_min, *out_max);
 }
 
-void ReluLayer(Tensor<unsigned char> x, Tensor<float> x_min, Tensor<float> x_max,
-   Tensor<unsigned char> w, Tensor<float> w_min, Tensor<float> w_max, Tensor<float> b,
-    Tensor<unsigned char> &output, Tensor<float> &output_min, Tensor<float> &output_max) {
+template<class T1, class T2, class T3, class T4, class T5>
+void ReluLayer(Tensor* x, Tensor* x_min, Tensor* x_max,
+   Tensor* w, Tensor* w_min, Tensor* w_max, Tensor* b,
+    Tensor** output, Tensor** output_min, Tensor** output_max) {
   
     //quantized matmul
-    Tensor<int> out_c;
-    Tensor<float> matmul_out_min({1});
-    Tensor<float> matmul_out_max({1});
+    Tensor* out_c = nullptr;
+    Tensor* matmul_out_min = new RamTensor<float>({1});
+    Tensor* matmul_out_max = new RamTensor<float>({1});
 
-    QuantizedMatMul<uint8_t, uint8_t, int>(x, w, out_c, x_min, w_min, x_max,
+    QuantizedMatMul<uint8_t, uint8_t, int>(x, w, &out_c, x_min, w_min, x_max,
       w_max, matmul_out_min, matmul_out_max);
     //clean up
-    x.~Tensor();
-    w.~Tensor();
-    x_min.~Tensor();
-    w_min.~Tensor();
-    x_max.~Tensor();
-    w_max.~Tensor();
+    delete x;
+    delete w;
+    delete x_min;
+    delete w_min;
+    delete x_max;
+    delete w_max;
 
     //Requantization_Range
-    Tensor<float> req_out_min({1});
-    Tensor<float> req_out_max({1});
+    Tensor* req_out_min = new RamTensor<float>({1});
+    Tensor* req_out_max = new RamTensor<float>({1});
     Requantization_Range<int, float>(out_c, matmul_out_min, matmul_out_max, req_out_min, req_out_max);
 
     //Requantize
-    Tensor<unsigned char> reqnt_out(out_c.getShape());
-    Tensor<float> reqnt_out_min({1});
-    Tensor<float> reqnt_out_max({1});
+    Tensor* reqnt_out = new RamTensor<unsigned char>(out_c->getShape());
+    Tensor* reqnt_out_min = new RamTensor<float>({1});
+    Tensor* reqnt_out_max = new RamTensor<float>({1});
     Requantize<int, float, unsigned char>(out_c, matmul_out_min, matmul_out_max, req_out_min, req_out_max,
       reqnt_out, reqnt_out_min, reqnt_out_max);
 
-    Shape out_shape = out_c.getShape();
+    Shape out_shape = out_c->getShape();
     //clean up
-    out_c.~Tensor();
-    matmul_out_min.~Tensor();
-    matmul_out_max.~Tensor();
-    req_out_min.~Tensor();
-    req_out_max.~Tensor();
+    delete out_c;
+    delete matmul_out_min;
+    delete matmul_out_max;
+    delete req_out_min;
+    delete req_out_max;
 
-    Tensor<float> deqnt_out;
-    tensorChkAlloc(deqnt_out, reqnt_out.getShape());
-    dequantize(reqnt_out, reqnt_out_min, reqnt_out_max, deqnt_out);
-    reqnt_out.~Tensor();
+    Tensor* deqnt_out = nullptr;
+    tensorChkAlloc<float>(&deqnt_out, reqnt_out->getShape());
+    dequantize<unsigned char>(reqnt_out, reqnt_out_min, reqnt_out_max, &deqnt_out);
+    delete reqnt_out;
 
-    Tensor<float> z_output(deqnt_out.getShape()); 
-    Add<float, float>(deqnt_out, b, z_output);
-    deqnt_out.~Tensor();
+    Tensor* z_output = new RamTensor<float>(deqnt_out->getShape()); 
+    Add<float, float>(deqnt_out, b, &z_output);
+    delete deqnt_out;
+    delete b;
 
-    Tensor<unsigned char> z_qnt_output;
-    Tensor<float> z_min({1});
-    Tensor<float> z_max({1});
-    tensorQuantize(z_output, z_qnt_output, z_min, z_max);
-    z_output.~Tensor();
+    Tensor* z_qnt_output = nullptr;
+    Tensor* z_min = new RamTensor<float>({1});
+    Tensor* z_max = new RamTensor<float>({1});
+    tensorQuantize<float, unsigned char, float, float>(z_output, &z_qnt_output, &z_min, &z_max);
 
-    tensorChkAlloc(output, z_qnt_output.getShape());
+    tensorChkAlloc<T3>(output, z_qnt_output->getShape());
     Shape shape_one;
     shape_one.push_back(1);
-    tensorChkAlloc(output_min, shape_one);
-    tensorChkAlloc(output_max, shape_one);
-    Relu<unsigned char, float, unsigned char>(z_qnt_output, z_min, z_max, output, output_min, output_max);
+    tensorChkAlloc<T4>(output_min, shape_one);
+    tensorChkAlloc<T4>(output_max, shape_one);
+    Relu<unsigned char, float, unsigned char>(z_qnt_output, z_min, z_max, *output, *output_min, *output_max);
 }
 
-void PredLayer(Tensor<unsigned char> input, Tensor<float> input_min,
-               Tensor<float> input_max, Tensor<int> &output) {
+template<class T1, class T2, class T3>
+void PredLayer(Tensor* input, Tensor* input_min,
+               Tensor* input_max, Tensor** output) {
   TensorIdxImporter t_import;
-  Tensor<unsigned char> w = t_import.ubyte_import(
+  Tensor* w = t_import.ubyte_import(
       "/fs/testData/deep_mlp/runPredLayer/MatMul_2_eightbit_quantized_mat_mul/"
       "inputs/Variable_4_quint8_const_0.idx");
-  Tensor<float> w_min = t_import.float_import(
+  Tensor* w_min = t_import.float_import(
       "/fs/testData/deep_mlp/runPredLayer/MatMul_2_eightbit_quantized_mat_mul/"
       "inputs/Variable_4_min_0.idx");
-  Tensor<float> w_max = t_import.float_import(
+  Tensor* w_max = t_import.float_import(
       "/fs/testData/deep_mlp/runPredLayer/MatMul_2_eightbit_quantized_mat_mul/"
       "inputs/Variable_4_max_0.idx");
 
-  Tensor<int> out_c;
-  Tensor<float> matmul_out_min({1});
-  Tensor<float> matmul_out_max({1});
+  Tensor* out_c = nullptr;
+  Tensor* matmul_out_min = new RamTensor<float>({1});
+  Tensor* matmul_out_max = new RamTensor<float>({1});
 
   //MatMul
-  QuantizedMatMul<uint8_t, uint8_t, int>(input, w, out_c, input_min, w_min,
+  QuantizedMatMul<uint8_t, uint8_t, int>(input, w, &out_c, input_min, w_min,
                                          input_max, w_max, matmul_out_min,
                                          matmul_out_max);
   //clean up
-  input.~Tensor();
-  w.~Tensor();
-  w_min.~Tensor();
-  w_max.~Tensor();
-  input_min.~Tensor();
-  input_max.~Tensor();
+  delete input;
+  delete w;;
+  delete w_min;
+  delete w_max;
+  delete input_min;
+  delete input_max;
 
   //Requantization_Range
-  Tensor<float> req_out_min({1});
-  Tensor<float> req_out_max({1});
+  Tensor* req_out_min = new RamTensor<float>({1});
+  Tensor* req_out_max = new RamTensor<float>({1});
   Requantization_Range<int, float>(out_c, matmul_out_min, matmul_out_max,
                                    req_out_min, req_out_max);
 
   //Requantize
-  Tensor<unsigned char> reqnt_out(out_c.getShape());
-  Tensor<float> reqnt_out_min({1});
-  Tensor<float> reqnt_out_max({1});
+  Tensor* reqnt_out = new RamTensor<unsigned char>(out_c->getShape());
+  Tensor* reqnt_out_min = new RamTensor<float>({1});
+  Tensor* reqnt_out_max = new RamTensor<float>({1});
   Requantize<int, float, unsigned char>(out_c, matmul_out_min, matmul_out_max,
                                         req_out_min, req_out_max, reqnt_out,
                                         reqnt_out_min, reqnt_out_max);
 
-  out_c.~Tensor();
-  matmul_out_min.~Tensor();
-  matmul_out_max.~Tensor();
+  delete out_c;
+  delete matmul_out_min;
+  delete matmul_out_max;
 
   //dequantize
-  Tensor<float> deqnt_out;
-  dequantize(reqnt_out, reqnt_out_min, reqnt_out_max, deqnt_out);
-  reqnt_out_min.~Tensor();
-  reqnt_out_max.~Tensor();
+  Tensor* deqnt_out = nullptr;
+  dequantize<unsigned char>(reqnt_out, reqnt_out_min, reqnt_out_max, &deqnt_out);
+  delete reqnt_out_min;
+  delete reqnt_out_max;
 
   //Add
-  Tensor<float> bias = t_import.float_import(
+  Tensor* bias = t_import.float_import(
       "/fs/testData/deep_mlp/runPredLayer/add_2/inputs/Variable_5_0.idx");
-  Tensor<float> output_z;
-  Add<float, float>(deqnt_out, bias, output_z);
-  deqnt_out.~Tensor();
-  bias.~Tensor();
+  Tensor* output_z = nullptr;
+  Add<float, float>(deqnt_out, bias, &output_z);
+  delete deqnt_out;
+  delete bias;
 
   //ArgMax
-  Tensor<int> dim = t_import.int_import(
+  Tensor* dim = t_import.int_import(
       "/fs/testData/deep_mlp/runPredLayer/y_pred/inputs/"
       "y_pred-dimension_0.idx");
-  ArgMax(output_z, dim, output);
+  ArgMax<float, T3>(output_z, dim, output);
 }
 
 //Test code
@@ -199,28 +201,28 @@ void runPred(void) {
 
 int runMLP(string inputIdxFile) {
   TensorIdxImporter t_import;
-  Tensor<float> x =
+  Tensor* x =
       t_import.float_import(inputIdxFile);
-  Tensor<unsigned char> x_quantized;
-  Tensor<float> x_min;
-  Tensor<float> x_max;
+  Tensor* x_quantized = nullptr;
+  Tensor* x_min = nullptr;
+  Tensor* x_max = nullptr;
 
-  tensorQuantize(x, x_quantized, x_min, x_max);
+  tensorQuantize<float, unsigned char, float, float>(x, &x_quantized, &x_min, &x_max);
 
-  Tensor<unsigned char> w = t_import.ubyte_import(
+  Tensor* w = t_import.ubyte_import(
       "/fs/testData/deep_mlp/import-Variable_quint8_const_0.idx");
-  Tensor<float> w_min =
+  Tensor* w_min =
       t_import.float_import("/fs/testData/deep_mlp/import-Variable_min_0.idx");
-  Tensor<float> w_max =
+  Tensor* w_max =
       t_import.float_import("/fs/testData/deep_mlp/import-Variable_max_0.idx");
-  Tensor<float> b =
+  Tensor* b =
       t_import.float_import("/fs/testData/deep_mlp/import-Variable_1_0.idx");
-  Tensor<unsigned char> relu_output;
-  Tensor<float> relu_min;
-  Tensor<float> relu_max;
+  Tensor* relu_output = nullptr;
+  Tensor* relu_min = nullptr;
+  Tensor* relu_max = nullptr;
 
-  ReluLayer(x_quantized, x_min, x_max, w, w_min, w_max, b, relu_output,
-            relu_min, relu_max);
+  ReluLayer<unsigned char, unsigned char, unsigned char, float, float>(x_quantized, x_min, x_max, w, w_min, w_max, b, &relu_output,
+            &relu_min, &relu_max);
 
   w = t_import.ubyte_import(
       "/fs/testData/deep_mlp/import-Variable_2_quint8_const_0.idx");
@@ -229,25 +231,23 @@ int runMLP(string inputIdxFile) {
   w_max = t_import.float_import(
       "/fs/testData/deep_mlp/import-Variable_2_max_0.idx");
   b = t_import.float_import("/fs/testData/deep_mlp/import-Variable_3_0.idx");
-  Tensor<unsigned char> relu_output2;
-  Tensor<float> relu_min2;
-  Tensor<float> relu_max2;
+  Tensor* relu_output2 = nullptr;
+  Tensor* relu_min2 = nullptr;
+  Tensor* relu_max2 = nullptr;
 
-  ReluLayer(relu_output, relu_min, relu_max, w, w_min, w_max, b, relu_output2,
-            relu_min2, relu_max2);
-  w.~Tensor();
-
-
-  Tensor<int> pred;
-  PredLayer(relu_output2, relu_min2, relu_max2, pred);
-  relu_output2.~Tensor();
+  ReluLayer<unsigned char, unsigned char, unsigned char, float, float>(relu_output, relu_min, relu_max, w, w_min, w_max, b, &relu_output2,
+            &relu_min2, &relu_max2);
 
 
-  Tensor<float> ref_out = t_import.float_import(
+  Tensor* pred = nullptr;
+  PredLayer<unsigned char, float, int>(relu_output2, relu_min2, relu_max2, &pred);
+
+
+  Tensor* ref_out = t_import.float_import(
     "/fs/testData/deep_mlp/runPredLayer/y_pred/outputs/y_pred_0.idx");
-  Tensor<int> ref_pred = TensorCast<float, int>(ref_out);
+  Tensor* ref_pred = TensorCast<float, int>(ref_out);
 
-  double result = Test::meanPercentErr(ref_pred, pred);
+  double result = Test::meanPercentErr<int>(ref_pred, pred);
   
   if (result < 0.0001) {
     printf("PASSED %.8f\r\n\r\n", result);
@@ -255,6 +255,6 @@ int runMLP(string inputIdxFile) {
     printf("FAILED %.8f\r\n\r\n", result);
   }
 
-  return *(pred.getPointer({0}));
+  return *(pred->read<int>(0, 0));
   // output layer
 }

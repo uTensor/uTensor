@@ -108,7 +108,7 @@ public:
     Tensor* matmul_out_min = new RamTensor<float>({1});
     Tensor* matmul_out_max = new RamTensor<float>({1});
 
-    QuantizedMatMul<uint8_t, uint8_t, int>(x, w, out_c, x_min, w_min, x_max,
+    QuantizedMatMul<uint8_t, uint8_t, int>(x, w, &out_c, x_min, w_min, x_max,
       w_max, matmul_out_min, matmul_out_max);
     //clean up
     delete x;
@@ -197,7 +197,7 @@ public:
 
     //output
     Tensor* deqnt_out = new RamTensor<float>(out_c->getShape());
-    dequantize<unsigned char>(reqnt_out, reqnt_out_min, reqnt_out_max, deqnt_out);
+    dequantize<unsigned char>(reqnt_out, reqnt_out_min, reqnt_out_max, &deqnt_out);
     delete out_c;
     delete reqnt_out_min;
     delete reqnt_out_max;
@@ -229,7 +229,7 @@ public:
     Tensor* bias = t_import.float_import("/fs/testData/mlpTest/runQntDeqntLayerZ/out/import-Variable_1_0.idx");
     //output
     Tensor* output_z = new RamTensor<float>(deqnt_out->getShape()); 
-    Add<float, float>(deqnt_out, bias, output_z);
+    Add<float, float>(deqnt_out, bias, &output_z);
     delete deqnt_out;
 
     DEBUG("Add completed!\r\n");
