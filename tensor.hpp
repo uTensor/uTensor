@@ -350,10 +350,13 @@ void printDim(Tensor* t) {
 
 template <typename T>
 void tensorChkAlloc(Tensor** t, Shape dim) {
-  if ((*t)->getSize() == 0) {
-    *t = new RamTensor<T>(dim);
-  } else if ((*t)->getShape() != dim) {
+  if (*t && (*t)->getSize() == 0) {
+    (*t)->init<T>(dim);
+  } else if (*t && (*t)->getShape() != dim) {
     ERR_EXIT("Dim mismatched...\r\n");
+  } else {
+      *t = new RamTensor<T>(dim);
   }
+   
 }
 #endif
