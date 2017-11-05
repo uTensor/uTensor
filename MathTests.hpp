@@ -222,7 +222,7 @@ class MathOpsTest : public Test {
     // modify the checks below:
     Tensor* out = new RamTensor<float>(ref_out->getShape());
     timer_start();
-    Add<float, float>(a, b, out);
+    Add<float, float>(a, b, &out);
     timer_stop();
 
     double result = meanPercentErr<float>(ref_out, out);

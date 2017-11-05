@@ -66,16 +66,16 @@ void Requantize(Tensor* input, Tensor* in_min, Tensor* in_max,
 }
 
 template <class TIn, class TOut>
-void Add(Tensor* input, Tensor* input2, Tensor* out) {
+void Add(Tensor* input, Tensor* input2, Tensor** out) {
   const TIn* p_in = input->read<TIn>(0, 0);
   const TIn* p_in2 = input2->read<TIn>(0, 0);
 
   //auto shape
-  tensorChkAlloc<TOut>(&out, input->getShape());
+  tensorChkAlloc<TOut>(out, input->getShape());
 
-  TOut* p_out = out->write<TOut>(0, 0);
+  TOut* p_out = (*out)->write<TOut>(0, 0);
 
-  const uint32_t size = out->getSize();
+  const uint32_t size = (*out)->getSize();
   for (uint32_t i = 0; i < size; i++) {
     p_out[i] = p_in[i] + p_in2[i];
   }
@@ -160,14 +160,17 @@ void ArgMax(Tensor* input, Tensor* dim, Tensor** out) {
   permute.erase(permute.begin() + dim_reduce);
 
   // check dimensionality
-  if ((*out)->getSize() != 0 && (*out)->getShape() != outShape) {
+  if (*out && (*out)->getSize() != 0 && (*out)->getShape() != outShape) {
     ERR_EXIT("output shape mismatch");
   }
 
   // allocate output tensor if empty
-  if ((*out)->getSize() == 0) {
-    *out = new RamTensor<TOut>(outShape);
+  if (*out && (*out)->getSize() == 0) {
+    (*out)->init<TOut>(outShape);
+  } else {
+      *out = new RamTensor<TOut>(outShape);
   }
+  
 
   // construct the origin-shape for permuteIndexTransform
   Shape vOutShape = outShape;
