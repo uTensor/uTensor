@@ -204,8 +204,8 @@ public:
     delete reqnt_out;
 
     Tensor* ref_deqnt_out = t_import.float_import("/fs/testData/mlpTest/runQntDeqntLayerZ/import-MatMul_0.idx");
-    double temp;
-    if((temp = meanPercentErr<float>(ref_deqnt_out, deqnt_out)) > 0) {
+    double temp = meanPercentErr<float>(ref_deqnt_out, deqnt_out);
+    if(temp > 0.0001) {
       printf("dequantize failed (%.6f)\r\n", temp);
       float* ref_ptr = ref_deqnt_out->read<float>(0, 0);
       float* test_ptr = deqnt_out->read<float>(0, 0);
@@ -240,8 +240,9 @@ public:
     Tensor* ref_z = t_import.float_import("/fs/testData/mlpTest/runQntDeqntLayerZ/out/import-add_0.idx");
 
     double result = meanPercentErr<float>(ref_z, output_z);
+    std::cout << result << std::endl;
 
-    passed(result < 0.0001);
+    passed(result < 0.001);
     delete ref_z;
     delete output_z;
     delete bias;
