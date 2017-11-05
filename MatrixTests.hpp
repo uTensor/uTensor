@@ -43,7 +43,7 @@ class matrixOpsTest : public Test {
     Tensor* out_min = new RamTensor<float>(c_min->getShape());
     Tensor* out_max = new RamTensor<float>(c_max->getShape());
     timer_start();
-    QuantizedMatMul<uint8_t, uint8_t, int>(a, b, out_c, a_min, b_min, a_max,
+    QuantizedMatMul<uint8_t, uint8_t, int>(a, b, &out_c, a_min, b_min, a_max,
                                            b_max, out_min, out_max);
     timer_stop(); 
     //

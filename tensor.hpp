@@ -354,7 +354,7 @@ void tensorChkAlloc(Tensor** t, Shape dim) {
     (*t)->init<T>(dim);
   } else if (*t && (*t)->getShape() != dim) {
     ERR_EXIT("Dim mismatched...\r\n");
-  } else {
+  } else if (*t == nullptr){
       *t = new RamTensor<T>(dim);
   }
    
