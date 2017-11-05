@@ -1,0 +1,20 @@
+{
+    "builds": {
+        "K64F-GCC": {
+            "platform": "K64F",
+            "toolchain": "GCC_ARM",
+            "base_path": "./BUILD/K64F/GCC_ARM",
+            "baud_rate": 115200,
+            "tests": {
+                "tests-ops-math": {
+                    "binaries": [
+                        {
+                            "binary_type": "bootable",
+                            "path": "./BUILD/K64F/GCC_ARM/tests-ops-math.bin"
+                        }
+                    ]
+                }
+            }
+        }
+    }
+}
