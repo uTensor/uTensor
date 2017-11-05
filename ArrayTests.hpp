@@ -79,7 +79,7 @@ public:
         Tensor* out = new RamTensor<float>(out_ref->getShape());
 
         timer_start();
-        reshape<float>(ref_a, ref_dim, out);
+        reshape<float>(ref_a, ref_dim, &out);
         timer_stop();
 
         double result = meanPercentErr<float>(out_ref, out);
