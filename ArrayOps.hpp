@@ -52,15 +52,15 @@ void QuantizeV2(Tensor* input, Tensor* _min_range, Tensor* _max_range,
 //name = unspecified
 //dequantize_op.cc: 87
 template <typename T>
-void dequantize(Tensor* input, Tensor* min_range, Tensor* max_range, Tensor* output) {
+void dequantize(Tensor* input, Tensor* min_range, Tensor* max_range, Tensor** output) {
     float min = *(min_range->read<float>(0, 0));
     float max = *(max_range->read<float>(0, 0));
       //auto tensor allocation
     Shape out_shape;
-    tensorChkAlloc<float>(&output, input->getShape());
+    tensorChkAlloc<float>(output, input->getShape());
 
     T* input_ptr = input->read<T>(0, 0);
-    float* output_ptr = output->write<float>(0, 0);
+    float* output_ptr = (*output)->write<float>(0, 0);
 
     //quantization_utils.h: 771
     QuantizedToFloatStruct<T> q2f(min, max);
