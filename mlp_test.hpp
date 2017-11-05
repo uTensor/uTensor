@@ -242,7 +242,7 @@ public:
     double result = meanPercentErr<float>(ref_z, output_z);
     std::cout << result << std::endl;
 
-    passed(result < 0.001);
+    passed(result < 0.0001);
     delete ref_z;
     delete output_z;
     delete bias;
