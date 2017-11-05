@@ -28,8 +28,8 @@ int main(int argc, char** argv) {
   printf("Deep MLP on Mbed (Trained with Tensorflow)\r\n\r\n");
   printf("running deep-mlp...\r\n");
 
-//  int prediction = runMLP("/fs/testData/deep_mlp/import-Placeholder_0.idx");
-//  printf("prediction: %d\r\n", prediction);
+  int prediction = runMLP("/fs/testData/deep_mlp/import-Placeholder_0.idx");
+  printf("prediction: %d\r\n", prediction);
    idxImporterTest idxTest;
    idxTest.runAll();
 
@@ -72,11 +72,11 @@ int main(int argc, char** argv) {
    ctxTest.printSummary();
 
 
-/*   printf("mlp test: \r\n");
+   printf("mlp test: \r\n");
    mlpTest mlpt;
    mlpt.runAll();
    printf("mlp result...\r\n");
-   mlpt.printSummary();*/
+   mlpt.printSummary();
   //In [24]: tf.get_default_graph().get_tensor_by_name("import/y_pred:0").eval(feed_dict={x: mnist.test.images[0:1]})
   //Out[24]: array([7])
 
