@@ -123,6 +123,30 @@ class Tensor : public uTensor {
 
   }
 
+  template <class T>
+  void resize(std::vector<uint32_t>& v) {
+      uint32_t size = 0;
+      s->shape.clear();
+      for (auto i : v) {
+        s->shape.push_back(i);
+        if (size == 0) {
+            size = i;
+        } else {
+            size *= i;
+        }
+      }
+      if (size == s->total_size) {
+          return;
+      } else {
+          free(s->data);
+          s->total_size = size;
+          s->data = (void*)malloc(unit_size() * s->total_size);
+      }
+
+      if (s->data == NULL) 
+          ERR_EXIT("ran out of memory for %lu malloc", unit_size() * s->total_size);
+  }
+
   std::vector<uint32_t> getShape(void) { return s->shape; }
 
   uint32_t getSize(void) { return s->total_size; }

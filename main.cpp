@@ -77,6 +77,13 @@ int main(int argc, char** argv) {
    mlpt.runAll();
    printf("mlp result...\r\n");
    mlpt.printSummary();
+
+
+   printf("tesnor test: \r\n");
+   tensorTest tenT;
+   tenT.runAll();
+   printf("tensor result: \r\n");
+   tenT.printSummary();
   //In [24]: tf.get_default_graph().get_tensor_by_name("import/y_pred:0").eval(feed_dict={x: mnist.test.images[0:1]})
   //Out[24]: array([7])
 
