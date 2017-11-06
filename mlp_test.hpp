@@ -207,8 +207,8 @@ public:
     double temp = meanPercentErr<float>(ref_deqnt_out, deqnt_out);
     if(temp > 0.0001) {
       printf("dequantize failed (%.6f)\r\n", temp);
-      float* ref_ptr = ref_deqnt_out->read<float>(0, 0);
-      float* test_ptr = deqnt_out->read<float>(0, 0);
+      const float* ref_ptr = ref_deqnt_out->read<float>(0, 0);
+      const float* test_ptr = deqnt_out->read<float>(0, 0);
       for(uint32_t i; i < ref_deqnt_out->getSize(); i++) {
         if(ref_ptr[i] != test_ptr[i]) {
           DEBUG("%d: %.3f != %.3f, diff: %.8f%%\r\n", i, ref_ptr[i], test_ptr[i], test_ptr[i]/ref_ptr[i]);

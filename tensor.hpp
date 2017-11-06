@@ -159,8 +159,8 @@ class Tensor : public uTensor {
   size_t getDim(void) { return s->shape.size(); }
 
   template <class T>
-  T* read(size_t offset, size_t ele) {
-    return (T*)read(offset, ele);
+  const T* read(size_t offset, size_t ele) {
+    return (const T*)read(offset, ele);
   }
 
   template <class T>
@@ -239,8 +239,8 @@ class RamTensor : public Tensor {
 template <typename Tin, typename Tout>
 Tensor* TensorCast(Tensor* input) {
   Tensor* output = new RamTensor<Tout>(input->getShape());
-  Tin* inputPrt = input->read<Tin>(0, 0);
-  Tout* outputPrt = output->read<Tout>(0, 0);
+  const Tin* inputPrt = input->read<Tin>(0, 0);
+  Tout* outputPrt = output->write<Tout>(0, 0);
 
   for (uint32_t i = 0; i < input->getSize(); i++) {
     outputPrt[i] = static_cast<Tout>(inputPrt[i]);
@@ -252,7 +252,7 @@ Tensor* TensorCast(Tensor* input) {
 template <typename T>
 Tensor* TensorConstant(std::vector<uint32_t> shape, T c) {
   Tensor* output = new RamTensor<T>(shape);
-  T* outPrt = output->read<T>(0, 0);
+  T* outPrt = output->write<T>(0, 0);
 
   for (uint32_t i = 0; i < output->getSize(); i++) {
     outPrt[i] = c;

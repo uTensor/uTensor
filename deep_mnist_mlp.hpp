@@ -18,8 +18,8 @@ void tensorQuantize(Tensor* input, Tensor** output,
     Shape input_shape = input->getShape();
     Tensor* reshape_out = nullptr;
 
-    *(reshape_shape->read<int>(0, 0)) = -1;
-    *(reduce_dim->read<int>(0, 0)) = 0;
+    *(reshape_shape->write<int>(0, 0)) = -1;
+    *(reduce_dim->write<int>(0, 0)) = 0;
 
     reshape<float>(input, reshape_shape, &reshape_out);
 

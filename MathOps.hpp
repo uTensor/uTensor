@@ -11,7 +11,7 @@ void CalculateUsedRange(Tensor* input, int32_t* used_min_quan,
   int32_t minimum = INT_MAX;
   int32_t maxmum = INT_MIN;
   uint32_t size = input->getSize();
-  T1* in_ptr = input->read<T1>(0, 0);
+  const T1* in_ptr = input->read<T1>(0, 0);
 
   for (uint32_t i = 0; i < size; i++) {
     if (minimum > in_ptr[i]) minimum = static_cast<int32_t>(in_ptr[i]);
@@ -50,7 +50,7 @@ void Requantize(Tensor* input, Tensor* in_min, Tensor* in_max,
   const float input_max = in_max->read<T2>(0, 0)[0];
   const float r_output_min = r_min->read<T2>(0, 0)[0];
   const float r_output_max = r_max->read<T2>(0, 0)[0];
-  T1 *input_ptr = input->read<T1>(0, 0);
+  const T1 *input_ptr = input->read<T1>(0, 0);
   Toutput *out_ptr = output->write<Toutput>(0, 0);
 
   // RequantizeManyInNewRange<T1, Toutput>(input, input.getSize(), input_min,
@@ -84,7 +84,7 @@ template <class TIn, class Td, class TOut>
 void Min(Tensor* input, Tensor* dim, Tensor* out) {
   const TIn* p_in = input->read<TIn>(0, 0);
   const Td* p_in2 = dim->read<Td>(0, 0);
-  TOut* p_out = out->read<TOut>(0, 0);
+  TOut* p_out = out->write<TOut>(0, 0);
 
   Td n_dim = p_in2[0];
   std::vector<uint8_t> permute;
@@ -116,7 +116,7 @@ template <class TIn, class Td, class TOut>
 void Max(Tensor* input, Tensor* dim, Tensor* out) {
   const TIn* p_in = input->read<TIn>(0, 0);
   const Td* p_in2 = dim->read<Td>(0, 0);
-  TOut* p_out = out->read<TOut>(0, 0);
+  TOut* p_out = out->write<TOut>(0, 0);
 
   Td n_dim = p_in2[0];
   std::vector<uint8_t> permute;
@@ -181,7 +181,7 @@ void ArgMax(Tensor* input, Tensor* dim, Tensor** out) {
   // In this case, we are going backward.
   permuteIndexTransform trans(vOutShape, permute);
 
-  TIn* inPtr = input->read<TIn>(0, 0);
+  const TIn* inPtr = input->read<TIn>(0, 0);
   TOut* outPtr = (*out)->write<TOut>(0, 0);
 
   size_t out_index = 0;

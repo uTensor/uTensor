@@ -9,7 +9,7 @@ void Relu(Tensor* input, Tensor* in_min, Tensor* in_max,
           Tensor* output, Tensor* out_min, Tensor* out_max) {
   const float input_min = in_min->read<T2>(0, 0)[0];
   const float input_max = in_max->read<T2>(0, 0)[0];
-  TIn* in = input->read<TIn>(0, 0);
+  const TIn* in = input->read<TIn>(0, 0);
 
   const TOut min_as_quantized =
       FloatToQuantized<TOut>(0.0f, input_min, input_max);
