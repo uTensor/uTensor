@@ -28,10 +28,10 @@ void QuantizeV2(Tensor* input, Tensor* _min_range, Tensor* _max_range,
     FloatToQuantizedStruct<T> f2q(min_range, max_range);
 
     //quantization_utils.h:149
-    float* input_ptr = input->read<float>(0, 0);
+    const float* input_ptr = input->read<float>(0, 0);
     T* output_ptr = output->write<T>(0, 0);
-    float* output_min_ptr = output_min->read<float>(0, 0);
-    float* output_max_ptr = output_max->read<float>(0, 0);
+    float* output_min_ptr = output_min->write<float>(0, 0);
+    float* output_max_ptr = output_max->write<float>(0, 0);
 
     ///NT: need error checking at some point...
     for(uint32_t i = 0; i < input->getSize(); i++) {
@@ -59,7 +59,7 @@ void dequantize(Tensor* input, Tensor* min_range, Tensor* max_range, Tensor** ou
     Shape out_shape;
     tensorChkAlloc<float>(output, input->getShape());
 
-    T* input_ptr = input->read<T>(0, 0);
+    const T* input_ptr = input->read<T>(0, 0);
     float* output_ptr = (*output)->write<float>(0, 0);
 
     //quantization_utils.h: 771
@@ -100,7 +100,7 @@ void reshape(Tensor* input, Tensor* shape, Tensor** output) {
     //validating and inferring dimensions
     int infer_index = -1;
     uint32_t dim_rem = input->getSize();
-    int* val = shape->read<int>(0, 0);
+    const int* val = shape->read<int>(0, 0);
     for(uint32_t i = 0; i < shape->getSize(); i++) {
         if(val[i] == -1) {
             if(infer_index == -1) {
@@ -123,11 +123,11 @@ void reshape(Tensor* input, Tensor* shape, Tensor** output) {
     if(dim_rem != 1) ERR_EXIT("supplied shape does not match up to input");
 
 
-    T* input_ptr = input->read<T>(0, 0);
+    const T* input_ptr = input->read<T>(0, 0);
     //check if the output dim is valid
     if(*output && (*output)->getSize() > 0 && dim == (*output)->getShape()) {
         //copy
-        T* output_ptr = (*output)->read<T>(0, 0);
+        T* output_ptr = (*output)->write<T>(0, 0);
         std::memcpy(output_ptr, input_ptr, (std::size_t) input->getSize_in_bytes());
     } else if(*output && (*output)->getSize() > 0 && dim != (*output)->getShape()) {
         ERR_EXIT("output tensor dimension mismatches supplied shape")

@@ -131,8 +131,8 @@ void QuantizedMatMul(Tensor* A, Tensor* B, Tensor** C,
   int a_dim_remaining = 1 - first;
   int b_dim_remaining = 1 - second;
 
-  T1* A_Data = A->read<T1>(0, 0);
-  T2* B_Data = B->read<T2>(0, 0);
+  const T1* A_Data = A->read<T1>(0, 0);
+  const T2* B_Data = B->read<T2>(0, 0);
   Toutput* C_Data = (*C)->write<Toutput>(0, 0);
 
   const bool transpose_c = false;
@@ -152,9 +152,9 @@ void QuantizedMatMul(Tensor* A, Tensor* B, Tensor** C,
   QuantizationRangeForMultiplication<T1, T2, Toutput>(
       min_a, max_a, min_b, max_b, &min_c_value, &max_c_value);
 
-  float* c_min = outmin->read<float>(0, 0);
+  float* c_min = outmin->write<float>(0, 0);
   *c_min = min_c_value;
-  float* c_max = outmax->read<float>(0, 0);
+  float* c_max = outmax->write<float>(0, 0);
   *c_max = max_c_value;
 }
 

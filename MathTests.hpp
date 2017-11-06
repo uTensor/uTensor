@@ -121,8 +121,8 @@ class MathOpsTest : public Test {
     double result;
     if((result = meanPercentErr<unsigned char>(ref_a_q, a_q)) != 0) {
         printf("Requantize a_q failed (%.6f)\r\n", result);
-        unsigned char* ref_ptr = ref_a_q->read<unsigned char>(0, 0);
-        unsigned char* test_ptr = a_q->read<unsigned char>(0, 0);
+        unsigned char* ref_ptr = ref_a_q->write<unsigned char>(0, 0);
+        unsigned char* test_ptr = a_q->write<unsigned char>(0, 0);
         for(uint32_t i = 0; i < ref_a_q->getSize(); i++) {
             if(ref_ptr[i] != test_ptr[i]) {
                 printf("%lu: %d != %d\r\n", i, ref_ptr[i], test_ptr[i]);
@@ -177,21 +177,21 @@ class MathOpsTest : public Test {
   void argmaxTest2(void) {  // NT: WIP   do not use t_import int 64 here
     testStart("argmax2");
     Tensor* test_input = TensorConstant<float>({10, 5}, 0.0f);
-    *(test_input->read<float>(25, 0)) = 1.0f;
-    *(test_input->read<float>(26, 0)) = 1.0f;
-    *(test_input->read<float>(7, 0)) = 1.0f;
-    *(test_input->read<float>(48, 0)) = 1.0f;
-    *(test_input->read<float>(14, 0)) = 1.0f;
+    *(test_input->write<float>(25, 0)) = 1.0f;
+    *(test_input->write<float>(26, 0)) = 1.0f;
+    *(test_input->write<float>(7, 0)) = 1.0f;
+    *(test_input->write<float>(48, 0)) = 1.0f;
+    *(test_input->write<float>(14, 0)) = 1.0f;
 
     Tensor* test_dim = new RamTensor<int>({1});
-    *(test_dim->read<int>(0, 0)) = 0;
+    *(test_dim->write<int>(0, 0)) = 0;
 
     Tensor* test_out_ref = new RamTensor<float>({5});
-    *(test_out_ref->read<float>(0, 0)) = 5.0f;
-    *(test_out_ref->read<float>(1, 0)) = 5.0f;
-    *(test_out_ref->read<float>(2, 0)) = 1.0f;
-    *(test_out_ref->read<float>(3, 0)) = 9.0f;
-    *(test_out_ref->read<float>(4, 0)) = 2.0f;
+    *(test_out_ref->write<float>(0, 0)) = 5.0f;
+    *(test_out_ref->write<float>(1, 0)) = 5.0f;
+    *(test_out_ref->write<float>(2, 0)) = 1.0f;
+    *(test_out_ref->write<float>(3, 0)) = 9.0f;
+    *(test_out_ref->write<float>(4, 0)) = 2.0f;
 
     Tensor* test_out = new RamTensor<float>(test_out_ref->getShape());
     timer_start();
@@ -286,7 +286,7 @@ class MathOpsTest : public Test {
 
   void runAll(void) {
     argmaxTest();
-//    argmaxTest2();
+    argmaxTest2();
     requantization_rangeTest();
     requantizeTest();
     requantizeTest2();
