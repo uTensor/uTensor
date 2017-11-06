@@ -125,6 +125,15 @@ class Test {
     }
     return pass;
   }
+  
+  bool testsize(uint32_t src, uint32_t res) {
+    bool pass = true;
+    if (src != res) {
+        pass = false;
+        return pass;
+    }
+    return pass;
+  }
   template <typename T>
   bool testval(T src, T res) {
     bool pass = true;
