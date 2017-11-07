@@ -12,3 +12,12 @@ void printBits(size_t const size, void const* const ptr) {
   }
   puts("");
 }
+
+bool testsize(uint32_t src, uint32_t res) {
+  bool pass = true;
+  if (src != res) {
+    pass = false;
+    return pass;
+  }
+  return pass;
+}
