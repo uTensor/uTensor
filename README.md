@@ -57,3 +57,8 @@ Currently, the binary runs the first sample of the [MNIST dataset](http://yann.l
 
 
  The related Tensorflow training script please refer to the [node-viewer](https://github.com/neil-tan/tf-node-viewer/blob/master/deep_mlp.py) project.
+
+## Testing
+```
+mbed test -n tests-* --app-config mbed_app.json --profile=build_profile/debug.json
+```
