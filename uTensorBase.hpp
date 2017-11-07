@@ -3,7 +3,7 @@
 
 #include "tensor.hpp"
 
-typedef vector<Tensor*> TList;
+typedef std::vector<Tensor*> TList;
 
 //isType() https://stackoverflow.com/questions/9974596/how-to-check-whether-two-pointers-point-to-the-same-object-or-not
 //double dispatch
