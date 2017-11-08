@@ -1,17 +1,18 @@
+
 # uTensor
 
 ## Introduction
 
-  uTensor is an extreme light-weight Deep-Learning Inference framework built on mbed and Tensorflow.
+  uTensor is an extremely light-weight Deep-Learning Inference framework built on mbed and Tensorflow.
 
-  This project is under going constant development. The development is running on develop branch.
+  This project is under going constant development.
 
 ## Requirement
 
 - [Mbed CLI](https://github.com/ARMmbed/mbed-cli)
 - [Tensorflow](https://www.tensorflow.org/install/)
 - [tf-node-viewer](https://github.com/neil-tan/tf-node-viewer) (Optional, for graph-weight extraction)
-- Mbed-os 5.6+ compatiable [boards](https://os.mbed.com/platforms/?mbed-os=25) with at least 256kb of RAM
+- Mbed-os 5.6+ compatible [boards](https://os.mbed.com/platforms/?mbed-os=25) with at least 256kb of RAM
 - SD Card (Must be LESS than 32 GB)
 - SD Card reader for the board (Optional if built into the board)
 
