@@ -9,8 +9,9 @@
 #include "tensorIdxImporter.hpp"
 #include "test.hpp"
 #include "MathOps.hpp"
+#include "deep_mnist_mlp.hpp"
 
-Serial pc(USBTX, USBRX, 115200);
+Serial pc(USBTX, USBRX, 9600);
 SDBlockDevice bd(MBED_CONF_APP_SD_MOSI, MBED_CONF_APP_SD_MISO, MBED_CONF_APP_SD_CLK, MBED_CONF_APP_SD_CS);
 FATFileSystem fs("fs");
 
@@ -314,11 +315,15 @@ utest::v1::status_t greentea_setup(const size_t number_of_cases) {
 Specification specification(greentea_setup, cases);
 
 int main(){
-    ON_ERR(bd.init(), "SDBlockDevice init ");
-    ON_ERR(fs.mount(&bd), "Mounting the filesystem on \"/fs\". ");
+    printf("SDBlockDevice init \n");
+    int err = bd.init();
+    printf("SDBlock returned %d\n", err);
+    printf("Mounting the filesystem on \"/fs\".\n");
+    err = fs.mount(&bd);
+    printf("FS mount returned %d\n", err);
 
     printf("Deep MLP on Mbed (Trained with Tensorflow)\r\n\r\n");
-    printf("running deep-mlp...\r\n");
+    printf("\e[32mRunning deep-mlp\e[39m...\r\n");
 
     int prediction = runMLP("/fs/testData/deep_mlp/import-Placeholder_0.idx");
     printf("prediction: %d\r\n", prediction);

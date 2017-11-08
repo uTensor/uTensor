@@ -13,6 +13,7 @@
 #include "ArrayOps.hpp"
 #include "MathOps.hpp"
 #include "MatrixOps.hpp"
+#include "deep_mnist_mlp.hpp"
 
 Serial pc(USBTX, USBRX, 115200);
 SDBlockDevice bd(MBED_CONF_APP_SD_MOSI, MBED_CONF_APP_SD_MISO, MBED_CONF_APP_SD_CLK, MBED_CONF_APP_SD_CS);
@@ -138,7 +139,7 @@ void runQntDeqntLayerZ() {
     double temp_result = (meanPercentErr<int>(ref_out_c, out_c) + meanPercentErr<float>(ref_matmul_out_min, matmul_out_min) + meanPercentErr<float>(ref_matmul_out_max, matmul_out_max));
     if(temp_result > 0) {
         DEBUG("matrix mul failed\r\n");
-        failed();
+        TEST_ASSERT(temp_result > 0);
         return;
     } else {
         DEBUG("matrix mul TEST_ASSERT\r\n");
@@ -162,7 +163,7 @@ void runQntDeqntLayerZ() {
     temp_result = (meanPercentErr<float>(ref_req_out_min, req_out_min) + meanPercentErr<float>(ref_req_out_max, req_out_max));
     if(temp_result > 0) {
         DEBUG("Requantization_Range failed\r\n");
-        failed();
+        TEST_ASSERT(temp_result > 0);
         return;
     } else {
         DEBUG("Requantization_Range TEST_ASSERT\r\n");
@@ -194,7 +195,7 @@ void runQntDeqntLayerZ() {
     temp_result = (meanPercentErr<unsigned char>(ref_reqnt_out, reqnt_out) + meanPercentErr<float>(ref_reqnt_out_min, reqnt_out_min) + meanPercentErr<float>(ref_reqnt_out_max, reqnt_out_max));
     if(temp_result > 0) {
         DEBUG("Requantize failed\r\n");
-        failed();
+        TEST_ASSERT(temp_result > 0);
         return;
     } else {
         DEBUG("Requantize TEST_ASSERT\r\n");
@@ -226,7 +227,7 @@ void runQntDeqntLayerZ() {
                 DEBUG("%d: %.3f == %.3f\r\n", i, ref_ptr[i], test_ptr[i]);
             }
         }
-        failed();
+        TEST_ASSERT(false);
         return;
     } else {
         DEBUG("dequantize TEST_ASSERT\r\n");

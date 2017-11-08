@@ -9,6 +9,9 @@
 #include "tensorIdxImporter.hpp"
 #include "test.hpp"
 #include "NnOps.hpp"
+#include <algorithm>
+#include <random>
+#include "deep_mnist_mlp.hpp"
 
 Serial pc(USBTX, USBRX, 115200);
 SDBlockDevice bd(MBED_CONF_APP_SD_MOSI, MBED_CONF_APP_SD_MISO, MBED_CONF_APP_SD_CLK, MBED_CONF_APP_SD_CS);

@@ -36,6 +36,7 @@ public:
  virtual ~uTensor() = 0;
  
 };
+inline uTensor::~uTensor() {}
 
 class TensorBase {
  public:
