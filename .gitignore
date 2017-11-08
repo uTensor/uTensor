@@ -36,3 +36,5 @@
 
 #Project generated test files
 TESTS/scripts/testData
+
+*.swp
