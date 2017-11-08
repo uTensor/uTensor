@@ -33,24 +33,24 @@ class TensorIdxImporter {
   HeaderMeta header;
   HeaderMeta parseHeader(void);
   template <typename U>
-  Tensor* loader(string& filename, IDX_DTYPE idx_type);
+  Tensor* loader(const string& filename, IDX_DTYPE idx_type);
   void open(string filename);
   // void open(FILE *fp);
 
  public:
-  Tensor* ubyte_import(string filename) {
+  Tensor* ubyte_import(const string& filename) {
     return loader<unsigned char>(filename, IDX_DTYPE::idx_ubyte);
   }
-  Tensor* byte_import(string filename) {
+  Tensor* byte_import(const string& filename) {
     return loader<char>(filename, IDX_DTYPE::idx_byte);
   }
-  Tensor* short_import(string filename) {
+  Tensor* short_import(const string& filename) {
     return loader<short>(filename, IDX_DTYPE::idx_short);
   }
-  Tensor* int_import(string filename) {
+  Tensor* int_import(const string& filename) {
     return loader<int>(filename, IDX_DTYPE::idx_int);
   }
-  Tensor* float_import(string filename) {
+  Tensor* float_import(const string& filename) {
     return loader<float>(filename, IDX_DTYPE::idx_float);
   }
   uint32_t getMagicNumber(unsigned char dtype, unsigned char dim);
@@ -63,66 +63,14 @@ class TensorIdxImporter {
 //     header = parseHeader();
 // }
 
-uint8_t TensorIdxImporter::getIdxDTypeSize(IDX_DTYPE dtype) {
-  switch (dtype) {
-    case idx_ubyte:
-      return 1;
-    case idx_byte:
-      return 1;
-    case idx_short:
-      return 2;
-    case idx_int:
-      return 4;
-    case idx_float:
-      return 4;
-    case idx_double:
-      return 8;
-  }
-
-  return 0;
-}
-
-uint32_t TensorIdxImporter::getMagicNumber(unsigned char dtype,
-                                           unsigned char dim) {
-  uint32_t magic = 0;
-
-  magic = (magic | dtype) << 8;
-  magic = magic | dim;
-
-  return magic;
-}
-
-HeaderMeta TensorIdxImporter::parseHeader(void) {
-  unsigned char* buf = (unsigned char*)malloc(sizeof(unsigned char) * 4);
-
-  fread(buf, 1, 4, fp);
-  if (buf[0] != 0 || buf[0] != 0) {
-    printf("Error, header magic number invalid\r\n");
-  }
-
-  HeaderMeta header;
-  header.dataType = static_cast<IDX_DTYPE>(buf[2]);
-  header.numDim = buf[3];
-
-  for (int i = 0; i < header.numDim; i++) {
-    fread(buf, 1, 4, fp);
-    uint32_t dimSize = ntoh32(*(uint32_t*)buf);
-    header.dim.push_back(dimSize);
-  }
-
-  free(buf);
-
-  header.dataPos = ftell(fp);
-
-  return header;
-}
 
 template <typename U>
-Tensor* TensorIdxImporter::loader(string& filename, IDX_DTYPE idx_type) {
+Tensor* TensorIdxImporter::loader(const string& filename, IDX_DTYPE idx_type) {
+  DEBUG("Opening file %s \r\n", filename.c_str());
   fp = fopen(filename.c_str(), "r");
 
-  DEBUG("Opening file %s ", filename.c_str());
-  if (fp == NULL) ERR_EXIT("Error opening file: %s", filename.c_str());
+  DEBUG("Opened file %s \r\n", filename.c_str());
+  if (fp == NULL) ERR_EXIT("Error opening file: %s\r\n", filename.c_str());
 
   header = parseHeader();
 
@@ -130,7 +78,10 @@ Tensor* TensorIdxImporter::loader(string& filename, IDX_DTYPE idx_type) {
     ERR_EXIT("TensorIdxImporter: header and tensor type mismatch\r\n");
   }
 
-  fseek(fp, header.dataPos, SEEK_SET);  // need error  handling
+  if (fseek(fp, header.dataPos, SEEK_SET) != 0) {
+    // need error  handling
+    ERR_EXIT("TensorIdxImporter: Failed to seek to data\r\n");
+  }
 
   Tensor* t = new RamTensor<U>(header.dim);  // tensor allocated
   const uint8_t unit_size = t->unit_size();

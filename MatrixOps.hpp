@@ -6,6 +6,7 @@
 #include <limits>
 #include "quantization_utils.hpp"
 #include "tensor.hpp"
+#include "uTensorBase.hpp"
 
 // tensorflow/tensorflow/core/kernels/reference_gemm.h
 
