@@ -8,6 +8,7 @@
 class matrixOpsTest : public Test {
  public:
   void qMatMul(void) {
+
     testStart("Quantized Matrix Mul");
     TensorIdxImporter t_import;
 
@@ -55,6 +56,7 @@ class matrixOpsTest : public Test {
                     meanPercentErr<float>(c_max, out_max);
     // passed(result < 0.0001);
     passed(result == 0);
+
   }
 
   void runAll(void) { qMatMul(); }

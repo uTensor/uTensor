@@ -1,34 +1,48 @@
 #ifndef UTENSOR_CTX_H
 #define UTENSOR_CTX_H
 
+#include <memory>
+#include <unordered_map>
 #include "uTensorBase.hpp"
 #include "stdio.h"
-
 //#include <list>
 
-//TODO: how do we deal with dangling tensors?
-//      only allow pushing for exact number of inputs
-//      output reference count are initialized to 0, incremented only on input-push
-//      outputs are allocated in ops
-//      output lists can contain nullptr/empty-tensors
-//      tensors can be all pointers here, but destructors has to set data to nullptr
-//      push(op, input_t_list, output_t_list)  or  push(op, init-list, init-list)
-//      TensorListModifierOp
+class Ref_Record {
+public:
+  uint8_t count;
+  bool allow_incr;
+  std::shared_ptr<Tensor> sptr;
+
+  Ref_Record() {
+    count = 0;
+    allow_incr = true;
+    sptr.reset();   
+  }
+};
+
 class Context : public uTensor {
 protected:
   vector<Operator*> op_list;
   bool del_onsight;
-  //std::unordered_map<Tensor*> TensorList;  //all tensors alive  //kill all unused if malloc failed?
+
+  std::unordered_map<Tensor*, Ref_Record> rTable;  //all tensors alive  //kill all unused if malloc failed?
   //uint32_t m_size; //remaining memory size
   //void registerTensor(Tensor* t);
   //void gc(void); //garbage collector, delete any tracked unreferenced tensor
 
-  void initTensors(const TList &t_list);
-  void deinitTensors(const TList &t_list);
-  void updateInputTensorRef(const TList &t_list);
-  void dcrRefCount(TList t_list);
+  void initTensors(const S_TList &t_list);
+  void deinitTensors(const S_TList &t_list);
+
+  void incrTListRef(const TList &t_list);
+  void dcrListRef(S_TList t_list);
+  void delTensor(Tensor* t);
+  //uint16_t incrRef(std::shared_ptr<Tensor> sptr);
+  uint8_t dcrRef(Tensor* t);
+  bool isTracked(Tensor* t);
+  //uint16_t getRef();
 
 public:
+  std::weak_ptr<Tensor> add(Tensor* t, uint8_t init_count = 0);
   void push(Operator *op, TList &_inputs, TList &_outputs);
   int eval(void);
 
@@ -37,50 +51,98 @@ public:
   }
 };
 
+std::weak_ptr<Tensor> Context::add(Tensor* t, uint8_t init_count) {
+  if(rTable.find(t) != rTable.end()) {
+    ERR_EXIT("tensor pointer address already exist in rTable");
+  }
+
+  shared_ptr<Tensor> _sptr(t);
+
+  Ref_Record record;
+
+  if(init_count != 0) {
+    record.count = init_count;
+    record.allow_incr = false;
+  }
+  record.sptr = _sptr;
+
+  rTable[t] = record;
+
+  auto wptr = _sptr;
+
+  return wptr;
+}
+
 
 void Context::push(Operator *op, TList &_inputs, TList &_outputs) {
-  if(op->getNumInputs() != _inputs.size()) {
-    ERR_EXIT("valid number of inputs\r\n");
-  }
-  if(op->getNumOutputs() != _outputs.size()) {
-    ERR_EXIT("valid number of output\r\n");
-  }
-
+  //error checking in the Op class
   op->setInputs(_inputs);
   op->setOutputs(_outputs);
   op_list.push_back(op);
-  updateInputTensorRef(_inputs);
+  incrTListRef(_inputs);
 
 }
 
-void Context::updateInputTensorRef(const TList &t_list) {
+void Context::incrTListRef(const TList &t_list) {
   for(auto t:t_list) {
-    t->incrRef();  //if an initial ref value is supplied to the tensor at compile time
+    Tensor* ptr = t.lock().get();
+    if(rTable.find(ptr) == rTable.end()) {
+      ERR_EXIT("tensor not registered");
+    }
+
+    Ref_Record record = rTable[ptr];
+    if(record.allow_incr) {
+      record.count++;
+      rTable[ptr] = record;
+    }
+    
+      //if an initial ref value is supplied to the tensor at compile time
                     //then this function does nothing
-                    //otherwise, it increment the internal ref count of the tensor
-                    //in internal count is init to 0 by the tensor constructor
+                    //otherwise, it increment the  ref count of the tensor
+                    //count is init to 0 by the record constructor
   }
 }
 
-void Context::initTensors(const TList &t_list) {
+void Context::initTensors(const S_TList &t_list) {
   for(auto t:t_list) {
     t->inFocus();
   }
 }
 
-void Context::deinitTensors(const TList &t_list) {
+void Context::deinitTensors(const S_TList &t_list) {
   for(auto t:t_list) {
     t->deFocus();
   }
 }
 
-void Context::dcrRefCount(TList t_list) {
+void Context::delTensor(Tensor* t) {
+  Ref_Record record = rTable[t];
+  record.sptr.reset();
+  rTable.erase(t);
+}
+
+void Context::dcrListRef(S_TList t_list) {
   for(auto t:t_list) {
-    t->dcrRef();
-    if(t->getRef() < 1 && del_onsight) {
-      delete t;
+    if(dcrRef(t.get()) < 1) {
+      delTensor(t.get());
     }
   }
+}
+
+uint8_t Context::dcrRef(Tensor* t) {
+  if(!isTracked(t)) {
+    ERR_EXIT("Tensor not registered");
+  }
+
+  Ref_Record record = rTable[t];
+  if(record.count > 0) record.count -= 1;
+  rTable[t] = record;
+
+  return record.count;
+}
+
+bool Context::isTracked(Tensor* t) {
+  return (rTable.find(t) != rTable.end());
 }
 
 int Context::eval(void) {
@@ -97,12 +159,10 @@ int Context::eval(void) {
     deinitTensors(op->getInputs());
     deinitTensors(op->getOutputs());
 
-    dcrRefCount(op->getInputs());
+    dcrListRef(op->getInputs());
 
-    op->dcrRef();
-    if(op->getRef() < 1 && del_onsight) {
-      delete op;
-    }
+    delete op;
+
   }
 
   return 0;
