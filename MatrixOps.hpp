@@ -158,6 +158,66 @@ void QuantizedMatMul(Tensor* A, Tensor* B, Tensor** C,
   *c_max = max_c_value;
 }
 
+//////////////////////////////////////////////////////
+template <class T1, class T2, class Toutput>
+void QuantizedMatMul2(Tensor* A, Tensor* B, Tensor* C,
+                     Tensor* mina, Tensor* minb, Tensor* maxa,
+                     Tensor* maxb, Tensor* outmin,
+                     Tensor* outmax, bool transpose_a = false,
+                     bool transpose_b = false) {
+  const float min_a = *(mina->read<float>(0, 0));
+  const float max_a = *(maxa->read<float>(0, 0));
+  const float min_b = *(minb->read<float>(0, 0));
+  const float max_b = *(maxb->read<float>(0, 0));
+
+  //auto tensor allocation
+  Shape c_shape;
+  c_shape.push_back((A->getShape())[0]);
+  c_shape.push_back((B->getShape())[1]);
+  //tensorChkAlloc2<Toutput>(C, c_shape);
+  //replace this with resize
+
+  const int32_t offset_a = FloatToQuantizedUnclamped<T1>(
+      0.0f, min_a, max_a);  // NT: what 0 quantized to; depends on
+                            // Eigen::NumTraits<T>::lowest()
+  const int32_t offset_b = FloatToQuantizedUnclamped<T2>(0.0f, min_b, max_b);
+  const int32_t offset_c = 0;
+  const int32_t mult_c = 1;
+  const int32_t shift_c = 0;
+
+  int first = transpose_a ? 0 : 1;
+  int second = transpose_b ? 1 : 0;
+
+  int a_dim_remaining = 1 - first;
+  int b_dim_remaining = 1 - second;
+
+  const T1* A_Data = A->read<T1>(0, 0);
+  const T2* B_Data = B->read<T2>(0, 0);
+  Toutput* C_Data = C->write<Toutput>(0, 0);
+
+  const bool transpose_c = false;
+  const size_t m = A->getShape()[a_dim_remaining];
+  const size_t n = B->getShape()[b_dim_remaining];
+  const size_t k = A->getShape()[first];
+  const size_t lda = A->getShape()[1];
+  const size_t ldb = B->getShape()[1];
+  const size_t ldc = n;
+
+  ReferenceGemmuImpl<T1, T2, Toutput>(
+      transpose_a, transpose_b, transpose_c, m, n, k, A_Data, offset_a, lda,
+      B_Data, offset_b, ldb, C_Data, shift_c, offset_c, mult_c, ldc);
+  float min_c_value;
+  float max_c_value;
+
+  QuantizationRangeForMultiplication<T1, T2, Toutput>(
+      min_a, max_a, min_b, max_b, &min_c_value, &max_c_value);
+
+  float* c_min = outmin->write<float>(0, 0);
+  *c_min = min_c_value;
+  float* c_max = outmax->write<float>(0, 0);
+  *c_max = max_c_value;
+}
+
 class QntMatMulOp : public Operator{
 public:
   QntMatMulOp() {
@@ -165,9 +225,9 @@ public:
     n_outputs = 3;
   }
   virtual void compute() override {
-    QuantizedMatMul<uint8_t, uint8_t, int>(inputs[0], inputs[3],
-     &(outputs[0]), inputs[1], inputs[4], inputs[2], inputs[5],
-      outputs[1], outputs[2]);
+    QuantizedMatMul2<uint8_t, uint8_t, int>(inputs[0].get(), inputs[3].get(),
+     outputs[0].get(), inputs[1].get(), inputs[4].get(), inputs[2].get(), inputs[5].get(),
+      outputs[1].get(), outputs[2].get());
   }
 };
 
