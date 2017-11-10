@@ -165,6 +165,8 @@ int Context::eval(void) {
 
   }
 
+  op_list.clear();
+
   return 0;
 }
 
