@@ -42,7 +42,7 @@ protected:
   //uint16_t getRef();
 
 public:
-  W_TENSOR add(Tensor* t, uint8_t init_count = 0);
+  TENSOR add(Tensor* t, uint8_t init_count = 0);
   void push(Operator *op, TList &_inputs, TList &_outputs);
   int eval(void);
 
@@ -51,7 +51,7 @@ public:
   }
 };
 
-W_TENSOR Context::add(Tensor* t, uint8_t init_count) {
+TENSOR Context::add(Tensor* t, uint8_t init_count) {
   if(rTable.find(t) != rTable.end()) {
     ERR_EXIT("tensor pointer address already exist in rTable");
   }
