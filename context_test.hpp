@@ -21,42 +21,43 @@ public:
     testStart("Context QntMatMal Op");
     Context ctx;
     //inputs
-    auto a =
+    W_TENSOR a =
         ctx.add(t_import.ubyte_import("/fs/testData/qMatMul/in/qA_0.idx"));
-    auto a_min =
+    W_TENSOR a_min =
         ctx.add(t_import.float_import("/fs/testData/qMatMul/in/qA_1.idx"));
-    auto a_max =
+    W_TENSOR a_max =
         ctx.add(t_import.float_import("/fs/testData/qMatMul/in/qA_2.idx"));
-    auto b =
+    W_TENSOR b =
         ctx.add(t_import.ubyte_import("/fs/testData/qMatMul/in/qB_0.idx"));
-    auto b_min =
+    W_TENSOR b_min =
         ctx.add(t_import.float_import("/fs/testData/qMatMul/in/qB_1.idx"));
-    auto b_max =
+    W_TENSOR b_max =
         ctx.add(t_import.float_import("/fs/testData/qMatMul/in/qB_2.idx"));
 
     // reference outputs
-    auto c =
+    W_TENSOR c =
         ctx.add(t_import.int_import("/fs/testData/qMatMul/out/qMatMul_0.idx"));
-    auto c_min =
+    W_TENSOR c_min =
         ctx.add(t_import.float_import("/fs/testData/qMatMul/out/qMatMul_1.idx"));
-    auto c_max =
+    W_TENSOR c_max =
         ctx.add(t_import.float_import("/fs/testData/qMatMul/out/qMatMul_2.idx"));
 
 
-    auto out_c = ctx.add(new RamTensor<int>(c.lock()->getShape()));
-    auto out_min = ctx.add(new RamTensor<float>(c_min.lock()->getShape()));
-    auto out_max = ctx.add(new RamTensor<float>(c_max.lock()->getShape()));
+    W_TENSOR out_c = ctx.add(new RamTensor<int>(c.lock()->getShape()));
+    W_TENSOR out_min = ctx.add(new RamTensor<float>(c_min.lock()->getShape()));
+    W_TENSOR out_max = ctx.add(new RamTensor<float>(c_max.lock()->getShape()));
 
     TList inputs = {a, a_min, a_max, b, b_min, b_max};
     TList outputs = {out_c, out_min, out_max};
 
-    //set which tensors to keep alive
-    auto ref_c_rptr = c.lock();
-    auto ref_min_rptr = c_min.lock();
-    auto ref_max_rptr = c_max.lock();
-    auto out_c_rptr = out_c.lock();
-    auto out_min_rptr = out_min.lock();
-    auto out_max_rptr = out_max.lock();
+    //if you want tensors to be alive after .eval()
+    //copies of the share_pointer needs to be here
+    S_TENSOR ref_c_rptr = c.lock();
+    S_TENSOR ref_min_rptr = c_min.lock();
+    S_TENSOR ref_max_rptr = c_max.lock();
+    S_TENSOR out_c_rptr = out_c.lock();
+    S_TENSOR out_min_rptr = out_min.lock();
+    S_TENSOR out_max_rptr = out_max.lock();
     
 
     timer_start();

@@ -17,6 +17,13 @@
 //   dbl,
 // };
 
+class Tensor;
+
+typedef std::shared_ptr<Tensor> S_TENSOR;
+typedef std::weak_ptr<Tensor> W_TENSOR;
+typedef vector<W_TENSOR> TList;
+typedef vector<S_TENSOR> S_TList;
+
 class uTensor {
 public:
  virtual void inFocus(){};

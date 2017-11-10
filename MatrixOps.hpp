@@ -160,10 +160,10 @@ void QuantizedMatMul(Tensor* A, Tensor* B, Tensor** C,
 
 //////////////////////////////////////////////////////
 template <class T1, class T2, class Toutput>
-void QuantizedMatMul2(Tensor* A, Tensor* B, Tensor* C,
-                     Tensor* mina, Tensor* minb, Tensor* maxa,
-                     Tensor* maxb, Tensor* outmin,
-                     Tensor* outmax, bool transpose_a = false,
+void QuantizedMatMul2(S_TENSOR A, S_TENSOR B, S_TENSOR C,
+                     S_TENSOR mina, S_TENSOR minb, S_TENSOR maxa,
+                     S_TENSOR maxb, S_TENSOR outmin,
+                     S_TENSOR outmax, bool transpose_a = false,
                      bool transpose_b = false) {
   const float min_a = *(mina->read<float>(0, 0));
   const float max_a = *(maxa->read<float>(0, 0));
@@ -225,9 +225,9 @@ public:
     n_outputs = 3;
   }
   virtual void compute() override {
-    QuantizedMatMul2<uint8_t, uint8_t, int>(inputs[0].get(), inputs[3].get(),
-     outputs[0].get(), inputs[1].get(), inputs[4].get(), inputs[2].get(), inputs[5].get(),
-      outputs[1].get(), outputs[2].get());
+    QuantizedMatMul2<uint8_t, uint8_t, int>(inputs[0], inputs[3],
+     outputs[0], inputs[1], inputs[4], inputs[2], inputs[5],
+      outputs[1], outputs[2]);
   }
 };
 

@@ -3,9 +3,6 @@
 
 #include "tensor.hpp"
 
-typedef vector<std::weak_ptr<Tensor>> TList;
-typedef vector<std::shared_ptr<Tensor>> S_TList;
-
 //isType() https://stackoverflow.com/questions/9974596/how-to-check-whether-two-pointers-point-to-the-same-object-or-not
 //double dispatch
 

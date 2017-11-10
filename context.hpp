@@ -11,7 +11,7 @@ class Ref_Record {
 public:
   uint8_t count;
   bool allow_incr;
-  std::shared_ptr<Tensor> sptr;
+  S_TENSOR sptr;
 
   Ref_Record() {
     count = 0;
@@ -42,7 +42,7 @@ protected:
   //uint16_t getRef();
 
 public:
-  std::weak_ptr<Tensor> add(Tensor* t, uint8_t init_count = 0);
+  W_TENSOR add(Tensor* t, uint8_t init_count = 0);
   void push(Operator *op, TList &_inputs, TList &_outputs);
   int eval(void);
 
@@ -51,12 +51,12 @@ public:
   }
 };
 
-std::weak_ptr<Tensor> Context::add(Tensor* t, uint8_t init_count) {
+W_TENSOR Context::add(Tensor* t, uint8_t init_count) {
   if(rTable.find(t) != rTable.end()) {
     ERR_EXIT("tensor pointer address already exist in rTable");
   }
 
-  shared_ptr<Tensor> _sptr(t);
+  S_TENSOR _sptr(t);
 
   Ref_Record record;
 
