@@ -91,26 +91,26 @@ public:
     S_TENSOR shr_out = out.lock();
 
     TList inputs0 = {a, b};
-    //TList outputs0 = {c};  //2
-    TList outputs0 = {out};
+    TList outputs0 = {c};  //2
     ctx.push(new AddOp(), inputs0, outputs0);
 
-    // TList inputs1 = {c, a};
-    // TList outputs1 = {b};  //3
-    // ctx.push(new AddOp(), inputs1, outputs1);
+    TList inputs1 = {c, a};
+    TList outputs1 = {b};  //3
+    ctx.push(new AddOp(), inputs1, outputs1);
 
-    // TList inputs2 = {a, b};
-    // TList outputs2 = {out};  //4
-    // ctx.push(new AddOp(), inputs2, outputs2);
+    TList inputs2 = {a, b};
+    TList outputs2 = {out};  //4
+    ctx.push(new AddOp(), inputs2, outputs2);
     ctx.eval();
     timer_stop();
 
-    if(a.lock() || b.lock() || c.lock()) {
+    if(a.lock() || b.lock() || c.lock() || !out.lock()) {
         failed();
         return;
     }
 
-    passed(*(shr_out->read<int>(0, 0)) != 4);
+    int result = *(shr_out->read<int>(0, 0));
+    passed(result == 4);
 
   }
 
