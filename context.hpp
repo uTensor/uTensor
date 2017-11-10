@@ -68,7 +68,7 @@ TENSOR Context::add(Tensor* t, uint8_t init_count) {
 
   rTable[t] = record;
 
-  auto wptr = _sptr;
+  TENSOR wptr = _sptr;
 
   return wptr;
 }
