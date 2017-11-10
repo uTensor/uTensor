@@ -21,31 +21,33 @@ public:
     testStart("Context QntMatMal Op");
     Context ctx;
     //inputs
-    W_TENSOR a =
+    TENSOR a =
         ctx.add(t_import.ubyte_import("/fs/testData/qMatMul/in/qA_0.idx"));
-    W_TENSOR a_min =
+    TENSOR a_min =
         ctx.add(t_import.float_import("/fs/testData/qMatMul/in/qA_1.idx"));
-    W_TENSOR a_max =
+    TENSOR a_max =
         ctx.add(t_import.float_import("/fs/testData/qMatMul/in/qA_2.idx"));
-    W_TENSOR b =
+    TENSOR b =
         ctx.add(t_import.ubyte_import("/fs/testData/qMatMul/in/qB_0.idx"));
-    W_TENSOR b_min =
+    TENSOR b_min =
         ctx.add(t_import.float_import("/fs/testData/qMatMul/in/qB_1.idx"));
-    W_TENSOR b_max =
+    TENSOR b_max =
         ctx.add(t_import.float_import("/fs/testData/qMatMul/in/qB_2.idx"));
 
     // reference outputs
-    W_TENSOR c =
+    TENSOR c =
         ctx.add(t_import.int_import("/fs/testData/qMatMul/out/qMatMul_0.idx"));
-    W_TENSOR c_min =
+    TENSOR c_min =
         ctx.add(t_import.float_import("/fs/testData/qMatMul/out/qMatMul_1.idx"));
-    W_TENSOR c_max =
+    TENSOR c_max =
         ctx.add(t_import.float_import("/fs/testData/qMatMul/out/qMatMul_2.idx"));
 
 
-    W_TENSOR out_c = ctx.add(new RamTensor<int>(c.lock()->getShape()));
-    W_TENSOR out_min = ctx.add(new RamTensor<float>(c_min.lock()->getShape()));
-    W_TENSOR out_max = ctx.add(new RamTensor<float>(c_max.lock()->getShape()));
+    //we need default constructor here
+    //so we can get ride of the shapes here
+    TENSOR out_c = ctx.add(new RamTensor<int>(c.lock()->getShape()));
+    TENSOR out_min = ctx.add(new RamTensor<float>(c_min.lock()->getShape()));
+    TENSOR out_max = ctx.add(new RamTensor<float>(c_max.lock()->getShape()));
 
     TList inputs = {a, a_min, a_max, b, b_min, b_max};
     TList outputs = {out_c, out_min, out_max};
