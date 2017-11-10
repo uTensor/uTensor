@@ -33,24 +33,24 @@ class TensorIdxImporter {
   HeaderMeta header;
   HeaderMeta parseHeader(void);
   template <typename U>
-  Tensor* loader(string& filename, IDX_DTYPE idx_type);
+  Tensor* loader(const string& filename, IDX_DTYPE idx_type);
   void open(string filename);
   // void open(FILE *fp);
 
  public:
-  Tensor* ubyte_import(string filename) {
+  Tensor* ubyte_import(const string& filename) {
     return loader<unsigned char>(filename, IDX_DTYPE::idx_ubyte);
   }
-  Tensor* byte_import(string filename) {
+  Tensor* byte_import(const string& filename) {
     return loader<char>(filename, IDX_DTYPE::idx_byte);
   }
-  Tensor* short_import(string filename) {
+  Tensor* short_import(const string& filename) {
     return loader<short>(filename, IDX_DTYPE::idx_short);
   }
-  Tensor* int_import(string filename) {
+  Tensor* int_import(const string& filename) {
     return loader<int>(filename, IDX_DTYPE::idx_int);
   }
-  Tensor* float_import(string filename) {
+  Tensor* float_import(const string& filename) {
     return loader<float>(filename, IDX_DTYPE::idx_float);
   }
   uint32_t getMagicNumber(unsigned char dtype, unsigned char dim);
@@ -65,11 +65,12 @@ class TensorIdxImporter {
 
 
 template <typename U>
-Tensor* TensorIdxImporter::loader(string& filename, IDX_DTYPE idx_type) {
+Tensor* TensorIdxImporter::loader(const string& filename, IDX_DTYPE idx_type) {
+  DEBUG("Opening file %s \r\n", filename.c_str());
   fp = fopen(filename.c_str(), "r");
 
-  DEBUG("Opening file %s ", filename.c_str());
-  if (fp == NULL) ERR_EXIT("Error opening file: %s", filename.c_str());
+  DEBUG("Opened file %s \r\n", filename.c_str());
+  if (fp == NULL) ERR_EXIT("Error opening file: %s\r\n", filename.c_str());
 
   header = parseHeader();
 
@@ -77,7 +78,10 @@ Tensor* TensorIdxImporter::loader(string& filename, IDX_DTYPE idx_type) {
     ERR_EXIT("TensorIdxImporter: header and tensor type mismatch\r\n");
   }
 
-  fseek(fp, header.dataPos, SEEK_SET);  // need error  handling
+  if (fseek(fp, header.dataPos, SEEK_SET) != 0) {
+    // need error  handling
+    ERR_EXIT("TensorIdxImporter: Failed to seek to data\r\n");
+  }
 
   Tensor* t = new RamTensor<U>(header.dim);  // tensor allocated
   const uint8_t unit_size = t->unit_size();

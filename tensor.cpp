@@ -32,4 +32,4 @@ void uTensor::setStaticRef(uint16_t c) {
 
 
 
-uTensor::~uTensor() {}
+//uTensor::~uTensor() {}
