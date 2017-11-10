@@ -88,7 +88,7 @@ class Tensor : public uTensor {
   }
 
   template <class T>
-  void resize(std::vector<uint32_t>& v) {
+  void resize(std::vector<uint32_t> v) {
       uint32_t size = 0;
       s->shape.clear();
       for (auto i : v) {

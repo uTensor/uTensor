@@ -14,12 +14,12 @@
 class contextTest : public Test {
 
   TensorIdxImporter t_import;
+  Context ctx;
 
 public:
 
   void MatMalTest(void) {
     testStart("Context QntMatMal Op");
-    Context ctx;
     //inputs
     TENSOR a =
         ctx.add(t_import.ubyte_import("/fs/testData/qMatMul/in/qA_0.idx"));
@@ -72,49 +72,52 @@ public:
 
     passed(result == 0);
   }
-/*
+
   void RefCountTest(void) {
     testStart("Context Ref Count");
+    timer_start();
     //inputs
-    Tensor* a = new RamTensor<int>({1,1,1});
-    Tensor* b = new RamTensor<int>({1,1,1});
-    Tensor* c = new RamTensor<int>({1,1,1});
+    TENSOR a = ctx.add(new RamTensor<int>({1,1,1}));
+    TENSOR b = ctx.add(new RamTensor<int>({1,1,1}));
+    TENSOR c = ctx.add(new RamTensor<int>({1,1,1}));
+
+    //init values
+    *(a.lock()->write<int>(0, 0)) = 1;
+    *(b.lock()->write<int>(0, 0)) = 1;
+    *(c.lock()->write<int>(0, 0)) = 1;
 
     // reference outputs
-    Tensor* out = new RamTensor<int>({1,1,1});
-    out->keep_alive(true);
+    TENSOR out = ctx.add(new RamTensor<int>({1,1,1}));
+    S_TENSOR shr_out = out.lock();
 
-
-    Context ctx;
-    timer_start();
-
-    TList input0 = {a, b};
-    TList output0 = {c};
+    TList inputs0 = {a, b};
+    //TList outputs0 = {c};  //2
+    TList outputs0 = {out};
     ctx.push(new AddOp(), inputs0, outputs0);
 
-    TList input1 = {c, a};
-    TList output1 = {b};
-    ctx.push(new AddOp(), inputs1, outputs1);
+    // TList inputs1 = {c, a};
+    // TList outputs1 = {b};  //3
+    // ctx.push(new AddOp(), inputs1, outputs1);
 
-    TList input2 = {a, b};
-    TList output2 = {out};
-    ctx.push(new AddOp(), inputs2, outputs2);
+    // TList inputs2 = {a, b};
+    // TList outputs2 = {out};  //4
+    // ctx.push(new AddOp(), inputs2, outputs2);
     ctx.eval();
     timer_stop();
 
-    if(a != nullptr || b != nullptr || c != nullptr) {
+    if(a.lock() || b.lock() || c.lock()) {
         failed();
         return;
     }
 
-    passed(out->read(0, 0) != 1);
+    passed(*(shr_out->read<int>(0, 0)) != 4);
 
   }
-  */
+
 
   void runAll(void) {
     MatMalTest();
-    //RefCountTest();
+    RefCountTest();
   }
 };
 

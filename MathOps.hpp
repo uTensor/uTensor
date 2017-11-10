@@ -201,4 +201,31 @@ void ArgMax(Tensor* input, Tensor* dim, Tensor** out) {
     out_index++;
   }
 }
+
+template <class TIn, class TOut>
+void Add(S_TENSOR input, S_TENSOR input2, S_TENSOR out) {
+  const TIn* p_in = input->read<TIn>(0, 0);
+  const TIn* p_in2 = input2->read<TIn>(0, 0);
+
+  //auto shape
+  out->resize<TOut>(input->getShape());
+
+  TOut* p_out = out->write<TOut>(0, 0);
+
+  const uint32_t size = out->getSize();
+  for (uint32_t i = 0; i < size; i++) {
+    p_out[i] = p_in[i] + p_in2[i];
+  }
+}
+
+class AddOp : public Operator{
+public:
+  AddOp() {
+    n_inputs = 2;
+    n_outputs = 1;
+  }
+  virtual void compute() override {
+    Add<int, int>(inputs[0], inputs[1], outputs[0]);
+  }
+};
 #endif  // UTENSOR_MATH_OPS
