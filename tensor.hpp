@@ -87,11 +87,17 @@ class TensorBase {
 class Tensor : public uTensor {
   virtual void* read(size_t offset, size_t ele) { return nullptr; }
   virtual void* write(size_t offset, size_t ele) { return nullptr; }
+  Tensor(const Tensor&);
+  Tensor& operator=(const Tensor&);
 
  protected:
   std::shared_ptr<TensorBase> s;  // short for states
  public:
-  Tensor(void) {}
+  Tensor(void) {
+    s = std::make_shared<TensorBase>();
+    s->total_size = 0;
+    s->data = nullptr;
+  }
 
   // returns how far a given dimension is apart
   size_t getStride(size_t dim_index) {
@@ -135,13 +141,16 @@ class Tensor : public uTensor {
             size *= i;
         }
       }
+      
       if (size == s->total_size) {
           return;
-      } else {
+      } 
+      
+      if (s->data){ 
           free(s->data);
-          s->total_size = size;
-          s->data = (void*)malloc(unit_size() * s->total_size);
       }
+      s->total_size = size;
+      s->data = (void*)malloc(unit_size() * s->total_size);
 
       if (s->data == NULL) 
           ERR_EXIT("ran out of memory for %lu malloc", unit_size() * s->total_size);
@@ -233,6 +242,9 @@ class RamTensor : public Tensor {
     return sizeof(T);
   }
   ~RamTensor() {}
+ private:
+  RamTensor(const RamTensor&);
+  RamTensor& operator=(const RamTensor&);
 
 };
 
