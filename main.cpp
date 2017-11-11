@@ -72,11 +72,11 @@ int main(int argc, char** argv) {
    ctxTest.printSummary();
 
 
-   printf("mlp test: \r\n");
-   mlpTest mlpt;
-   mlpt.runAll();
-   printf("mlp result...\r\n");
-   mlpt.printSummary();
+  //  printf("mlp test: \r\n");
+  //  mlpTest mlpt;
+  //  mlpt.runAll();
+  //  printf("mlp result...\r\n");
+  //  mlpt.printSummary();
 
 
    printf("tesnor test: \r\n");

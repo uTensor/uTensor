@@ -17,57 +17,21 @@
 //   dbl,
 // };
 
+class Tensor;
+
+typedef std::shared_ptr<Tensor> S_TENSOR;
+typedef std::weak_ptr<Tensor> TENSOR;
+typedef vector<TENSOR> TList;
+typedef vector<S_TENSOR> S_TList;
+
 class uTensor {
-protected:
- uint16_t ref_count;
- bool static_ref_flag;  //to support compile-time ref count
 public:
- uTensor() {
-   ref_count = 0;
-   static_ref_flag = false;
- }
  virtual void inFocus(){};
  virtual void deFocus(){};
- uint16_t incrRef();
- uint16_t dcrRef();
- uint16_t getRef();
- void setStaticRef(uint16_t c);
- bool is_static_ref(void);
+
  virtual ~uTensor() = 0;
  
 };
-
-uint16_t uTensor::incrRef() {
-  if(!static_ref_flag) {
-    ref_count += 1;
-  }
-
-  return ref_count;
-}
-
-uint16_t uTensor::dcrRef() {
-  ref_count -= 1;
-  return ref_count;
-}
-
-uint16_t uTensor::getRef() {
-  return ref_count;
-}
-
-bool uTensor::is_static_ref(void) {
-  return static_ref_flag;
-}
-
-void uTensor::setStaticRef(uint16_t c) {
-  if(ref_count == 0) {
-    ref_count = c;
-    static_ref_flag = true;
-  } else {
-    ERR_EXIT("None-zero ref_count");
-  }
-}
-
-
 
 uTensor::~uTensor() {}
 class TensorBase {
@@ -130,7 +94,7 @@ class Tensor : public uTensor {
   }
 
   template <class T>
-  void resize(std::vector<uint32_t>& v) {
+  void resize(std::vector<uint32_t> v) {
       uint32_t size = 0;
       s->shape.clear();
       for (auto i : v) {
