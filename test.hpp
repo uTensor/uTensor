@@ -40,7 +40,7 @@ class Test {
 
     Test_Record r;
     r.result = res;
-    r.lapsed_time = timer.read();
+    r.lapsed_time = timer.read() * 1000;
 
     tTable[testName] = r;
 

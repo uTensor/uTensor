@@ -84,6 +84,13 @@ int main(int argc, char** argv) {
    tenT.runAll();
    printf("tensor result: \r\n");
    tenT.printSummary();
+
+    printf("Test framework validation:\r\n");
+   if(arrayTests.getTestResult("quantize_v2") == Test_Result::PASSED) { printf("Passed : %.4f\r\n", arrayTests.getTestTime("quantize_v2"));}
+   if(arrayTests.getTestResult("dequantize") == Test_Result::PASSED) {printf("Passed : %.4f\r\n", arrayTests.getTestTime("dequantize"));}
+   if(arrayTests.getTestResult("reshape") == Test_Result::PASSED) {printf("Passed : %.4f\r\n", arrayTests.getTestTime("reshape"));}
+
+
   //In [24]: tf.get_default_graph().get_tensor_by_name("import/y_pred:0").eval(feed_dict={x: mnist.test.images[0:1]})
   //Out[24]: array([7])
 
