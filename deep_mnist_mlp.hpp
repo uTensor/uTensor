@@ -107,17 +107,7 @@ void ReluLayer(Tensor* x, Tensor* x_min, Tensor* x_max,
 
 template<class T1, class T2, class T3>
 void PredLayer(Tensor* input, Tensor* input_min,
-               Tensor* input_max, Tensor** output) {
-  TensorIdxImporter t_import;
-  Tensor* w = t_import.ubyte_import(
-      "/fs/testData/deep_mlp/runPredLayer/MatMul_2_eightbit_quantized_mat_mul/"
-      "inputs/Variable_4_quint8_const_0.idx");
-  Tensor* w_min = t_import.float_import(
-      "/fs/testData/deep_mlp/runPredLayer/MatMul_2_eightbit_quantized_mat_mul/"
-      "inputs/Variable_4_min_0.idx");
-  Tensor* w_max = t_import.float_import(
-      "/fs/testData/deep_mlp/runPredLayer/MatMul_2_eightbit_quantized_mat_mul/"
-      "inputs/Variable_4_max_0.idx");
+               Tensor* input_max, Tensor** output, Tensor* w, Tensor* w_min, Tensor* w_max, Tensor* bias, Tensor* dim) {
 
   Tensor* out_c = nullptr;
   Tensor* matmul_out_min = new RamTensor<float>({1});
@@ -160,17 +150,12 @@ void PredLayer(Tensor* input, Tensor* input_min,
   delete reqnt_out_max;
 
   //Add
-  Tensor* bias = t_import.float_import(
-      "/fs/testData/deep_mlp/runPredLayer/add_2/inputs/Variable_5_0.idx");
   Tensor* output_z = nullptr;
   Add<float, float>(deqnt_out, bias, &output_z);
   delete deqnt_out;
   delete bias;
 
   //ArgMax
-  Tensor* dim = t_import.int_import(
-      "/fs/testData/deep_mlp/runPredLayer/y_pred/inputs/"
-      "y_pred-dimension_0.idx");
   ArgMax<float, T3>(output_z, dim, output);
 }
 
@@ -203,5 +188,4 @@ void runPred(void) {
 */
 
 int runMLP(string inputIdxFile);
-
 #endif
