@@ -7,6 +7,7 @@
 #include "context.hpp"
 #include "tensorIdxImporter.hpp"
 #include "MatrixOps.hpp"
+#include "MathOps.hpp"
 #include "test.hpp"
 
 
