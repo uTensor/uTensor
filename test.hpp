@@ -5,17 +5,57 @@
 #include <limits>
 #include <string>
 #include <vector>
+#include <unordered_map>
 #include "mbed.h"
 #include "uTensor_util.hpp"
 #include "tensor.hpp"
+
+enum class Test_Result { FAILED, WARN, PASSED };
+
+class Test_Record {
+public:
+  Test_Result result;
+  float lapsed_time;
+
+  Test_Record() {
+    result = Test_Result::FAILED;
+    lapsed_time = std::numeric_limits<float>::quiet_NaN();;  
+  }
+};
 
 class Test {
  private:
   Timer timer;
   string testName;
   string summary;
+  bool stringReport;
+  std::unordered_map<string, Test_Record> tTable;
 
  protected:
+  void recordStatus(Test_Result res) {
+
+    if(tTable.find(testName) != tTable.end()) {
+      ERR_EXIT("%s already in the test record", testName.c_str());
+    }
+
+    Test_Record r;
+    r.result = res;
+    r.lapsed_time = timer.read() * 1000;
+
+    tTable[testName] = r;
+
+    if(stringReport) {
+      switch(res) {
+        case Test_Result::FAILED : printStatus("** FAILED **");
+            break;
+        case Test_Result::WARN : printStatus(" * WARN * ");
+            break;
+        case Test_Result::PASSED : printStatus("  OK  ");
+            break;
+      }
+    }
+  }
+
   void printStatus(string status) {
     int pLen = std::max(1, 30 - (int)testName.length());
     string msg = testName;
@@ -57,7 +97,7 @@ class Test {
     if (testName == "") ERR_EXIT("Error: test name not cleared piror to test run\r\n");
 
     numOk++;
-    printStatus("  OK  ");
+    recordStatus(Test_Result::PASSED);
 
     testName = "";
   }
@@ -68,7 +108,7 @@ class Test {
     if (testName == "") ERR_EXIT("Error: testStart is not called prior to test start\r\n");
 
     numFailed++;
-    printStatus("** FAILED **");
+    recordStatus(Test_Result::FAILED);
 
     testName = "";
   }
@@ -79,7 +119,7 @@ class Test {
     if (testName == "") ERR_EXIT("Error: testStart is not called prior to test start\r\n");
 
     numWarn++;
-    printStatus(" * WARN * ");
+    recordStatus(Test_Result::WARN);
 
     testName = "";
   }
@@ -98,6 +138,21 @@ class Test {
     testName = "";
     summary = "";
     print_test = false;
+    stringReport = true;
+  }
+
+  void setStringReport(bool in) {  //in == false means no string report generated
+    stringReport = in;
+  }
+
+  Test_Result getTestResult(string tname) {
+    Test_Record r = tTable[tname];
+    return r.result;
+  }
+
+  float getTestTime(string tname) {
+    Test_Record r = tTable[tname];
+    return r.lapsed_time;
   }
 
   void printSummary(void) { printf("%s\r\n", summary.c_str()); }
