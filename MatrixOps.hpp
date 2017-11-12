@@ -217,14 +217,15 @@ void QuantizedMatMul2(S_TENSOR A, S_TENSOR B, S_TENSOR C,
   *c_max = max_c_value;
 }
 
-class QntMatMulOp : public Operator{
+template <class T1, class T2, class TOut>
+class QntMatMulOp : public Operator {
 public:
   QntMatMulOp() {
     n_inputs = 6;
     n_outputs = 3;
   }
   virtual void compute() override {
-    QuantizedMatMul2<uint8_t, uint8_t, int>(inputs[0], inputs[3],
+    QuantizedMatMul2<T1, T2, TOut>(inputs[0], inputs[3],
      outputs[0], inputs[1], inputs[4], inputs[2], inputs[5],
       outputs[1], outputs[2]);
   }

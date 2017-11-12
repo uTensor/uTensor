@@ -11,6 +11,7 @@
 #include "MathTests.hpp"
 #include "tensor_test.hpp"
 #include "NnTests.hpp"
+#include "MatrixTests.hpp"
 //#include "deep_mnist_mlp.hpp"
 
 Serial pc(USBTX, USBRX, 115200);
@@ -31,13 +32,8 @@ int main(int argc, char** argv) {
    idxTest.runAll();
 
 
-/*   printf("running matrix test ...\r\n");
-   matrixOpsTest matrixTests;
-   matrixTests.runAll();*/
    printf("IDX import:\r\n");
    idxTest.printSummary();
-   printf("Matrix: \r\n");
-//   matrixTests.printSummary();
 
    ArrayOpsTest arrayTests;
    arrayTests.runAll();
@@ -49,6 +45,11 @@ int main(int argc, char** argv) {
    mathTests.runAll();
    printf("Math result...\r\n");
    mathTests.printSummary();
+
+   printf("running matrix test ...\r\n");
+   matrixOpsTest matrixTests;
+   matrixTests.runAll();
+   matrixTests.printSummary();
 
    printf("Context test: \r\n");
    contextTest ctxTest;
