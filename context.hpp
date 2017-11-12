@@ -3,6 +3,7 @@
 
 #include <memory>
 #include <unordered_map>
+#include <initializer_list>
 #include "uTensorBase.hpp"
 #include "stdio.h"
 //#include <list>
@@ -44,6 +45,7 @@ protected:
 public:
   TENSOR add(Tensor* t, uint8_t init_count = 0);
   void push(Operator *op, TList &_inputs, TList &_outputs);
+  void push(Operator *op, std::initializer_list<TENSOR> _inputs, std::initializer_list<TENSOR> _outputs);
   int eval(void);
 
   Context() {
@@ -81,6 +83,21 @@ void Context::push(Operator *op, TList &_inputs, TList &_outputs) {
   op_list.push_back(op);
   incrTListRef(_inputs);
 
+}
+
+void Context::push(Operator *op, std::initializer_list<TENSOR> _inputs, std::initializer_list<TENSOR> _outputs) {
+  TList inputs;
+  TList outputs;
+
+  for(auto i:_inputs) {
+    inputs.push_back(i);
+  }
+
+  for(auto o:_outputs) {
+    outputs.push_back(o);
+  }
+
+  push(op, inputs, outputs);
 }
 
 void Context::incrTListRef(const TList &t_list) {
