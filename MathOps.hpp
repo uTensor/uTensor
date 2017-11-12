@@ -4,6 +4,7 @@
 #include <climits>
 #include "quantization_utils.hpp"
 #include "tensor.hpp"
+#include "uTensorBase.hpp"
 
 template<class T1>
 void CalculateUsedRange(Tensor* input, int32_t* used_min_quan,
@@ -23,14 +24,14 @@ void CalculateUsedRange(Tensor* input, int32_t* used_min_quan,
   *used_max_quan = maxmum;
 }
 template <class T1, class T2>
-void Requantization_Range(Tensor* input, Tensor* min, Tensor* max,
-                          Tensor* out_min, Tensor* out_max) {
+void Requantization_Range(S_TENSOR input, S_TENSOR min, S_TENSOR max,
+                          S_TENSOR out_min, S_TENSOR out_max) {
   const float input_min = *(min->read<T2>(0, 0));
   const float input_max = *(max->read<T2>(0, 0));
 
   int32_t used_min_quan;
   int32_t used_max_quan;
-  CalculateUsedRange<T1>(input, &used_min_quan, &used_max_quan);
+  CalculateUsedRange<T1>(input.get(), &used_min_quan, &used_max_quan);
 
   const float used_min =
       std::min(0.0f, QuantizedToFloat(used_min_quan, input_min, input_max));
@@ -42,10 +43,22 @@ void Requantization_Range(Tensor* input, Tensor* min, Tensor* max,
   *c_max = used_max;
 }
 
+class Requantization_RangeOp : public Operator {
+  public:
+    Requantization_RangeOp() {
+      n_inputs = 3;
+      n_outputs = 2;
+    }
+
+    virtual void compute() override {
+      Requantization_Range<int, float>(inputs[0], inputs[1],
+              inputs[2], outputs[0], outputs[1]);
+    }
+};
 template <class T1, class T2, class Toutput>
-void Requantize(Tensor* input, Tensor* in_min, Tensor* in_max,
-                Tensor* r_min, Tensor* r_max, Tensor* output,
-                Tensor* out_min, Tensor* out_max) {
+void Requantize(S_TENSOR input, S_TENSOR in_min, S_TENSOR in_max,
+                S_TENSOR r_min, S_TENSOR r_max, S_TENSOR output,
+                S_TENSOR out_min, S_TENSOR out_max) {
   const float input_min = in_min->read<T2>(0, 0)[0];
   const float input_max = in_max->read<T2>(0, 0)[0];
   const float r_output_min = r_min->read<T2>(0, 0)[0];
@@ -65,6 +78,21 @@ void Requantize(Tensor* input, Tensor* in_min, Tensor* in_max,
   *v_out_max = r_output_max;
 }
 
+
+class RequantizeOp : public Operator {
+  public:
+    RequantizeOp() {
+      n_inputs = 5;
+      n_outputs = 3;
+    }
+
+    virtual void compute() override {
+        Requantize<int, float, unsigned char>(inputs[0], inputs[1], 
+                inputs[2], inputs[3], inputs[4],
+                outputs[0], outputs[1], outputs[2]);
+    }
+};
+
 template <class TIn, class TOut>
 void Add(Tensor* input, Tensor* input2, Tensor** out) {
   const TIn* p_in = input->read<TIn>(0, 0);
@@ -81,7 +109,7 @@ void Add(Tensor* input, Tensor* input2, Tensor** out) {
   }
 }
 template <class TIn, class Td, class TOut>
-void Min(Tensor* input, Tensor* dim, Tensor* out) {
+void Min(S_TENSOR input, S_TENSOR dim, S_TENSOR out) {
   const TIn* p_in = input->read<TIn>(0, 0);
   const Td* p_in2 = dim->read<Td>(0, 0);
   TOut* p_out = out->write<TOut>(0, 0);
@@ -112,8 +140,19 @@ void Min(Tensor* input, Tensor* dim, Tensor* out) {
   }
 }
 
+class MinOp : public Operator {
+  public:
+    MinOp() {
+        n_inputs = 2;
+        n_outputs = 1;
+    }
+
+    virtual void compute() override {
+      Min<float, int, float>(inputs[0], inputs[1], outputs[0]);
+    }
+};
 template <class TIn, class Td, class TOut>
-void Max(Tensor* input, Tensor* dim, Tensor* out) {
+void Max(S_TENSOR input, S_TENSOR dim, S_TENSOR out) {
   const TIn* p_in = input->read<TIn>(0, 0);
   const Td* p_in2 = dim->read<Td>(0, 0);
   TOut* p_out = out->write<TOut>(0, 0);
@@ -144,15 +183,27 @@ void Max(Tensor* input, Tensor* dim, Tensor* out) {
   }
 }
 
+class MaxOp : public Operator {
+  public:
+    MaxOp() {
+    n_inputs = 2;
+    n_outputs = 1;
+  }
+
+  virtual void compute() override {
+    Max<float, int, float>(inputs[0], inputs[1], outputs[0]);
+  }
+};
+
 template <class TIn, class TOut>
-void ArgMax(Tensor* input, Tensor* dim, Tensor** out) {
+void ArgMax(S_TENSOR input, S_TENSOR dim, S_TENSOR out) {
   int dim_reduce = *(dim->read<int>(0, 0));
   Shape outShape = input->getShape();
   uint32_t reduce_dim_size = outShape[dim_reduce];
   outShape.erase(outShape.begin() + dim_reduce);
 
   // construct the permute vector
-  vector<uint8_t> permute;
+  std::vector<uint8_t> permute;
   for (uint8_t i = 0; i < input->getShape().size(); i++) {
     permute.push_back(i);
   }
@@ -160,15 +211,13 @@ void ArgMax(Tensor* input, Tensor* dim, Tensor** out) {
   permute.erase(permute.begin() + dim_reduce);
 
   // check dimensionality
-  if (*out && (*out)->getSize() != 0 && (*out)->getShape() != outShape) {
+  if (out && out->getSize() != 0 && out->getShape() != outShape) {
     ERR_EXIT("output shape mismatch");
   }
 
   // allocate output tensor if empty
-  if (*out && (*out)->getSize() == 0) {
-    (*out)->init<TOut>(outShape);
-  } else {
-      *out = new RamTensor<TOut>(outShape);
+  if (out && out->getSize() == 0) {
+    out->resize<TOut>(outShape);
   }
   
 
@@ -182,7 +231,7 @@ void ArgMax(Tensor* input, Tensor* dim, Tensor** out) {
   permuteIndexTransform trans(vOutShape, permute);
 
   const TIn* inPtr = input->read<TIn>(0, 0);
-  TOut* outPtr = (*out)->write<TOut>(0, 0);
+  TOut* outPtr = out->write<TOut>(0, 0);
 
   size_t out_index = 0;
 
@@ -202,6 +251,19 @@ void ArgMax(Tensor* input, Tensor* dim, Tensor** out) {
   }
 }
 
+
+template<class TIn, class TOut>
+class ArgMaxOp : public Operator {
+  public:
+    ArgMaxOp() {
+      n_inputs = 2;
+      n_outputs = 1;
+  }
+
+  virtual void compute() override {
+    ArgMax<TIn, TOut>(inputs[0], inputs[1], outputs[0]);
+  }
+};
 template <class TIn, class TOut>
 void Add(S_TENSOR input, S_TENSOR input2, S_TENSOR out) {
   const TIn* p_in = input->read<TIn>(0, 0);
@@ -218,6 +280,7 @@ void Add(S_TENSOR input, S_TENSOR input2, S_TENSOR out) {
   }
 }
 
+template<class T1, class T2>
 class AddOp : public Operator{
 public:
   AddOp() {
@@ -225,7 +288,7 @@ public:
     n_outputs = 1;
   }
   virtual void compute() override {
-    Add<int, int>(inputs[0], inputs[1], outputs[0]);
+    Add<T1, T2>(inputs[0], inputs[1], outputs[0]);
   }
 };
 #endif  // UTENSOR_MATH_OPS
