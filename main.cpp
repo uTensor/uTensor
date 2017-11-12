@@ -10,6 +10,7 @@
 #include "context_test.hpp"
 #include "MathTests.hpp"
 #include "tensor_test.hpp"
+#include "NnTests.hpp"
 //#include "deep_mnist_mlp.hpp"
 
 Serial pc(USBTX, USBRX, 115200);
@@ -54,12 +55,13 @@ int main(int argc, char** argv) {
    ctxTest.runAll();
    printf("Context result...\r\n");
    ctxTest.printSummary();
-  /* printf("NnOpS: \r\n");
+
+  printf("NnOpS: \r\n");
    NnOpsTest nnTest;
    nnTest.runAll();
    printf("Nn Ops result...\r\n");
    nnTest.printSummary();
-  */
+
 
 
    printf("Transformation test: \r\n");
