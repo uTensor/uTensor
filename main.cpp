@@ -8,6 +8,7 @@
 #include "context.hpp"
 #include "ArrayTests.hpp"
 #include "context_test.hpp"
+#include "MathTests.hpp"
 //#include "deep_mnist_mlp.hpp"
 
 Serial pc(USBTX, USBRX, 115200);
@@ -41,13 +42,18 @@ int main(int argc, char** argv) {
    printf("Array: \r\n");
    arrayTests.printSummary();
 
-   /*printf("Math: \r\n");
+   printf("Math: \r\n");
    MathOpsTest mathTests;
    mathTests.runAll();
    printf("Math result...\r\n");
    mathTests.printSummary();
 
-   printf("NnOpS: \r\n");
+   printf("Context test: \r\n");
+   contextTest ctxTest;
+   ctxTest.runAll();
+   printf("Context result...\r\n");
+   ctxTest.printSummary();
+  /* printf("NnOpS: \r\n");
    NnOpsTest nnTest;
    nnTest.runAll();
    printf("Nn Ops result...\r\n");
@@ -59,11 +65,6 @@ int main(int argc, char** argv) {
    printf("Transformation result...\r\n");
    tTest.printSummary();
 
-   printf("Context test: \r\n");
-   contextTest ctxTest;
-   ctxTest.runAll();
-   printf("Context result...\r\n");
-   ctxTest.printSummary();
 
 
   //  printf("mlp test: \r\n");
