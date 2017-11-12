@@ -93,15 +93,15 @@ public:
 
     TList inputs0 = {a, b};
     TList outputs0 = {c};  //2
-    ctx.push(new AddOp(), inputs0, outputs0);
+    ctx.push(new AddOp<int, int>(), inputs0, outputs0);
 
     TList inputs1 = {c, a};
     TList outputs1 = {b};  //3
-    ctx.push(new AddOp(), inputs1, outputs1);
+    ctx.push(new AddOp<int, int>(), inputs1, outputs1);
 
     TList inputs2 = {a, b};
     TList outputs2 = {out};  //4
-    ctx.push(new AddOp(), inputs2, outputs2);
+    ctx.push(new AddOp<int, int>(), inputs2, outputs2);
     ctx.eval();
     timer_stop();
 
