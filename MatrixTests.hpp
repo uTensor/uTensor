@@ -42,8 +42,8 @@ class matrixOpsTest : public Test {
     TENSOR out_min = ctx.add(new RamTensor<float>(c_min.lock()->getShape()));
     TENSOR out_max = ctx.add(new RamTensor<float>(c_max.lock()->getShape()));
 
-    TList inputs = {a, a_min, a_max, b, b_min, b_max};
-    TList outputs = {out_c, out_min, out_max};
+    //TList inputs = {a, a_min, a_max, b, b_min, b_max};
+    //TList outputs = {out_c, out_min, out_max};
 
     //if you want tensors to be alive after .eval()
     //copies of the share_pointer needs to be here
@@ -56,7 +56,11 @@ class matrixOpsTest : public Test {
     
 
     timer_start();
-    ctx.push(new QntMatMulOp<uint8_t, uint8_t, int>(), inputs, outputs);
+    //ctx.push(new QntMatMulOp<uint8_t, uint8_t, int>(), inputs, outputs);
+    ctx.push(new QntMatMulOp<uint8_t, uint8_t, int>(),
+         {a, a_min, a_max, b, b_min, b_max},
+         {out_c, out_min, out_max});
+         
     ctx.eval();
     timer_stop();
 

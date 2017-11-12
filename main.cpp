@@ -63,8 +63,6 @@ int main(int argc, char** argv) {
    printf("Nn Ops result...\r\n");
    nnTest.printSummary();
 
-
-
    printf("Transformation test: \r\n");
    transTest tTest;
    tTest.runAll();
