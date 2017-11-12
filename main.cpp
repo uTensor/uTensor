@@ -9,6 +9,7 @@
 #include "ArrayTests.hpp"
 #include "context_test.hpp"
 #include "MathTests.hpp"
+#include "tensor_test.hpp"
 //#include "deep_mnist_mlp.hpp"
 
 Serial pc(USBTX, USBRX, 115200);
@@ -58,6 +59,8 @@ int main(int argc, char** argv) {
    nnTest.runAll();
    printf("Nn Ops result...\r\n");
    nnTest.printSummary();
+  */
+
 
    printf("Transformation test: \r\n");
    transTest tTest;
@@ -66,7 +69,7 @@ int main(int argc, char** argv) {
    tTest.printSummary();
 
 
-
+/*
   //  printf("mlp test: \r\n");
   //  mlpTest mlpt;
   //  mlpt.runAll();
