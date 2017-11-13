@@ -75,8 +75,6 @@ class Tensor : public uTensor {
   }
   template <class T>
   void init(std::vector<uint32_t>& v) {
-    s = std::make_shared<TensorBase>();
-    s->total_size = 0;
 
     for (auto i : v) {
       s->shape.push_back(i);
@@ -151,6 +149,7 @@ template <class T>
 class RamTensor : public Tensor {
   // need deep copy
  public:
+  RamTensor() : Tensor() {}
 
   RamTensor(std::initializer_list<uint32_t> l) : Tensor() {
     std::vector<uint32_t> v;
