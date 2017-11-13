@@ -33,6 +33,9 @@
 
 #OS stuff
 .DS_Store
+.vscode
+mbed-os
+sd-driver
 
 #Project generated test files
 TESTS/scripts/testData

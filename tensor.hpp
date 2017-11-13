@@ -5,6 +5,7 @@
 #include <iostream>
 #include <memory>
 #include <vector>
+#include <string.h>
 #include "stdlib.h"
 #include "uTensor_util.hpp"
 
@@ -150,6 +151,14 @@ class RamTensor : public Tensor {
   // need deep copy
  public:
   RamTensor() : Tensor() {}
+  RamTensor(RamTensor& other) : Tensor() {
+    // deepcopy raw pointer
+    s->shape = other.s->shape; // copy shape
+    s->total_size = other.s->total_size; // copy total size
+    size_t mem_size = unit_size() * s->total_size;
+    s->data = malloc(mem_size);
+    memcpy(s->data, other.s->data, mem_size);
+  }
 
   RamTensor(std::initializer_list<uint32_t> l) : Tensor() {
     std::vector<uint32_t> v;
