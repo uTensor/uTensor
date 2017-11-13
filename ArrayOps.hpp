@@ -22,6 +22,9 @@ void QuantizeV2(S_TENSOR input, S_TENSOR _min_range, S_TENSOR _max_range,
     float min_range = std::min(0.0f, input_min_range);
     const float epsilon = std::max(1.0f, std::max(fabsf(input_min_range),
                                                    fabsf(input_max_range))) / 100.0f;
+    if(output && output->getSize() == 0) {
+      output->resize<T>(input->getShape());
+    }
 
     float max_range = std::max(input_max_range, min_range + epsilon);
     max_range = std::max(0.0f, max_range);
@@ -86,9 +89,9 @@ void dequantize(S_TENSOR input, S_TENSOR min_range, S_TENSOR max_range, S_TENSOR
                         val * q2f.range_scale);
     }
 }
-class Dequantize2Op : public Operator {
+class DequantizeOp : public Operator {
   public:
-    Dequantize2Op() {
+    DequantizeOp() {
       n_inputs = 3;
       n_outputs = 1;
     }
