@@ -73,7 +73,7 @@ public:
         S_TENSOR ref_out = out_ref.lock();
 
         timer_start();
-        ctx.push(new Dequantize2Op(), inputs, outputs);
+        ctx.push(new DequantizeOp(), inputs, outputs);
         ctx.eval();
         timer_stop();
 
