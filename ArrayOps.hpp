@@ -22,8 +22,15 @@ void QuantizeV2(S_TENSOR input, S_TENSOR _min_range, S_TENSOR _max_range,
     float min_range = std::min(0.0f, input_min_range);
     const float epsilon = std::max(1.0f, std::max(fabsf(input_min_range),
                                                    fabsf(input_max_range))) / 100.0f;
+    std::vector<uint32_t> v;
+
+    std::vector<uint32_t> org = input->getShape();
+    for (int i = org.size() - 1; i >= 0; i--) {
+        v.push_back(org[i]);
+    }
+
     if(output && output->getSize() == 0) {
-      output->resize<T>(input->getShape());
+      output->resize<T>(v);
     }
 
     float max_range = std::max(input_max_range, min_range + epsilon);
@@ -125,6 +132,19 @@ class DequantizeOp : public Operator {
 template <typename T>
 void reshape(S_TENSOR input, S_TENSOR shape, S_TENSOR output) {
     Shape dim;
+    uint32_t t = input->getShape().size();
+    if (t == 0) {
+        t = 1;
+    }
+
+    shape->resize<int>({t});
+
+    if (t == 1) {
+        shape->write<int>(0, 0)[0] = -1;
+    } else {
+        shape->write<int>(0, 0)[0] = input->getSize();
+        shape->write<int>(0, 0)[1] = -1;
+    }
 
     //validating and inferring dimensions
     int infer_index = -1;
