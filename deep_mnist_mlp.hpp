@@ -64,12 +64,6 @@ void ReluLayer(Context& ctx, TENSOR x, TENSOR x_min, TENSOR x_max,
 
     ctx.push(new AddOp<float, float>(), {deqnt_out, b}, {z_output});
 
-/*    TENSOR z_qnt_output = ctx.add(new RamTensor<unsigned char>());
-    TENSOR z_min = ctx.add(new RamTensor<float>({1}));
-    TENSOR z_max = ctx.add(new RamTensor<float>({1}));
-    tensorQuantize(ctx, z_output, z_qnt_output, z_min, z_max);
-
-    ctx.push(new ReluOp<unsigned char, float, unsigned char>(), {z_qnt_output, z_min, z_max}, {output, output_min, output_max});*/
 }
 
 void PredLayer(Context &ctx, TENSOR input, TENSOR input_min,
@@ -108,35 +102,6 @@ void PredLayer(Context &ctx, TENSOR input, TENSOR input_min,
   ctx.push(new ArgMaxOp<float, int>(), {output_z, dim}, {output});
 }
 
-//Test code
-/*
-void runPred(void) {
-  TensorIdxImporter t_import;
-  Tensor<unsigned char> x = t_import.ubyte_import(
-      "/fs/testData/deep_mlp/runPredLayer/MatMul_2_eightbit_quantized_mat_mul/"
-      "inputs/Relu_1_eightbit_quantized_0.idx");
-  Tensor<float> x_min = t_import.float_import(
-      "/fs/testData/deep_mlp/runPredLayer/MatMul_2_eightbit_quantized_mat_mul/"
-      "inputs/Relu_1_eightbit_quantized_1.idx");
-  Tensor<float> x_max = t_import.float_import(
-      "/fs/testData/deep_mlp/runPredLayer/MatMul_2_eightbit_quantized_mat_mul/"
-      "inputs/Relu_1_eightbit_quantized_2.idx");
-  Tensor<float> ref_out = t_import.float_import(
-      "/fs/testData/deep_mlp/runPredLayer/y_pred/outputs/y_pred_0.idx");
-  Tensor<int> out(ref_out.getShape());
-
-  PredLayer(x, x_min, x_max, out);
-  Tensor<float> out_float = TensorCast<int, float>(out);
-  double result = Test::meanPercentErr(ref_out, out_float);
-  if (result < 0.0001) {
-    printf("PASSED %.8f\r\n\r\n", result);
-  } else {
-    printf("FAILED %.8f\r\n\r\n", result);
-  }
-}
-*/
-
-
 int runMLP(string inputIdxFile) {
   TensorIdxImporter t_import;
   Context ctx;
@@ -170,31 +135,6 @@ int runMLP(string inputIdxFile) {
   TENSOR z_output = ctx.add(new RamTensor<float>()); 
 
   ReluLayer(ctx, x_quantized, x_min, x_max, w, w_min, w_max, b, z_output);
-/*  TENSOR out_c = ctx.add(new RamTensor<int>());
-
-  TENSOR matmul_out_min = ctx.add(new RamTensor<float>({1}));
-  TENSOR matmul_out_max = ctx.add(new RamTensor<float>({1}));
-
-  ctx.push(new QntMatMulOp<uint8_t, uint8_t, int>(), {x_quantized, x_min, x_max, w, w_min, w_max}, {out_c, matmul_out_min, matmul_out_max});
-
-    //Requantization_Range
-  TENSOR req_out_min = ctx.add(new RamTensor<float>({1}));
-  TENSOR req_out_max = ctx.add(new RamTensor<float>({1}));
-  ctx.push(new Requantization_RangeOp(), {out_c, matmul_out_min, matmul_out_max}, {req_out_min, req_out_max});
-
-    //Requantize
-  TENSOR reqnt_out = ctx.add(new RamTensor<unsigned char>());
-  TENSOR reqnt_out_min = ctx.add(new RamTensor<float>({1}));
-  TENSOR reqnt_out_max = ctx.add(new RamTensor<float>({1}));
-  ctx.push(new RequantizeOp(), {out_c, matmul_out_min, matmul_out_max, req_out_min, req_out_max}, {reqnt_out, reqnt_out_min, reqnt_out_max});
-
-
-  TENSOR deqnt_out = ctx.add(new RamTensor<float>());
-  ctx.push(new DequantizeOp(), {reqnt_out, reqnt_out_min, reqnt_out_max}, {deqnt_out});
-
-  TENSOR z_output = ctx.add(new RamTensor<float>()); 
-  TENSOR sz_output = z_output.lock();
-  ctx.push(new AddOp<float, float>(), {deqnt_out, b}, {z_output});*/
 
   TENSOR z_qnt_output = ctx.add(new RamTensor<unsigned char>());
   TENSOR z_min = ctx.add(new RamTensor<float>({1}));
@@ -223,30 +163,6 @@ int runMLP(string inputIdxFile) {
   TENSOR z_output2 = ctx.add(new RamTensor<float>()); 
   ReluLayer(ctx, relu_output, relu_min, relu_max, w2, w_min2, w_max2, b2, z_output2);
 
-/*  TENSOR out_c2 = ctx.add(new RamTensor<int>());
-
-  TENSOR matmul_out_min2 = ctx.add(new RamTensor<float>({1}));
-  TENSOR matmul_out_max2 = ctx.add(new RamTensor<float>({1}));
-
-  ctx.push(new QntMatMulOp<uint8_t, uint8_t, int>(), {relu_output, relu_min, relu_max, w2, w_min2, w_max2}, {out_c2, matmul_out_min2, matmul_out_max2});
-
-    //Requantization_Range
-  TENSOR req_out_min2 = ctx.add(new RamTensor<float>({1}));
-  TENSOR req_out_max2 = ctx.add(new RamTensor<float>({1}));
-  ctx.push(new Requantization_RangeOp(), {out_c2, matmul_out_min2, matmul_out_max2}, {req_out_min2, req_out_max2});
-
-    //Requantize
-  TENSOR reqnt_out2 = ctx.add(new RamTensor<unsigned char>());
-  TENSOR reqnt_out_min2 = ctx.add(new RamTensor<float>({1}));
-  TENSOR reqnt_out_max2 = ctx.add(new RamTensor<float>({1}));
-  ctx.push(new RequantizeOp(), {out_c2, matmul_out_min2, matmul_out_max2, req_out_min2, req_out_max2}, {reqnt_out2, reqnt_out_min2, reqnt_out_max2});
-
-
-  TENSOR deqnt_out2 = ctx.add(new RamTensor<float>());
-  ctx.push(new DequantizeOp(), {reqnt_out2, reqnt_out_min2, reqnt_out_max2}, {deqnt_out2});
-
-  TENSOR z_output2 = ctx.add(new RamTensor<float>()); 
-  ctx.push(new AddOp<float, float>(), {deqnt_out2, b2}, {z_output2});*/
 
   TENSOR z_qnt_output2 = ctx.add(new RamTensor<unsigned char>());
   TENSOR z_min2 = ctx.add(new RamTensor<float>({1}));
@@ -255,8 +171,6 @@ int runMLP(string inputIdxFile) {
 
   ctx.push(new ReluOp<unsigned char, float, unsigned char>(), {z_qnt_output2, z_min2, z_max2}, {relu_output2, relu_min2, relu_max2});
 
-  //ReluLayer(ctx, relu_output, relu_min, relu_max, w, w_min, w_max, b, relu_output2,
-  //          relu_min2, relu_max2);
   ctx.eval();
 
   TENSOR w3 = ctx.add(t_import.ubyte_import(
