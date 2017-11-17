@@ -236,7 +236,6 @@ class MathOpsTest : public Test {
     timer_stop();
 
     double result = meanPercentErr<float>(ref_val.get(), out_val.get());
-    std::cout << result << std::endl;
      passed(result < 0.0001);
     //passed(result == 0);
   }
@@ -268,7 +267,6 @@ class MathOpsTest : public Test {
     timer_stop();
 
     double result = meanPercentErr<float>(ref_vxx.get(), out_vxx.get());
-    std::cout << result << std::endl;
      passed(result < 0.0001);
     //passed(result == 0);
   }

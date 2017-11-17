@@ -13,7 +13,7 @@
 #include "NnTests.hpp"
 #include "MatrixTests.hpp"
 #include "mlp_test.hpp"
-//#include "deep_mnist_mlp.hpp"
+#include "deep_mnist_mlp.hpp"
 
 Serial pc(USBTX, USBRX, 115200);
 SDBlockDevice bd(MBED_CONF_APP_SD_MOSI, MBED_CONF_APP_SD_MISO,
@@ -27,8 +27,8 @@ int main(int argc, char** argv) {
   printf("Deep MLP on Mbed (Trained with Tensorflow)\r\n\r\n");
   printf("running deep-mlp...\r\n");
 
-/*  int prediction = runMLP("/fs/testData/deep_mlp/import-Placeholder_0.idx");
-  printf("prediction: %d\r\n", prediction);*/
+  int prediction = runMLP("/fs/testData/deep_mlp/import-Placeholder_0.idx");
+  printf("prediction: %d\r\n", prediction);
    idxImporterTest idxTest;
    idxTest.runAll();
 
