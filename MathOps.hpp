@@ -64,6 +64,9 @@ void Requantize(S_TENSOR input, S_TENSOR in_min, S_TENSOR in_max,
   const float r_output_min = r_min->read<T2>(0, 0)[0];
   const float r_output_max = r_max->read<T2>(0, 0)[0];
   const T1 *input_ptr = input->read<T1>(0, 0);
+  if (output && output->getSize() == 0) {
+  output->resize<Toutput>(input->getShape());
+  }
   Toutput *out_ptr = output->write<Toutput>(0, 0);
 
   // RequantizeManyInNewRange<T1, Toutput>(input, input.getSize(), input_min,
