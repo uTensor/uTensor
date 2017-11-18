@@ -28,8 +28,13 @@ class uTensor {
 public:
  virtual void inFocus(){};
  virtual void deFocus(){};
+ virtual std::string getName() { return name; }
+ virtual void setName(std::string _name) { name = _name; }
+
 
  virtual ~uTensor() = 0;
+private:
+ std::string name;
  
 };
 
@@ -57,10 +62,11 @@ class Tensor : public uTensor {
  protected:
   std::shared_ptr<TensorBase> s;  // short for states
  public:
-  Tensor(void) {
+  Tensor(TName &_name) {
     s = std::make_shared<TensorBase>();
     s->total_size = 0;
     s->data = nullptr;
+    setName(_name);
   }
 
   // returns how far a given dimension is apart
@@ -149,9 +155,9 @@ template <class T>
 class RamTensor : public Tensor {
   // need deep copy
  public:
-  RamTensor() : Tensor() {}
+  RamTensor(TName _name) : Tensor(_name) {}
 
-  RamTensor(std::initializer_list<uint32_t> l) : Tensor() {
+  RamTensor(std::initializer_list<uint32_t> l, TName _name) : Tensor(_name) {
     std::vector<uint32_t> v;
     for (auto i : l) {
       v.push_back(i);
@@ -160,7 +166,7 @@ class RamTensor : public Tensor {
     Tensor::init<T>(v);
   }
 
-  RamTensor(std::vector<uint32_t> v) : Tensor() {
+  RamTensor(std::vector<uint32_t> v, TName _name) : Tensor(_name) {
     Tensor::init<T>(v);
   }
 
