@@ -27,22 +27,22 @@ void Context::push(Operator *op, TNameList &in_names, TNameList &out_names) {
   //error checking in the Op class
   S_TList _inputs;
   for(auto in:in_names) {
+    if(rTable.find(in) == rTable.end()) { ERR_EXIT("Tensor \"%s\" not found", in.c_str()); }
     Ref_Record r = rTable[in];
-    if(r == rTable.end()) { ERROR_EXIT("Tensor \"%s\" not found", in.c_str()); }
     _inputs.push_back(r.sptr);
   }
 
   S_TList _outputs;
   for(auto out:out_names) {
+    if(rTable.find(out) == rTable.end()) { ERR_EXIT("Tensor \"%s\" not found", out.c_str()); }
     Ref_Record r = rTable[out];
-    if(r == rTable.end()) { ERROR_EXIT("Tensor \"%s\" not found", in.c_str()); }
     _outputs.push_back(r.sptr);
   }
 
   op->setInputs(_inputs);
   op->setOutputs(_outputs);
   op_list.push_back(op);
-  incrTListRef(_inputs);
+  incrTNameListRef(in_names);
 
 }
 
@@ -61,9 +61,8 @@ void Context::push(Operator *op, std::initializer_list<TName> _inputs, std::init
   push(op, inputs, outputs);
 }
 
-void Context::incrTListRef(const S_TList &t_list) {
-  for(auto t:t_list) {
-    TName t_name = t->getName();
+void Context::incrTNameListRef(const TNameList &t_list) {
+  for(auto t_name:t_list) {
     if(rTable.find(t_name) == rTable.end()) {
       ERR_EXIT("tensor not registered");
     }

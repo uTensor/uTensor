@@ -1,3 +1,4 @@
+#ifdef __DEEP_MNIST_MLP_HPP__ 
 #include "deep_mnist_mlp.hpp"
 
 void tensorQuantize(Context& ctx, TENSOR input, TENSOR output,
@@ -199,3 +200,4 @@ int runMLP(string inputIdxFile) {
   return *(pred.lock()->read<int>(0, 0));
   // output layer
 }
+#endif
