@@ -2,66 +2,66 @@
 #define UTENSOR_TENSOR_H
 
 #include <initializer_list>
+#include <iostream>
 #include <memory>
-#include <uTensor_util.hpp>
 #include <vector>
-#include "mbed.h"
 #include "stdlib.h"
+#include "uTensor_util.hpp"
 
-template <class U>
+// enum class DType : char { 
+//   uint8,
+//   int8,
+//   uint16,
+//   int32,
+//   flt,
+//   dbl,
+// };
+
+class Tensor;
+
+typedef std::shared_ptr<Tensor> S_TENSOR;
+typedef std::weak_ptr<Tensor> TENSOR;
+typedef std::vector<TENSOR> TList;
+typedef std::vector<S_TENSOR> S_TList;
+
+class uTensor {
+public:
+ virtual void inFocus(){};
+ virtual void deFocus(){};
+
+ virtual ~uTensor() = 0;
+ 
+};
+
+inline uTensor::~uTensor() {}
 class TensorBase {
  public:
-  vector<uint32_t> shape;
-  U* data;
+  std::vector<uint32_t> shape;
+  void* data;
   uint32_t total_size;
 
   ~TensorBase() {
-    if(data != nullptr) {
+    if (data != nullptr) {
       free(data);
       DEBUG("TensorBase memory freed..\r\n");
     }
   }
 };
 
-template <class T>
-class Tensor {
-  std::shared_ptr<TensorBase<T>> s;  // short for states
+class Tensor : public uTensor {
+  virtual void* read(size_t offset, size_t ele) { return nullptr; }
+  virtual void* write(size_t offset, size_t ele) { return nullptr; }
+  Tensor(const Tensor&);
+  Tensor& operator=(const Tensor&);
 
-  void init(vector<uint32_t>& v) {
-    s = std::make_shared<TensorBase<T>>(TensorBase<T>());
-    s->total_size = 0;
-
-    for (auto i : v) {
-      s->shape.push_back(i);
-      // total_size = (total_size == 0)? i : total_size *= i;
-      if (s->total_size == 0) {
-        s->total_size = i;
-      } else {
-        s->total_size *= i;
-      }
-    }
-
-    s->data = (T*)malloc(unit_size() * s->total_size);
-    if(s->data == NULL) ERR_EXIT("ran out of memory for %lu malloc", unit_size() * s->total_size);
-  }
-
+ protected:
+  std::shared_ptr<TensorBase> s;  // short for states
  public:
   Tensor(void) {
-    s = std::make_shared<TensorBase<T>>(TensorBase<T>());
+    s = std::make_shared<TensorBase>();
     s->total_size = 0;
     s->data = nullptr;
   }
-
-  Tensor(initializer_list<uint32_t> l) {
-    vector<uint32_t> v;
-    for (auto i : l) {
-      v.push_back(i);
-    }
-
-    init(v);
-  }
-
-  Tensor(vector<uint32_t> v) { init(v); }
 
   // returns how far a given dimension is apart
   size_t getStride(size_t dim_index) {
@@ -73,12 +73,110 @@ class Tensor {
 
     return (size_t)size_accm;
   }
+  template <class T>
+  void init(std::vector<uint32_t>& v) {
+
+    for (auto i : v) {
+      s->shape.push_back(i);
+      if (s->total_size == 0) {
+        s->total_size = i;
+      } else {
+        s->total_size *= i;
+      }
+    }
+
+    s->data = (void*)malloc(unit_size() * s->total_size);
+    if (s->data == NULL)
+      ERR_EXIT("ran out of memory for %lu malloc", unit_size() * s->total_size);
+
+  }
+
+  template <class T>
+  void resize(std::vector<uint32_t> v) {
+      uint32_t size = 0;
+      s->shape.clear();
+      for (auto i : v) {
+        s->shape.push_back(i);
+        if (size == 0) {
+            size = i;
+        } else {
+            size *= i;
+        }
+      }
+      
+      if (size == s->total_size) {
+          return;
+      } 
+      
+      if (s->data){ 
+          free(s->data);
+      }
+      s->total_size = size;
+      s->data = (void*)malloc(unit_size() * s->total_size);
+
+      if (s->data == NULL) 
+          ERR_EXIT("ran out of memory for %lu malloc", unit_size() * s->total_size);
+  }
+
+  std::vector<uint32_t> getShape(void) { return s->shape; }
+
+  uint32_t getSize(void) { return s->total_size; }
+
+  virtual uint16_t unit_size(void) { return 0; }
+
+  uint32_t getSize_in_bytes(void) { return s->total_size * unit_size(); }
+
+  // returns the number of dimensions in the tensor
+  size_t getDim(void) { return s->shape.size(); }
+
+  template <class T>
+  const T* read(size_t offset, size_t ele) {
+    return (const T*)read(offset, ele);
+  }
+
+  template <class T>
+  T* write(size_t offset, size_t ele) {
+    return (T*)write(offset, ele);
+  }
+
+  ~Tensor() {
+    s = nullptr;
+    DEBUG("Tensor Destructed\r\n");
+  }
+};
+
+template <class T>
+class RamTensor : public Tensor {
+  // need deep copy
+ public:
+  RamTensor() : Tensor() {}
+
+  RamTensor(std::initializer_list<uint32_t> l) : Tensor() {
+    std::vector<uint32_t> v;
+    for (auto i : l) {
+      v.push_back(i);
+    }
+
+    Tensor::init<T>(v);
+  }
+
+  RamTensor(std::vector<uint32_t> v) : Tensor() {
+    Tensor::init<T>(v);
+  }
 
   // PRE:      l, initization list, specifying the element/dimension
   // POST:     When a degenerative index is supplied, the pointer
   //          lowest specified dimension is returned.
   //          Otherwise, return the pointer to the specific element.
-  T* getPointer(initializer_list<size_t> l) {
+  virtual void* read(size_t offset, size_t ele) override {
+    return (void *)((T*)s->data + offset);
+  }
+  virtual void* write(size_t offset, size_t ele) override {
+    return (void*)((T*)s->data + offset);
+  }
+
+
+  /*virtual void* read(std::initializer_list<uint32_t> l) override {
     size_t p_offset = 0;
     signed short current_dim = 0;
     for (auto i : l) {
@@ -87,46 +185,39 @@ class Tensor {
     }
 
     // printf("p_offset: %d\r\n", p_offset);
-    return s->data + p_offset;
+    return (void*)((T*)s->data + p_offset);
   }
 
-  T* getPointer(vector<uint32_t> v) {
-    size_t p_offset = 0;
-    signed short current_dim = 0;
-    for (auto i : v) {
-      p_offset += i * getStride(current_dim);
-      current_dim++;
-    }
+    T* getPointer(std::vector<uint32_t> v) {
+      size_t p_offset = 0;
+      signed short current_dim = 0;
+      for (auto i : v) {
+        p_offset += i * getStride(current_dim);
+        current_dim++;
+      }
 
-    printf("p_offset: %d\r\n", p_offset);
+      printf("p_offset: %d\r\n", p_offset);
 
-    return s->data + p_offset;
+      return s->data + p_offset;
+    }*/
+  // virtual void* read(size_t offset, size_t ele) override{};
+  virtual uint16_t unit_size(void) override {
+    return sizeof(T);
   }
+  ~RamTensor() {}
+ private:
+  RamTensor(const RamTensor&);
+  RamTensor& operator=(const RamTensor&);
 
-  vector<uint32_t> getShape(void) { return s->shape; }
-
-  uint32_t getSize(void) { return s->total_size; }
-
-  uint16_t unit_size(void) { return sizeof(T); }
-
-  uint32_t getSize_in_bytes(void) { return s->total_size * unit_size(); }
-
-  // returns the number of dimensions in the tensor
-  size_t getDim(void) { return s->shape.size(); }
-
-  ~Tensor() {
-    s = nullptr;
-    DEBUG("Tensor Destructed\r\n");
-  }
 };
 
 template <typename Tin, typename Tout>
-Tensor<Tout> TensorCast(Tensor<Tin> input) {
-  Tensor<Tout> output(input.getShape());
-  Tin* inputPrt = input.getPointer({});
-  Tout* outputPrt = output.getPointer({});
+Tensor* TensorCast(Tensor* input) {
+  Tensor* output = new RamTensor<Tout>(input->getShape());
+  const Tin* inputPrt = input->read<Tin>(0, 0);
+  Tout* outputPrt = output->write<Tout>(0, 0);
 
-  for (uint32_t i = 0; i < input.getSize(); i++) {
+  for (uint32_t i = 0; i < input->getSize(); i++) {
     outputPrt[i] = static_cast<Tout>(inputPrt[i]);
   }
 
@@ -134,11 +225,11 @@ Tensor<Tout> TensorCast(Tensor<Tin> input) {
 }
 
 template <typename T>
-Tensor<T> TensorConstant(vector<uint32_t> shape, T c) {
-  Tensor<T> output(shape);
-  T* outPrt = output.getPointer({});
+Tensor* TensorConstant(std::vector<uint32_t> shape, T c) {
+  Tensor* output = new RamTensor<T>(shape);
+  T* outPrt = output->write<T>(0, 0);
 
-  for (uint32_t i = 0; i < output.getSize(); i++) {
+  for (uint32_t i = 0; i < output->getSize(); i++) {
     outPrt[i] = c;
   }
 
@@ -146,8 +237,8 @@ Tensor<T> TensorConstant(vector<uint32_t> shape, T c) {
 }
 
 template <typename T>
-Tensor<T> TensorConstant(initializer_list<uint32_t> l, T c) {
-  vector<uint32_t> v;
+Tensor* TensorConstant(std::initializer_list<uint32_t> l, T c) {
+  std::vector<uint32_t> v;
   for (auto i : l) {
     v.push_back(i);
   }
@@ -163,8 +254,8 @@ Tensor<T> TensorConstant(initializer_list<uint32_t> l, T c) {
 
 class permuteIndexTransform {
  private:
-  vector<uint8_t> permute;
-  vector<uint8_t> depermute;
+  std::vector<uint8_t> permute;
+  std::vector<uint8_t> depermute;
   Shape in_shape;
   Shape in_stride;
   Shape out_shape;
@@ -204,14 +295,14 @@ class permuteIndexTransform {
   }
 
  public:
-  permuteIndexTransform(Shape input_shape, vector<uint8_t> permute) {
+  permuteIndexTransform(Shape input_shape, std::vector<uint8_t> permute) {
     setInputShape(input_shape);
     setPermute(permute);
     apply();
   }
 
-  vector<uint8_t> getPermute(void) { return permute; }
-  void setPermute(vector<uint8_t>& _permute) {
+  std::vector<uint8_t> getPermute(void) { return permute; }
+  void setPermute(std::vector<uint8_t>& _permute) {
     permute = _permute;
     depermute.resize(permute.size());
     uint8_t i = 0;
@@ -244,25 +335,27 @@ class permuteIndexTransform {
 
     return out_index;
   }
-
 };
 
 template <typename T>
-void printDim(Tensor<T> t) {
+void printDim(Tensor* t) {
   printf("Dimension: ");
-  Shape s = t.getShape();
-  for(auto d:s) {
+  Shape s = t->getShape();
+  for (auto d : s) {
     printf("[%lu] ", d);
   }
   printf("\r\n");
 }
 
 template <typename T>
-void tensorChkAlloc(Tensor<T> &t, Shape dim) {
-  if (t.getSize() == 0) {
-    t = Tensor<T>(dim);
-  } else if (t.getShape() != dim) {
+void tensorChkAlloc(Tensor** t, Shape dim) {
+  if (*t && (*t)->getSize() == 0) {
+    (*t)->init<T>(dim);
+  } else if (*t && (*t)->getShape() != dim) {
     ERR_EXIT("Dim mismatched...\r\n");
+  } else if (*t == nullptr){
+      *t = new RamTensor<T>(dim);
   }
+   
 }
 #endif
