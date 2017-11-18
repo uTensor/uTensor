@@ -6,8 +6,8 @@
 #include "tensor.hpp"
 #include "tensorIdxImporterTests.hpp"
 #include "context.hpp"
-/*#include "ArrayTests.hpp"
-#include "context_test.hpp"
+#include "ArrayTests.hpp"
+/*#include "context_test.hpp"
 #include "MathTests.hpp"
 #include "tensor_test.hpp"
 #include "NnTests.hpp"
@@ -36,12 +36,12 @@ int main(int argc, char** argv) {
    printf("IDX import:\r\n");
    idxTest.printSummary();
 
-/*   ArrayOpsTest arrayTests;
+   ArrayOpsTest arrayTests;
    arrayTests.runAll();
    printf("Array: \r\n");
    arrayTests.printSummary();
 
-   printf("Math: \r\n");
+/*   printf("Math: \r\n");
    MathOpsTest mathTests;
    mathTests.runAll();
    printf("Math result...\r\n");
