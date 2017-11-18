@@ -24,6 +24,7 @@ class idxImporterTest : public Test {
     timer_stop();
     double result = sum<unsigned char>(t);
     passed(result == 4518);
+    delete t;
   }
 
   void shortTest(void) {
@@ -35,6 +36,7 @@ class idxImporterTest : public Test {
     timer_stop();
     double result = sum<short>(t);
     passed(result == 270250);
+    delete t;
   }
 
   void intTest(void) {
@@ -46,6 +48,7 @@ class idxImporterTest : public Test {
     timer_stop();
     double result = sum<int>(t);
     passed(result == 5748992600);
+    delete t;
   }
 
   void floatTest(void) {
@@ -60,6 +63,7 @@ class idxImporterTest : public Test {
 
     DEBUG("***floating point test yielded: %.8e\r\n", (float)result);
     passed((float)result == -1.0f);
+    delete t;
   }
 
   void runAll(void) {
