@@ -21,8 +21,8 @@ class Tensor;
 
 typedef std::shared_ptr<Tensor> S_TENSOR;
 typedef std::weak_ptr<Tensor> TENSOR;
-typedef vector<TENSOR> TList;
-typedef vector<S_TENSOR> S_TList;
+typedef std::vector<TENSOR> TList;
+typedef std::vector<S_TENSOR> S_TList;
 
 class uTensor {
 public:
@@ -33,7 +33,7 @@ public:
  
 };
 
-uTensor::~uTensor() {}
+inline uTensor::~uTensor() {}
 class TensorBase {
  public:
   std::vector<uint32_t> shape;

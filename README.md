@@ -1,8 +1,9 @@
+
 # uTensor
 
 ## Introduction
 
-  uTensor is an extreme light-weight Deep-Learning Inference framework built on mbed and Tensorflow.
+  uTensor is an extremely light-weight Deep-Learning Inference framework built on mbed and Tensorflow.
 
   This project is under going constant development.
 
@@ -11,7 +12,7 @@
 - [Mbed CLI](https://github.com/ARMmbed/mbed-cli)
 - [Tensorflow](https://www.tensorflow.org/install/)
 - [tf-node-viewer](https://github.com/neil-tan/tf-node-viewer) (Optional, for graph-weight extraction)
-- Mbed-os 5.6+ compatiable [boards](https://os.mbed.com/platforms/?mbed-os=25) with at least 256kb of RAM
+- Mbed-os 5.6+ compatible [boards](https://os.mbed.com/platforms/?mbed-os=25) with at least 256kb of RAM
 - SD Card (Must be LESS than 32 GB)
 - SD Card reader for the board (Optional if built into the board)
 
@@ -35,9 +36,10 @@ See mbed_app.json
 ## SD Card Preparation
 The test data has to be loaded to the SD card for the default binary to run:
 
+1. Install python dependencies `pip install -r requirements.txt` (Note: may have to use `pip3`)
 1. Go to the `[project]\TESTS\scripts` folder
-2. Run `python3 compileTestData.py`. This will create `[project]\TESTS\scripts\testData` directory.
-3. Copy `[project]\TESTS\scripts\testData` to the root of your SD card.
+1. Run `python3 compileTestData.py`. This will create `[project]\TESTS\scripts\testData` directory.
+1. Copy `[project]\TESTS\scripts\testData` to the root of your SD card.
 
 ## Expected Output
 The quantized weight and input data are stored in the SD. Setting the serial baud rate to 115200, here is what you should see:

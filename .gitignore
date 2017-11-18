@@ -36,3 +36,6 @@
 
 #Project generated test files
 TESTS/scripts/testData
+
+#Vim stuff
+*.swp
