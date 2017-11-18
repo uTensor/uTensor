@@ -1,7 +1,8 @@
 #include "context.hpp"
 
-TENSOR Context::add(Tensor* t, uint8_t init_count) {
-  if(rTable.find(t) != rTable.end()) {
+S_TENSOR Context::add(Tensor* t, uint8_t init_count) {
+  if(t == nullptr) { ERR_EXIT("null pointer tensor"); }
+  if(rTable.find(t->getName()) != rTable.end()) {
     ERR_EXIT("tensor pointer address already exist in rTable");
   }
 
@@ -13,18 +14,31 @@ TENSOR Context::add(Tensor* t, uint8_t init_count) {
     record.count = init_count;
     record.allow_incr = false;
   }
+
   record.sptr = _sptr;
 
-  rTable[t] = record;
+  rTable[t->getName()] = record;
 
-  TENSOR wptr = _sptr;
-
-  return wptr;
+  return _sptr;
 }
 
 
-void Context::push(Operator *op, TList &_inputs, TList &_outputs) {
+void Context::push(Operator *op, TNameList &in_names, TNameList &out_names) {
   //error checking in the Op class
+  S_TList _inputs;
+  for(auto in:in_names) {
+    Ref_Record r = rTable[in];
+    if(r == rTable.end()) { ERROR_EXIT("Tensor \"%s\" not found", in.c_str()); }
+    _inputs.push_back(r.sptr);
+  }
+
+  S_TList _outputs;
+  for(auto out:out_names) {
+    Ref_Record r = rTable[out];
+    if(r == rTable.end()) { ERROR_EXIT("Tensor \"%s\" not found", in.c_str()); }
+    _outputs.push_back(r.sptr);
+  }
+
   op->setInputs(_inputs);
   op->setOutputs(_outputs);
   op_list.push_back(op);
@@ -32,9 +46,9 @@ void Context::push(Operator *op, TList &_inputs, TList &_outputs) {
 
 }
 
-void Context::push(Operator *op, std::initializer_list<TENSOR> _inputs, std::initializer_list<TENSOR> _outputs) {
-  TList inputs;
-  TList outputs;
+void Context::push(Operator *op, std::initializer_list<TName> _inputs, std::initializer_list<TName> _outputs) {
+  TNameList inputs;
+  TNameList outputs;
 
   for(auto i:_inputs) {
     inputs.push_back(i);
@@ -47,17 +61,17 @@ void Context::push(Operator *op, std::initializer_list<TENSOR> _inputs, std::ini
   push(op, inputs, outputs);
 }
 
-void Context::incrTListRef(const TList &t_list) {
+void Context::incrTListRef(const S_TList &t_list) {
   for(auto t:t_list) {
-    Tensor* ptr = t.lock().get();
-    if(rTable.find(ptr) == rTable.end()) {
+    TName t_name = t->getName();
+    if(rTable.find(t_name) == rTable.end()) {
       ERR_EXIT("tensor not registered");
     }
 
-    Ref_Record record = rTable[ptr];
+    Ref_Record record = rTable[t_name];
     if(record.allow_incr) {
       record.count++;
-      rTable[ptr] = record;
+      rTable[t_name] = record;
     }
     
       //if an initial ref value is supplied to the tensor at compile time
@@ -79,34 +93,34 @@ void Context::deinitTensors(const S_TList &t_list) {
   }
 }
 
-void Context::delTensor(Tensor* t) {
-  Ref_Record record = rTable[t];
+void Context::delTensor(TName t_name) {
+  Ref_Record record = rTable[t_name];
   record.sptr.reset();
-  rTable.erase(t);
+  rTable.erase(t_name);
 }
 
 void Context::dcrListRef(S_TList t_list) {
   for(auto t:t_list) {
-    if(dcrRef(t.get()) < 1) {
-      delTensor(t.get());
+    if(dcrRef(t->getName()) < 1) {
+      delTensor(t->getName());
     }
   }
 }
 
-uint8_t Context::dcrRef(Tensor* t) {
-  if(!isTracked(t)) {
+uint8_t Context::dcrRef(TName t_name) {
+  if(!isTracked(t_name)) {
     ERR_EXIT("Tensor not registered");
   }
 
-  Ref_Record record = rTable[t];
+  Ref_Record record = rTable[t_name];
   if(record.count > 0) record.count -= 1;
-  rTable[t] = record;
+  rTable[t_name] = record;
 
   return record.count;
 }
 
-bool Context::isTracked(Tensor* t) {
-  return (rTable.find(t) != rTable.end());
+bool Context::isTracked(TName t_name) {
+  return (rTable.find(t_name) != rTable.end());
 }
 
 int Context::eval(void) {
