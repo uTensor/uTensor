@@ -19,47 +19,51 @@ class idxImporterTest : public Test {
     testStart("uchar import test");
     TensorIdxImporter t_import;
     timer_start();
-    Tensor<unsigned char> t =
+    Tensor* t =
         t_import.ubyte_import("/fs/testData/idxImport/uint8_4d_power2.idx");
     timer_stop();
-    double result = sum(t);
+    double result = sum<unsigned char>(t);
     passed(result == 4518);
+    delete t;
   }
 
   void shortTest(void) {
     testStart("short import test");
     TensorIdxImporter t_import;
     timer_start();
-    Tensor<short> t =
+    Tensor* t =
         t_import.short_import("/fs/testData/idxImport/int16_4d_power2.idx");
     timer_stop();
-    double result = sum(t);
+    double result = sum<short>(t);
     passed(result == 270250);
+    delete t;
   }
 
   void intTest(void) {
     testStart("int import test");
     TensorIdxImporter t_import;
     timer_start();
-    Tensor<int> t =
+    Tensor* t =
         t_import.int_import("/fs/testData/idxImport/int32_4d_power2.idx");
     timer_stop();
-    double result = sum(t);
+    double result = sum<int>(t);
     passed(result == 5748992600);
+    delete t;
   }
 
   void floatTest(void) {
     testStart("float import test");
     TensorIdxImporter t_import;
     timer_start();
-    Tensor<float> t =
+    Tensor* t =
         t_import.float_import("/fs/testData/idxImport/float_4d_power2.idx");
     timer_stop();
 
-    double result = sum(t);
+    double result = sum<float>(t);
 
     DEBUG("***floating point test yielded: %.8e\r\n", (float)result);
     passed((float)result == -1.0f);
+    delete t;
   }
 
   void runAll(void) {
