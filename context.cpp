@@ -3,7 +3,7 @@
 S_TENSOR Context::add(Tensor* t, uint8_t init_count) {
   if(t == nullptr) { ERR_EXIT("null pointer tensor"); }
   if(rTable.find(t->getName()) != rTable.end()) {
-    ERR_EXIT("tensor pointer address already exist in rTable");
+    ERR_EXIT("tensor with name \"%s\" address already exist in rTable", t->getName().c_str());
   }
 
   S_TENSOR _sptr(t);
@@ -20,6 +20,11 @@ S_TENSOR Context::add(Tensor* t, uint8_t init_count) {
   rTable[t->getName()] = record;
 
   return _sptr;
+}
+
+S_TENSOR Context::get(TName const &t_name) {
+  if(rTable.find(t_name) == rTable.end()) ERR_EXIT("No tensor with name: %s", t_name.c_str());
+  return rTable[t_name].sptr;
 }
 
 
@@ -146,3 +151,21 @@ int Context::eval(void) {
 
   return 0;
 }
+
+uint32_t Context::gc(void) {
+  TNameList nlist;
+
+  for ( auto it : rTable) {
+    Ref_Record r = it.second;
+    if(r.count < 1) {
+      nlist.push_back(it.first);
+    }
+  }
+
+  for(auto name:nlist) {
+    delTensor(name);
+  }
+  
+  return (uint32_t) nlist.size();
+}
+
