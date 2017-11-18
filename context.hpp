@@ -40,11 +40,10 @@ protected:
   //uint16_t incrRef(std::shared_ptr<Tensor> sptr);
   uint8_t dcrRef(TName name);
   bool isTracked(TName name);
-  bool isTracked(TName name);
   //uint16_t getRef();
 
 public:
-  TENSOR add(Tensor* t, uint8_t init_count = 0);
+  S_TENSOR add(Tensor* t, uint8_t init_count = 0);
   void push(Operator *op, TNameList &_inputs, TNameList &_outputs);
   void push(Operator *op, std::initializer_list<TName> _inputs, std::initializer_list<TName> _outputs);
   int eval(void);
