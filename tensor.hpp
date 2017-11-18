@@ -18,10 +18,10 @@
 // };
 
 class Tensor;
-
+typedef std::string TName;
+typedef std::string OpName;
+typedef std::vector<TName> TNameList;
 typedef std::shared_ptr<Tensor> S_TENSOR;
-typedef std::weak_ptr<Tensor> TENSOR;
-typedef std::vector<TENSOR> TList;
 typedef std::vector<S_TENSOR> S_TList;
 
 class uTensor {
