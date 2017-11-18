@@ -106,7 +106,7 @@ class Test {
 
   template<typename U>
   double sum(Tensor* input) {
-    U* elem = input->read<U>(0, 0);
+    const U* elem = input->read<U>(0, 0);
     double accm = 0.0;
     for (uint32_t i = 0; i < input->getSize(); i++) {
       accm += (double)elem[i];
@@ -125,6 +125,15 @@ class Test {
     }
     return pass;
   }
+  
+  bool testsize(uint32_t src, uint32_t res) {
+    bool pass = true;
+    if (src != res) {
+        pass = false;
+        return pass;
+    }
+    return pass;
+  }
   template <typename T>
   bool testval(T src, T res) {
     bool pass = true;
@@ -140,8 +149,8 @@ class Test {
       ERR_EXIT("Test.meanAbsErr(): dimension mismatch\r\n");
     }
 
-    U* elemA = A->read<U>(0, 0);
-    U* elemB = B->read<U>(0, 0);
+    const U* elemA = A->read<U>(0, 0);
+    const U* elemB = B->read<U>(0, 0);
 
     double accm = 0.0;
     for (uint32_t i = 0; i < A->getSize(); i++) {
@@ -158,8 +167,8 @@ class Test {
       ERR_EXIT("Test.sumPercentErr(): dimension mismatch\r\n");
     }
 
-    U* elemA = A->read<U>(0, 0);
-    U* elemB = B->read<U>(0, 0);
+    const U* elemA = A->read<U>(0, 0);
+    const U* elemB = B->read<U>(0, 0);
 
     double accm = 0.0;
     for (uint32_t i = 0; i < A->getSize(); i++) {
@@ -182,18 +191,6 @@ class Test {
 };
 
 // https://stackoverflow.com/questions/111928/is-there-a-printf-converter-to-print-in-binary-format
-void printBits(size_t const size, void const* const ptr) {
-  unsigned char* b = (unsigned char*)ptr;
-  unsigned char byte;
-  int i, j;
-
-  for (i = size - 1; i >= 0; i--) {
-    for (j = 7; j >= 0; j--) {
-      byte = (b[i] >> j) & 1;
-      printf("%d", byte);
-    }
-  }
-  puts("");
-}
+void printBits(size_t const size, void const* const ptr);
 
 #endif

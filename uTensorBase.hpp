@@ -3,59 +3,31 @@
 
 #include "tensor.hpp"
 
-typedef vector<Tensor*> TList;
-
-class uTensor {
-  virtual void inFocus() {};
-  virtual void deFocus() {};
-  virtual ~uTensor() = 0;
-};
-
-
 //isType() https://stackoverflow.com/questions/9974596/how-to-check-whether-two-pointers-point-to-the-same-object-or-not
 //double dispatch
 
 //new vs stack
-class Operator {
+class Operator : public uTensor {
 protected:
   //setup input/output info in derived constructors
-  TList inputs;
-  vector<DType> dtype_in;
-  TList outputs;
-  vector<DType> dtype_out;
+  //ref count?
+  S_TList inputs;
+  uint8_t n_inputs;
+  S_TList outputs;
+  uint8_t n_outputs;
+
 public:
   virtual void compute() = 0;
+  void setInputs(TList &_inputs);
+  void setOutputs(TList &_outputs);
+  S_TList getInputs(void) { return inputs; }
+  S_TList getOutputs(void) { return outputs;}
+  uint8_t getNumInputs(void) { return n_inputs; }
+  uint8_t getNumOutputs(void) { return n_outputs; }
 
-  void setInputs(TList &_inputs) {
-    if(_inputs.size() != inputs.size()) ERR_EXIT("Input Tensor list mismatched...");
-
-    for(uint8_t i = 0; i < input.size(); i++) {
-      if(dtype_in[i] != inputs.getType()) {
-        ERR_EXIT("Tensor Type mismatched...");
-      }
-
-      input[i] = _inputs[i];
-    }
-  }
-
-  void setOutputs(TList &_outputs) {
-    if(_outputs.size() != outputs.size()) ERR_EXIT("Input Tensor list mismatched...");
-
-    for(uint8_t i = 0; i < output.size(); i++) {
-      if(dtype_out[i].getType() != output[i].getType()) {
-        ERR_EXIT("Tensor Type mismatched...");
-      }
-
-      output[i] = _output[i]
-    }
-  }
-
-  TList getInputs(void) {
-    return inputs;
-  }
-
-  TList getOutputs(void) {
-    return outputs;
+  Operator() {
+    n_inputs = 0;  //overridden by constructor
+    n_outputs = 0;
   }
 };
 
