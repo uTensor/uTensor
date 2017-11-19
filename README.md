@@ -3,9 +3,14 @@
 
 ## Introduction
 
-  uTensor is an extremely light-weight Deep-Learning Inference framework built on mbed and Tensorflow.
+  uTensor is an extremely light-weight Deep-Learning Inference framework built on Mbed and Tensorflow:
+  
+  - TensorFlow to uTensor exporter (planned)
+  - Tensor Classes
+  - Operators Classes
+  - Context, a resource and graph management class
 
-  This project is under going constant development.
+  This project is under going constant development. APIs are expected to update rapidly.
 
 ## Requirement
 
@@ -56,5 +61,20 @@ Currently, the binary runs the first sample of the [MNIST dataset](http://yann.l
 
 ![alt text](https://raw.githubusercontent.com/dmlc/web-data/master/mxnet/image/mlp_mnist.png "mxnet Handwritten Digit Recognition")
 
-
  The related Tensorflow training script please refer to the [node-viewer](https://github.com/neil-tan/tf-node-viewer/blob/master/deep_mlp.py) project.
+ 
+##Exporting to uTensor
+  
+  At this time, exporting models to uTensor requires the  [node-viewer](https://github.com/neil-tan/tf-node-viewer/) project. This tool is designed to view navigate TensorFlow graphs and export tensors to idx files. The idx files are then used by the uTensor. For further instruction, please refer to this [wiki-page](https://github.com/neil-tan/uTensor/wiki/Tensorflow-model-exporting-note).
+  
+  uTensor-CLI is a tool planned for the next releases. It would streamline the process of moving TensorFlow models to uTensor environment.
+   
+##Reference
+
+- [TensorFlow](https://www.tensorflow.org)
+- [Mbed](https://developer.mbed.org)
+- [Node-Viewer](https://github.com/neil-tan/tf-node-viewer/)
+- [How to Quantize Neural Networks with TensorFlow](https://petewarden.com/2016/05/03/how-to-quantize-neural-networks-with-tensorflow/)
+- [mxnet Handwritten Digit Recognition](https://mxnet.incubator.apache.org/tutorials/python/mnist.html)
+
+
