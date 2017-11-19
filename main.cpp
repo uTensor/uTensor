@@ -7,11 +7,11 @@
 #include "tensorIdxImporterTests.hpp"
 #include "context.hpp"
 #include "MathTests.hpp"
-/*#include "ArrayTests.hpp"
+#include "MatrixTests.hpp"
 #include "context_test.hpp"
+/*#include "ArrayTests.hpp"
 #include "tensor_test.hpp"
 #include "NnTests.hpp"
-#include "MatrixTests.hpp"
 #include "mlp_test.hpp"
 #include "deep_mnist_mlp.hpp"*/
 
@@ -42,22 +42,21 @@ int main(int argc, char** argv) {
   printf("Math result...\r\n");
   mathTests.printSummary();
 
+  printf("running matrix test ...\r\n");
+  matrixOpsTest matrixTests;
+  matrixTests.runAll();
+  matrixTests.printSummary();
+
+  printf("Context test: \r\n");
+  contextTest ctxTest;
+  ctxTest.runAll();
+  printf("Context result...\r\n");
+  ctxTest.printSummary();
+
 /*   ArrayOpsTest arrayTests;
    arrayTests.runAll();
    printf("Array: \r\n");
    arrayTests.printSummary();
-
-
-   printf("running matrix test ...\r\n");
-   matrixOpsTest matrixTests;
-   matrixTests.runAll();
-   matrixTests.printSummary();
-
-   printf("Context test: \r\n");
-   contextTest ctxTest;
-   ctxTest.runAll();
-   printf("Context result...\r\n");
-   ctxTest.printSummary();
 
   printf("NnOpS: \r\n");
    NnOpsTest nnTest;
