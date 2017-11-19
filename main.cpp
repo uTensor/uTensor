@@ -7,13 +7,16 @@
 #include "tensorIdxImporterTests.hpp"
 #include "context.hpp"
 #include "ArrayTests.hpp"
-#include "context_test.hpp"
 #include "MathTests.hpp"
+#include "MatrixTests.hpp"
+#include "context_test.hpp"
 #include "tensor_test.hpp"
 #include "NnTests.hpp"
-#include "MatrixTests.hpp"
 #include "mlp_test.hpp"
 #include "deep_mnist_mlp.hpp"
+#include "context_test.hpp"
+#include "MathTests.hpp"
+#include "MatrixTests.hpp"
 
 Serial pc(USBTX, USBRX, 115200);
 SDBlockDevice bd(MBED_CONF_APP_SD_MOSI, MBED_CONF_APP_SD_MISO,
@@ -28,61 +31,61 @@ int main(int argc, char** argv) {
   printf("running deep-mlp...\r\n");
 
   int prediction = runMLP("/fs/testData/deep_mlp/import-Placeholder_0.idx");
-  printf("prediction: %d\r\n", prediction);
-   idxImporterTest idxTest;
-   idxTest.runAll();
+  printf("prediction: %d\r\n\r\n\r\n\r\n", prediction);
 
+  printf("IDX import:\r\n");
+  idxImporterTest idxTest;
+  idxTest.runAll();
+  printf("IDX import result...\r\n");
+  idxTest.printSummary();
 
-   printf("IDX import:\r\n");
-   idxTest.printSummary();
+  printf("tesnor test: \r\n");
+  tensorTest tenT;
+  tenT.runAll();
+  printf("tensor result...\r\n");
+  tenT.printSummary();
 
-   ArrayOpsTest arrayTests;
-   arrayTests.runAll();
-   printf("Array: \r\n");
-   arrayTests.printSummary();
+  printf("Context test: \r\n");
+  contextTest ctxTest;
+  ctxTest.runAll();
+  printf("Context result...\r\n");
+  ctxTest.printSummary();
 
-   printf("Math: \r\n");
-   MathOpsTest mathTests;
-   mathTests.runAll();
-   printf("Math result...\r\n");
-   mathTests.printSummary();
+  printf("Transformation test: \r\n");
+  transTest tTest;
+  tTest.runAll();
+  printf("Transformation result...\r\n");
+  tTest.printSummary();
 
-   printf("running matrix test ...\r\n");
-   matrixOpsTest matrixTests;
-   matrixTests.runAll();
-   matrixTests.printSummary();
+  printf("Array test: \r\n");
+  ArrayOpsTest arrayTests;
+  arrayTests.runAll();
+  printf("Array result...\r\n");
+  arrayTests.printSummary();
 
-   printf("Context test: \r\n");
-   contextTest ctxTest;
-   ctxTest.runAll();
-   printf("Context result...\r\n");
-   ctxTest.printSummary();
+  printf("Math: \r\n");
+  MathOpsTest mathTests;
+  mathTests.runAll();
+  printf("Math result...\r\n");
+  mathTests.printSummary();
+
+  printf("running matrix test:\r\n");
+  matrixOpsTest matrixTests;
+  matrixTests.runAll();
+  printf("running matrix result ...\r\n");
+  matrixTests.printSummary();
 
   printf("NnOpS: \r\n");
-   NnOpsTest nnTest;
-   nnTest.runAll();
-   printf("Nn Ops result...\r\n");
-   nnTest.printSummary();
+  NnOpsTest nnTest;
+  nnTest.runAll();
+  printf("Nn Ops result...\r\n");
+  nnTest.printSummary();
 
-   printf("Transformation test: \r\n");
-   transTest tTest;
-   tTest.runAll();
-   printf("Transformation result...\r\n");
-   tTest.printSummary();
-
-   printf("tesnor test: \r\n");
-   tensorTest tenT;
-   tenT.runAll();
-   printf("tensor result: \r\n");
-   tenT.printSummary();
-
-
-
-   printf("mlp test: \r\n");
+/*   printf("mlp test: \r\n");
   mlpTest mlpt;
    mlpt.runAll();
    printf("mlp result...\r\n");
-   mlpt.printSummary();
+   mlpt.printSummary();*/
 
 
 

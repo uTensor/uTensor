@@ -15,38 +15,25 @@ public:
         testStart("quantize_v2");
         
         //reference inputs  /Users/neitan01/Documents/mbed/uTensor.git/TESTS/scripts/PRE-GEN/qA
-        TENSOR b = ctx.add(t_import.float_import ("/fs/testData/qB/in/Cast_1_0.idx"));
-        TENSOR b_min = ctx.add(t_import.float_import("/fs/testData/qB/in/Min_1_0.idx"));
-        TENSOR b_max = ctx.add(t_import.float_import("/fs/testData/qB/in/Max_1_0.idx"));
+        S_TENSOR b_q_ref = ctx.add(t_import.float_import ("/fs/testData/qB/in/Cast_1_0.idx", "b_q_ref"));
+        S_TENSOR b_min_q_ref = ctx.add(t_import.float_import("/fs/testData/qB/in/Min_1_0.idx", "b_min_q_ref"));
+        S_TENSOR b_max_q_ref = ctx.add(t_import.float_import("/fs/testData/qB/in/Max_1_0.idx", "b_max_q_ref"));
 
         //reference outputs
-        TENSOR b_q_ref = ctx.add(t_import.ubyte_import("/fs/testData/qB/out/qB_0.idx"));
-        TENSOR b_min_q_ref = ctx.add(t_import.float_import("/fs/testData/qB/out/qB_1.idx"));
-        TENSOR b_max_q_ref = ctx.add(t_import.float_import("/fs/testData/qB/out/qb_2.idx"));
+        S_TENSOR ref_b_q = ctx.add(t_import.ubyte_import("/fs/testData/qB/out/qB_0.idx", "ref_b_q"));
+        S_TENSOR ref_b_min_q = ctx.add(t_import.float_import("/fs/testData/qB/out/qB_1.idx", "ref_b_min_q"));
+        S_TENSOR ref_b_max_q = ctx.add(t_import.float_import("/fs/testData/qB/out/qb_2.idx", "ref_b_max_q"));
 
-        TENSOR b_q = ctx.add(new RamTensor<unsigned char>(b_q_ref.lock()->getShape()));
-        TENSOR b_min_q = ctx.add(new RamTensor<float>(b_min_q_ref.lock()->getShape()));
-        TENSOR b_max_q = ctx.add(new RamTensor<float>(b_max_q_ref.lock()->getShape()));
-
-        TList inputs = {b, b_min, b_max};
-        TList outputs = {b_q, b_min_q, b_max_q};
-        S_TENSOR out_b_q = b_q.lock();
-        S_TENSOR out_b_min_q = b_min_q.lock();
-        S_TENSOR out_b_max_q = b_max_q.lock();
-        S_TENSOR ref_b_q = b_q_ref.lock();
-        S_TENSOR ref_b_min_q = b_min_q_ref.lock();
-        S_TENSOR ref_b_max_q = b_max_q_ref.lock();
+        S_TENSOR out_b_q = ctx.add(new RamTensor<unsigned char>(b_q_ref->getShape(), "b_q"));
+        S_TENSOR out_b_min_q = ctx.add(new RamTensor<float>(b_min_q_ref->getShape(), "b_min_q"));
+        S_TENSOR out_b_max_q = ctx.add(new RamTensor<float>(b_max_q_ref->getShape(), "b_max_q"));
 
         //Implementation goes here
         timer_start();
-        ctx.push(new QuantizeV2Op(), inputs, outputs);
+        ctx.push(new QuantizeV2Op(), {"b_q_ref", "b_min_q_ref", "b_max_q_ref"}, {"b_q", "b_min_q", "b_max_q"});
         ctx.eval();
         timer_stop();
 
-        // printf("refMin is : %f \r\n", *(b_min_q_ref.getPointer({0})));
-        // printf("outMin is : %f \r\n", *(b_min_q.getPointer({0})));
-        // printf("diff : output(%f), outMin(%f), outMax(%f)\r\n", 
-        //  meanPercentErr(b_q_ref, b_q), meanPercentErr(b_min_q_ref, b_min_q), meanPercentErr(b_max_q_ref, b_max_q));
 
         double result = meanPercentErr<unsigned char>(ref_b_q.get(), out_b_q.get()) + meanPercentErr<float>(ref_b_min_q.get(), out_b_min_q.get()) + meanPercentErr<float>(ref_b_max_q.get(), out_b_max_q.get());
         //passed(result < 0.0001);
@@ -57,27 +44,22 @@ public:
         testStart("dequantize");
 
         //reference inputs
-        TENSOR a = ctx.add(t_import.ubyte_import("/fs/testData/deQ/in/rQ_0.idx"));
-        TENSOR a_min = ctx.add(t_import.float_import("/fs/testData/deQ/in/rQ_1.idx"));
-        TENSOR a_max = ctx.add(t_import.float_import("/fs/testData/deQ/in/rQ_2.idx"));
+        S_TENSOR a = ctx.add(t_import.ubyte_import("/fs/testData/deQ/in/rQ_0.idx", "a"));
+        S_TENSOR a_min = ctx.add(t_import.float_import("/fs/testData/deQ/in/rQ_1.idx", "a_min"));
+        S_TENSOR a_max = ctx.add(t_import.float_import("/fs/testData/deQ/in/rQ_2.idx", "a_max"));
 
         //reference outputs
-        TENSOR out_ref = ctx.add(t_import.float_import("/fs/testData/deQ/out/deQ_0.idx"));
+        S_TENSOR out_ref = ctx.add(t_import.float_import("/fs/testData/deQ/out/deQ_0.idx", "out_ref"));
 
         //modify the checks below:
-        TENSOR out = ctx.add(new RamTensor<float>(out_ref.lock()->getShape()));
-        TList inputs = {a, a_min, a_max};
-        TList outputs = {out};
-
-        S_TENSOR out_val = out.lock();
-        S_TENSOR ref_out = out_ref.lock();
+        S_TENSOR out = ctx.add(new RamTensor<float>(out_ref->getShape(), "out"));
 
         timer_start();
-        ctx.push(new DequantizeOp(), inputs, outputs);
+        ctx.push(new DequantizeOp(), {"a", "a_min", "a_max"}, {"out"});
         ctx.eval();
         timer_stop();
 
-        double result = meanPercentErr<float>(out_val.get(), ref_out.get());
+        double result = meanPercentErr<float>(out.get(), out_ref.get());
         //passed(result < 0.0001);
         passed(result == 0);
     }
@@ -87,26 +69,22 @@ public:
         TensorIdxImporter t_import;
 
         //reference inputs
-        TENSOR ref_a = ctx.add(t_import.float_import("/fs/testData/ref_reshape/in/Const_0.idx"));
-        TENSOR ref_dim = ctx.add(t_import.int_import("/fs/testData/ref_reshape/in/Const_1_0.idx"));
+        S_TENSOR ref_a = ctx.add(t_import.float_import("/fs/testData/ref_reshape/in/Const_0.idx", "ref_a"));
+        S_TENSOR ref_dim = ctx.add(t_import.int_import("/fs/testData/ref_reshape/in/Const_1_0.idx", "ref_dim"));
 
         //reference outputs
-        TENSOR out_ref = ctx.add(t_import.float_import("/fs/testData/ref_reshape/out/ref_reshape_0.idx"));
+        S_TENSOR out_ref_2 = ctx.add(t_import.float_import("/fs/testData/ref_reshape/out/ref_reshape_0.idx", "out_ref_2"));
 
         //modify the checks below:
-        TENSOR out = ctx.add(new RamTensor<float>(out_ref.lock()->getShape()));
-        S_TENSOR out_val = out.lock();
-        S_TENSOR ref_out = out_ref.lock();
+        S_TENSOR out_2 = ctx.add(new RamTensor<float>(out_ref_2->getShape(), "out_2"));
         
-        TList inputs = {ref_a, ref_dim};
-        TList outputs = {out};
 
         timer_start();
-        ctx.push(new ReshapeOp(), inputs, outputs);
+        ctx.push(new ReshapeOp(), {"ref_a", "ref_dim"}, {"out_2"});
         ctx.eval();
         timer_stop();
 
-        double result = meanPercentErr<float>(out_val.get(), ref_out.get());
+        double result = meanPercentErr<float>(out_2.get(), out_ref_2.get());
         //passed(result < 0.0001);
         passed(result == 0);
     }
