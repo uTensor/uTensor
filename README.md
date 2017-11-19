@@ -1,4 +1,3 @@
-
 # uTensor
 
 ## Introduction
@@ -29,7 +28,7 @@
 
 ## Configure
 
-See mbed_app.json
+See [mbed_app.json](blob/master/mbed_app.json)
 
 ## Build Steps
 
@@ -63,18 +62,16 @@ Currently, the binary runs the first sample of the [MNIST dataset](http://yann.l
 
  The related Tensorflow training script please refer to the [node-viewer](https://github.com/neil-tan/tf-node-viewer/blob/master/deep_mlp.py) project.
  
-##Exporting to uTensor
+## Exporting to uTensor
   
   At this time, exporting models to uTensor requires the  [node-viewer](https://github.com/neil-tan/tf-node-viewer/) project. This tool is designed to view navigate TensorFlow graphs and export tensors to idx files. The idx files are then used by the uTensor. For further instruction, please refer to this [wiki-page](https://github.com/neil-tan/uTensor/wiki/Tensorflow-model-exporting-note).
   
   uTensor-CLI is a tool planned for the next releases. It would streamline the process of moving TensorFlow models to uTensor environment.
    
-##Reference
+## Reference
 
 - [TensorFlow](https://www.tensorflow.org)
 - [Mbed](https://developer.mbed.org)
 - [Node-Viewer](https://github.com/neil-tan/tf-node-viewer/)
 - [How to Quantize Neural Networks with TensorFlow](https://petewarden.com/2016/05/03/how-to-quantize-neural-networks-with-tensorflow/)
 - [mxnet Handwritten Digit Recognition](https://mxnet.incubator.apache.org/tutorials/python/mnist.html)
-
-
