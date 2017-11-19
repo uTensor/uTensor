@@ -12,15 +12,15 @@
 #include "uTensorBase.hpp"
 #include "context.hpp"
 
-void tensorQuantize(Context& ctx, TENSOR input, TENSOR output,
-  TENSOR out_min, TENSOR out_max); 
+void tensorQuantize(Context& ctx, TName input, TName output,
+  TName out_min, TName out_max); 
 
-void ReluLayer(Context& ctx, TENSOR x, TENSOR x_min, TENSOR x_max,
-   TENSOR w, TENSOR w_min, TENSOR w_max, TENSOR b,
-    TENSOR z_output); 
+void ReluLayer(Context& ctx, TName x, TName x_min, TName x_max,
+   TName w, TName w_min, TName w_max, TName b,
+    TName z_output); 
 
-void PredLayer(Context &ctx, TENSOR input, TENSOR input_min,
-               TENSOR input_max, TENSOR output, TENSOR w, TENSOR w_min, TENSOR w_max, TENSOR bias, TENSOR dim);
+void PredLayer(Context &ctx, TName input, TName input_min,
+               TName input_max, TName output, TName w, TName w_min, TName w_max, TName bias, TName dim);
 
 int runMLP(string inputIdxFile);
 
