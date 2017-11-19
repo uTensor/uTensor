@@ -218,8 +218,8 @@ class RamTensor : public Tensor {
 };
 
 template <typename Tin, typename Tout>
-Tensor* TensorCast(Tensor* input) {
-  Tensor* output = new RamTensor<Tout>(input->getShape());
+Tensor* TensorCast(Tensor* input, TName name) {
+  Tensor* output = new RamTensor<Tout>(input->getShape(), name);
   const Tin* inputPrt = input->read<Tin>(0, 0);
   Tout* outputPrt = output->write<Tout>(0, 0);
 
