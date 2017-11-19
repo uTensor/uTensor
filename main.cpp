@@ -13,10 +13,10 @@
 #include "tensor_test.hpp"
 #include "NnTests.hpp"
 #include "mlp_test.hpp"
-/*#include "context_test.hpp"
+#include "deep_mnist_mlp.hpp"
+#include "context_test.hpp"
 #include "MathTests.hpp"
 #include "MatrixTests.hpp"
-#include "deep_mnist_mlp.hpp"*/
 
 Serial pc(USBTX, USBRX, 115200);
 SDBlockDevice bd(MBED_CONF_APP_SD_MOSI, MBED_CONF_APP_SD_MISO,
@@ -30,8 +30,9 @@ int main(int argc, char** argv) {
   printf("Deep MLP on Mbed (Trained with Tensorflow)\r\n\r\n");
   printf("running deep-mlp...\r\n");
 
-//  int prediction = runMLP("/fs/testData/deep_mlp/import-Placeholder_0.idx");
-//  printf("prediction: %d\r\n", prediction);
+  int prediction = runMLP("/fs/testData/deep_mlp/import-Placeholder_0.idx");
+  printf("prediction: %d\r\n\r\n\r\n\r\n", prediction);
+
   printf("IDX import:\r\n");
   idxImporterTest idxTest;
   idxTest.runAll();
@@ -80,11 +81,11 @@ int main(int argc, char** argv) {
   printf("Nn Ops result...\r\n");
   nnTest.printSummary();
 
-  printf("mlp test: \r\n");
+/*   printf("mlp test: \r\n");
   mlpTest mlpt;
-  mlpt.runAll();
-  printf("mlp result...\r\n");
-  mlpt.printSummary();
+   mlpt.runAll();
+   printf("mlp result...\r\n");
+   mlpt.printSummary();*/
 
 
 
