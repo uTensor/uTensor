@@ -218,8 +218,8 @@ class RamTensor : public Tensor {
 };
 
 template <typename Tin, typename Tout>
-Tensor* TensorCast(Tensor* input) {
-  Tensor* output = new RamTensor<Tout>(input->getShape());
+Tensor* TensorCast(Tensor* input, TName name) {
+  Tensor* output = new RamTensor<Tout>(input->getShape(), name);
   const Tin* inputPrt = input->read<Tin>(0, 0);
   Tout* outputPrt = output->write<Tout>(0, 0);
 
@@ -231,8 +231,8 @@ Tensor* TensorCast(Tensor* input) {
 }
 
 template <typename T>
-Tensor* TensorConstant(std::vector<uint32_t> shape, T c) {
-  Tensor* output = new RamTensor<T>(shape);
+Tensor* TensorConstant(std::vector<uint32_t> shape, T c, TName const &name) {
+  Tensor* output = new RamTensor<T>(shape, name);
   T* outPrt = output->write<T>(0, 0);
 
   for (uint32_t i = 0; i < output->getSize(); i++) {
@@ -243,13 +243,13 @@ Tensor* TensorConstant(std::vector<uint32_t> shape, T c) {
 }
 
 template <typename T>
-Tensor* TensorConstant(std::initializer_list<uint32_t> l, T c) {
+Tensor* TensorConstant(std::initializer_list<uint32_t> l, T c, TName const &name) {
   std::vector<uint32_t> v;
   for (auto i : l) {
     v.push_back(i);
   }
 
-  return TensorConstant<T>(v, c);
+  return TensorConstant<T>(v, c, name);
 }
 
 //
