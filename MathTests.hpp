@@ -164,12 +164,12 @@ class MathOpsTest : public Test {
     // reference outputs
     /// NT: FIXME: argmax outputs int64 tensor which isn't supported by
     /// int_import.
-    S_TENSOR ref_val = ctx.add(t_import.float_import("/fs/testData/ArgMax/out/ArgMax_0.idx", "ref_out"));
+    S_TENSOR ref_out = ctx.add(t_import.float_import("/fs/testData/ArgMax/out/ArgMax_0.idx", "ref_out"));
 
     // Implementation goes here
 
     // modify the checks below:
-    S_TENSOR out_val = ctx.add(new RamTensor<int>(ref_val->getShape(), "out"));
+    S_TENSOR out = ctx.add(new RamTensor<int>(ref_out->getShape(), "out"));
     
     TNameList inputs = {"ref_a", "ref_dim"};
     TNameList outputs = {"out"};
@@ -179,9 +179,9 @@ class MathOpsTest : public Test {
     ctx.eval();
     timer_stop();
     
-    Tensor* out_float = TensorCast<int, float>(out_val.get(), "out_float");  ///NT: /WIP  how to handle the name?
+    Tensor* out_float = TensorCast<int, float>(out.get(), "out_float");  ///NT: /WIP  how to handle the name?
 
-    double result = meanPercentErr<float>(ref_val.get(), out_float);
+    double result = meanPercentErr<float>(ref_out.get(), out_float);
 
     // passed(result < 0.0001);
     passed(result == 0);
@@ -202,14 +202,14 @@ class MathOpsTest : public Test {
     S_TENSOR test_dim = ctx.add(new RamTensor<int>({1}, "test_dim"));
     *(test_dim->write<int>(0, 0)) = 0;
 
-    S_TENSOR ref_val = ctx.add(new RamTensor<float>({5}, "test_out_ref"));
-    *(ref_val->write<float>(0, 0)) = 5.0f;
-    *(ref_val->write<float>(1, 0)) = 5.0f;
-    *(ref_val->write<float>(2, 0)) = 1.0f;
-    *(ref_val->write<float>(3, 0)) = 9.0f;
-    *(ref_val->write<float>(4, 0)) = 2.0f;
+    S_TENSOR test_out_ref = ctx.add(new RamTensor<float>({5}, "test_out_ref"));
+    *(test_out_ref->write<float>(0, 0)) = 5.0f;
+    *(test_out_ref->write<float>(1, 0)) = 5.0f;
+    *(test_out_ref->write<float>(2, 0)) = 1.0f;
+    *(test_out_ref->write<float>(3, 0)) = 9.0f;
+    *(test_out_ref->write<float>(4, 0)) = 2.0f;
 
-    S_TENSOR out_val = ctx.add(new RamTensor<float>(ref_val->getShape(), "test_out"));
+    S_TENSOR test_out = ctx.add(new RamTensor<float>(test_out_ref->getShape(), "test_out"));
     TNameList inputs = {"test_input", "test_dim"};
     TNameList outputs = {"test_out"};
 
@@ -218,7 +218,7 @@ class MathOpsTest : public Test {
     ctx.eval();
     timer_stop();
 
-    double result = meanPercentErr<float>(ref_val.get(), out_val.get());
+    double result = meanPercentErr<float>(test_out_ref.get(), test_out.get());
      passed(result < 0.0001);
     //passed(result == 0);
   }
@@ -231,12 +231,12 @@ class MathOpsTest : public Test {
     ctx.add(t_import.float_import("/fs/testData/ref_add/in/Const_6_0.idx", "b"));
 
     // reference outputs
-    S_TENSOR ref_vxx = ctx.add(t_import.float_import("/fs/testData/ref_add/out/ref_add_0.idx", "ref_out"));
+    S_TENSOR ref_out = ctx.add(t_import.float_import("/fs/testData/ref_add/out/ref_add_0.idx", "ref_out"));
 
     // Implementation goes here
 
     // modify the checks below:
-    S_TENSOR out_vxx = ctx.add(new RamTensor<float>(ref_vxx->getShape(), "out"));
+    S_TENSOR out = ctx.add(new RamTensor<float>(ref_out->getShape(), "out"));
     TNameList inputs = {"a", "b"};
     TNameList outputs = {"out"};
     timer_start();
@@ -244,7 +244,7 @@ class MathOpsTest : public Test {
     ctx.eval();
     timer_stop();
 
-    double result = meanPercentErr<float>(ref_vxx.get(), out_vxx.get());
+    double result = meanPercentErr<float>(ref_out.get(), out.get());
      passed(result < 0.0001);
     //passed(result == 0);
   }
@@ -259,12 +259,12 @@ class MathOpsTest : public Test {
     ctx.add(t_import.int_import("/fs/testData/ref_min/in/Const_3_0.idx", "dim"));
 
     // reference outputs
-    S_TENSOR ref_val = ctx.add(t_import.float_import("/fs/testData/ref_min/out/ref_min_0.idx", "ref_out"));
+    S_TENSOR ref_out = ctx.add(t_import.float_import("/fs/testData/ref_min/out/ref_min_0.idx", "ref_out"));
 
     // Implementation goes here
 
     // modify the checks below:
-    S_TENSOR out_val = ctx.add(new RamTensor<float>(ref_val->getShape(), "out"));
+    S_TENSOR out = ctx.add(new RamTensor<float>(ref_out->getShape(), "out"));
     TNameList inputs = {"a", "dim"};
     TNameList outputs = {"out"};
 
@@ -273,7 +273,7 @@ class MathOpsTest : public Test {
     ctx.eval();
     timer_stop();
 
-    double result = meanPercentErr<float>(ref_val.get(), out_val.get());
+    double result = meanPercentErr<float>(ref_out.get(), out.get());
     // passed(result < 0.0001);
     passed(result == 0);
   }
@@ -288,12 +288,12 @@ class MathOpsTest : public Test {
     ctx.add(t_import.int_import("/fs/testData/ref_max/in/Const_4_0.idx", "dim"));
 
     // reference outputs
-    S_TENSOR ref_val = ctx.add(t_import.float_import("/fs/testData/ref_max/out/ref_max_0.idx", "ref_out"));
+    S_TENSOR ref_out = ctx.add(t_import.float_import("/fs/testData/ref_max/out/ref_max_0.idx", "ref_out"));
 
     // Implementation goes here
 
     // modify the checks below:
-    S_TENSOR out_val = ctx.add(new RamTensor<float>(ref_val->getShape(), "out"));
+    S_TENSOR out = ctx.add(new RamTensor<float>(ref_out->getShape(), "out"));
     TNameList inputs = {"a", "dim"};
     TNameList outputs = {"out"};
     timer_start();
@@ -301,7 +301,7 @@ class MathOpsTest : public Test {
     ctx.eval();
     timer_stop();
 
-    double result = meanPercentErr<float>(ref_val.get(), out_val.get());
+    double result = meanPercentErr<float>(ref_out.get(), out.get());
     // passed(result < 0.0001);
     passed(result == 0);
   }
