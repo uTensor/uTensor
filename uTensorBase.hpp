@@ -18,8 +18,8 @@ protected:
 
 public:
   virtual void compute() = 0;
-  void setInputs(TList &_inputs);
-  void setOutputs(TList &_outputs);
+  void setInputs(S_TList &_inputs);
+  void setOutputs(S_TList &_outputs);
   S_TList getInputs(void) { return inputs; }
   S_TList getOutputs(void) { return outputs;}
   uint8_t getNumInputs(void) { return n_inputs; }
