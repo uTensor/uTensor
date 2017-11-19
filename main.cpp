@@ -7,6 +7,7 @@
 #include "tensorIdxImporterTests.hpp"
 #include "context.hpp"
 #include "ArrayTests.hpp"
+#include "MathTests.hpp"
 #include "NnTests.hpp"
 #include "tensor_test.hpp"
 #include "mlp_test.hpp"
@@ -29,12 +30,18 @@ int main(int argc, char** argv) {
 
 //  int prediction = runMLP("/fs/testData/deep_mlp/import-Placeholder_0.idx");
 //  printf("prediction: %d\r\n", prediction);
-   idxImporterTest idxTest;
-   idxTest.runAll();
+  idxImporterTest idxTest;
+  idxTest.runAll();
 
 
-   printf("IDX import:\r\n");
-   idxTest.printSummary();
+  printf("IDX import:\r\n");
+  idxTest.printSummary();
+
+  printf("Math: \r\n");
+  MathOpsTest mathTests;
+  mathTests.runAll();
+  printf("Math result...\r\n");
+  mathTests.printSummary();
 
    ArrayOpsTest arrayTests;
    arrayTests.runAll();
