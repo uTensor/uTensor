@@ -9,10 +9,10 @@
 #include "ArrayTests.hpp"
 #include "NnTests.hpp"
 #include "tensor_test.hpp"
+#include "mlp_test.hpp"
 /*#include "context_test.hpp"
 #include "MathTests.hpp"
 #include "MatrixTests.hpp"
-#include "mlp_test.hpp"
 #include "deep_mnist_mlp.hpp"*/
 
 Serial pc(USBTX, USBRX, 115200);
@@ -78,11 +78,11 @@ int main(int argc, char** argv) {
 
 
 
-/*   printf("mlp test: \r\n");
+   printf("mlp test: \r\n");
   mlpTest mlpt;
    mlpt.runAll();
    printf("mlp result...\r\n");
-   mlpt.printSummary();*/
+   mlpt.printSummary();
 
 
 
