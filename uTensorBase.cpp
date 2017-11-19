@@ -1,17 +1,14 @@
 #include "uTensorBase.hpp"
 
-void Operator::setInputs(TList &_inputs) {
+void Operator::setInputs(S_TList &_inputs) {
   if(_inputs.size() != n_inputs) ERR_EXIT("Input Tensor list mismatched...");
 
-  for(uint8_t i=0; i < _inputs.size(); i++) {
-    inputs.push_back(_inputs[i].lock());
-  }
+  inputs = _inputs;
 }
 
-void Operator::setOutputs(TList &_outputs) {
+void Operator::setOutputs(S_TList &_outputs) {
   if(_outputs.size() != n_outputs) ERR_EXIT("Input Tensor list mismatched...");
 
-  for(uint8_t i=0; i < _outputs.size(); i++) {
-    outputs.push_back(_outputs[i].lock());
-  }
+  outputs = _outputs;
+
 }

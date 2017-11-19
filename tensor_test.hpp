@@ -12,7 +12,7 @@ class tensorTest : public Test {
   public:
       void runResize() {
       testStart("tensortest");
-          Tensor* a = new RamTensor<int>({3, 2, 3});
+          Tensor* a = new RamTensor<int>({3, 2, 3}, "a");
           std::vector<uint32_t> v({1, 5, 8});
           a->resize<int>(v);
           bool res = testsize(1 * 5 * 8, a->getSize());
@@ -32,18 +32,20 @@ class transTest : public Test {
     bool res = false;
 
     testStart("transtest");
-    for (int i = 0; i < 10; i++) {
+    for (int i = 0; i < 9; i++) {
       std::default_random_engine gen;
       vector<uint32_t> tmp({2, 3, 4, 5});
-      TENSOR inputTensor = ctx.add(new RamTensor<int>(tmp));
+      std::string a_s = "input" + std::to_string(i);
+      S_TENSOR inputTensor = ctx.add(new RamTensor<int>(tmp, a_s));
       vector<uint8_t> permute = {2, 3, 1, 0};
-      vector<uint32_t> g = inputTensor.lock()->getShape();
+      vector<uint32_t> g = inputTensor->getShape();
       std::shuffle(permute.begin(), permute.end(), gen);
 
-      permuteIndexTransform trans(inputTensor.lock()->getShape(), permute);
+      permuteIndexTransform trans(inputTensor->getShape(), permute);
 
-      TENSOR output = ctx.add(new RamTensor<int>(trans.getNewShape()));
-      vector<uint32_t> s = output.lock()->getShape();
+      std::string a_o = "output" + std::to_string(i);
+      S_TENSOR output = ctx.add(new RamTensor<int>(trans.getNewShape(), a_o));
+      vector<uint32_t> s = output->getShape();
       res = testshape<uint32_t>(g, s, permute);
       if (!res) {
         break;
@@ -59,10 +61,10 @@ class transTest : public Test {
     vector<int> output_1({2, 2, 3, 5, 6, 6, 4, 5, 7, 5, 1, 9,
                           1, 3, 2, 2, 5, 3, 3, 6, 3, 4, 9, 2});
 
-    TENSOR inputTensor = ctx.add(new RamTensor<int>({2, 3, 4}));
+    S_TENSOR inputTensor2 = ctx.add(new RamTensor<int>({2, 3, 4}, "inputTensor2"));
     vector<uint8_t> permute = {0, 2, 1};
 
-    permuteIndexTransform trans(inputTensor.lock()->getShape(), permute);
+    permuteIndexTransform trans(inputTensor2->getShape(), permute);
     size_t out_index = 0;
     bool res = false;
 
@@ -85,9 +87,9 @@ class transTest : public Test {
     vector<int> output_2({2, 1, 2, 3, 3, 2, 5, 2, 6, 5, 6, 3,
                           4, 3, 5, 6, 7, 3, 5, 4, 1, 9, 9, 2});
 
-    TENSOR inputTensor2 = ctx.add(new RamTensor<int>({2, 4, 3}));
+    S_TENSOR inputTensor3 = ctx.add(new RamTensor<int>({2, 4, 3}, "inputTensor3"));
     vector<uint8_t> permute2 = {1, 2, 0};
-    permuteIndexTransform trans2(inputTensor2.lock()->getShape(), permute2);
+    permuteIndexTransform trans2(inputTensor3->getShape(), permute2);
     testStart("test vec 2 for transform");
     for (uint32_t i = 0; i < input_2.size(); i++) {
       out_index = trans2[i];
@@ -105,9 +107,9 @@ class transTest : public Test {
     vector<int> output_3({8, 2, 8, 1, 0, 3, 4, 6, 2, 6, 0, 6, 3, 9,
                           2, 7, 0, 7, 0, 4, 8, 9, 0, 4, 3, 6, 8});
 
-    TENSOR inputTensor3 = ctx.add(new RamTensor<int>({1, 3, 3, 3}));
+    S_TENSOR inputTensor4 = ctx.add(new RamTensor<int>({1, 3, 3, 3}, "inputTensor4"));
     vector<uint8_t> permute3 = {0, 3, 2, 1};
-    permuteIndexTransform trans3(inputTensor3.lock()->getShape(), permute3);
+    permuteIndexTransform trans3(inputTensor4->getShape(), permute3);
     testStart("test vec 4d for transform");
     for (uint32_t i = 0; i < input_3.size(); i++) {
       out_index = trans3[i];
