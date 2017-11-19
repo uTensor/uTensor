@@ -152,178 +152,169 @@ class MathOpsTest : public Test {
     passed(result == 0);
   }
 
-//   void argmaxTest(void) {  // NT: WIP   do not use t_import int 64 here
-//     testStart("argmax");
+  void argmaxTest(void) {  // NT: WIP   do not use t_import int 64 here
+    testStart("argmax");
 
-//     // reference inputs
-//     TENSOR ref_a = ctx.add(t_import.float_import("/fs/testData/ArgMax/in/ArgMax-input_0.idx"));
-//     TENSOR ref_dim = ctx.add(t_import.int_import("/fs/testData/ArgMax/in/ArgMax-dimension_0.idx"));
+    ctx.gc();
 
-//     // reference outputs
-//     /// NT: FIXME: argmax outputs int64 tensor which isn't supported by
-//     /// int_import.
-//     TENSOR ref_out = ctx.add(t_import.float_import("/fs/testData/ArgMax/out/ArgMax_0.idx"));
+    // reference inputs
+    ctx.add(t_import.float_import("/fs/testData/ArgMax/in/ArgMax-input_0.idx", "ref_a"));
+    ctx.add(t_import.int_import("/fs/testData/ArgMax/in/ArgMax-dimension_0.idx", "ref_dim"));
 
-//     // Implementation goes here
+    // reference outputs
+    /// NT: FIXME: argmax outputs int64 tensor which isn't supported by
+    /// int_import.
+    S_TENSOR ref_out = ctx.add(t_import.float_import("/fs/testData/ArgMax/out/ArgMax_0.idx", "ref_out"));
 
-//     // modify the checks below:
-//     TENSOR out = ctx.add(new RamTensor<int>(ref_out.lock()->getShape()));
+    // Implementation goes here
+
+    // modify the checks below:
+    S_TENSOR out = ctx.add(new RamTensor<int>(ref_out->getShape(), "out"));
     
-//     TList inputs = {ref_a, ref_dim};
-//     TList outputs = {out};
+    TNameList inputs = {"ref_a", "ref_dim"};
+    TNameList outputs = {"out"};
 
-//     S_TENSOR ref_val = ref_out.lock();
-//     S_TENSOR out_val = out.lock();
-//     timer_start();
-//     ctx.push(new ArgMaxOp<float, int>(), inputs, outputs);
-//     ctx.eval();
-//     timer_stop();
+    timer_start();
+    ctx.push(new ArgMaxOp<float, int>(), inputs, outputs);
+    ctx.eval();
+    timer_stop();
     
-//     Tensor* out_float = TensorCast<int, float>(out_val.get());
+    Tensor* out_float = TensorCast<int, float>(out.get(), "out_float");  ///NT: /WIP  how to handle the name?
 
-//     double result = meanPercentErr<float>(ref_val.get(), out_float);
+    double result = meanPercentErr<float>(ref_out.get(), out_float);
 
-//     // passed(result < 0.0001);
-//     passed(result == 0);
-//   }
+    // passed(result < 0.0001);
+    passed(result == 0);
+  }
 
-//   void argmaxTest2(void) {  // NT: WIP   do not use t_import int 64 here
-//     testStart("argmax2");
-//     TENSOR test_input = ctx.add(TensorConstant<float>({10, 5}, 0.0f));
-//     *(test_input.lock()->write<float>(25, 0)) = 1.0f;
-//     *(test_input.lock()->write<float>(26, 0)) = 1.0f;
-//     *(test_input.lock()->write<float>(7, 0)) = 1.0f;
-//     *(test_input.lock()->write<float>(48, 0)) = 1.0f;
-//     *(test_input.lock()->write<float>(14, 0)) = 1.0f;
+  void argmaxTest2(void) {  // NT: WIP   do not use t_import int 64 here
+    testStart("argmax2");
 
-//     TENSOR test_dim = ctx.add(new RamTensor<int>({1}));
-//     *(test_dim.lock()->write<int>(0, 0)) = 0;
+    ctx.gc();
 
-//     TENSOR test_out_ref = ctx.add(new RamTensor<float>({5}));
-//     *(test_out_ref.lock()->write<float>(0, 0)) = 5.0f;
-//     *(test_out_ref.lock()->write<float>(1, 0)) = 5.0f;
-//     *(test_out_ref.lock()->write<float>(2, 0)) = 1.0f;
-//     *(test_out_ref.lock()->write<float>(3, 0)) = 9.0f;
-//     *(test_out_ref.lock()->write<float>(4, 0)) = 2.0f;
+    S_TENSOR test_input = ctx.add(TensorConstant<float>({10, 5}, 0.0f, "test_input"));
+    *(test_input->write<float>(25, 0)) = 1.0f;
+    *(test_input->write<float>(26, 0)) = 1.0f;
+    *(test_input->write<float>(7, 0))  = 1.0f;
+    *(test_input->write<float>(48, 0)) = 1.0f;
+    *(test_input->write<float>(14, 0)) = 1.0f;
 
-//     TENSOR test_out = ctx.add(new RamTensor<float>(test_out_ref.lock()->getShape()));
-//     TList inputs = {test_input, test_dim};
-//     TList outputs = {test_out};
-//     S_TENSOR ref_val = test_out_ref.lock();
-//     S_TENSOR out_val = test_out.lock();
+    S_TENSOR test_dim = ctx.add(new RamTensor<int>({1}, "test_dim"));
+    *(test_dim->write<int>(0, 0)) = 0;
 
-//     timer_start();
-//     ctx.push(new ArgMaxOp<float, float>(), inputs, outputs);
-//     ctx.eval();
-//     timer_stop();
+    S_TENSOR test_out_ref = ctx.add(new RamTensor<float>({5}, "test_out_ref"));
+    *(test_out_ref->write<float>(0, 0)) = 5.0f;
+    *(test_out_ref->write<float>(1, 0)) = 5.0f;
+    *(test_out_ref->write<float>(2, 0)) = 1.0f;
+    *(test_out_ref->write<float>(3, 0)) = 9.0f;
+    *(test_out_ref->write<float>(4, 0)) = 2.0f;
 
-//     double result = meanPercentErr<float>(ref_val.get(), out_val.get());
-//      passed(result < 0.0001);
-//     //passed(result == 0);
-//   }
+    S_TENSOR test_out = ctx.add(new RamTensor<float>(test_out_ref->getShape(), "test_out"));
+    TNameList inputs = {"test_input", "test_dim"};
+    TNameList outputs = {"test_out"};
 
-//   void addTest(void) {
-//     testStart("add");
+    timer_start();
+    ctx.push(new ArgMaxOp<float, float>(), inputs, outputs);
+    ctx.eval();
+    timer_stop();
 
-//     // reference inputs
-//     TENSOR a =
-//         ctx.add(t_import.float_import("/fs/testData/ref_add/in/Const_5_0.idx"));
-//     TENSOR b =
-//         ctx.add(t_import.float_import("/fs/testData/ref_add/in/Const_6_0.idx"));
+    double result = meanPercentErr<float>(test_out_ref.get(), test_out.get());
+     passed(result < 0.0001);
+    //passed(result == 0);
+  }
 
-//     // reference outputs
-//     TENSOR ref_out =
-//         ctx.add(t_import.float_import("/fs/testData/ref_add/out/ref_add_0.idx"));
+  void addTest(void) {
+    testStart("add");
 
-//     // Implementation goes here
+    // reference inputs
+    ctx.add(t_import.float_import("/fs/testData/ref_add/in/Const_5_0.idx", "a"));
+    ctx.add(t_import.float_import("/fs/testData/ref_add/in/Const_6_0.idx", "b"));
 
-//     // modify the checks below:
-//     TENSOR out = ctx.add(new RamTensor<float>(ref_out.lock()->getShape()));
-//     S_TENSOR out_vxx = out.lock();
-//     S_TENSOR ref_vxx = ref_out.lock();
-//     TList inputs = {a, b};
-//     TList outputs = {out};
-//     timer_start();
-//     ctx.push(new AddOp<float, float>(), inputs, outputs);
-//     ctx.eval();
-//     timer_stop();
+    // reference outputs
+    S_TENSOR ref_out = ctx.add(t_import.float_import("/fs/testData/ref_add/out/ref_add_0.idx", "ref_out"));
 
-//     double result = meanPercentErr<float>(ref_vxx.get(), out_vxx.get());
-//      passed(result < 0.0001);
-//     //passed(result == 0);
-//   }
+    // Implementation goes here
 
-//   void minTest(void) {
-//     testStart("min");
+    // modify the checks below:
+    S_TENSOR out = ctx.add(new RamTensor<float>(ref_out->getShape(), "out"));
+    TNameList inputs = {"a", "b"};
+    TNameList outputs = {"out"};
+    timer_start();
+    ctx.push(new AddOp<float, float>(), inputs, outputs);
+    ctx.eval();
+    timer_stop();
 
-//     // reference inputs
-//     TENSOR a =
-//         ctx.add(t_import.float_import("/fs/testData/ref_min/in/Const_2_0.idx"));
-//     TENSOR dim =
-//         ctx.add(t_import.int_import("/fs/testData/ref_min/in/Const_3_0.idx"));
+    double result = meanPercentErr<float>(ref_out.get(), out.get());
+     passed(result < 0.0001);
+    //passed(result == 0);
+  }
 
-//     // reference outputs
-//     TENSOR ref_out =
-//         ctx.add(t_import.float_import("/fs/testData/ref_min/out/ref_min_0.idx"));
+  void minTest(void) {
+    testStart("min");
 
-//     // Implementation goes here
+    ctx.gc();
 
-//     // modify the checks below:
-//     TENSOR out = ctx.add(new RamTensor<float>(ref_out.lock()->getShape()));
-//     TList inputs = {a, dim};
-//     TList outputs = {out};
-//     S_TENSOR ref_val = ref_out.lock();
-//     S_TENSOR out_val = out.lock();
-//     timer_start();
-//     ctx.push(new MinOp(), inputs, outputs);
-//     ctx.eval();
-//     timer_stop();
+    // reference inputs
+    ctx.add(t_import.float_import("/fs/testData/ref_min/in/Const_2_0.idx", "a"));
+    ctx.add(t_import.int_import("/fs/testData/ref_min/in/Const_3_0.idx", "dim"));
 
-//     double result = meanPercentErr<float>(ref_val.get(), out_val.get());
-//     // passed(result < 0.0001);
-//     passed(result == 0);
-//   }
+    // reference outputs
+    S_TENSOR ref_out = ctx.add(t_import.float_import("/fs/testData/ref_min/out/ref_min_0.idx", "ref_out"));
 
-//   void maxTest(void) {
-//     testStart("max");
+    // Implementation goes here
 
-//     // reference inputs
-//     TENSOR a =
-//         ctx.add(t_import.float_import("/fs/testData/ref_max/in/Const_2_0.idx"));
-//     TENSOR dim =
-//         ctx.add(t_import.int_import("/fs/testData/ref_max/in/Const_4_0.idx"));
+    // modify the checks below:
+    S_TENSOR out = ctx.add(new RamTensor<float>(ref_out->getShape(), "out"));
+    TNameList inputs = {"a", "dim"};
+    TNameList outputs = {"out"};
 
-//     // reference outputs
-//     TENSOR ref_out =
-//         ctx.add(t_import.float_import("/fs/testData/ref_max/out/ref_max_0.idx"));
+    timer_start();
+    ctx.push(new MinOp(), inputs, outputs);
+    ctx.eval();
+    timer_stop();
 
-//     // Implementation goes here
+    double result = meanPercentErr<float>(ref_out.get(), out.get());
+    // passed(result < 0.0001);
+    passed(result == 0);
+  }
 
-//     // modify the checks below:
-//     TENSOR out = ctx.add(new RamTensor<float>(ref_out.lock()->getShape()));
-//     TList inputs = {a, dim};
-//     TList outputs = {out};
-//     S_TENSOR ref_val = ref_out.lock();
-//     S_TENSOR out_val = out.lock();
-//     timer_start();
-//     ctx.push(new MaxOp(), inputs, outputs);
-//     ctx.eval();
-//     timer_stop();
+  void maxTest(void) {
+    testStart("max");
 
-//     double result = meanPercentErr<float>(ref_val.get(), out_val.get());
-//     // passed(result < 0.0001);
-//     passed(result == 0);
-//   }
+    ctx.gc();
+
+    // reference inputs
+    ctx.add(t_import.float_import("/fs/testData/ref_max/in/Const_2_0.idx", "a"));
+    ctx.add(t_import.int_import("/fs/testData/ref_max/in/Const_4_0.idx", "dim"));
+
+    // reference outputs
+    S_TENSOR ref_out = ctx.add(t_import.float_import("/fs/testData/ref_max/out/ref_max_0.idx", "ref_out"));
+
+    // Implementation goes here
+
+    // modify the checks below:
+    S_TENSOR out = ctx.add(new RamTensor<float>(ref_out->getShape(), "out"));
+    TNameList inputs = {"a", "dim"};
+    TNameList outputs = {"out"};
+    timer_start();
+    ctx.push(new MaxOp(), inputs, outputs);
+    ctx.eval();
+    timer_stop();
+
+    double result = meanPercentErr<float>(ref_out.get(), out.get());
+    // passed(result < 0.0001);
+    passed(result == 0);
+  }
 
   void runAll(void) {
-    //argmaxTest();
-    // argmaxTest2();
+    argmaxTest();
+    argmaxTest2();
     requantization_rangeTest();
     requantizeTest();
     requantizeTest2();
-    // addTest();
-    // minTest();
-    // maxTest();
+    addTest();
+    minTest();
+    maxTest();
   }
 };
 
