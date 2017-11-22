@@ -11,7 +11,7 @@ for i0 in range(0, arr.shape[0]):
             for i3 in range(0, arr.shape[3]):
                 arr[i0, i1, i2, i3] = tmp - 1
                 tmp = tmp * 4
-                if tmp > 2**32:
+                if tmp > 2 ** 31:
                     tmp = 1
 
 
