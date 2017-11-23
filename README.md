@@ -28,7 +28,7 @@
 
 ## Configure
 
-See [mbed_app.json](blob/master/mbed_app.json)
+See [mbed_app.json](../../blob/master/mbed_app.json)
 
 ## Build Steps
 
