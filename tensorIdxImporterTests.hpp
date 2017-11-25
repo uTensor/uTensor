@@ -47,7 +47,7 @@ class idxImporterTest : public Test {
         t_import.int_import("/fs/testData/idxImport/int32_4d_power2.idx", "int1");
     timer_stop();
     double result = sum<int>(t);
-    passed(result == 5748992600);
+    passed(result == 7158278745);
     delete t;
   }
 
