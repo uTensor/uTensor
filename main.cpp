@@ -17,6 +17,7 @@
 #include "context_test.hpp"
 #include "MathTests.hpp"
 #include "MatrixTests.hpp"
+#include "sdtest.hpp"
 
 Serial pc(USBTX, USBRX, 115200);
 SDBlockDevice bd(MBED_CONF_APP_SD_MOSI, MBED_CONF_APP_SD_MISO,
@@ -38,6 +39,12 @@ int main(int argc, char** argv) {
   idxTest.runAll();
   printf("IDX import result...\r\n");
   idxTest.printSummary();
+
+  printf("SDTensor test:\r\n");
+  SDTensorTest sdtest;
+  sdtest.runAll();
+  printf("sd tensor result...\r\n");
+  sdtest.printSummary();
 
   printf("tesnor test: \r\n");
   tensorTest tenT;

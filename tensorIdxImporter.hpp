@@ -2,11 +2,12 @@
 #define UTENSOR_IDX_IMPORTER
 
 #include <stdio.h>
+#include <iostream>
 #include <stdlib.h>
 #include <vector>
 #include "mbed.h"
-#include "tensor.hpp"
 #include "uTensor_util.hpp"
+#include "tensor.hpp"
 
 using namespace std;
 
@@ -34,6 +35,11 @@ class TensorIdxImporter {
   HeaderMeta parseHeader(void);
   template <typename U>
   Tensor* loader(string& filename, IDX_DTYPE idx_type, string name);
+  void parseMeta(string& filename, IDX_DTYPE idx_type);
+  template <typename U>
+  void load_impl(U* dst, uint8_t unit_size, uint32_t arrsize);
+  template <typename U>
+  void flush_impl(U* dst, uint8_t unit_size, uint32_t arrsize);
   void open(string filename);
   // void open(FILE *fp);
 
@@ -54,7 +60,19 @@ class TensorIdxImporter {
     return loader<float>(filename, IDX_DTYPE::idx_float, name);
   }
   uint32_t getMagicNumber(unsigned char dtype, unsigned char dim);
+  template <typename T>
+  void load_data(string& filename, IDX_DTYPE idx_type, uint8_t unit_size, uint32_t arrsize, long int offset, T* data);
+  template <typename T>
+  void flush_data(string& filename, IDX_DTYPE idx_type, uint8_t unit_size, uint32_t arrsize, long int offset, T* data);
   uint8_t getIdxDTypeSize(IDX_DTYPE dtype);
+  ~TensorIdxImporter() {
+    if (fp != NULL) {
+      ON_ERR(fclose(fp), "Closing file...");
+    }
+  }
+  TensorIdxImporter() {
+    fp = NULL;
+  }
   // Tensor<double> double_import(string filename) {};
 };
 
@@ -65,27 +83,9 @@ class TensorIdxImporter {
 
 
 template <typename U>
-Tensor* TensorIdxImporter::loader(string& filename, IDX_DTYPE idx_type, string name) {
-  fp = fopen(filename.c_str(), "r");
-
-  DEBUG("Opening file %s ", filename.c_str());
-  if (fp == NULL) ERR_EXIT("Error opening file: %s", filename.c_str());
-
-  header = parseHeader();
-
-  if (header.dataType != idx_type) {
-    ERR_EXIT("TensorIdxImporter: header and tensor type mismatch\r\n");
-  }
-
-  fseek(fp, header.dataPos, SEEK_SET);  // need error  handling
-
-  Tensor* t = new RamTensor<U>(header.dim, name);  // tensor allocated
-  const uint8_t unit_size = t->unit_size();
-
+void TensorIdxImporter::load_impl(U* dst, uint8_t unit_size, uint32_t arrsize) {
   U* val = (U*)malloc(unit_size);
-  U* data = t->write<U>(0, 0);
-
-  for (uint32_t i = 0; i < t->getSize(); i++) {
+  for (uint32_t i = 0; i < arrsize; i++) {
     fread(val, unit_size, 1, fp);
 
     switch (unit_size) {
@@ -101,14 +101,64 @@ Tensor* TensorIdxImporter::loader(string& filename, IDX_DTYPE idx_type, string n
 
     // val = htonl((uint32_t) buff);  //NT: testing for uint8 only, deference
     // error here
-    data[i] = *val;
+   dst[i] = *val;
   }
-
   free(val);
+}
+template <typename U>
+void TensorIdxImporter::flush_impl(U* dst, uint8_t unit_size, uint32_t arrsize) {
+  U* val = (U*)malloc(unit_size);
+  for (uint32_t i = 0; i < arrsize; i++) {
+    val = dst + i;
+    switch (unit_size) {
+      case 2:
+        *(uint16_t*)val = ntoh16(*(uint16_t*)val);
+        break;
+      case 4:
+        *(uint32_t*)val = ntoh32(*(uint32_t*)val);
+        break;
+      default:
+        break;
+    }
+
+    // val = htonl((uint32_t) buff);  //NT: testing for uint8 only, deference
+    // error here
+  }
+  fwrite(dst, unit_size, arrsize, fp);
+  free(val);
+}
+template <typename U>
+Tensor* TensorIdxImporter::loader(string& filename, IDX_DTYPE idx_type, string name) {
+
+  parseMeta(filename, idx_type);
+  fseek(fp, header.dataPos, SEEK_SET);
+  Tensor* t = new RamTensor<U>(header.dim, name);  // tensor allocated
+  const uint8_t unit_size = t->unit_size();
+
+  U* data = t->write<U>(0, 0);
+  load_impl(data, unit_size, t->getSize());
 
   ON_ERR(fclose(fp), "Closing file...");
 
   return t;
+}
+template<typename T>
+void TensorIdxImporter::load_data(string& filename, IDX_DTYPE idx_type, uint8_t unit_size, uint32_t arrsize, long int offset, T* data) {
+  if (fp == NULL) {
+  parseMeta(filename, idx_type);
+  }
+  fseek(fp, header.dataPos + offset, SEEK_SET);  // need error  handling
+  load_impl(data, unit_size, arrsize);
+  return;
+}
+template<typename T>
+void TensorIdxImporter::flush_data(string& filename, IDX_DTYPE idx_type, uint8_t unit_size, uint32_t arrsize, long int offset, T* data) {
+  if (fp == NULL) {
+  parseMeta(filename, idx_type);
+  }
+  fseek(fp, header.dataPos + offset, SEEK_SET);
+  flush_impl(data, unit_size, arrsize);
+  return;
 }
 
 #endif  // UTENSOR_IDX_IMPORTER

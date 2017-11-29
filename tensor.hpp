@@ -18,6 +18,7 @@
 // };
 
 class Tensor;
+class TensorIdxImporter;
 typedef std::string TName;
 typedef std::string OpName;
 typedef std::vector<TName> TNameList;
@@ -150,7 +151,6 @@ class Tensor : public uTensor {
     DEBUG("Tensor Destructed\r\n");
   }
 };
-
 template <class T>
 class RamTensor : public Tensor {
   // need deep copy
@@ -175,37 +175,19 @@ class RamTensor : public Tensor {
   //          lowest specified dimension is returned.
   //          Otherwise, return the pointer to the specific element.
   virtual void* read(size_t offset, size_t ele) override {
+    if (ele > s->total_size) {
+        ERR_EXIT("data overflow");
+    }
     return (void *)((T*)s->data + offset);
   }
   virtual void* write(size_t offset, size_t ele) override {
+    if (ele > s->total_size) {
+        ERR_EXIT("data overflow");
+    }
     return (void*)((T*)s->data + offset);
   }
 
 
-  /*virtual void* read(std::initializer_list<uint32_t> l) override {
-    size_t p_offset = 0;
-    signed short current_dim = 0;
-    for (auto i : l) {
-      p_offset += i * getStride(current_dim);
-      current_dim++;
-    }
-
-    // printf("p_offset: %d\r\n", p_offset);
-    return (void*)((T*)s->data + p_offset);
-  }
-
-    T* getPointer(std::vector<uint32_t> v) {
-      size_t p_offset = 0;
-      signed short current_dim = 0;
-      for (auto i : v) {
-        p_offset += i * getStride(current_dim);
-        current_dim++;
-      }
-
-      printf("p_offset: %d\r\n", p_offset);
-
-      return s->data + p_offset;
-    }*/
   // virtual void* read(size_t offset, size_t ele) override{};
   virtual uint16_t unit_size(void) override {
     return sizeof(T);
