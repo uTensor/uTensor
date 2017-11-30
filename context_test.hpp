@@ -17,6 +17,16 @@ class contextTest : public Test {
   TensorIdxImporter t_import;
   Context ctx;
 
+private:
+
+  TName codeGenStatfulHelper(TName input) {
+    ctx.add(TensorConstant({1}, 1, "incr_val"));
+    ctx.add(new RamTensor<float>(ref_out->getShape(), "out"));  //gc problem?
+    ctx.push(new AddOp<uint32_t, uint32_t>(), {"incr_val", input}, output);
+
+    return output;
+  }
+
 public:
   void RefCountTest(void) {
     testStart("Context Ref Count");
@@ -61,10 +71,14 @@ public:
 
   }
 
+  void codeGenTemplate(void) {
+    ctx.gc();
+  }
+
 
   void runAll(void) {
-    // MatMalTest();
     RefCountTest();
+    codeGenTemplate();
   }
 };
 

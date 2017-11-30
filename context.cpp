@@ -3,6 +3,7 @@
 S_TENSOR Context::add(Tensor* t, uint8_t init_count) {
   if(t == nullptr) { ERR_EXIT("null pointer tensor"); }
   if(rTable.find(t->getName()) != rTable.end()) {
+    ///NT: TODO: check stateful here
     ERR_EXIT("tensor with name \"%s\" address already exist in rTable", t->getName().c_str());
   }
 
@@ -143,7 +144,11 @@ int Context::eval(void) {
 
     dcrListRef(op->getInputs());
 
-    delete op;
+    delete op;  ///NT: TODO: replace this with a cleanupOp(op) method
+                ///context would require a new op record table
+                ///addStateful(Ops, name)
+                ///push(opName, ...)
+                ///Can you pass constructor as a reference?
 
   }
 
