@@ -19,12 +19,11 @@ class contextTest : public Test {
 
 private:
 
-  TName codeGenStatfulHelper(TName input) {
-    ctx.add(TensorConstant({1}, 1, "incr_val"));
-    ctx.add(new RamTensor<float>(ref_out->getShape(), "out"));  //gc problem?
-    ctx.push(new AddOp<uint32_t, uint32_t>(), {"incr_val", input}, output);
-
-    return output;
+  void codeGenStatfulHelper(TName state) {
+    ctx.add(TensorConstant<uint32_t>({1}, 1, "incr_val"));
+    ctx.add(new RamTensor<uint32_t>({1}, "out"));  //gc problem?
+    ctx.push(new AddOp<uint32_t, uint32_t>(), {"incr_val", state}, {"out"});
+    ctx.eval();
   }
 
 public:
@@ -72,7 +71,20 @@ public:
   }
 
   void codeGenTemplate(void) {
+    testStart("codeGenTemplate");
     ctx.gc();
+    S_TENSOR state = ctx.add(TensorConstant<uint32_t>({1}, 0, "state"), 255);
+    S_TENSOR out;
+    for(auto i = 0; i < 5; i++) {
+      codeGenStatfulHelper("state");
+      out = ctx.get("out");
+      *(state->write<uint32_t>(0, 0)) = *(out->read<uint32_t>(0, 0));
+      ctx.gc();
+    }
+
+    int result = *(out->read<int>(0, 0));
+    passed(result == 5);
+
   }
 
 
