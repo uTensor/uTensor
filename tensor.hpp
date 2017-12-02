@@ -7,6 +7,7 @@
 #include <vector>
 #include "stdlib.h"
 #include "uTensor_util.hpp"
+#include <limits>
 
 // enum class DType : char { 
 //   uint8,
@@ -45,6 +46,7 @@ class TensorBase {
   std::vector<uint32_t> shape;
   void* data;
   uint32_t total_size;
+  uint32_t max_size;
 
   ~TensorBase() {
     if (data != nullptr) {
@@ -66,6 +68,7 @@ class Tensor : public uTensor {
   Tensor(TName &_name) {
     s = std::make_shared<TensorBase>();
     s->total_size = 0;
+    s->max_size = std::numeric_limits<uint32_t>::max();
     s->data = nullptr;
     setName(_name);
   }
@@ -92,7 +95,12 @@ class Tensor : public uTensor {
       }
     }
 
-    s->data = (void*)malloc(unit_size() * s->total_size);
+    if (s->total_size > s->max_size) {
+      s->data = (void*)malloc(unit_size() * s->max_size);
+      s->total_size = s->max_size;
+    } else {
+      s->data = (void*)malloc(unit_size() * s->total_size);
+    }
     if (s->data == NULL)
       ERR_EXIT("ran out of memory for %lu malloc", unit_size() * s->total_size);
 
