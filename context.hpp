@@ -6,6 +6,7 @@
 #include <initializer_list>
 #include "uTensorBase.hpp"
 #include "stdio.h"
+#include <functional>
 //#include <list>
 
 class Ref_Record {
@@ -44,10 +45,11 @@ protected:
   //uint16_t getRef();
 
 public:
-  S_TENSOR add(Tensor* t, uint8_t init_count = 0);
+//S_TENSOR addStateful(std::function<void*(void)> func);
+  S_TENSOR add(std::function<void*(void)> func, uint8_t init_count = 0);
   S_TENSOR get(TName const &t_name);
-  void push(Operator *op, TNameList &_inputs, TNameList &_outputs);
-  void push(Operator *op, std::initializer_list<TName> _inputs, std::initializer_list<TName> _outputs);
+  void push(std::function<void*(void)> func, TNameList &_inputs, TNameList &_outputs);
+  void push(std::function<void*(void)> func, std::initializer_list<TName> _inputs, std::initializer_list<TName> _outputs);
   uint32_t gc(void);
   int eval(void);
 
@@ -57,5 +59,6 @@ public:
 };
 
 
+#define defer(...) ([&](){return (void*) (__VA_ARGS__);})
 
 #endif // UTENSOR_CTX_H
