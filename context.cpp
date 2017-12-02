@@ -1,6 +1,7 @@
 #include "context.hpp"
 
-S_TENSOR Context::add(Tensor* t, uint8_t init_count) {
+S_TENSOR Context::add(std::function<void*(void)> func, uint8_t init_count) {
+  Tensor* t = (Tensor*) func();
   if(t == nullptr) { ERR_EXIT("null pointer tensor"); }
   if(rTable.find(t->getName()) != rTable.end()) {
     ///NT: TODO: check stateful here
@@ -29,7 +30,8 @@ S_TENSOR Context::get(TName const &t_name) {
 }
 
 
-void Context::push(Operator *op, TNameList &in_names, TNameList &out_names) {
+void Context::push(std::function<void*(void)> func, TNameList &in_names, TNameList &out_names) {
+  Operator* op = (Operator*) func();
   //error checking in the Op class
   S_TList _inputs;
   for(auto in:in_names) {
@@ -52,7 +54,7 @@ void Context::push(Operator *op, TNameList &in_names, TNameList &out_names) {
 
 }
 
-void Context::push(Operator *op, std::initializer_list<TName> _inputs, std::initializer_list<TName> _outputs) {
+void Context::push(std::function<void*(void)> func, std::initializer_list<TName> _inputs, std::initializer_list<TName> _outputs) {
   TNameList inputs;
   TNameList outputs;
 
@@ -64,7 +66,7 @@ void Context::push(Operator *op, std::initializer_list<TName> _inputs, std::init
     outputs.push_back(o);
   }
 
-  push(op, inputs, outputs);
+  push(func, inputs, outputs);
 }
 
 void Context::incrTNameListRef(const TNameList &t_list) {
