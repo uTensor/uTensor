@@ -16,6 +16,7 @@ class SDTensor : public Tensor {
       for (auto i : l) {
          v.push_back(i);
       }
+      s->max_size = 50;
       Tensor::init<T>(v);
       _filename = file;
       cursor = 0;
@@ -25,6 +26,7 @@ class SDTensor : public Tensor {
     }
 
     SDTensor(std::vector<uint32_t> v, TName _name, std::string file) : Tensor(_name) {
+      s->max_size = 50;
       Tensor::init<T>(v);
       _filename = file;
       cursor = 0;

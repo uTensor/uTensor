@@ -8,7 +8,7 @@
 class SDTensorTest : public Test {
   public:
     void readTest(void) {
-    testStart("sd import test");
+    testStart("sd read test1");
     timer_start();
     Tensor* t = nullptr;
     {
@@ -19,8 +19,17 @@ class SDTensorTest : public Test {
     Tensor* s = new SDTensor<unsigned char>(t->getShape(), "sdf", "/fs/testData/idxImport/uint8_4d_power2.idx");
     const unsigned char* x = t->read<unsigned char>(0, 0);
     const unsigned char* y = s->read<unsigned char>(5, 5);
-    timer_stop();
     passed(x[5] == y[0]);
+    testStart("sd read test2");
+    y = s->read<unsigned char>(55, 5);
+    passed(x[55] == y[0]);
+    testStart("sd write1 test");
+    unsigned char *y_w = s->write<unsigned char>(55, 5);
+    unsigned char *x_w = t->write<unsigned char>(0, 0);
+    y_w[0] = '5';
+    x_w[55] = '5';
+    passed(x_w[55] + x_w[56] == y_w[0] + y_w[1]);
+    timer_stop();
     delete t;
     delete s;
   }
