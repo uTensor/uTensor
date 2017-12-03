@@ -29,7 +29,6 @@ S_TENSOR Context::addCached(std::function<void*(void)> func, TName _name, uint8_
 S_TENSOR Context::add(Tensor* t, TName _name, uint8_t init_count) {
   if(t == nullptr) { ERR_EXIT("null pointer tensor"); }
   if(rTable.find(_name) != rTable.end()) {
-    ///NT: TODO: check stateful here
     ERR_EXIT("tensor with name \"%s\" address already exist in rTable", t->getName().c_str());
   }
 
@@ -210,6 +209,7 @@ int Context::eval(void) {
 
 uint32_t Context::gc(void) {
   TNameList nlist;
+  ///NT: TODO: implement cache policy here
 
   for ( auto it : rTable) {
     Ref_Record r = it.second;
