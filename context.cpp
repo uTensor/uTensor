@@ -1,14 +1,40 @@
 #include "context.hpp"
 
-S_TENSOR Context::add(std::function<void*(void)> func, uint8_t init_count) {
-  Tensor* t = (Tensor*) func();
+S_TENSOR Context::add_static(std::function<void*(void)> func, TName _name) {
+  return addCached(func, _name, 1, true);
+}
+
+S_TENSOR Context::addCached(std::function<void*(void)> func, TName _name, uint8_t init_count, bool _is_static) {
+  Tensor* t;
+  if(rTable.find(_name) == rTable.end()) {
+    t = (Tensor*) func();
+    add(t, _name);
+  }
+
+  Ref_Record record = rTable[_name];
+  record.is_static = _is_static;
+  record.is_cacheable = true;
+  if(init_count > 0) {
+    record.count = init_count;
+    record.allow_incr = false;
+  }
+  if(record.count < 1 && record.is_static) {
+    record.count = 1;
+  }
+  rTable[_name] = record;
+
+  return record.sptr;
+}
+
+S_TENSOR Context::add(Tensor* t, TName _name, uint8_t init_count) {
   if(t == nullptr) { ERR_EXIT("null pointer tensor"); }
-  if(rTable.find(t->getName()) != rTable.end()) {
+  if(rTable.find(_name) != rTable.end()) {
     ///NT: TODO: check stateful here
     ERR_EXIT("tensor with name \"%s\" address already exist in rTable", t->getName().c_str());
   }
 
   S_TENSOR _sptr(t);
+  t->setName(_name);
 
   Ref_Record record;
 
@@ -19,7 +45,7 @@ S_TENSOR Context::add(std::function<void*(void)> func, uint8_t init_count) {
 
   record.sptr = _sptr;
 
-  rTable[t->getName()] = record;
+  rTable[_name] = record;
 
   return _sptr;
 }
@@ -29,9 +55,42 @@ S_TENSOR Context::get(TName const &t_name) {
   return rTable[t_name].sptr;
 }
 
+Operator* Context::registerOpTable(std::function<void*(void)> func, TName _name) {
+  Operator* op;
+  //empty static op tensor list
+  if(opTable.find(_name) == opTable.end()) {
+    op = (Operator*) func();
+    op->setName(_name);
+  } else {
+    op = opTable[_name];
+  }
+  
+  return op;
+}
 
-void Context::push(std::function<void*(void)> func, TNameList &in_names, TNameList &out_names) {
-  Operator* op = (Operator*) func();
+void Context::push_static(std::function<void*(void)> func, TName _name, TNameList &_inputs, TNameList &_outputs, bool is_static) {
+  push(registerOpTable(func, _name), _inputs, _outputs);
+}
+void Context::push_static(std::function<void*(void)> func, TName _name, std::initializer_list<TName> _inputs, std::initializer_list<TName> _outputs, bool is_static) {
+  push(registerOpTable(func, _name), _inputs, _outputs);
+}
+
+void Context::push(Operator* op, std::initializer_list<TName> _inputs, std::initializer_list<TName> _outputs) {
+  TNameList inputs;
+  TNameList outputs;
+
+  for(auto i:_inputs) {
+    inputs.push_back(i);
+  }
+
+  for(auto o:_outputs) {
+    outputs.push_back(o);
+  }
+
+  push(op, inputs, outputs);
+}
+
+void Context::push(Operator* op, TNameList &in_names, TNameList &out_names) {
   //error checking in the Op class
   S_TList _inputs;
   for(auto in:in_names) {
@@ -54,21 +113,6 @@ void Context::push(std::function<void*(void)> func, TNameList &in_names, TNameLi
 
 }
 
-void Context::push(std::function<void*(void)> func, std::initializer_list<TName> _inputs, std::initializer_list<TName> _outputs) {
-  TNameList inputs;
-  TNameList outputs;
-
-  for(auto i:_inputs) {
-    inputs.push_back(i);
-  }
-
-  for(auto o:_outputs) {
-    outputs.push_back(o);
-  }
-
-  push(func, inputs, outputs);
-}
-
 void Context::incrTNameListRef(const TNameList &t_list) {
   for(auto t_name:t_list) {
     if(rTable.find(t_name) == rTable.end()) {
@@ -76,7 +120,7 @@ void Context::incrTNameListRef(const TNameList &t_list) {
     }
 
     Ref_Record record = rTable[t_name];
-    if(record.allow_incr) {
+    if(record.allow_incr && !record.is_static) {
       record.count++;
       rTable[t_name] = record;
     }
@@ -120,7 +164,7 @@ uint8_t Context::dcrRef(TName t_name) {
   }
 
   Ref_Record record = rTable[t_name];
-  if(record.count > 0) record.count -= 1;
+  if(record.count > 0 && !record.is_static) record.count -= 1;
   rTable[t_name] = record;
 
   return record.count;
@@ -128,6 +172,14 @@ uint8_t Context::dcrRef(TName t_name) {
 
 bool Context::isTracked(TName t_name) {
   return (rTable.find(t_name) != rTable.end());
+}
+
+void Context::cleanUpOp(Operator* op) {
+  if(opTable.find(op->getName()) == opTable.end()) {
+    delete op;
+  } else {
+    op->empty();
+  }
 }
 
 int Context::eval(void) {
@@ -146,11 +198,8 @@ int Context::eval(void) {
 
     dcrListRef(op->getInputs());
 
-    delete op;  ///NT: TODO: replace this with a cleanupOp(op) method
-                ///context would require a new op record table
-                ///addStateful(Ops, name)
-                ///push(opName, ...)
-                ///Can you pass constructor as a reference?
+
+    cleanUpOp(op);
 
   }
 

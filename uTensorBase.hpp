@@ -24,6 +24,7 @@ public:
   S_TList getOutputs(void) { return outputs;}
   uint8_t getNumInputs(void) { return n_inputs; }
   uint8_t getNumOutputs(void) { return n_outputs; }
+  void empty(void);
 
   Operator() {
     n_inputs = 0;  //overridden by constructor
