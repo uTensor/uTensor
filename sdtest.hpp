@@ -7,7 +7,7 @@
 
 class SDTensorTest : public Test {
   public:
-    void readTest(void) {
+    void rwTest(void) {
     testStart("sd read test1");
     timer_start();
     Tensor* t = nullptr;
@@ -16,7 +16,8 @@ class SDTensorTest : public Test {
     t =
         t_import.ubyte_import("/fs/testData/idxImport/uint8_4d_power2.idx", "uchar1");
     }
-    Tensor* s = new SDTensor<unsigned char>(t->getShape(), "sdf", "/fs/testData/idxImport/uint8_4d_power2.idx");
+    Tensor* s = new SDTensor<unsigned char>(t->getShape(), "sdf", "/fs/testData/idxImport/uint8_4d_power2.idx", 50);//the size of data is 50 elements
+
     const unsigned char* x = t->read<unsigned char>(0, 0);
     const unsigned char* y = s->read<unsigned char>(5, 5);
     passed(x[5] == y[0]);
@@ -34,7 +35,7 @@ class SDTensorTest : public Test {
     delete s;
   }
   void runAll() {
-    readTest();
+    rwTest();
   }
 
 };
