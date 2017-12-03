@@ -20,9 +20,9 @@ class contextTest : public Test {
 private:
 
   void codeGenStatfulHelper(TName state) {
-    ctx.add(defer(TensorConstant<uint32_t>({1}, 1, "incr_val")));
-    ctx.add(defer(new RamTensor<uint32_t>({1}, "out")));  //gc problem?
-    ctx.push(defer(new AddOp<uint32_t, uint32_t>()), {"incr_val", state}, {"out"});
+    ctx.add(TensorConstant<uint32_t>({1}, 1), "incr_val");
+    ctx.add(new RamTensor<uint32_t>({1}), "out");  //gc problem?
+    ctx.push(new AddOp<uint32_t, uint32_t>(), {"incr_val", state}, {"out"});
     ctx.eval();
   }
 
@@ -35,9 +35,9 @@ public:
     timer_start();
     //inputs
     
-    S_TENSOR a = ctx.add(defer(new RamTensor<int>({1,1,1}, "a")));
-    S_TENSOR b = ctx.add(defer(new RamTensor<int>({1,1,1}, "b")));
-    S_TENSOR c = ctx.add(defer(new RamTensor<int>({1,1,1}, "c")));
+    S_TENSOR a = ctx.add(new RamTensor<int>({1,1,1}), "a");
+    S_TENSOR b = ctx.add(new RamTensor<int>({1,1,1}), "b");
+    S_TENSOR c = ctx.add(new RamTensor<int>({1,1,1}), "c");
 
     //init values
     *(a->write<int>(0, 0)) = 1;
@@ -45,19 +45,19 @@ public:
     *(c->write<int>(0, 0)) = 1;
 
     // reference outputs
-    S_TENSOR out = ctx.add(defer(new RamTensor<int>({1,1,1}, "out")));
+    S_TENSOR out = ctx.add(new RamTensor<int>({1,1,1}), "out");
 
     TNameList inputs0 = {"a", "b"};
     TNameList outputs0 = {"c"};  //2
-    ctx.push(defer(new AddOp<int, int>()), inputs0, outputs0);
+    ctx.push(new AddOp<int, int>(), inputs0, outputs0);
 
     TNameList inputs1 = {"c", "a"};
     TNameList outputs1 = {"b"};  //3
-    ctx.push(defer(new AddOp<int, int>()), inputs1, outputs1);
+    ctx.push(new AddOp<int, int>(), inputs1, outputs1);
 
     TNameList inputs2 = {"a", "b"};
     TNameList outputs2 = {"out"};  //4
-    ctx.push(defer(new AddOp<int, int>()), inputs2, outputs2);
+    ctx.push(new AddOp<int, int>(), inputs2, outputs2);
     ctx.eval();
     timer_stop();
 
@@ -74,9 +74,9 @@ public:
   void codeGenTemplate(void) {
     testStart("codeGenTemplate");
     ctx.gc();
-    S_TENSOR state = ctx.add(defer(TensorConstant<uint32_t>({1}, 0, "state")), 255);
     S_TENSOR out;
     for(auto i = 0; i < 5; i++) {
+      S_TENSOR state = ctx.add_static(hold(TensorConstant<uint32_t>({1}, 0)), "state");
       codeGenStatfulHelper("state");
       out = ctx.get("out");
       *(state->write<uint32_t>(0, 0)) = *(out->read<uint32_t>(0, 0));

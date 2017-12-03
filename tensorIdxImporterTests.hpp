@@ -20,7 +20,7 @@ class idxImporterTest : public Test {
     TensorIdxImporter t_import;
     timer_start();
     Tensor* t =
-        t_import.ubyte_import("/fs/testData/idxImport/uint8_4d_power2.idx", "uchar1");
+        t_import.ubyte_import("/fs/testData/idxImport/uint8_4d_power2.idx");
     timer_stop();
     double result = sum<unsigned char>(t);
     passed(result == 4518);
@@ -32,7 +32,7 @@ class idxImporterTest : public Test {
     TensorIdxImporter t_import;
     timer_start();
     Tensor* t =
-        t_import.short_import("/fs/testData/idxImport/int16_4d_power2.idx", "short1");
+        t_import.short_import("/fs/testData/idxImport/int16_4d_power2.idx");
     timer_stop();
     double result = sum<short>(t);
     passed(result == 270250);
@@ -44,10 +44,10 @@ class idxImporterTest : public Test {
     TensorIdxImporter t_import;
     timer_start();
     Tensor* t =
-        t_import.int_import("/fs/testData/idxImport/int32_4d_power2.idx", "int1");
+        t_import.int_import("/fs/testData/idxImport/int32_4d_power2.idx");
     timer_stop();
     double result = sum<int>(t);
-    passed(result == 5748992600);
+    passed(result == 7158278745);
     delete t;
   }
 
@@ -56,7 +56,7 @@ class idxImporterTest : public Test {
     TensorIdxImporter t_import;
     timer_start();
     Tensor* t =
-        t_import.float_import("/fs/testData/idxImport/float_4d_power2.idx", "float1");
+        t_import.float_import("/fs/testData/idxImport/float_4d_power2.idx");
     timer_stop();
 
     double result = sum<float>(t);

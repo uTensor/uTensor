@@ -29,7 +29,13 @@ public:
  virtual void inFocus(){};
  virtual void deFocus(){};
  virtual std::string getName() { return name; }
- virtual void setName(std::string _name) { name = _name; }
+ virtual void setName(std::string _name) { 
+    if(name == "") {
+      name = _name;
+    } else {
+      ERR_EXIT("Tensor %s already has a name %s\r\n", _name.c_str(), name.c_str());
+    }
+  }
 
 
  virtual ~uTensor() = 0;
@@ -62,11 +68,11 @@ class Tensor : public uTensor {
  protected:
   std::shared_ptr<TensorBase> s;  // short for states
  public:
-  Tensor(TName &_name) {
+  Tensor() {
     s = std::make_shared<TensorBase>();
     s->total_size = 0;
     s->data = nullptr;
-    setName(_name);
+    setName("");
   }
 
   // returns how far a given dimension is apart
@@ -155,9 +161,10 @@ template <class T>
 class RamTensor : public Tensor {
   // need deep copy
  public:
-  RamTensor(TName _name) : Tensor(_name) {}
+  //RamTensor(TName _name) : Tensor(_name) {}
+  RamTensor() {};
 
-  RamTensor(std::initializer_list<uint32_t> l, TName _name) : Tensor(_name) {
+  RamTensor(std::initializer_list<uint32_t> l) {
     std::vector<uint32_t> v;
     for (auto i : l) {
       v.push_back(i);
@@ -166,7 +173,7 @@ class RamTensor : public Tensor {
     Tensor::init<T>(v);
   }
 
-  RamTensor(std::vector<uint32_t> v, TName _name) : Tensor(_name) {
+  RamTensor(std::vector<uint32_t> v) {
     Tensor::init<T>(v);
   }
 
@@ -218,8 +225,8 @@ class RamTensor : public Tensor {
 };
 
 template <typename Tin, typename Tout>
-Tensor* TensorCast(Tensor* input, TName name) {
-  Tensor* output = new RamTensor<Tout>(input->getShape(), name);
+Tensor* TensorCast(Tensor* input) {
+  Tensor* output = new RamTensor<Tout>(input->getShape());
   const Tin* inputPrt = input->read<Tin>(0, 0);
   Tout* outputPrt = output->write<Tout>(0, 0);
 
@@ -231,8 +238,8 @@ Tensor* TensorCast(Tensor* input, TName name) {
 }
 
 template <typename T>
-Tensor* TensorConstant(std::vector<uint32_t> shape, T c, TName const &name) {
-  Tensor* output = new RamTensor<T>(shape, name);
+Tensor* TensorConstant(std::vector<uint32_t> shape, T c) {
+  Tensor* output = new RamTensor<T>(shape);
   T* outPrt = output->write<T>(0, 0);
 
   for (uint32_t i = 0; i < output->getSize(); i++) {
@@ -243,13 +250,13 @@ Tensor* TensorConstant(std::vector<uint32_t> shape, T c, TName const &name) {
 }
 
 template <typename T>
-Tensor* TensorConstant(std::initializer_list<uint32_t> l, T c, TName const &name) {
+Tensor* TensorConstant(std::initializer_list<uint32_t> l, T c) {
   std::vector<uint32_t> v;
   for (auto i : l) {
     v.push_back(i);
   }
 
-  return TensorConstant<T>(v, c, name);
+  return TensorConstant<T>(v, c);
 }
 
 //
