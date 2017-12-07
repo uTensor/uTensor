@@ -33,25 +33,25 @@ class TensorIdxImporter {
   HeaderMeta header;
   HeaderMeta parseHeader(void);
   template <typename U>
-  Tensor* loader(string& filename, IDX_DTYPE idx_type, string name);
+  Tensor* loader(string& filename, IDX_DTYPE idx_type);
   void open(string filename);
   // void open(FILE *fp);
 
  public:
-  Tensor* ubyte_import(string filename, string name) {
-    return loader<unsigned char>(filename, IDX_DTYPE::idx_ubyte, name);
+  Tensor* ubyte_import(string filename) {
+    return loader<unsigned char>(filename, IDX_DTYPE::idx_ubyte);
   }
-  Tensor* byte_import(string filename, string name) {
-    return loader<char>(filename, IDX_DTYPE::idx_byte, name);
+  Tensor* byte_import(string filename) {
+    return loader<char>(filename, IDX_DTYPE::idx_byte);
   }
-  Tensor* short_import(string filename, string name) {
-    return loader<short>(filename, IDX_DTYPE::idx_short, name);
+  Tensor* short_import(string filename) {
+    return loader<short>(filename, IDX_DTYPE::idx_short);
   }
-  Tensor* int_import(string filename, string name) {
-    return loader<int>(filename, IDX_DTYPE::idx_int, name);
+  Tensor* int_import(string filename) {
+    return loader<int>(filename, IDX_DTYPE::idx_int);
   }
-  Tensor* float_import(string filename, string name) {
-    return loader<float>(filename, IDX_DTYPE::idx_float, name);
+  Tensor* float_import(string filename) {
+    return loader<float>(filename, IDX_DTYPE::idx_float);
   }
   uint32_t getMagicNumber(unsigned char dtype, unsigned char dim);
   uint8_t getIdxDTypeSize(IDX_DTYPE dtype);
@@ -65,7 +65,7 @@ class TensorIdxImporter {
 
 
 template <typename U>
-Tensor* TensorIdxImporter::loader(string& filename, IDX_DTYPE idx_type, string name) {
+Tensor* TensorIdxImporter::loader(string& filename, IDX_DTYPE idx_type) {
   fp = fopen(filename.c_str(), "r");
 
   DEBUG("Opening file %s ", filename.c_str());
@@ -79,7 +79,7 @@ Tensor* TensorIdxImporter::loader(string& filename, IDX_DTYPE idx_type, string n
 
   fseek(fp, header.dataPos, SEEK_SET);  // need error  handling
 
-  Tensor* t = new RamTensor<U>(header.dim, name);  // tensor allocated
+  Tensor* t = new RamTensor<U>(header.dim);  // tensor allocated
   const uint8_t unit_size = t->unit_size();
 
   U* val = (U*)malloc(unit_size);

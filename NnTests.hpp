@@ -14,24 +14,24 @@ class NnOpsTest : public Test {
     testStart("quantized_relu");
     // reference inputs
     S_TENSOR a =
-        ctx.add(t_import.ubyte_import("/fs/testData/ref_qRelu/in/QuantizeV2_0.idx", "a"));
+        ctx.add(t_import.ubyte_import("/fs/testData/ref_qRelu/in/QuantizeV2_0.idx"), "a");
     S_TENSOR min =
-        ctx.add(t_import.float_import("/fs/testData/ref_qRelu/in/QuantizeV2_1.idx", "min"));
+        ctx.add(t_import.float_import("/fs/testData/ref_qRelu/in/QuantizeV2_1.idx"), "min");
     S_TENSOR max =
-        ctx.add(t_import.float_import("/fs/testData/ref_qRelu/in/QuantizeV2_2.idx", "max"));
+        ctx.add(t_import.float_import("/fs/testData/ref_qRelu/in/QuantizeV2_2.idx"), "max");
 
     // reference outputs
     S_TENSOR ref_out =
-        ctx.add(t_import.ubyte_import("/fs/testData/ref_qRelu/out/ref_qRelu_0.idx", "ref_out"));
+        ctx.add(t_import.ubyte_import("/fs/testData/ref_qRelu/out/ref_qRelu_0.idx"), "ref_out");
     S_TENSOR ref_min =
-        ctx.add(t_import.float_import("/fs/testData/ref_qRelu/out/ref_qRelu_1.idx", "ref_min"));
+        ctx.add(t_import.float_import("/fs/testData/ref_qRelu/out/ref_qRelu_1.idx"), "ref_min");
     S_TENSOR ref_max =
-        ctx.add(t_import.float_import("/fs/testData/ref_qRelu/out/ref_qRelu_2.idx", "ref_max"));
+        ctx.add(t_import.float_import("/fs/testData/ref_qRelu/out/ref_qRelu_2.idx"), "ref_max");
 
     // modify the checks below:
-    S_TENSOR out = ctx.add(new RamTensor<unsigned char>(ref_out->getShape(), "out"));
-    S_TENSOR out_min = ctx.add(new RamTensor<float>(ref_min->getShape(), "out_min"));
-    S_TENSOR out_max = ctx.add(new RamTensor<float>(ref_max->getShape(), "out_max"));
+    S_TENSOR out = ctx.add(new RamTensor<unsigned char>(ref_out->getShape()), "out");
+    S_TENSOR out_min = ctx.add(new RamTensor<float>(ref_min->getShape()), "out_min");
+    S_TENSOR out_max = ctx.add(new RamTensor<float>(ref_max->getShape()), "out_max");
 
 
     timer_start();

@@ -7,16 +7,13 @@
 #include "tensorIdxImporterTests.hpp"
 #include "context.hpp"
 #include "ArrayTests.hpp"
-#include "MathTests.hpp"
 #include "MatrixTests.hpp"
-#include "context_test.hpp"
 #include "tensor_test.hpp"
 #include "NnTests.hpp"
-#include "mlp_test.hpp"
+// #include "mlp_test.hpp"
 #include "deep_mnist_mlp.hpp"
 #include "context_test.hpp"
 #include "MathTests.hpp"
-#include "MatrixTests.hpp"
 
 Serial pc(USBTX, USBRX, 115200);
 SDBlockDevice bd(MBED_CONF_APP_SD_MOSI, MBED_CONF_APP_SD_MISO,
