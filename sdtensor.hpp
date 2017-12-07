@@ -5,18 +5,19 @@
 template <class T>
 class SDTensor : public Tensor {
   public:
-    SDTensor(TName _name, std::string filename) : Tensor(_name) {
+    SDTensor(TName _name, std::string filename, uint32_t maxsize) : Tensor(_name) {
         _filename = filename;
+        s->max_size = maxsize;
         cursor = 0;
         dirty = false;
     }
 
-    SDTensor(std::initializer_list<uint32_t> l, TName _name, std::string file) : Tensor(_name) {
+    SDTensor(std::initializer_list<uint32_t> l, TName _name, std::string file, uint32_t maxsize) : Tensor(_name) {
       std::vector<uint32_t> v;
       for (auto i : l) {
          v.push_back(i);
       }
-      s->max_size = 50;
+      s->max_size = maxsize;
       Tensor::init<T>(v);
       _filename = file;
       cursor = 0;
@@ -25,8 +26,8 @@ class SDTensor : public Tensor {
       dirty = false;
     }
 
-    SDTensor(std::vector<uint32_t> v, TName _name, std::string file) : Tensor(_name) {
-      s->max_size = 50;
+    SDTensor(std::vector<uint32_t> v, TName _name, std::string file, uint32_t size) : Tensor(_name) {
+      s->max_size = size;
       Tensor::init<T>(v);
       _filename = file;
       cursor = 0;
