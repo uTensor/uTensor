@@ -273,13 +273,20 @@ void Add(S_TENSOR input, S_TENSOR input2, S_TENSOR out) {
   const TIn* p_in2 = input2->read<TIn>(0, 0);
 
   //auto shape
-  out->resize<TOut>(input->getShape());
+  // [FIXME] hacking for broadcasting scalar tensor
+  const uint32_t size1 = input->getSize();
+  const uint32_t size2 = input2->getSize();
+  if (size2 == 1) {
+    out->resize<TOut>(input->getShape());
+  } else {
+    out->resize<TOut>(input2->getShape());
+  }
 
   TOut* p_out = out->write<TOut>(0, 0);
 
   const uint32_t size = out->getSize();
   for (uint32_t i = 0; i < size; i++) {
-    p_out[i] = p_in[i] + p_in2[i];
+    p_out[i] = p_in[size1 > 1 ? i : 0] + p_in2[size2 > 1 ? i : 0];
   }
 }
 
