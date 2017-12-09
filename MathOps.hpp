@@ -2,6 +2,8 @@
 #define UTENSOR_MATH_OPS
 
 #include <climits>
+#include <algorithm>
+#include <vector>
 #include "quantization_utils.hpp"
 #include "tensor.hpp"
 #include "uTensorBase.hpp"
@@ -118,26 +120,80 @@ void Add(Tensor* input, Tensor* input2, Tensor** out) {
     p_out[i] = p_in[i] + p_in2[i];
   }
 }
+
+// void reduceShapeHelper(Shape input, Shape dim, Shape &reduce_shape, Shape &out_shape, std::vector<uint8_t> &perm, size_t &reduce_size);
+
+// template <class TIn, class TOut>
+// std::vector<TOut> tensorToLinearVec(S_TENSOR input);
+
+
+
+//reduce_shape actual output shape without the reduce dim
+//out_shape intermediate shape with reduce dim in the last orders
+inline void reduceShapeHelper(Shape input, Shape dim, Shape &reduce_shape, Shape &out_shape, std::vector<uint8_t> &perm, size_t &reduce_size) {
+  reduce_shape.empty();
+  out_shape.empty();
+  perm.empty();
+
+  for(auto i = 0; i < input.size(); i++) {
+    if(std::find(dim.begin(), dim.end(), i) == dim.end()) {
+      perm.push_back(i);
+      out_shape.push_back(input[i]);
+    }
+  }
+
+  reduce_shape = out_shape;
+  reduce_size = 0;
+
+  for(auto d:dim) {
+    perm.push_back(d);
+    out_shape.push_back(input[d]);
+    if(reduce_size == 0) {
+      reduce_size = input[d];
+    } else {
+      reduce_size *= input[d];
+    }
+  }
+}
+
+template <class TIn, class TOut>
+inline std::vector<TOut> tensorToLinearVec(S_TENSOR input) {
+  std::vector<TOut> vec;
+  const TIn* ptr = input->read<TIn>(0, 0);
+  for(auto i = 0; i < input->getSize(); i++) {
+    vec.push_back(static_cast<TOut>(ptr[i]));
+  }
+
+  return vec;
+}
+
+
+
 template <class TIn, class Td, class TOut>
 void Min(S_TENSOR input, S_TENSOR dim, S_TENSOR out) {
   const TIn* p_in = input->read<TIn>(0, 0);
-  const Td* p_in2 = dim->read<Td>(0, 0);
+  Shape dim_vec = tensorToLinearVec<Td, uint32_t>(dim);
 
+  Shape outShape;
+  std::vector<uint8_t> permute;
+  size_t reduce_size;
+  Shape reduce_shape;
+  reduceShapeHelper(input->getShape(), dim_vec, reduce_shape, outShape, permute, reduce_size);
   Shape one_shape = {1};
-  if(out->getSize() == 0) out->resize<TOut>(one_shape);
+  if(out->getSize() == 0) out->resize<TOut>(reduce_shape);  //TODO: dimension check here
   TOut* p_out = out->write<TOut>(0, 0);
 
-  Td n_dim = p_in2[0];
-  std::vector<uint8_t> permute;
-  for (uint32_t i_dim = 0; i_dim < input->getShape().size(); i_dim++) {
-    permute.push_back(i_dim);
-  }
-  permute.push_back(n_dim);
-  permute.erase(permute.begin() + n_dim);
-  Shape outShape = input->getShape();
-  size_t reduce_size = outShape[n_dim];
-  outShape.erase(outShape.begin() + n_dim);
-  outShape.push_back(reduce_size);
+  //Td n_dim = p_in2[0];
+  
+  // for (uint32_t i_dim = 0; i_dim < input->getShape().size(); i_dim++) {
+  //   permute.push_back(i_dim);
+  // }
+  // permute.push_back(n_dim);
+  // permute.erase(permute.begin() + n_dim);
+  // Shape outShape = input->getShape();
+  // size_t reduce_size = outShape[n_dim];
+  // outShape.erase(outShape.begin() + n_dim);
+  // outShape.push_back(reduce_size);
   size_t out_index = 0;
   permuteIndexTransform trans(outShape, permute);
   for (uint32_t j = 0; j < input->getSize(); j += reduce_size) {
