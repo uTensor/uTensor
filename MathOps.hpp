@@ -33,6 +33,10 @@ void Requantization_Range(S_TENSOR input, S_TENSOR min, S_TENSOR max,
   int32_t used_max_quan;
   CalculateUsedRange<T1>(input.get(), &used_min_quan, &used_max_quan);
 
+  Shape one_shape = {1};
+  if(out_min->getSize() == 0) out_min->resize<T2>(one_shape);
+  if(out_max->getSize() == 0) out_max->resize<T2>(one_shape);
+
   const float used_min =
       std::min(0.0f, QuantizedToFloat(used_min_quan, input_min, input_max));
   const float used_max = QuantizedToFloat(used_max_quan, input_min, input_max);
@@ -64,9 +68,8 @@ void Requantize(S_TENSOR input, S_TENSOR in_min, S_TENSOR in_max,
   const float r_output_min = r_min->read<T2>(0, 0)[0];
   const float r_output_max = r_max->read<T2>(0, 0)[0];
   const T1 *input_ptr = input->read<T1>(0, 0);
-  if (output && output->getSize() == 0) {
-  output->resize<Toutput>(input->getShape());
-  }
+
+  if (output->getSize() == 0) output->resize<Toutput>(input->getShape());
   Toutput *out_ptr = output->write<Toutput>(0, 0);
 
   // RequantizeManyInNewRange<T1, Toutput>(input, input.getSize(), input_min,
@@ -74,6 +77,10 @@ void Requantize(S_TENSOR input, S_TENSOR in_min, S_TENSOR in_max,
   //                                       output);
   RequantizeManyInNewRangeReference(input_ptr, input->getSize(),input_min,
     input_max, r_output_min, r_output_max, out_ptr);
+
+    Shape one_shape = {1};
+    if(out_min->getSize() == 0) out_min->resize<T2>(one_shape);
+    if(out_max->getSize() == 0) out_max->resize<T2>(one_shape);
 
   float* v_out_min = out_min->write<T2>(0, 0);
   *v_out_min = r_output_min;
@@ -115,6 +122,9 @@ template <class TIn, class Td, class TOut>
 void Min(S_TENSOR input, S_TENSOR dim, S_TENSOR out) {
   const TIn* p_in = input->read<TIn>(0, 0);
   const Td* p_in2 = dim->read<Td>(0, 0);
+
+  Shape one_shape = {1};
+  if(out->getSize() == 0) out->resize<TOut>(one_shape);
   TOut* p_out = out->write<TOut>(0, 0);
 
   Td n_dim = p_in2[0];
@@ -158,6 +168,9 @@ template <class TIn, class Td, class TOut>
 void Max(S_TENSOR input, S_TENSOR dim, S_TENSOR out) {
   const TIn* p_in = input->read<TIn>(0, 0);
   const Td* p_in2 = dim->read<Td>(0, 0);
+
+  Shape one_shape = {1};
+  if(out->getSize() == 0) out->resize<TOut>(one_shape);
   TOut* p_out = out->write<TOut>(0, 0);
 
   Td n_dim = p_in2[0];
@@ -214,12 +227,12 @@ void ArgMax(S_TENSOR input, S_TENSOR dim, S_TENSOR out) {
   permute.erase(permute.begin() + dim_reduce);
 
   // check dimensionality
-  if (out && out->getSize() != 0 && out->getShape() != outShape) {
+  if (out->getSize() != 0 && out->getShape() != outShape) {
     ERR_EXIT("output shape mismatch");
   }
 
   // allocate output tensor if empty
-  if (out && out->getSize() == 0) {
+  if (out->getSize() == 0) {
     out->resize<TOut>(outShape);
   }
   
