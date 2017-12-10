@@ -61,9 +61,9 @@ class TensorIdxImporter {
   }
   uint32_t getMagicNumber(unsigned char dtype, unsigned char dim);
   template <typename T>
-  void load_data(string& filename, IDX_DTYPE idx_type, uint8_t unit_size, uint32_t arrsize, long int offset, T* data);
+  std::vector<uint32_t> load_data(string& filename, IDX_DTYPE idx_type, uint8_t unit_size, uint32_t cachesize, uint32_t arrsize, long int offset, T* data);
   template <typename T>
-  void flush_data(string& filename, IDX_DTYPE idx_type, uint8_t unit_size, uint32_t arrsize, long int offset, T* data);
+  void flush_data(string& filename, IDX_DTYPE idx_type, uint8_t unit_size, uint32_t cachesize, uint32_t arrsize, long int offset, T* data);
   uint8_t getIdxDTypeSize(IDX_DTYPE dtype);
   ~TensorIdxImporter() {
     if (fp != NULL) {
@@ -143,21 +143,34 @@ Tensor* TensorIdxImporter::loader(string& filename, IDX_DTYPE idx_type, string n
   return t;
 }
 template<typename T>
-void TensorIdxImporter::load_data(string& filename, IDX_DTYPE idx_type, uint8_t unit_size, uint32_t arrsize, long int offset, T* data) {
+std::vector<uint32_t> TensorIdxImporter::load_data(string& filename, IDX_DTYPE idx_type, uint8_t unit_size, uint32_t cachesize, uint32_t arrsize, long int offset, T* data) {
   if (fp == NULL) {
   parseMeta(filename, idx_type);
   }
+  if (arrsize == 0) {
+    for (auto i : header.dim) {
+      if (arrsize == 0) {
+        arrsize = i;
+      } else {
+        arrsize *= i;
+      }
+    }
+  
+  }
+  int size = std::min(cachesize, arrsize);
+  
   fseek(fp, header.dataPos + offset, SEEK_SET);  // need error  handling
-  load_impl(data, unit_size, arrsize);
-  return;
+  load_impl(data, unit_size, size);
+  return header.dim;
 }
 template<typename T>
-void TensorIdxImporter::flush_data(string& filename, IDX_DTYPE idx_type, uint8_t unit_size, uint32_t arrsize, long int offset, T* data) {
+void TensorIdxImporter::flush_data(string& filename, IDX_DTYPE idx_type, uint8_t unit_size, uint32_t cachesize, uint32_t arrsize, long int offset, T* data) {
   if (fp == NULL) {
   parseMeta(filename, idx_type);
   }
+  int size = std::min(cachesize, arrsize);
   fseek(fp, header.dataPos + offset, SEEK_SET);
-  flush_impl(data, unit_size, arrsize);
+  flush_impl(data, unit_size, size);
   return;
 }
 
