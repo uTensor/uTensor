@@ -46,7 +46,7 @@ class TensorBase {
   std::vector<uint32_t> shape;
   void* data;
   uint32_t total_size;
-  uint32_t max_size;
+  uint32_t cache_size;
 
   ~TensorBase() {
     if (data != nullptr) {
@@ -68,7 +68,7 @@ class Tensor : public uTensor {
   Tensor(TName &_name) {
     s = std::make_shared<TensorBase>();
     s->total_size = 0;
-    s->max_size = std::numeric_limits<uint32_t>::max();
+    s->cache_size = std::numeric_limits<uint32_t>::max();
     s->data = nullptr;
     setName(_name);
   }
@@ -94,10 +94,12 @@ class Tensor : public uTensor {
         s->total_size *= i;
       }
     }
+    if (s->data != NULL) {
+        return;
+    }
 
-    if (s->total_size > s->max_size) {
-      s->data = (void*)malloc(unit_size() * s->max_size);
-      s->total_size = s->max_size;
+    if (s->total_size > s->cache_size) {
+      s->data = (void*)malloc(unit_size() * s->cache_size);
     } else {
       s->data = (void*)malloc(unit_size() * s->total_size);
     }
