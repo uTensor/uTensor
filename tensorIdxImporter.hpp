@@ -8,6 +8,7 @@
 #include "mbed.h"
 #include "uTensor_util.hpp"
 #include "tensor.hpp"
+#include <memory>
 
 using namespace std;
 
@@ -105,7 +106,9 @@ void TensorIdxImporter::load_impl(U* dst, uint8_t unit_size, uint32_t offset, ui
   free(val);
 }
 template <typename U>
-void TensorIdxImporter::flush_impl(U* dst, uint8_t unit_size, uint32_t arrsize) {
+void TensorIdxImporter::flush_impl(U* res, uint8_t unit_size, uint32_t arrsize) {
+  U* dst = (U*)malloc(unit_size * arrsize);
+  std::memcpy(dst, res, (size_t) (unit_size * arrsize));
   for (uint32_t i = 0; i < arrsize; i++) {
     U* val = dst + i;
     switch (unit_size) {
@@ -124,6 +127,7 @@ void TensorIdxImporter::flush_impl(U* dst, uint8_t unit_size, uint32_t arrsize) 
   }
   fwrite(dst, unit_size, arrsize, fp);
   fflush(fp);
+  free(dst);
 }
 template <typename U>
 Tensor* TensorIdxImporter::loader(string& filename, IDX_DTYPE idx_type, string name) {
