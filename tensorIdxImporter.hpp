@@ -37,7 +37,7 @@ class TensorIdxImporter {
   Tensor* loader(string& filename, IDX_DTYPE idx_type, string name);
   void parseMeta(string& filename, IDX_DTYPE idx_type);
   template <typename U>
-  void load_impl(U* dst, uint8_t unit_size, uint32_t arrsize);
+  void load_impl(U* dst, uint8_t unit_size, uint32_t offset, uint32_t arrsize);
   template <typename U>
   void flush_impl(U* dst, uint8_t unit_size, uint32_t arrsize);
   void open(string filename);
@@ -66,9 +66,6 @@ class TensorIdxImporter {
   void flush_data(string& filename, IDX_DTYPE idx_type, uint8_t unit_size, uint32_t cachesize, uint32_t arrsize, long int offset, T* data);
   uint8_t getIdxDTypeSize(IDX_DTYPE dtype);
   ~TensorIdxImporter() {
-    if (fp != NULL) {
-      ON_ERR(fclose(fp), "Closing file...");
-    }
   }
   TensorIdxImporter() {
     fp = NULL;
@@ -83,11 +80,12 @@ class TensorIdxImporter {
 
 
 template <typename U>
-void TensorIdxImporter::load_impl(U* dst, uint8_t unit_size, uint32_t arrsize) {
+void TensorIdxImporter::load_impl(U* dst, uint8_t unit_size, uint32_t offset, uint32_t arrsize) {
   U* val = (U*)malloc(unit_size);
-  for (uint32_t i = 0; i < arrsize; i++) {
+  uint32_t size = offset + arrsize;
+  for (uint32_t i = 0; i < size; i++) {
     fread(val, unit_size, 1, fp);
-
+    if (i >= offset) {
     switch (unit_size) {
       case 2:
         *(uint16_t*)val = ntoh16(*(uint16_t*)val);
@@ -101,15 +99,15 @@ void TensorIdxImporter::load_impl(U* dst, uint8_t unit_size, uint32_t arrsize) {
 
     // val = htonl((uint32_t) buff);  //NT: testing for uint8 only, deference
     // error here
-   dst[i] = *val;
+   dst[i - offset] = *val;
+    }
   }
   free(val);
 }
 template <typename U>
 void TensorIdxImporter::flush_impl(U* dst, uint8_t unit_size, uint32_t arrsize) {
-  U* val = (U*)malloc(unit_size);
   for (uint32_t i = 0; i < arrsize; i++) {
-    val = dst + i;
+    U* val = dst + i;
     switch (unit_size) {
       case 2:
         *(uint16_t*)val = ntoh16(*(uint16_t*)val);
@@ -125,7 +123,7 @@ void TensorIdxImporter::flush_impl(U* dst, uint8_t unit_size, uint32_t arrsize) 
     // error here
   }
   fwrite(dst, unit_size, arrsize, fp);
-  free(val);
+  fflush(fp);
 }
 template <typename U>
 Tensor* TensorIdxImporter::loader(string& filename, IDX_DTYPE idx_type, string name) {
@@ -136,7 +134,7 @@ Tensor* TensorIdxImporter::loader(string& filename, IDX_DTYPE idx_type, string n
   const uint8_t unit_size = t->unit_size();
 
   U* data = t->write<U>(0, 0);
-  load_impl(data, unit_size, t->getSize());
+  load_impl(data, unit_size, 0, t->getSize());
 
   ON_ERR(fclose(fp), "Closing file...");
 
@@ -144,9 +142,7 @@ Tensor* TensorIdxImporter::loader(string& filename, IDX_DTYPE idx_type, string n
 }
 template<typename T>
 std::vector<uint32_t> TensorIdxImporter::load_data(string& filename, IDX_DTYPE idx_type, uint8_t unit_size, uint32_t cachesize, uint32_t arrsize, long int offset, T* data) {
-  if (fp == NULL) {
   parseMeta(filename, idx_type);
-  }
   if (arrsize == 0) {
     for (auto i : header.dim) {
       if (arrsize == 0) {
@@ -158,19 +154,21 @@ std::vector<uint32_t> TensorIdxImporter::load_data(string& filename, IDX_DTYPE i
   
   }
   int size = std::min(cachesize, arrsize);
+  uint32_t offset_t = (uint32_t)offset;
   
-  fseek(fp, header.dataPos + offset, SEEK_SET);  // need error  handling
-  load_impl(data, unit_size, size);
+  fseek(fp, header.dataPos, SEEK_SET);  // need error  handling
+  load_impl(data, unit_size, offset_t, size);
+
+  ON_ERR(fclose(fp), "Closing file...");
   return header.dim;
 }
 template<typename T>
 void TensorIdxImporter::flush_data(string& filename, IDX_DTYPE idx_type, uint8_t unit_size, uint32_t cachesize, uint32_t arrsize, long int offset, T* data) {
-  if (fp == NULL) {
   parseMeta(filename, idx_type);
-  }
   int size = std::min(cachesize, arrsize);
-  fseek(fp, header.dataPos + offset, SEEK_SET);
+  fseek(fp, header.dataPos + offset * unit_size, SEEK_SET);
   flush_impl(data, unit_size, size);
+  ON_ERR(fclose(fp), "Closing file...");
   return;
 }
 

@@ -9,19 +9,48 @@ class SDTensorTest : public Test {
     TensorIdxImporter t_import;
     Context ctx;
   public:
-    void rwTest(void) {
+    void rTest(void) {
     testStart("sd read test1");
     timer_start();
     Tensor* t = nullptr;
-    {
-    TensorIdxImporter t_import;
-    t =
-        t_import.ubyte_import("/fs/testData/idxImport/uint8_4d_power2.idx", "uchar1");
-    }
-    Tensor* s = new SDTensor<unsigned char>(t->getShape(), "sdf", "/fs/testData/idxImport/uint8_4d_power2.idx", 50);//the size of data is 50 elements
+    t = t_import.ubyte_import("/fs/testData/idxImport/uint8_4d_power2.idx", "uchar1");
+    Tensor* s = new SDTensor<unsigned char>(t->getShape(), "sdf", "/fs/testData/idxImport/uint8_4d_power2.idx", 10);//the size of data is 50 elements
 
     const unsigned char* x = t->read<unsigned char>(0, 0);
-    const unsigned char* y = s->read<unsigned char>(5, 5);
+    uint32_t x_res = 0;
+    uint32_t y_res = 0;
+    for (uint32_t index = 0; index < t->getSize(); index++) {
+      const unsigned char* y = s->read<unsigned char>(index, 1);
+      x_res += (uint32_t)x[index];
+      y_res += (uint32_t)y[0];
+    }
+
+    passed(x_res == y_res);
+    timer_stop();
+    delete t;
+    delete s;
+  }
+    void wTest(void) {
+    testStart("sd write test2");
+    timer_start();
+    Tensor* h = new SDTensor<int>("sdf", "/fs/testData/qMatMul/res/res.idx", 5);//the size of data is 50 elements
+
+    int* y = h->write<int>(0, 1);
+    uint32_t res_x = 0;
+    uint32_t res_y = 0;
+    for (uint32_t i = 0; i < h->getSize(); i++) {
+      y = h->write<int>(i, 1);
+      y[0] = 's';
+      unsigned char a = 's';
+      res_y += (uint32_t)y[0];
+      res_x += (uint32_t)a;
+    }
+
+    passed(res_x == res_y);
+    timer_stop();
+    delete h;
+  }
+  /*  void wTest() {
     passed(x[5] == y[0]);
     testStart("sd read test2");
     y = s->read<unsigned char>(55, 5);
@@ -31,11 +60,7 @@ class SDTensorTest : public Test {
     unsigned char *x_w = t->write<unsigned char>(0, 0);
     y_w[0] = '5';
     x_w[55] = '5';
-    passed(x_w[55] + x_w[56] == y_w[0] + y_w[1]);
-    timer_stop();
-    delete t;
-    delete s;
-  }
+    }*/
   void qMatMul(void) {
 
     testStart("Quantized Matrix Mul");
@@ -45,12 +70,12 @@ class SDTensorTest : public Test {
 //    ctx.add(t_import.ubyte_import("/fs/testData/qMatMul/in/qA_0.idx", "a"));
 //    ctx.add(t_import.float_import("/fs/testData/qMatMul/in/qA_1.idx", "a_min"));
 //    ctx.add(t_import.float_import("/fs/testData/qMatMul/in/qA_2.idx", "a_max"));
-    ctx.add(new SDTensor<unsigned char>("a", "/fs/testData/qMatMul/in/qA_0.idx", 16384));
-    ctx.add(new SDTensor<float>("a_min", "/fs/testData/qMatMul/in/qA_1.idx", 10));
-    ctx.add(new SDTensor<float>("a_max", "/fs/testData/qMatMul/in/qA_2.idx", 10));
-    ctx.add(new SDTensor<unsigned char>("b", "/fs/testData/qMatMul/in/qB_0.idx", 128));
-    ctx.add(new SDTensor<float>("b_min", "/fs/testData/qMatMul/in/qB_1.idx", 10));
-    ctx.add(new SDTensor<float>("b_max", "/fs/testData/qMatMul/in/qB_2.idx", 10));
+    ctx.add(new SDTensor<unsigned char>("a", "/fs/testData/qMatMul/in/qA_0.idx", 160));
+    ctx.add(new SDTensor<float>("a_min", "/fs/testData/qMatMul/in/qA_1.idx", 1));
+    ctx.add(new SDTensor<float>("a_max", "/fs/testData/qMatMul/in/qA_2.idx", 1));
+    ctx.add(new SDTensor<unsigned char>("b", "/fs/testData/qMatMul/in/qB_0.idx", 64));
+    ctx.add(new SDTensor<float>("b_min", "/fs/testData/qMatMul/in/qB_1.idx", 1));
+    ctx.add(new SDTensor<float>("b_max", "/fs/testData/qMatMul/in/qB_2.idx", 1));
 
     //ctx.add(t_import.ubyte_import("/fs/testData/qMatMul/in/qB_0.idx", "b"));
     //ctx.add(t_import.float_import("/fs/testData/qMatMul/in/qB_1.idx", "b_min"));
@@ -64,7 +89,7 @@ class SDTensorTest : public Test {
     //so we can get ride of the shapes here
     S_TENSOR out_c = ctx.add(new SDTensor<int>(c->getShape(), "out_c", "/fs/testData/qMatMul/res/res.idx", 100));
     S_TENSOR out_min = ctx.add(new SDTensor<float>(c_min->getShape(), "out_min", "/fs/testData/qMatMul/res/min.idx", 1));
-    S_TENSOR out_max = ctx.add(new SDTensor<float>(c_max->getShape(), "out_max", "/fs/testData/qMatMul/res/max.idx", 1));
+    S_TENSOR out_max = ctx.add(new SDTensor<float>(c_max->getShape(), "out_max", "/fs/testData/qMatMul/out/max.idx", 1));
 
     //TList inputs = {a, a_min, a_max, b, b_min, b_max};
     //TList outputs = {out_c, out_min, out_max};
@@ -87,7 +112,8 @@ class SDTensorTest : public Test {
     passed(result == 0);
   }
   void runAll() {
-    rwTest();
+    rTest();
+    wTest();
     qMatMul();
   }
 

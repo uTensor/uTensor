@@ -63,18 +63,18 @@ class SDTensor : public Tensor {
       if (ele > s->total_size) {
         ERR_EXIT("data overflow");
       }
-      if (offset + ele <= cursor + s->cache_size) {
+      if (offset + ele <= cursor + s->cache_size && offset + ele >= cursor) {
         //1. shared && not miss state
         //2. dirty && not miss state
         dirty = false;
         return (void *)((T*)s->data + offset - cursor);
-      } else if (dirty && offset + ele >= cursor + s->cache_size) { 
+      } else if (dirty && (offset + ele > cursor + s->cache_size || offset + ele < cursor)) { 
         //1. dirty && miss state
         data_importer.flush_data<T>(_filename, type, unit_size(), s->cache_size, s->total_size, cursor, (T*)s->data);
         data_importer.load_data<T>(_filename, type, unit_size(), s->cache_size, s->total_size, offset, (T*)s->data);
         cursor = offset;
         dirty = false;
-      } else if (!dirty && offset + ele >= cursor + s->cache_size) {
+      } else if (!dirty && (offset + ele > cursor + s->cache_size || offset + ele < cursor)) {
         //1. shared && miss state
         data_importer.load_data<T>(_filename, type, unit_size(), s->cache_size, s->total_size, offset, (T*)s->data);
         cursor = offset;
@@ -85,23 +85,23 @@ class SDTensor : public Tensor {
       if (ele > s->total_size) {
         ERR_EXIT("data overflow");
       }
-      if (offset + ele <= cursor + s->total_size) {
+      if (offset + ele <= cursor + s->cache_size && offset + ele >= cursor) {
         //1. dirty && not miss state
         //2. shared && not miss state
         dirty = true;
         return (void *)((T*)s->data + offset - cursor);
-      } else if (dirty && offset + ele >= cursor + s->cache_size) {
+      } else if (dirty && (offset + ele > cursor + s->cache_size || offset + ele < cursor)) {
         //1. dirty && miss state
         data_importer.flush_data<T>(_filename, type, unit_size(), s->cache_size, s->total_size, cursor, (T*)s->data);
         data_importer.load_data<T>(_filename, type, unit_size(), s->cache_size, s->total_size, offset, (T*)s->data);
         cursor = offset;
-      } else if (!dirty && offset + ele >= cursor + s->cache_size) {
+      } else if (!dirty && (offset + ele > cursor + s->cache_size || offset + ele < cursor)) {
         //1. shared && miss state
         data_importer.load_data<T>(_filename, type, unit_size(), s->cache_size, s->total_size, offset, (T*)s->data);
         cursor = offset;
         dirty = true;
       }
-      return (void*)((T*)s->data + offset);
+      return (void*)((T*)s->data);
     }
 
 
@@ -112,7 +112,8 @@ class SDTensor : public Tensor {
   long int getCursor() {
       return cursor;
   }
-  ~SDTensor() {}
+  ~SDTensor() {
+  }
  private:
   SDTensor(const SDTensor&);
   TensorIdxImporter data_importer;
