@@ -89,7 +89,7 @@ class SDTensorTest : public Test {
     //so we can get ride of the shapes here
     S_TENSOR out_c = ctx.add(new SDTensor<int>(c->getShape(), "out_c", "/fs/testData/qMatMul/res/res.idx", 100));
     S_TENSOR out_min = ctx.add(new SDTensor<float>(c_min->getShape(), "out_min", "/fs/testData/qMatMul/res/min.idx", 1));
-    S_TENSOR out_max = ctx.add(new SDTensor<float>(c_max->getShape(), "out_max", "/fs/testData/qMatMul/out/max.idx", 1));
+    S_TENSOR out_max = ctx.add(new SDTensor<float>(c_max->getShape(), "out_max", "/fs/testData/qMatMul/res/max.idx", 1));
 
     //TList inputs = {a, a_min, a_max, b, b_min, b_max};
     //TList outputs = {out_c, out_min, out_max};
