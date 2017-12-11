@@ -33,7 +33,7 @@ class SDTensorTest : public Test {
     void wTest(void) {
     testStart("sd write test2");
     timer_start();
-    Tensor* h = new SDTensor<int>("sdf", "/fs/testData/qMatMul/res/res.idx", 5);//the size of data is 50 elements
+    Tensor* h = new SDTensor<int>("sdf", "/fs/testData/qMatMul/res/wtest.idx", 5);//the size of data is 50 elements
 
     int* y = h->write<int>(0, 1);
     uint32_t res_x = 0;

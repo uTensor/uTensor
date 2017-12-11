@@ -104,6 +104,10 @@ class SDTensor : public Tensor {
       return (void*)((T*)s->data);
     }
 
+    virtual void deFocus() override{
+        data_importer.flush_data<T>(_filename, type, unit_size(), s->cache_size, s->total_size, cursor, (T*)s->data);
+        dirty = false;
+    }
 
   // virtual void* read(size_t offset, size_t ele) override{};
   virtual uint16_t unit_size(void) override {
