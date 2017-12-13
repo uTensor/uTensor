@@ -113,9 +113,7 @@ class SDTensor : public Tensor {
   virtual uint16_t unit_size(void) override {
     return sizeof(T);
   }
-  long int getCursor() {
-      return cursor;
-  }
+  
   ~SDTensor() {
   }
  private:
@@ -123,7 +121,7 @@ class SDTensor : public Tensor {
   TensorIdxImporter data_importer;
   std::string _filename;
   bool dirty;
-  long int cursor;
+  uint32_t cursor;
   SDTensor& operator=(const SDTensor&);
   IDX_DTYPE type;
 
