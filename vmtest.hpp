@@ -1,7 +1,6 @@
 #ifndef UTENSOR_VM_TESTS
 #define UTENSOR_VM_TESTS
 
-#include "vm.hpp"
 #include "test.hpp"
 #include "tensorIdxImporter.hpp"
 
@@ -14,18 +13,6 @@ class vmTest : public Test {
         unsigned char* data = t->write<unsigned char>(0, 0);
         string tmp_file = "/fs/testData/tmp.txt";
         vm g;
-/*        FILE *buf = fopen(tmp_file.c_str(), "w");
-        unsigned char* ss = (unsigned char*)malloc(1);
-        *ss = 'x';
-        size_t s = fwrite(ss, 1, 1, buf);
-        
-        fflush(buf);
-        fclose(buf)*/
-        FILE *buf = g.createFile(tmp_file);  
-        uint8_t size = (uint8_t)t->unit_size();
-        uint32_t totalsize = t->getSize();
-        string origin = "/fs/testData/idxImport/uint8_4d_power2.idx";
-        t_import.exportFile<unsigned char>(origin, IDX_DTYPE::idx_ubyte, buf, size, totalsize);
         unsigned char* data_g = (unsigned char*)malloc(t->unit_size() * t->getSize());
         g.load_data<unsigned char>(tmp_file, t->unit_size(), 30, t->getSize(), 0,  data_g);
         uint32_t res_x = 0;

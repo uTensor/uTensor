@@ -9,6 +9,7 @@
 #include "uTensor_util.hpp"
 #include "tensor.hpp"
 #include <memory>
+#include "sdtensor.hpp"
 
 using namespace std;
 
@@ -36,6 +37,8 @@ class TensorIdxImporter {
   HeaderMeta parseHeader(void);
   template <typename U>
   Tensor* loader(string& filename, IDX_DTYPE idx_type, string name);
+  template <typename U>
+  Tensor* sdloader(string& filename, IDX_DTYPE idx_type, string name, uint32_t cachesize);
   void parseMeta(string& filename, IDX_DTYPE idx_type);
   template <typename U>
   void load_impl(U* dst, uint8_t unit_size, uint32_t offset, uint32_t arrsize);
@@ -60,6 +63,21 @@ class TensorIdxImporter {
   Tensor* float_import(string filename, string name) {
     return loader<float>(filename, IDX_DTYPE::idx_float, name);
   }
+  Tensor* sd_ubyte_import(string filename, string name, uint32_t cachesize) {
+    return sdloader<unsigned char>(filename, IDX_DTYPE::idx_ubyte, name, cachesize);
+  }
+  Tensor* sd_byte_import(string filename, string name, uint32_t cachesize) {
+    return sdloader<char>(filename, IDX_DTYPE::idx_byte, name, cachesize);
+  }
+  Tensor* sd_short_import(string filename, string name, uint32_t cachesize) {
+    return sdloader<short>(filename, IDX_DTYPE::idx_short, name, cachesize);
+  }
+  Tensor* sd_int_import(string filename, string name, uint32_t cachesize) {
+    return sdloader<int>(filename, IDX_DTYPE::idx_int, name, cachesize);
+  }
+  Tensor* sd_float_import(string filename, string name, uint32_t cachesize) {
+    return sdloader<float>(filename, IDX_DTYPE::idx_float, name, cachesize);
+  }
   uint32_t getMagicNumber(unsigned char dtype, unsigned char dim);
   template <typename T>
   std::vector<uint32_t> load_data(string& filename, IDX_DTYPE idx_type, uint8_t unit_size, uint32_t cachesize, uint32_t arrsize, long int offset, T* data);
@@ -68,7 +86,7 @@ class TensorIdxImporter {
   uint8_t getIdxDTypeSize(IDX_DTYPE dtype);
 
   template<typename U>
-  void exportFile(string& filename, IDX_DTYPE idx_type, FILE* buffer, uint8_t unit_size, uint32_t arrsize);
+  void exportFile(string& filename, IDX_DTYPE idx_type, SDTensor<U>* t, uint8_t unit_size, uint32_t arrsize);
   ~TensorIdxImporter() {
   }
   TensorIdxImporter() {
@@ -84,9 +102,11 @@ class TensorIdxImporter {
 
 
 template<typename U>
-void TensorIdxImporter::exportFile(string& filename, IDX_DTYPE idx_type, FILE* buffer, uint8_t unit_size, uint32_t arrsize) {
-  parseMeta(filename, idx_type);
+void TensorIdxImporter::exportFile(string& filename, IDX_DTYPE idx_type, SDTensor<U>* t, uint8_t unit_size, uint32_t arrsize) {
+  vm mem = t->getVM();
+  FILE* buffer = mem.getFile();
   U* val = (U*)malloc(unit_size);
+  parseMeta(filename, idx_type);
   fseek(fp, header.dataPos, SEEK_SET);
   fseek(buffer, 0, SEEK_SET);
   for (uint32_t i = 0; i < arrsize; i++) {
@@ -102,15 +122,15 @@ void TensorIdxImporter::exportFile(string& filename, IDX_DTYPE idx_type, FILE* b
         break;
     }
     size_t ret = fwrite(val, unit_size, 1, buffer);
-    if (ret != unit_size) {
+    if (ret != 1) {
         printf("write failed");
         exit(-1);
     }
     fflush(buffer);
   }
   free(val);
-  fclose(fp);
   fclose(buffer);
+  t->initCache();
 }
 
 template <typename U>
@@ -174,9 +194,26 @@ Tensor* TensorIdxImporter::loader(string& filename, IDX_DTYPE idx_type, string n
   load_impl(data, unit_size, 0, t->getSize());
 
   ON_ERR(fclose(fp), "Closing file...");
+  fp = NULL;
 
   return t;
 }
+
+template <typename U>
+Tensor* TensorIdxImporter::sdloader(string& filename, IDX_DTYPE idx_type, string name, uint32_t cachesize) {
+
+  parseMeta(filename, idx_type);
+  fseek(fp, header.dataPos, SEEK_SET);
+  SDTensor<U>* t = new SDTensor<U>(header.dim, name, cachesize);  // tensor allocated
+  const uint8_t unit_size = t->unit_size();
+  uint32_t totalsize = t->getSize();
+  exportFile<U>(filename, idx_type, t, unit_size, totalsize);
+  ON_ERR(fclose(fp), "Closing file...");
+
+  Tensor* ret = (Tensor*)t;
+  return ret;
+}
+
 template<typename T>
 std::vector<uint32_t> TensorIdxImporter::load_data(string& filename, IDX_DTYPE idx_type, uint8_t unit_size, uint32_t cachesize, uint32_t arrsize, long int offset, T* data) {
   parseMeta(filename, idx_type);

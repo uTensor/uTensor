@@ -1,7 +1,5 @@
 #ifndef UTENSOR_VM
 #define UTENSOR_VM
-#include "tensor.hpp"
-#include "uTensor_util.hpp"
 #include <vector>
 #include <iostream>
 #include "mbed.h"
@@ -16,6 +14,8 @@ class vm {
     void flush_data(string& filename, uint8_t unit_size, uint32_t cachesize, uint32_t arrsize, long int offset, T* data);
 
     FILE* createFile(string& filename);
+
+    FILE* getFile() { return buffer; }
 
   private:
     template<typename U>
@@ -43,10 +43,6 @@ void vm::flush_impl(U* dst, uint8_t unit_size, uint32_t arrsize) {
   fflush(buffer);
 }
 
-FILE* vm::createFile(std::string& filename) {
-  buffer = fopen(filename.c_str(), "w");
-  return buffer;
-}
 
 template<typename T>
 void vm::load_data(string& filename, uint8_t unit_size, uint32_t cachesize, uint32_t arrsize, long int offset, T* data) {

@@ -18,6 +18,7 @@
 #include "MathTests.hpp"
 #include "MatrixTests.hpp"
 #include "sdtest.hpp"
+#include "vmtest.hpp"
 
 Serial pc(USBTX, USBRX, 115200);
 SDBlockDevice bd(MBED_CONF_APP_SD_MOSI, MBED_CONF_APP_SD_MISO,
@@ -39,6 +40,12 @@ int main(int argc, char** argv) {
   idxTest.runAll();
   printf("IDX import result...\r\n");
   idxTest.printSummary();
+
+  printf("vm: \r\n");
+  vmTest vmtest;
+  vmtest.runAll();
+  printf("VM result...\r\n");
+  vmtest.printSummary();
 
   printf("SDTensor test:\r\n");
   SDTensorTest sdtest;
@@ -87,6 +94,7 @@ int main(int argc, char** argv) {
   nnTest.runAll();
   printf("Nn Ops result...\r\n");
   nnTest.printSummary();
+
 
 /*   printf("mlp test: \r\n");
   mlpTest mlpt;
