@@ -5,6 +5,7 @@
 #include <iostream>
 #include <memory>
 #include <vector>
+#include <algorithm>
 #include "stdlib.h"
 #include "uTensor_util.hpp"
 
@@ -371,4 +372,119 @@ void tensorChkAlloc(Tensor** t, Shape dim) {
   }
    
 }
+
+
+//
+// permuteIndexTransform trans(inputTensor.getShape(), permute);
+//
+// Tensor<int> outputTensor(trans.getNewShape());  //of shape {100,40,10,10}
+// size_t output_buffer_index = trans[input_buffer_index];
+
+class broadcastIndexTransform {
+ private:
+  Shape l_shape;
+  Shape l_stride;
+  Shape s_shape;
+  Shape s_stride;
+  bool swap_flag;
+
+  size_t evalStride(size_t dim_index, Shape s) {
+    unsigned int size_accm = 1;
+    for (auto it = s.begin() + dim_index + 1; it != s.end(); it++) {
+      size_accm *= *it;
+    }
+
+    return (size_t)size_accm;
+  }
+
+  void computeSStride(void) {
+    s_stride.clear();
+    for (uint32_t i = 0; i < s_shape.size(); i++) {
+      s_stride.push_back(evalStride(i, s_shape));
+    }
+  }
+  void computeLStride(void) {
+    l_stride.clear();
+    for (uint32_t i = 0; i < l_shape.size(); i++) {
+      l_stride.push_back(evalStride(i, l_shape));
+    }
+  }
+
+  void sortShape(Shape a, Shape b) {
+    if(a.size() > b.size()) {
+      l_shape = a;
+      s_shape = b;
+    } else if(a.size() < b.size()) {
+      l_shape = b;
+      s_shape = a;
+      swap_flag = true;
+    } else {
+      auto it = std::find(a.begin(), a.end(), 1);
+      if (it == a.end()) {
+        l_shape = a;
+        s_shape = b;
+      } else {
+        l_shape = b;
+        s_shape = a;
+        swap_flag = true;
+      }
+    }
+  }
+
+  void checkShape(void) {
+    if(l_shape.size() < s_shape.size()) ERR_EXIT("cannot boardcast to fewer dimensions");
+    for(int i = 0; i < l_shape.size(); i++) {
+      int small_i = i - (l_shape.size() - s_shape.size());
+      if(small_i < 0) continue;
+      if(l_shape[i] != s_shape[small_i] && s_shape[small_i] != 1) ERR_EXIT("ValueError: frames are not aligned");
+      if(l_shape[i] < s_shape[small_i]) ERR_EXIT("Only single target broadcast is supported");
+    }
+  }
+
+
+//b_shape being a smaller shape
+ public:
+  broadcastIndexTransform(Shape _l_shape, Shape _s_shape) {
+    swap_flag = false;
+    sortShape(_l_shape, _s_shape);
+    checkShape();
+    apply();
+  }
+
+  void apply(void) {
+    //computeOutputShape();
+    computeLStride();
+    computeSStride();
+  }
+
+  Shape getOutputShape(void) {
+    return l_shape;
+  }
+
+  bool is_swaped(void) {
+    return swap_flag;
+  }
+
+  size_t operator[](const size_t linear_index) {
+    size_t out_index = 0;
+    size_t rem = linear_index;
+
+    for (size_t curr_dim = 0; curr_dim < l_shape.size(); curr_dim++) {
+      size_t curr_stride = l_stride[curr_dim];
+
+      if(l_shape.size() - curr_dim <= s_shape.size()) {
+        size_t curr_l_index = (rem / curr_stride);
+        size_t curr_s_index = (curr_l_index % s_shape[curr_dim]);
+        out_index += curr_s_index * s_stride[curr_dim];
+      }
+
+      rem = rem % curr_stride;
+    }
+
+    out_index += rem;
+
+    return out_index;
+  }
+};
+
 #endif

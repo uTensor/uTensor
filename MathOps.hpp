@@ -338,17 +338,24 @@ class ArgMaxOp : public Operator {
 };
 template <class TIn, class TOut>
 void Add(S_TENSOR input, S_TENSOR input2, S_TENSOR out) {
+
+  broadcastIndexTransform transf(input->getShape(), input2->getShape());
+  S_TENSOR tmp_sptr;
+  if(transf.is_swaped()) {
+    tmp_sptr = input2;
+    input2 = input;
+    input = tmp_sptr;
+  }
+  //auto shape
+  out->resize<TOut>(transf.getOutputShape());
   const TIn* p_in = input->read<TIn>(0, 0);
   const TIn* p_in2 = input2->read<TIn>(0, 0);
-
-  //auto shape
-  out->resize<TOut>(input->getShape());
 
   TOut* p_out = out->write<TOut>(0, 0);
 
   const uint32_t size = out->getSize();
   for (uint32_t i = 0; i < size; i++) {
-    p_out[i] = p_in[i] + p_in2[i];
+    p_out[i] = p_in[i] + p_in2[transf[i]];
   }
 }
 
