@@ -66,6 +66,9 @@ class TensorIdxImporter {
   template <typename T>
   void flush_data(string& filename, IDX_DTYPE idx_type, uint8_t unit_size, uint32_t cachesize, uint32_t arrsize, long int offset, T* data);
   uint8_t getIdxDTypeSize(IDX_DTYPE dtype);
+
+  template<typename U>
+  void exportFile(string& filename, IDX_DTYPE idx_type, FILE* buffer, uint8_t unit_size, uint32_t arrsize);
   ~TensorIdxImporter() {
   }
   TensorIdxImporter() {
@@ -79,6 +82,36 @@ class TensorIdxImporter {
 //     header = parseHeader();
 // }
 
+
+template<typename U>
+void TensorIdxImporter::exportFile(string& filename, IDX_DTYPE idx_type, FILE* buffer, uint8_t unit_size, uint32_t arrsize) {
+  parseMeta(filename, idx_type);
+  U* val = (U*)malloc(unit_size);
+  fseek(fp, header.dataPos, SEEK_SET);
+  fseek(buffer, 0, SEEK_SET);
+  for (uint32_t i = 0; i < arrsize; i++) {
+    fread(val, unit_size, 1, fp);
+    switch (unit_size) {
+      case 2:
+        *(uint16_t*)val = ntoh16(*(uint16_t*)val);
+        break;
+      case 4:
+        *(uint32_t*)val = ntoh32(*(uint32_t*)val);
+        break;
+      default:
+        break;
+    }
+    size_t ret = fwrite(val, unit_size, 1, buffer);
+    if (ret != unit_size) {
+        printf("write failed");
+        exit(-1);
+    }
+    fflush(buffer);
+  }
+  free(val);
+  fclose(fp);
+  fclose(buffer);
+}
 
 template <typename U>
 void TensorIdxImporter::load_impl(U* dst, uint8_t unit_size, uint32_t offset, uint32_t arrsize) {
