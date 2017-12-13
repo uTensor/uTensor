@@ -1,63 +1,41 @@
 #ifndef UTENSOR_SDTENSOR_H
 #define UTENSOR_SDTENSOR_H
 #include "tensor.hpp"
-#include "tensorIdxImporter.hpp"
+#include "vm.hpp"
 template <class T>
 class SDTensor : public Tensor {
   public:
     SDTensor(TName _name, std::string filename, uint32_t cachesize) : Tensor(_name) {
-        _filename = filename;
+        string file = "/fs/tmp/" + getName();
+        _filename = file;
+        mem.createFile(_filename);
         s->cache_size = cachesize;
-        if (s->data == NULL) {
-          s->data = (void *)malloc(unit_size() * s->cache_size);
-        }
         cursor = 0;
-        setIdxType();
-        std::vector<uint32_t> shape = data_importer.load_data<T>(_filename, type, unit_size(), cachesize, 0, cursor, (T*)s->data);
-        Tensor::init<T>(shape);
         dirty = false;
-
     }
 
-    SDTensor(std::initializer_list<uint32_t> l, TName _name, std::string file, uint32_t cachesize) : Tensor(_name) {
+    SDTensor(std::initializer_list<uint32_t> l, TName _name, uint32_t cachesize) : Tensor(_name) {
       std::vector<uint32_t> v;
       for (auto i : l) {
          v.push_back(i);
       }
       s->cache_size = cachesize;
       Tensor::init<T>(v);
+      string file = "/fs/tmp/" + getName();
       _filename = file;
+      mem.createFile(_filename);
       cursor = 0;
-      setIdxType();
-      data_importer.load_data<T>(_filename, type, unit_size(), cachesize, s->total_size, cursor, (T*)s->data);
       dirty = false;
     }
 
-    SDTensor(std::vector<uint32_t> v, TName _name, std::string file, uint32_t cachesize) : Tensor(_name) {
+    SDTensor(std::vector<uint32_t> v, TName _name, uint32_t cachesize) : Tensor(_name) {
       s->cache_size = cachesize;
       Tensor::init<T>(v);
+      string file = "/fs/tmp/" + getName();
       _filename = file;
+      mem.createFile(_filename);
       cursor = 0;
-      setIdxType();
-      data_importer.load_data<T>(_filename, type, unit_size(), cachesize, s->total_size, cursor, (T*)s->data);
       dirty = false;
-    }
-    void setIdxType() {
-      if (std::is_same<T, unsigned char>::value) {
-          type = idx_ubyte;
-      } else if (std::is_same<T, char>::value) {
-          type = idx_byte;
-      } else if (std::is_same<T, short>::value) {
-          type = idx_short;
-      } else if (std::is_same<T, int>::value) {
-          type = idx_int;
-      } else if (std::is_same<T, float>::value) {
-          type = idx_float;
-      } else if (std::is_same<T, double>::value) {
-          type = idx_double;
-      } else {
-          ERR_EXIT("idx type not supported");
-      }
     }
     virtual void* read(size_t offset, size_t ele) override {
       if (ele > s->total_size) {
@@ -70,13 +48,13 @@ class SDTensor : public Tensor {
         return (void *)((T*)s->data + offset - cursor);
       } else if (dirty && (offset + ele > cursor + s->cache_size || offset + ele < cursor)) { 
         //1. dirty && miss state
-        data_importer.flush_data<T>(_filename, type, unit_size(), s->cache_size, s->total_size, cursor, (T*)s->data);
-        data_importer.load_data<T>(_filename, type, unit_size(), s->cache_size, s->total_size, offset, (T*)s->data);
+        mem.flush_data<T>(_filename, unit_size(), s->cache_size, s->total_size, cursor, (T*)s->data);
+        mem.load_data<T>(_filename, unit_size(), s->cache_size, s->total_size, offset, (T*)s->data);
         cursor = offset;
         dirty = false;
       } else if (!dirty && (offset + ele > cursor + s->cache_size || offset + ele < cursor)) {
         //1. shared && miss state
-        data_importer.load_data<T>(_filename, type, unit_size(), s->cache_size, s->total_size, offset, (T*)s->data);
+        mem.load_data<T>(_filename, unit_size(), s->cache_size, s->total_size, offset, (T*)s->data);
         cursor = offset;
       } 
       return (void *)((T*)s->data);
@@ -92,21 +70,28 @@ class SDTensor : public Tensor {
         return (void *)((T*)s->data + offset - cursor);
       } else if (dirty && (offset + ele > cursor + s->cache_size || offset + ele < cursor)) {
         //1. dirty && miss state
-        data_importer.flush_data<T>(_filename, type, unit_size(), s->cache_size, s->total_size, cursor, (T*)s->data);
-        data_importer.load_data<T>(_filename, type, unit_size(), s->cache_size, s->total_size, offset, (T*)s->data);
+        mem.flush_data<T>(_filename, unit_size(), s->cache_size, s->total_size, cursor, (T*)s->data);
+        mem.load_data<T>(_filename, unit_size(), s->cache_size, s->total_size, offset, (T*)s->data);
         cursor = offset;
       } else if (!dirty && (offset + ele > cursor + s->cache_size || offset + ele < cursor)) {
         //1. shared && miss state
-        data_importer.load_data<T>(_filename, type, unit_size(), s->cache_size, s->total_size, offset, (T*)s->data);
+        mem.load_data<T>(_filename, unit_size(), s->cache_size, s->total_size, offset, (T*)s->data);
         cursor = offset;
         dirty = true;
       }
       return (void*)((T*)s->data);
     }
+    void initCache() {
+        mem.load_data<T>(_filename, unit_size(), s->cache_size, s->total_size, 0, (T*)s->data);
+    }
 
     virtual void deFocus() override{
-        data_importer.flush_data<T>(_filename, type, unit_size(), s->cache_size, s->total_size, cursor, (T*)s->data);
+        mem.flush_data<T>(_filename, unit_size(), s->cache_size, s->total_size, cursor, (T*)s->data);
         dirty = false;
+    }
+
+    vm getVM() {
+        return mem;
     }
 
   // virtual void* read(size_t offset, size_t ele) override{};
@@ -118,12 +103,11 @@ class SDTensor : public Tensor {
   }
  private:
   SDTensor(const SDTensor&);
-  TensorIdxImporter data_importer;
+  vm mem;
   std::string _filename;
   bool dirty;
   uint32_t cursor;
   SDTensor& operator=(const SDTensor&);
-  IDX_DTYPE type;
 
 };
 #endif
