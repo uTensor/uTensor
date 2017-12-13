@@ -433,7 +433,7 @@ class broadcastIndexTransform {
 
   void checkShape(void) {
     if(l_shape.size() < s_shape.size()) ERR_EXIT("cannot boardcast to fewer dimensions");
-    for(int i = 0; i < l_shape.size(); i++) {
+    for(int i = 0; i < (int) l_shape.size(); i++) {
       int small_i = i - (l_shape.size() - s_shape.size());
       if(small_i < 0) continue;
       if(l_shape[i] != s_shape[small_i] && s_shape[small_i] != 1) ERR_EXIT("ValueError: frames are not aligned");
@@ -468,20 +468,33 @@ class broadcastIndexTransform {
   size_t operator[](const size_t linear_index) {
     size_t out_index = 0;
     size_t rem = linear_index;
+    const size_t d_dim = l_shape.size() - s_shape.size();
+    size_t s_dim;
 
     for (size_t curr_dim = 0; curr_dim < l_shape.size(); curr_dim++) {
       size_t curr_stride = l_stride[curr_dim];
 
       if(l_shape.size() - curr_dim <= s_shape.size()) {
         size_t curr_l_index = (rem / curr_stride);
-        size_t curr_s_index = (curr_l_index % s_shape[curr_dim]);
-        out_index += curr_s_index * s_stride[curr_dim];
+        s_dim = curr_dim - d_dim;
+        size_t curr_s_index = (curr_l_index % s_shape[s_dim]);
+        out_index += curr_s_index * s_stride[s_dim];
       }
 
       rem = rem % curr_stride;
     }
 
-    out_index += rem;
+    out_index += (rem % s_stride[s_dim]);
+
+    // ///NT: DEBUG CODE
+    // int sum = 0;
+    // for(auto i:l_shape) {
+    //   sum += i;
+    // }
+    // if((int)out_index > sum) {
+    //   ERR_EXIT("index out of range, linear_index: %d, sum: %d, out_index: %d", linear_index, sum, out_index);
+    // }
+    // ///
 
     return out_index;
   }
