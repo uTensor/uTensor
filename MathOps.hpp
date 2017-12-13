@@ -135,7 +135,7 @@ inline void reduceShapeHelper(Shape input, Shape dim, Shape &reduce_shape, Shape
   out_shape.empty();
   perm.empty();
 
-  for(auto i = 0; i < input.size(); i++) {
+  for(auto i = 0; i < (int) input.size(); i++) {
     if(std::find(dim.begin(), dim.end(), i) == dim.end()) {
       perm.push_back(i);
       out_shape.push_back(input[i]);
@@ -160,7 +160,7 @@ template <class TIn, class TOut>
 inline std::vector<TOut> tensorToLinearVec(S_TENSOR input) {
   std::vector<TOut> vec;
   const TIn* ptr = input->read<TIn>(0, 0);
-  for(auto i = 0; i < input->getSize(); i++) {
+  for(auto i = 0; i < (int) input->getSize(); i++) {
     vec.push_back(static_cast<TOut>(ptr[i]));
   }
 
@@ -336,6 +336,7 @@ class ArgMaxOp : public Operator {
     ArgMax<TIn, TOut>(inputs[0], inputs[1], outputs[0]);
   }
 };
+
 template <class TIn, class TOut>
 void Add(S_TENSOR input, S_TENSOR input2, S_TENSOR out) {
 
@@ -346,10 +347,12 @@ void Add(S_TENSOR input, S_TENSOR input2, S_TENSOR out) {
     input2 = input;
     input = tmp_sptr;
   }
-  //auto shape
-  out->resize<TOut>(transf.getOutputShape());
+
   const TIn* p_in = input->read<TIn>(0, 0);
   const TIn* p_in2 = input2->read<TIn>(0, 0);
+
+  //auto shape
+  out->resize<TOut>(transf.getOutputShape());
 
   TOut* p_out = out->write<TOut>(0, 0);
 
