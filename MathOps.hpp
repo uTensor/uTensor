@@ -157,11 +157,16 @@ inline void reduceShapeHelper(Shape input, Shape dim, Shape &reduce_shape, Shape
 }
 
 template <class TIn, class TOut>
-inline std::vector<TOut> tensorToLinearVec(S_TENSOR input) {
+inline std::vector<TOut> tensorToLinearVec(S_TENSOR input, S_TENSOR dim) {
   std::vector<TOut> vec;
-  const TIn* ptr = input->read<TIn>(0, 0);
-  for(auto i = 0; i < (int) input->getSize(); i++) {
-    vec.push_back(static_cast<TOut>(ptr[i]));
+  const TIn* ptr = dim->read<TIn>(0, 0);
+  for(auto i = 0; i < (int) dim->getSize(); i++) {
+    TIn curr_dim = ptr[i];
+    if(curr_dim < 0) {
+      curr_dim = input->getShape().size() + curr_dim;
+    }
+
+    vec.push_back(static_cast<TOut>(curr_dim));
   }
 
   return vec;
@@ -170,9 +175,9 @@ inline std::vector<TOut> tensorToLinearVec(S_TENSOR input) {
 
 
 template <class TIn, class Td, class TOut>
-void Min(S_TENSOR input, S_TENSOR dim, S_TENSOR out) {
+void MinMaxHelper(S_TENSOR input, S_TENSOR dim, S_TENSOR out, bool find_min) {
   const TIn* p_in = input->read<TIn>(0, 0);
-  Shape dim_vec = tensorToLinearVec<Td, uint32_t>(dim);
+  Shape dim_vec = tensorToLinearVec<Td, uint32_t>(input, dim);
 
   Shape outShape;
   std::vector<uint8_t> permute;
@@ -183,28 +188,30 @@ void Min(S_TENSOR input, S_TENSOR dim, S_TENSOR out) {
   if(out->getSize() == 0) out->resize<TOut>(reduce_shape);  //TODO: dimension check here
   TOut* p_out = out->write<TOut>(0, 0);
 
-  //Td n_dim = p_in2[0];
-  
-  // for (uint32_t i_dim = 0; i_dim < input->getShape().size(); i_dim++) {
-  //   permute.push_back(i_dim);
-  // }
-  // permute.push_back(n_dim);
-  // permute.erase(permute.begin() + n_dim);
-  // Shape outShape = input->getShape();
-  // size_t reduce_size = outShape[n_dim];
-  // outShape.erase(outShape.begin() + n_dim);
-  // outShape.push_back(reduce_size);
   size_t out_index = 0;
   permuteIndexTransform trans(outShape, permute);
   for (uint32_t j = 0; j < input->getSize(); j += reduce_size) {
-    TIn min_val = std::numeric_limits<TIn>::max();
+
+    TIn tmp_val;
+    if(find_min) {
+      tmp_val = std::numeric_limits<TIn>::max();
+    } else {
+      tmp_val = std::numeric_limits<TIn>::min();
+    }
+
     for (size_t k = 0; k < reduce_size; k++) {
       TIn val = p_in[trans[j + k]];
-      if (val < min_val) {
-        min_val = val;
+      if(find_min) {
+        if (val < tmp_val) {
+          tmp_val = val;
+        }
+      } else {
+        if (val > tmp_val) {
+          tmp_val = val;
+        }
       }
     }
-    p_out[out_index] = min_val;
+    p_out[out_index] = tmp_val;
     out_index++;
   }
 }
@@ -217,43 +224,43 @@ class MinOp : public Operator {
     }
 
     virtual void compute() override {
-      Min<float, int, float>(inputs[0], inputs[1], outputs[0]);
+      MinMaxHelper<float, int, float>(inputs[0], inputs[1], outputs[0], true);
     }
 };
-template <class TIn, class Td, class TOut>
-void Max(S_TENSOR input, S_TENSOR dim, S_TENSOR out) {
-  const TIn* p_in = input->read<TIn>(0, 0);
-  const Td* p_in2 = dim->read<Td>(0, 0);
+// template <class TIn, class Td, class TOut>
+// void Max(S_TENSOR input, S_TENSOR dim, S_TENSOR out) {
+//   const TIn* p_in = input->read<TIn>(0, 0);
+//   const Td* p_in2 = dim->read<Td>(0, 0);
 
-  Shape one_shape = {1};
-  if(out->getSize() == 0) out->resize<TOut>(one_shape);
-  TOut* p_out = out->write<TOut>(0, 0);
+//   Shape one_shape = {1};
+//   if(out->getSize() == 0) out->resize<TOut>(one_shape);
+//   TOut* p_out = out->write<TOut>(0, 0);
 
-  Td n_dim = p_in2[0];
-  std::vector<uint8_t> permute;
-  for (uint32_t i_dim = 0; i_dim < input->getShape().size(); i_dim++) {
-    permute.push_back(i_dim);
-  }
-  permute.push_back(n_dim);
-  permute.erase(permute.begin() + n_dim);
-  Shape outShape = input->getShape();
-  size_t reduce_size = outShape[n_dim];
-  outShape.erase(outShape.begin() + n_dim);
-  outShape.push_back(reduce_size);
-  size_t out_index = 0;
-  permuteIndexTransform trans(outShape, permute);
-  for (uint32_t j = 0; j < input->getSize(); j += reduce_size) {
-    TIn max_val = std::numeric_limits<TIn>::lowest();
-    for (size_t k = 0; k < reduce_size; k++) {
-      TIn val = p_in[trans[j + k]];
-      if (val > max_val) {
-        max_val = val;
-      }
-    }
-    p_out[out_index] = max_val;
-    out_index++;
-  }
-}
+//   Td n_dim = p_in2[0];
+//   std::vector<uint8_t> permute;
+//   for (uint32_t i_dim = 0; i_dim < input->getShape().size(); i_dim++) {
+//     permute.push_back(i_dim);
+//   }
+//   permute.push_back(n_dim);
+//   permute.erase(permute.begin() + n_dim);
+//   Shape outShape = input->getShape();
+//   size_t reduce_size = outShape[n_dim];
+//   outShape.erase(outShape.begin() + n_dim);
+//   outShape.push_back(reduce_size);
+//   size_t out_index = 0;
+//   permuteIndexTransform trans(outShape, permute);
+//   for (uint32_t j = 0; j < input->getSize(); j += reduce_size) {
+//     TIn max_val = std::numeric_limits<TIn>::lowest();
+//     for (size_t k = 0; k < reduce_size; k++) {
+//       TIn val = p_in[trans[j + k]];
+//       if (val > max_val) {
+//         max_val = val;
+//       }
+//     }
+//     p_out[out_index] = max_val;
+//     out_index++;
+//   }
+// }
 
 class MaxOp : public Operator {
   public:
@@ -263,7 +270,7 @@ class MaxOp : public Operator {
   }
 
   virtual void compute() override {
-    Max<float, int, float>(inputs[0], inputs[1], outputs[0]);
+    MinMaxHelper<float, int, float>(inputs[0], inputs[1], outputs[0], false);
   }
 };
 
