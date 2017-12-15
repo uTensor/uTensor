@@ -70,7 +70,7 @@ class SDTensorTest : public Test {
 //    ctx.add(t_import.ubyte_import("/fs/testData/qMatMul/in/qA_0.idx", "a"));
 //    ctx.add(t_import.float_import("/fs/testData/qMatMul/in/qA_1.idx", "a_min"));
 //    ctx.add(t_import.float_import("/fs/testData/qMatMul/in/qA_2.idx", "a_max"));
-    ctx.add(t_import.sd_ubyte_import("/fs/testData/qMatMul/in/qA_0.idx", "a", 16384));
+    ctx.add(t_import.sd_ubyte_import("/fs/testData/qMatMul/in/qA_0.idx", "a", 160));
     ctx.add(t_import.sd_float_import("/fs/testData/qMatMul/in/qA_1.idx", "a_min", 1));
     ctx.add(t_import.sd_float_import("/fs/testData/qMatMul/in/qA_2.idx", "a_max", 1));
     ctx.add(t_import.sd_ubyte_import("/fs/testData/qMatMul/in/qB_0.idx", "b", 128));
