@@ -28,6 +28,7 @@ FATFileSystem fs("fs");
 int main(int argc, char** argv) {
   ON_ERR(bd.init(), "SDBlockDevice init ");
   ON_ERR(fs.mount(&bd), "Mounting the filesystem on \"/fs\". ");
+  init_env();
 
   printf("Deep MLP on Mbed (Trained with Tensorflow)\r\n\r\n");
   printf("running deep-mlp...\r\n");
