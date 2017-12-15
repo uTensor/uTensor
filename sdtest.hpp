@@ -87,7 +87,7 @@ class SDTensorTest : public Test {
 
     //we need default constructor here
     //so we can get ride of the shapes here
-    S_TENSOR out_c = ctx.add(t_import.sd_int_import("/fs/testData/qMatMul/res/res.idx", "out_c", 128));
+    S_TENSOR out_c = ctx.add(new SDTensor<int>("out_c", 128));
     S_TENSOR out_min = ctx.add(t_import.sd_float_import("/fs/testData/qMatMul/res/min.idx", "out_min", 1));
     S_TENSOR out_max = ctx.add(t_import.sd_float_import("/fs/testData/qMatMul/res/max.idx", "out_max", 1));
 
