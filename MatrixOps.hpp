@@ -178,7 +178,7 @@ void QuantizedMatMul2(S_TENSOR A, S_TENSOR B, S_TENSOR C,
   c_shape.push_back((A->getShape())[0]);
   c_shape.push_back((B->getShape())[1]);
   if (C->getSize() == 0) {
-  C->resize<Toutput>(c_shape);
+  C->resize(c_shape);
   }
 
   const int32_t offset_a = FloatToQuantizedUnclamped<T1>(

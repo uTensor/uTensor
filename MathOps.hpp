@@ -65,7 +65,7 @@ void Requantize(S_TENSOR input, S_TENSOR in_min, S_TENSOR in_max,
   const float r_output_max = r_max->read<T2>(0, 0)[0];
   const T1 *input_ptr = input->read<T1>(0, 0);
   if (output && output->getSize() == 0) {
-  output->resize<Toutput>(input->getShape());
+  output->resize(input->getShape());
   }
   Toutput *out_ptr = output->write<Toutput>(0, 0);
 
@@ -220,7 +220,7 @@ void ArgMax(S_TENSOR input, S_TENSOR dim, S_TENSOR out) {
 
   // allocate output tensor if empty
   if (out && out->getSize() == 0) {
-    out->resize<TOut>(outShape);
+    out->resize(outShape);
   }
   
 
@@ -273,7 +273,7 @@ void Add(S_TENSOR input, S_TENSOR input2, S_TENSOR out) {
   const TIn* p_in2 = input2->read<TIn>(0, 0);
 
   //auto shape
-  out->resize<TOut>(input->getShape());
+  out->resize(input->getShape());
 
   TOut* p_out = out->write<TOut>(0, 0);
 

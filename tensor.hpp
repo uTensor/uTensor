@@ -48,6 +48,29 @@ class TensorBase {
   uint32_t total_size;
   uint32_t cache_size;
 
+  void initialize(std::vector<uint32_t>& vec) {
+    uint32_t ret = 0;
+    shape.clear();
+    for (auto ele : vec) {
+      shape.push_back(ele);
+      if (ret == 0) {
+          ret = ele;
+      } else {
+          ret *= ele; 
+      }
+    }
+    total_size = ret;
+  }
+  void allocate(uint8_t unit_size) {
+    if (total_size > cache_size) {
+      data = (void*)malloc(unit_size * cache_size);
+    } else {
+      data = (void*)malloc(unit_size * total_size);
+    }
+    if (data == NULL)
+      ERR_EXIT("ran out of memory for %lu malloc", unit_size* total_size);
+  }
+
   ~TensorBase() {
     if (data != nullptr) {
       free(data);
@@ -83,56 +106,26 @@ class Tensor : public uTensor {
 
     return (size_t)size_accm;
   }
-  template <class T>
-  void init(std::vector<uint32_t>& v) {
 
-    for (auto i : v) {
-      s->shape.push_back(i);
-      if (s->total_size == 0) {
-        s->total_size = i;
-      } else {
-        s->total_size *= i;
-      }
-    }
+  virtual void init(std::vector<uint32_t>& v) {
+
+    s->initialize(v);
     if (s->data != NULL) {
         return;
     }
-
-    if (s->total_size > s->cache_size) {
-      s->data = (void*)malloc(unit_size() * s->cache_size);
-    } else {
-      s->data = (void*)malloc(unit_size() * s->total_size);
-    }
-    if (s->data == NULL)
-      ERR_EXIT("ran out of memory for %lu malloc", unit_size() * s->total_size);
-
+    s->allocate(unit_size());
   }
 
-  template <class T>
-  void resize(std::vector<uint32_t> v) {
-      uint32_t size = 0;
-      s->shape.clear();
-      for (auto i : v) {
-        s->shape.push_back(i);
-        if (size == 0) {
-            size = i;
-        } else {
-            size *= i;
-        }
-      }
+  virtual void resize(std::vector<uint32_t> v) {
+      uint32_t size = s->total_size;
       
+      s->initialize(v);
+
       if (size == s->total_size) {
           return;
       } 
       
-      if (s->data){ 
-          free(s->data);
-      }
-      s->total_size = size;
-      s->data = (void*)malloc(unit_size() * s->total_size);
-
-      if (s->data == NULL) 
-          ERR_EXIT("ran out of memory for %lu malloc", unit_size() * s->total_size);
+      s->allocate(unit_size());
   }
 
   std::vector<uint32_t> getShape(void) { return s->shape; }
@@ -173,11 +166,11 @@ class RamTensor : public Tensor {
       v.push_back(i);
     }
 
-    Tensor::init<T>(v);
+    Tensor::init(v);
   }
 
   RamTensor(std::vector<uint32_t> v, TName _name) : Tensor(_name) {
-    Tensor::init<T>(v);
+    Tensor::init(v);
   }
 
   // PRE:      l, initization list, specifying the element/dimension
@@ -348,7 +341,7 @@ void printDim(Tensor* t) {
 template <typename T>
 void tensorChkAlloc(Tensor** t, Shape dim) {
   if (*t && (*t)->getSize() == 0) {
-    (*t)->init<T>(dim);
+    (*t)->init(dim);
   } else if (*t && (*t)->getShape() != dim) {
     ERR_EXIT("Dim mismatched...\r\n");
   } else if (*t == nullptr){

@@ -5,7 +5,7 @@
 template <class T>
 class SDTensor : public Tensor {
   public:
-    SDTensor(TName _name, std::string filename, uint32_t cachesize) : Tensor(_name) {
+    SDTensor(TName _name, uint32_t cachesize) : Tensor(_name) {
         string file = "/fs/tmp/" + getName();
         _filename = file;
         mem.createFile(_filename);
@@ -20,7 +20,7 @@ class SDTensor : public Tensor {
          v.push_back(i);
       }
       s->cache_size = cachesize;
-      Tensor::init<T>(v);
+      Tensor::init(v);
       string file = "/fs/tmp/" + getName();
       _filename = file;
       mem.createFile(_filename);
@@ -30,7 +30,7 @@ class SDTensor : public Tensor {
 
     SDTensor(std::vector<uint32_t> v, TName _name, uint32_t cachesize) : Tensor(_name) {
       s->cache_size = cachesize;
-      Tensor::init<T>(v);
+      Tensor::init(v);
       string file = "/fs/tmp/" + getName();
       _filename = file;
       mem.createFile(_filename);
@@ -80,6 +80,10 @@ class SDTensor : public Tensor {
         dirty = true;
       }
       return (void*)((T*)s->data);
+    }
+    void resize(std::vector<uint32_t> v) {
+        Tensor::resize(v);
+        initCache();
     }
     void initCache() {
         mem.load_data<T>(_filename, unit_size(), s->cache_size, s->total_size, 0, (T*)s->data);
