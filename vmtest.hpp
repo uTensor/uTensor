@@ -11,9 +11,11 @@ class vmTest : public Test {
         testStart("load test");
         Tensor* t = t_import.ubyte_import("/fs/testData/idxImport/uint8_4d_power2.idx", "uchar1");
         unsigned char* data = t->write<unsigned char>(0, 0);
-        string tmp_file = "/fs/testData/tmp.txt";
+        string tmp_file = "/fs/tmp/tmp.txt";
         vm g;
         unsigned char* data_g = (unsigned char*)malloc(t->unit_size() * t->getSize());
+        g.createFile(tmp_file);
+        g.flush_data<unsigned char>(tmp_file, t->unit_size(), 30, t->getSize(), 0,  data);
         g.load_data<unsigned char>(tmp_file, t->unit_size(), 30, t->getSize(), 0,  data_g);
         uint32_t res_x = 0;
         uint32_t res_y = 0;
@@ -21,6 +23,7 @@ class vmTest : public Test {
            res_x += data_g[i];
            res_y += data[i];
         }
+        g.flush_data<unsigned char>(tmp_file, t->unit_size(), 30, t->getSize(), 30,  data + 30);
         g.load_data<unsigned char>(tmp_file, t->unit_size(), 30, t->getSize(), 30,  data_g);
         for (unsigned int i = 0; i < 30; i++) {
            res_x += data_g[i];
@@ -35,7 +38,7 @@ class vmTest : public Test {
         testStart("write test");
         Tensor* t = t_import.ubyte_import("/fs/testData/idxImport/uint8_4d_power2.idx", "uchar1");
         unsigned char* data = t->write<unsigned char>(0, 0);
-        string tmp_file = "/fs/testData/tmp2.txt";
+        string tmp_file = "/fs/tmp/tmp2.txt";
         vm g;
         FILE *buf = g.createFile(tmp_file);  
         uint8_t size = (uint8_t)t->unit_size();
