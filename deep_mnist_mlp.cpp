@@ -5,11 +5,13 @@ void tensorQuantize(Context& ctx, TName input, TName output,
 
     //reshape
     S_TENSOR reduce_dim = ctx.add(new RamTensor<int>({1}), "reduce_dim");
+    *(reduce_dim->write<int>(0, 0)) = 0;
+
     ctx.add(new RamTensor<float>(), "reshape_out");
 
-    ctx.add(new RamTensor<int>(), "reshape_shape");
+    S_TENSOR reshape_shape = ctx.add(new RamTensor<int>({1}), "reshape_shape");
+    *(reshape_shape->write<int>(0, 0)) = -1;
 
-    *(reduce_dim->write<int>(0, 0)) = 0;
     ctx.push(new ReshapeOp(), {input, "reshape_shape"}, {"reshape_out"});
 
 
