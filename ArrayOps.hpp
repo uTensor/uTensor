@@ -132,19 +132,13 @@ class DequantizeOp : public Operator {
 template <typename T>
 void reshape(S_TENSOR input, S_TENSOR shape, S_TENSOR output) {
     Shape dim;
-    uint32_t t = input->getShape().size();
-    if (t == 0) {
-        t = 1;
+
+    auto shape_vec = shape->getShape();
+    for(auto i = 0; i < shape_vec.size(); i++) {
+        //This may due to references to zero-tensor's dimensions
+        if(shape_vec[i] == 0) ERR_EXIT("shape tensor contains 0 value entry");
     }
 
-    shape->resize<int>({t});
-
-    if (t == 1) {
-        shape->write<int>(0, 0)[0] = -1;
-    } else {
-        shape->write<int>(0, 0)[0] = input->getSize();
-        shape->write<int>(0, 0)[1] = -1;
-    }
 
     //validating and inferring dimensions
     int infer_index = -1;
