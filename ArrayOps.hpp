@@ -22,15 +22,18 @@ void QuantizeV2(S_TENSOR input, S_TENSOR _min_range, S_TENSOR _max_range,
     float min_range = std::min(0.0f, input_min_range);
     const float epsilon = std::max(1.0f, std::max(fabsf(input_min_range),
                                                    fabsf(input_max_range))) / 100.0f;
-    std::vector<uint32_t> v;
+    // std::vector<uint32_t> v;
 
-    std::vector<uint32_t> org = input->getShape();
-    for (int i = org.size() - 1; i >= 0; i--) {
-        v.push_back(org[i]);
-    }
+    // std::vector<uint32_t> org = input->getShape();
+    // for (size_t i = 0; i < org.size(); ++i) {
+    //     v.push_back(org[i]);
+    // }
+    // for (int i = org.size() - 1; i >= 0; i--) {
+    //     v.push_back(org[i]);
+    // }
 
     if(output && output->getSize() == 0) {
-      output->resize<T>(v);
+      output->resize<T>(input->getShape());
     }
 
     float max_range = std::max(input_max_range, min_range + epsilon);
