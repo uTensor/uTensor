@@ -142,6 +142,18 @@ class Tensor : public uTensor {
   // returns the number of dimensions in the tensor
   size_t getDim(void) { return s->shape.size(); }
 
+  void printShape(void) {
+    std::vector<uint32_t> shape = getShape();
+    size_t num_dim = shape.size();
+    printf("tensor name: %s\n", getName().c_str());
+    printf("shape: ");
+    for (size_t i = 0; i < num_dim-1; ++i) {
+      printf("%lu, ", shape[i]);
+    }
+    printf("%lu\n", shape[num_dim-1]);
+    printf("size: %lu\n\n", getSize());
+  }
+
   template <class T>
   const T* read(size_t offset, size_t ele) {
     return (const T*)read(offset, ele);

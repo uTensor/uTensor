@@ -177,7 +177,12 @@ void QuantizedMatMul2(S_TENSOR A, S_TENSOR B, S_TENSOR C,
     c_shape.push_back((B->getShape())[1]);
     C->resize<Toutput>(c_shape);
   }
-  
+  if (A->getShape()[1] != B->getShape()[0]) {
+    printf("[WARN] incompatiple input matrices\n");
+    A->printShape();
+    B->printShape();
+    printf("======== end of WARN =========\n");
+  }
 
   const int32_t offset_a = FloatToQuantizedUnclamped<T1>(
       0.0f, min_a, max_a);  // NT: what 0 quantized to; depends on

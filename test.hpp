@@ -145,8 +145,8 @@ class Test {
 
   template <typename U>
   static double meanAbsErr(Tensor* A, Tensor* B) {
-    if (A->getSize() != B->getSize()) {
-      ERR_EXIT("Test.meanAbsErr(): dimension mismatch\r\n");
+    if (A->getShape() != B->getShape()) {
+      ERR_EXIT("Test.meanAbsErr(): shape mismatch\r\n");
     }
 
     const U* elemA = A->read<U>(0, 0);
@@ -163,8 +163,10 @@ class Test {
   // A being the reference
   template <typename U>
   static double sumPercentErr(Tensor* A, Tensor* B) {
-    if (A->getSize() != B->getSize()) {
-      ERR_EXIT("Test.sumPercentErr(): dimension mismatch\r\n");
+    if (A->getShape() != B->getShape()) {
+      A->printShape();
+      B->printShape();
+      ERR_EXIT("Test.sumPercewntErr(): shape mismatch\r\n");
     }
 
     const U* elemA = A->read<U>(0, 0);
