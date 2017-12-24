@@ -13,7 +13,7 @@ class vmTest : public Test {
         unsigned char* data = t->write<unsigned char>(0, 0);
         string tmp_file = "/fs/tmp/tmp.txt";
         vm g;
-        unsigned char* data_g = (unsigned char*)malloc(t->unit_size() * t->getSize());
+        unsigned char* data_g = (unsigned char*)malloc(t->getSize_in_bytes());
         g.createFile(tmp_file);
         g.flush_data<unsigned char>(tmp_file, t->unit_size(), 30, t->getSize(), 0,  data);
         g.load_data<unsigned char>(tmp_file, t->unit_size(), 30, t->getSize(), 0,  data_g);

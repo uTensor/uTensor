@@ -14,7 +14,7 @@ class SDTensorTest : public Test {
     timer_start();
     Tensor* t = nullptr;
     t = t_import.ubyte_import("/fs/testData/idxImport/uint8_4d_power2.idx", "uchar1");
-    Tensor* s = t_import.sd_ubyte_import("/fs/testData/idxImport/uint8_4d_power2.idx", "sdf", 10);//the size of data is 50 elements
+    Tensor* s = t_import.sd_ubyte_import("/fs/testData/idxImport/uint8_4d_power2.idx", "sdf", 10);//the size of data is 10 elements
 
     const unsigned char* x = t->read<unsigned char>(0, 0);
     uint32_t x_res = 0;
@@ -33,7 +33,7 @@ class SDTensorTest : public Test {
     void wTest(void) {
     testStart("sd write test2");
     timer_start();
-    Tensor* h = t_import.sd_int_import("/fs/testData/qMatMul/res/wtest.idx", "sdf", 5);//the size of data is 50 elements
+    Tensor* h = t_import.sd_int_import("/fs/testData/qMatMul/res/wtest.idx", "sdf", 5);//the size of data is 5 elements
 
     int* y = h->write<int>(0, 1);
     uint32_t res_x = 0;
@@ -42,8 +42,12 @@ class SDTensorTest : public Test {
       y = h->write<int>(i, 1);
       y[0] = 's';
       unsigned char a = 's';
-      res_y += (uint32_t)y[0];
       res_x += (uint32_t)a;
+    }
+
+    for(uint32_t i = 0; i < h->getSize(); i++) {
+      auto y = h->read<int>(i, 1);
+      res_y += (uint32_t) *y;
     }
 
     passed(res_x == res_y);
