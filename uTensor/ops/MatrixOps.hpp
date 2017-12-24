@@ -222,9 +222,16 @@ void QuantizedMatMul2(S_TENSOR A, S_TENSOR B, S_TENSOR C,
 
 template<class T1, class T2, class T3>
 void conv(S_TENSOR input_data, int input_batches, int input_height, int input_width,
-        int input_depth, S_TENSOR filter_data, int filter_height, int filter_width, 
-        int filter_count, int stride_rows, int stride_cols, S_TENSOR output_data,
-        int output_height, int output_width) {
+        int input_depth, int input_offset, S_TENSOR filter_data, int filter_height, int filter_width, 
+        int filter_count, int filter_offset, int stride_rows, int stride_cols, S_TENSOR output_data,
+        int output_height, int output_width, int output_shift, int output_offset, int output_mult) {
+    const int32_t highest = static_cast<int32_t>(std::numeric_limits<T3>::highest());
+    const int32_t lowest = static_cast<int32_t>(std::numeric_limits<T3>::lowest());
+    
+    const int32_t rounding = (output_shift < 1) ? 0 : (1 << (output_shift - 1)); 
+
+
+    // When we're converting the 32 bit accumulator to a lower bit depth, we
     int filter_left_offset;
     int filter_top_offset;
     if (padding == VALID) {
@@ -252,38 +259,48 @@ void conv(S_TENSOR input_data, int input_batches, int input_height, int input_wi
           for (int out_channel = 0; out_channel < filter_count; ++out_channel) {
             const int in_x_origin = (out_x * stride_cols) - filter_left_offset;
             const int in_y_origin = (out_y * stride_rows) - filter_top_offset;
-            T3 total(0);
+            int32_t total = 0;
             for (int filter_y = 0; filter_y < filter_height; ++filter_y) {
               for (int filter_x = 0; filter_x < filter_width; ++filter_x) {
                 for (int in_channel = 0; in_channel < input_depth;
                      ++in_channel) {
                   const int in_x = in_x_origin + filter_x;
                   const int in_y = in_y_origin + filter_y;
-                  const T1 *input_value;
+                  int32_t input_value;
                   if ((in_x >= 0) && (in_x < input_width) && (in_y >= 0) &&
                       (in_y < input_height)) {
-                    *input_value =
+                    const T1 *input_source_ptr =  
                         input_data->read<T1>(((batch * input_height * input_width *
                                     input_depth) +
                                    (in_y * input_width * input_depth) +
                                    (in_x * input_depth) + in_channel), 0);
+                    input_value = static_cast<int32_t>(*input_source_ptr) - input_offset;
                   } else {
-                    *input_value = T1(0);
+                    input_value = 0;
                   }
-                  const T2 *filter_value =
+                  const T2 *filter_ptr =
                       filter_data->read<T2>((filter_y * filter_width * input_depth *
                                    filter_count) +
                                   (filter_x * input_depth * filter_count) +
                                   (in_channel * filter_count) + out_channel, 0);
+                  const int32_t filter_value = 
+                      static_cast<int32_t>(*filter_ptr) - filter_offset;
                   total += (input_value * filter_value);
                 }
               }
             }
+            const int32_t output_val =
+                ((((total + output_offset) * output_mult) + rounding) >>
+                 output_shift);
+            // We need to saturate the results against the largest and smallest
+            
+            const int32_t top_clamped_output = std::min(output_val, highest);
+            const int32_t clamped_output = std::max(top_clamped_output, lowest);
             T3 *output = 
             output_data->write<T3>((batch * output_height * output_width * filter_count) +
                         (out_y * output_width * filter_count) +
                         (out_x * filter_count) + out_channel, 0);
-            *output = total;
+            *output = clamped_output;
           }
         }
       }
