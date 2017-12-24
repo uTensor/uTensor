@@ -217,9 +217,79 @@ void QuantizedMatMul2(S_TENSOR A, S_TENSOR B, S_TENSOR C,
   *c_max = max_c_value;
 }
 
+template<class T1, class T2, class T3>
+void conv(S_TENSOR input_data, int input_batches, int input_height, int input_width,
+        int input_depth, S_TENSOR filter_data, int filter_height, int filter_width, 
+        int filter_count, int stride_rows, int stride_cols, S_TENSOR output_data,
+        int output_height, int output_width) {
+    int filter_left_offset;
+    int filter_top_offset;
+    if (padding == VALID) {
+      filter_left_offset =
+          ((output_width - 1) * stride_cols + filter_width - input_width + 1) /
+          2;
+      filter_top_offset = ((output_height - 1) * stride_rows + filter_height -
+                           input_height + 1) /
+                          2;
+    } else {
+      filter_left_offset =
+          ((output_width - 1) * stride_cols + filter_width - input_width) / 2;
+      filter_top_offset =
+          ((output_height - 1) * stride_rows + filter_height - input_height) /
+          2;
+    }
+
+    // If we've got multiple images in our input, work through each of them.
+    for (int batch = 0; batch < input_batches; ++batch) {
+      // Walk through all the output image values, sliding the filter to
+      // different positions in the input.
+      for (int out_y = 0; out_y < output_height; ++out_y) {
+        for (int out_x = 0; out_x < output_width; ++out_x) {
+          // Each filter kernel produces one output channel.
+          for (int out_channel = 0; out_channel < filter_count; ++out_channel) {
+            const int in_x_origin = (out_x * stride_cols) - filter_left_offset;
+            const int in_y_origin = (out_y * stride_rows) - filter_top_offset;
+            T3 total(0);
+            for (int filter_y = 0; filter_y < filter_height; ++filter_y) {
+              for (int filter_x = 0; filter_x < filter_width; ++filter_x) {
+                for (int in_channel = 0; in_channel < input_depth;
+                     ++in_channel) {
+                  const int in_x = in_x_origin + filter_x;
+                  const int in_y = in_y_origin + filter_y;
+                  const T1 *input_value;
+                  if ((in_x >= 0) && (in_x < input_width) && (in_y >= 0) &&
+                      (in_y < input_height)) {
+                    *input_value =
+                        input_data->read<T1>(((batch * input_height * input_width *
+                                    input_depth) +
+                                   (in_y * input_width * input_depth) +
+                                   (in_x * input_depth) + in_channel), 0);
+                  } else {
+                    *input_value = T1(0);
+                  }
+                  const T2 *filter_value =
+                      filter_data->read<T2>((filter_y * filter_width * input_depth *
+                                   filter_count) +
+                                  (filter_x * input_depth * filter_count) +
+                                  (in_channel * filter_count) + out_channel, 0);
+                  total += (input_value * filter_value);
+                }
+              }
+            }
+            T3 *output = 
+            output_data->write<T3>((batch * output_height * output_width * filter_count) +
+                        (out_y * output_width * filter_count) +
+                        (out_x * filter_count) + out_channel, 0);
+            *output = total;
+          }
+        }
+      }
+    }
+}
+
 template <class T1, class T2, class TOut>
 class QntMatMulOp : public Operator {
-public:
+    public:
   QntMatMulOp() {
     n_inputs = 6;
     n_outputs = 3;
