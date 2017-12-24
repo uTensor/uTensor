@@ -14,7 +14,7 @@ void Relu(S_TENSOR input, S_TENSOR in_min, S_TENSOR in_max,
   const TOut min_as_quantized =
       FloatToQuantized<TOut>(0.0f, input_min, input_max);
   if (output && output->getSize() == 0) {
-      output->resize<TOut>(input->getShape());
+      output->resize(input->getShape());
   }
   TOut* out = output->write<TOut>(0, 0);
   for (uint32_t i = 0; i < output->getSize(); i++) {

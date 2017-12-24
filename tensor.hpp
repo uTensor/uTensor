@@ -7,6 +7,7 @@
 #include <vector>
 #include "stdlib.h"
 #include "uTensor_util.hpp"
+#include <limits>
 
 // enum class DType : char { 
 //   uint8,
@@ -18,6 +19,7 @@
 // };
 
 class Tensor;
+class TensorIdxImporter;
 typedef std::string TName;
 typedef std::string OpName;
 typedef std::vector<TName> TNameList;
@@ -50,6 +52,30 @@ class TensorBase {
   std::vector<uint32_t> shape;
   void* data;
   uint32_t total_size;
+  uint32_t cache_size;
+
+  void initialize(std::vector<uint32_t>& vec) {
+    uint32_t ret = 0;
+    shape.clear();
+    for (auto ele : vec) {
+      shape.push_back(ele);
+      if (ret == 0) {
+          ret = ele;
+      } else {
+          ret *= ele; 
+      }
+    }
+    total_size = ret;
+  }
+  void allocate(uint8_t unit_size) {
+    if (total_size > cache_size) {
+      data = (void*)malloc(unit_size * cache_size);
+    } else {
+      data = (void*)malloc(unit_size * total_size);
+    }
+    if (data == NULL)
+      ERR_EXIT("ran out of memory for %lu malloc", unit_size* total_size);
+  }
 
   ~TensorBase() {
     if (data != nullptr) {
@@ -71,6 +97,7 @@ class Tensor : public uTensor {
   Tensor() {
     s = std::make_shared<TensorBase>();
     s->total_size = 0;
+    s->cache_size = std::numeric_limits<uint32_t>::max();
     s->data = nullptr;
     setName("");
   }
@@ -85,49 +112,26 @@ class Tensor : public uTensor {
 
     return (size_t)size_accm;
   }
-  template <class T>
-  void init(std::vector<uint32_t>& v) {
 
-    for (auto i : v) {
-      s->shape.push_back(i);
-      if (s->total_size == 0) {
-        s->total_size = i;
-      } else {
-        s->total_size *= i;
-      }
+  virtual void init(std::vector<uint32_t>& v) {
+
+    s->initialize(v);
+    if (s->data != NULL) {
+        return;
     }
-
-    s->data = (void*)malloc(unit_size() * s->total_size);
-    if (s->data == NULL)
-      ERR_EXIT("ran out of memory for %lu malloc", unit_size() * s->total_size);
-
+    s->allocate(unit_size());
   }
 
-  template <class T>
-  void resize(std::vector<uint32_t> v) {
-      uint32_t size = 0;
-      s->shape.clear();
-      for (auto i : v) {
-        s->shape.push_back(i);
-        if (size == 0) {
-            size = i;
-        } else {
-            size *= i;
-        }
-      }
+  virtual void resize(std::vector<uint32_t> v) {
+      uint32_t size = s->total_size;
       
+      s->initialize(v);
+
       if (size == s->total_size) {
           return;
       } 
       
-      if (s->data){ 
-          free(s->data);
-      }
-      s->total_size = size;
-      s->data = (void*)malloc(unit_size() * s->total_size);
-
-      if (s->data == NULL) 
-          ERR_EXIT("ran out of memory for %lu malloc", unit_size() * s->total_size);
+      s->allocate(unit_size());
   }
 
   std::vector<uint32_t> getShape(void) { return s->shape; }
@@ -156,7 +160,6 @@ class Tensor : public uTensor {
     DEBUG("Tensor Destructed\r\n");
   }
 };
-
 template <class T>
 class RamTensor : public Tensor {
   // need deep copy
@@ -170,11 +173,11 @@ class RamTensor : public Tensor {
       v.push_back(i);
     }
 
-    Tensor::init<T>(v);
+    Tensor::init(v);
   }
 
-  RamTensor(std::vector<uint32_t> v) {
-    Tensor::init<T>(v);
+  RamTensor(std::vector<uint32_t> v) : Tensor() {
+    Tensor::init(v);
   }
 
   // PRE:      l, initization list, specifying the element/dimension
@@ -182,37 +185,19 @@ class RamTensor : public Tensor {
   //          lowest specified dimension is returned.
   //          Otherwise, return the pointer to the specific element.
   virtual void* read(size_t offset, size_t ele) override {
+    if (ele > s->total_size) {
+        ERR_EXIT("data overflow");
+    }
     return (void *)((T*)s->data + offset);
   }
   virtual void* write(size_t offset, size_t ele) override {
+    if (ele > s->total_size) {
+        ERR_EXIT("data overflow");
+    }
     return (void*)((T*)s->data + offset);
   }
 
 
-  /*virtual void* read(std::initializer_list<uint32_t> l) override {
-    size_t p_offset = 0;
-    signed short current_dim = 0;
-    for (auto i : l) {
-      p_offset += i * getStride(current_dim);
-      current_dim++;
-    }
-
-    // printf("p_offset: %d\r\n", p_offset);
-    return (void*)((T*)s->data + p_offset);
-  }
-
-    T* getPointer(std::vector<uint32_t> v) {
-      size_t p_offset = 0;
-      signed short current_dim = 0;
-      for (auto i : v) {
-        p_offset += i * getStride(current_dim);
-        current_dim++;
-      }
-
-      printf("p_offset: %d\r\n", p_offset);
-
-      return s->data + p_offset;
-    }*/
   // virtual void* read(size_t offset, size_t ele) override{};
   virtual uint16_t unit_size(void) override {
     return sizeof(T);
@@ -363,7 +348,7 @@ void printDim(Tensor* t) {
 template <typename T>
 void tensorChkAlloc(Tensor** t, Shape dim) {
   if (*t && (*t)->getSize() == 0) {
-    (*t)->init<T>(dim);
+    (*t)->init(dim);
   } else if (*t && (*t)->getShape() != dim) {
     ERR_EXIT("Dim mismatched...\r\n");
   } else if (*t == nullptr){

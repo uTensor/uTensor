@@ -30,7 +30,7 @@ void QuantizeV2(S_TENSOR input, S_TENSOR _min_range, S_TENSOR _max_range,
     }
 
     if(output && output->getSize() == 0) {
-      output->resize<T>(v);
+      output->resize(v);
     }
 
     float max_range = std::max(input_max_range, min_range + epsilon);
@@ -81,7 +81,7 @@ void dequantize(S_TENSOR input, S_TENSOR min_range, S_TENSOR max_range, S_TENSOR
     float max = *(max_range->read<float>(0, 0));
       //auto tensor allocation
     Shape out_shape;
-    output->resize<float>(input->getShape());
+    output->resize(input->getShape());
 
     const T* input_ptr = input->read<T>(0, 0);
     float* output_ptr = output->write<float>(0, 0);
@@ -137,7 +137,7 @@ void reshape(S_TENSOR input, S_TENSOR shape, S_TENSOR output) {
         t = 1;
     }
 
-    shape->resize<int>({t});
+    shape->resize({t});
 
     if (t == 1) {
         shape->write<int>(0, 0)[0] = -1;
@@ -182,7 +182,7 @@ void reshape(S_TENSOR input, S_TENSOR shape, S_TENSOR output) {
         ERR_EXIT("output tensor dimension mismatches supplied shape")
     } else {
         //construct a new tensor and copy
-        output->resize<T>(dim);
+        output->resize(dim);
         T* output_ptr = output->write<T>(0, 0);
         std::memcpy(output_ptr, input_ptr, (std::size_t) input->getSize_in_bytes());
     }

@@ -3,6 +3,9 @@
 #include <stdint.h>
 #include <stdio.h>
 #include <vector>
+#include <iostream>
+#include "mbed.h"
+#include "SDBlockDevice.h"
 
 // #define MAX(A, B) ((A > B)? A:B)
 
@@ -62,4 +65,5 @@ uint32_t htonl(uint32_t& val);
 uint16_t ntoh16(uint16_t val);
 uint32_t ntoh32(uint32_t val);
 
+void init_env();
 #endif
