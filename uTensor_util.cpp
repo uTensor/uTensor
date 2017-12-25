@@ -51,3 +51,18 @@ uint32_t ntoh32(uint32_t val) {
 
   return ret;
 }
+
+void init_env() {
+    int status;
+    DIR* dir = opendir("/fs/tmp");
+    if (dir) {
+        closedir(dir);
+        return;
+    } else {
+     
+      status = mkdir("/fs/tmp", S_IRWXU);
+      if (status == -1) {
+        ERR_EXIT("env setting failed");
+      }
+    }
+}

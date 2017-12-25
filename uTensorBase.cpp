@@ -12,3 +12,8 @@ void Operator::setOutputs(S_TList &_outputs) {
   outputs = _outputs;
 
 }
+
+void Operator::empty(void) {
+  inputs.empty();
+  outputs.empty();
+}
