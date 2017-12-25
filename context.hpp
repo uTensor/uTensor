@@ -63,6 +63,8 @@ public:
   uint32_t gc(void);
   int eval(void);
 
+  //TODO: add a keep(int count = 1) funcion to make graph construction easier?
+
   Context() {
     del_onsight = true;
   }
