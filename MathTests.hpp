@@ -17,24 +17,24 @@ class MathOpsTest : public Test {
 
     //Note: raw pointers should be owned ONLY by the context. no copy of the raw pointer should exist elsewhere
     // reference inputs
-    ctx.add(t_import.int_import("/fs/testData/rqRange/in/qMatMul_0.idx", "a"));
-    ctx.add(t_import.float_import("/fs/testData/rqRange/in/qMatMul_1.idx", "a_min"));
-    ctx.add(t_import.float_import("/fs/testData/rqRange/in/qMatMul_2.idx", "a_max"));
+    ctx.addCached(hold(t_import.int_import("/fs/testData/rqRange/in/qMatMul_0.idx")), "a");
+    ctx.addCached(hold(t_import.float_import("/fs/testData/rqRange/in/qMatMul_1.idx")), "a_min");
+    ctx.addCached(hold(t_import.float_import("/fs/testData/rqRange/in/qMatMul_2.idx")), "a_max");
 
     // reference output
-    ctx.add(t_import.float_import("/fs/testData/rqRange/out/rqRange_0.idx", "ref_min"));
-    ctx.add(t_import.float_import("/fs/testData/rqRange/out/rqRange_1.idx", "ref_max"));
+    ctx.addCached(hold(t_import.float_import("/fs/testData/rqRange/out/rqRange_0.idx")), "ref_min");
+    ctx.addCached(hold(t_import.float_import("/fs/testData/rqRange/out/rqRange_1.idx")), "ref_max");
 
     // Implementation goes here
 
     // modify the checks below:
-    ctx.add(new RamTensor<float>(ctx.get("ref_min")->getShape(), "out_min"));
-    ctx.add(new RamTensor<float>(ctx.get("ref_max")->getShape(), "out_max"));
+    ctx.addCached(hold(new RamTensor<float>(ctx.get("ref_min")->getShape())), "out_min");
+    ctx.addCached(hold(new RamTensor<float>(ctx.get("ref_max")->getShape())), "out_max");
     TNameList inputs = {"a", "a_min", "a_max"};
     TNameList outputs = {"out_min", "out_max"};
     
     timer_start();
-    ctx.push(new Requantization_RangeOp(), inputs, outputs);
+    ctx.push_static(hold(new Requantization_RangeOp()), "Requantization_RangeOp", inputs, outputs);
     ctx.eval();
     timer_stop();
 
@@ -52,25 +52,25 @@ class MathOpsTest : public Test {
     ctx.gc();
 
     // reference inputs
-    ctx.add(t_import.int_import("/fs/testData/rQ/in/qMatMul_0.idx", "a"));
-    ctx.add(t_import.float_import("/fs/testData/rQ/in/qMatMul_1.idx", "a_min"));
-    ctx.add(t_import.float_import("/fs/testData/rQ/in/qMatMul_2.idx", "a_max"));
-    ctx.add(t_import.float_import("/fs/testData/rQ/in/rqRange_0.idx", "r_a_min"));
-    ctx.add(t_import.float_import("/fs/testData/rQ/in/rqRange_1.idx", "r_a_max"));
+    ctx.addCached(hold(t_import.int_import("/fs/testData/rQ/in/qMatMul_0.idx")), "a");
+    ctx.addCached(hold(t_import.float_import("/fs/testData/rQ/in/qMatMul_1.idx")), "a_min");
+    ctx.addCached(hold(t_import.float_import("/fs/testData/rQ/in/qMatMul_2.idx")), "a_max");
+    ctx.addCached(hold(t_import.float_import("/fs/testData/rQ/in/rqRange_0.idx")), "r_a_min");
+    ctx.addCached(hold(t_import.float_import("/fs/testData/rQ/in/rqRange_1.idx")), "r_a_max");
     // tf.quint8
 
     //Note:
     //Instead of using ctx.get() to obtain a shared_ptr, you may also use the shared_ptr returned by ctx.add()
 
     // reference outputs
-    S_TENSOR ref_a_q = ctx.add(t_import.ubyte_import("/fs/testData/rQ/out/rQ_0.idx", "ref_a_q"));
-    S_TENSOR ref_a_min = ctx.add(t_import.float_import("/fs/testData/rQ/out/rQ_1.idx", "ref_a_min"));
-    S_TENSOR ref_a_max = ctx.add(t_import.float_import("/fs/testData/rQ/out/rQ_2.idx", "ref_a_max"));
+    S_TENSOR ref_a_q = ctx.addCached(hold(t_import.ubyte_import("/fs/testData/rQ/out/rQ_0.idx")), "ref_a_q");
+    S_TENSOR ref_a_min = ctx.addCached(hold(t_import.float_import("/fs/testData/rQ/out/rQ_1.idx")), "ref_a_min");
+    S_TENSOR ref_a_max = ctx.addCached(hold(t_import.float_import("/fs/testData/rQ/out/rQ_2.idx")), "ref_a_max");
 
     // modify the checks below:
-    S_TENSOR a_q = ctx.add(new RamTensor<unsigned char>(ref_a_q->getShape(), "a_q"));
-    S_TENSOR a_min_q = ctx.add(new RamTensor<float>(ref_a_min->getShape(), "a_min_q"));
-    S_TENSOR a_max_q = ctx.add(new RamTensor<float>(ref_a_max->getShape(), "a_max_q"));
+    S_TENSOR a_q = ctx.addCached(hold(new RamTensor<unsigned char>(ref_a_q->getShape())), "a_q");
+    S_TENSOR a_min_q = ctx.addCached(hold(new RamTensor<float>(ref_a_min->getShape())), "a_min_q");
+    S_TENSOR a_max_q = ctx.addCached(hold(new RamTensor<float>(ref_a_max->getShape())), "a_max_q");
 
 
     TNameList inputs = {"a", "a_min", "a_max", "r_a_min", "r_a_max"};
@@ -78,7 +78,7 @@ class MathOpsTest : public Test {
 
     // Implementation goes here
     timer_start();
-    ctx.push(new RequantizeOp(), inputs, outputs);
+    ctx.push_static(hold(new RequantizeOp()), "RequantizeOp", inputs, outputs);
     ctx.eval();
     timer_stop();
 
@@ -95,23 +95,23 @@ class MathOpsTest : public Test {
     ctx.gc();
 
     // reference inputs
-    ctx.add(t_import.int_import("/fs/testData/import-MatMul_eightbit_requantize/in/import-MatMul_eightbit_quantized_mat_mul_0.idx", "a"));
-    ctx.add(t_import.float_import("/fs/testData/import-MatMul_eightbit_requantize/in/import-MatMul_eightbit_quantized_mat_mul_1.idx", "a_min"));
-    ctx.add(t_import.float_import("/fs/testData/import-MatMul_eightbit_requantize/in/import-MatMul_eightbit_quantized_mat_mul_2.idx", "a_max"));
-    ctx.add(t_import.float_import("/fs/testData/import-MatMul_eightbit_requantize/in/import-MatMul_eightbit_requant_range_0.idx", "r_a_min"));
-    ctx.add(t_import.float_import("/fs/testData/import-MatMul_eightbit_requantize/in/import-MatMul_eightbit_requant_range_1.idx", "r_a_max"));
+    ctx.addCached(hold(t_import.int_import("/fs/testData/import-MatMul_eightbit_requantize/in/import-MatMul_eightbit_quantized_mat_mul_0.idx")), "a");
+    ctx.addCached(hold(t_import.float_import("/fs/testData/import-MatMul_eightbit_requantize/in/import-MatMul_eightbit_quantized_mat_mul_1.idx")), "a_min");
+    ctx.addCached(hold(t_import.float_import("/fs/testData/import-MatMul_eightbit_requantize/in/import-MatMul_eightbit_quantized_mat_mul_2.idx")), "a_max");
+    ctx.addCached(hold(t_import.float_import("/fs/testData/import-MatMul_eightbit_requantize/in/import-MatMul_eightbit_requant_range_0.idx")), "r_a_min");
+    ctx.addCached(hold(t_import.float_import("/fs/testData/import-MatMul_eightbit_requantize/in/import-MatMul_eightbit_requant_range_1.idx")), "r_a_max");
     // tf.quint8
 
     // reference outputs
-    ctx.add(t_import.ubyte_import("/fs/testData/import-MatMul_eightbit_requantize/out/import-MatMul_eightbit_requantize_0.idx", "ref_a_q"));
-    ctx.add(t_import.float_import("/fs/testData/import-MatMul_eightbit_requantize/out/import-MatMul_eightbit_requantize_1.idx", "ref_a_min"));
-    ctx.add(t_import.float_import("/fs/testData/import-MatMul_eightbit_requantize/out/import-MatMul_eightbit_requantize_2.idx", "ref_a_max"));
+    ctx.addCached(hold(t_import.ubyte_import("/fs/testData/import-MatMul_eightbit_requantize/out/import-MatMul_eightbit_requantize_0.idx")), "ref_a_q");
+    ctx.addCached(hold(t_import.float_import("/fs/testData/import-MatMul_eightbit_requantize/out/import-MatMul_eightbit_requantize_1.idx")), "ref_a_min");
+    ctx.addCached(hold(t_import.float_import("/fs/testData/import-MatMul_eightbit_requantize/out/import-MatMul_eightbit_requantize_2.idx")), "ref_a_max");
 
     
     // modify the checks below:
-    ctx.add(new RamTensor<unsigned char>(ctx.get("ref_a_q")->getShape(), "a_q"));
-    ctx.add(new RamTensor<float>(ctx.get("ref_a_min")->getShape(), "a_min_q"));
-    ctx.add(new RamTensor<float>(ctx.get("ref_a_max")->getShape(), "a_max_q"));
+    ctx.addCached(hold(new RamTensor<unsigned char>(ctx.get("ref_a_q")->getShape())), "a_q");
+    ctx.addCached(hold(new RamTensor<float>(ctx.get("ref_a_min")->getShape())), "a_min_q");
+    ctx.addCached(hold(new RamTensor<float>(ctx.get("ref_a_max")->getShape())), "a_max_q");
 
     S_TENSOR ref_val = ctx.get("ref_a_q");
     S_TENSOR ref_min = ctx.get("ref_a_min");
@@ -122,7 +122,7 @@ class MathOpsTest : public Test {
 
     // Implementation goes here
     timer_start();
-    ctx.push(new RequantizeOp(), {"a", "a_min", "a_max", "r_a_min", "r_a_max"}, {"a_q", "a_min_q", "a_max_q"});
+    ctx.push_static(hold(new RequantizeOp()), "RequantizeOp", {"a", "a_min", "a_max", "r_a_min", "r_a_max"}, {"a_q", "a_min_q", "a_max_q"});
     ctx.eval();
     timer_stop();
 
@@ -158,28 +158,28 @@ class MathOpsTest : public Test {
     ctx.gc();
 
     // reference inputs
-    ctx.add(t_import.float_import("/fs/testData/ArgMax/in/ArgMax-input_0.idx", "ref_a"));
-    ctx.add(t_import.int_import("/fs/testData/ArgMax/in/ArgMax-dimension_0.idx", "ref_dim"));
+    ctx.addCached(hold(t_import.float_import("/fs/testData/ArgMax/in/ArgMax-input_0.idx")), "ref_a");
+    ctx.addCached(hold(t_import.int_import("/fs/testData/ArgMax/in/ArgMax-dimension_0.idx")), "ref_dim");
 
     // reference outputs
     /// NT: FIXME: argmax outputs int64 tensor which isn't supported by
     /// int_import.
-    S_TENSOR ref_out = ctx.add(t_import.float_import("/fs/testData/ArgMax/out/ArgMax_0.idx", "ref_out"));
+    S_TENSOR ref_out = ctx.addCached(hold(t_import.float_import("/fs/testData/ArgMax/out/ArgMax_0.idx")), "ref_out");
 
     // Implementation goes here
 
     // modify the checks below:
-    S_TENSOR out = ctx.add(new RamTensor<int>(ref_out->getShape(), "out"));
+    S_TENSOR out = ctx.addCached(hold(new RamTensor<int>(ref_out->getShape())), "out");
     
     TNameList inputs = {"ref_a", "ref_dim"};
     TNameList outputs = {"out"};
 
     timer_start();
-    ctx.push(new ArgMaxOp<float, int>(), inputs, outputs);
+    ctx.push_static(hold(new ArgMaxOp<float, int>()), "ArgMaxOp", inputs, outputs);
     ctx.eval();
     timer_stop();
     
-    Tensor* out_float = TensorCast<int, float>(out.get(), "out_float");  ///NT: /WIP  how to handle the name?
+    Tensor* out_float = TensorCast<int, float>(out.get());  ///NT: /WIP  how to handle the name?
 
     double result = meanPercentErr<float>(ref_out.get(), out_float);
 
@@ -192,24 +192,24 @@ class MathOpsTest : public Test {
 
     ctx.gc();
 
-    S_TENSOR test_input = ctx.add(TensorConstant<float>({10, 5}, 0.0f, "test_input"));
+    S_TENSOR test_input = ctx.add(TensorConstant<float>({10, 5}, 0.0f), "test_input");
     *(test_input->write<float>(25, 0)) = 1.0f;
     *(test_input->write<float>(26, 0)) = 1.0f;
     *(test_input->write<float>(7, 0))  = 1.0f;
     *(test_input->write<float>(48, 0)) = 1.0f;
     *(test_input->write<float>(14, 0)) = 1.0f;
 
-    S_TENSOR test_dim = ctx.add(new RamTensor<int>({1}, "test_dim"));
+    S_TENSOR test_dim = ctx.add(new RamTensor<int>({1}), "test_dim");
     *(test_dim->write<int>(0, 0)) = 0;
 
-    S_TENSOR test_out_ref = ctx.add(new RamTensor<float>({5}, "test_out_ref"));
+    S_TENSOR test_out_ref = ctx.add(new RamTensor<float>({5}), "test_out_ref");
     *(test_out_ref->write<float>(0, 0)) = 5.0f;
     *(test_out_ref->write<float>(1, 0)) = 5.0f;
     *(test_out_ref->write<float>(2, 0)) = 1.0f;
     *(test_out_ref->write<float>(3, 0)) = 9.0f;
     *(test_out_ref->write<float>(4, 0)) = 2.0f;
 
-    S_TENSOR test_out = ctx.add(new RamTensor<float>(test_out_ref->getShape(), "test_out"));
+    S_TENSOR test_out = ctx.add(new RamTensor<float>(test_out_ref->getShape()), "test_out");
     TNameList inputs = {"test_input", "test_dim"};
     TNameList outputs = {"test_out"};
 
@@ -227,20 +227,20 @@ class MathOpsTest : public Test {
     testStart("add");
 
     // reference inputs
-    ctx.add(t_import.float_import("/fs/testData/ref_add/in/Const_5_0.idx", "a"));
-    ctx.add(t_import.float_import("/fs/testData/ref_add/in/Const_6_0.idx", "b"));
+    ctx.addCached(hold(t_import.float_import("/fs/testData/ref_add/in/Const_5_0.idx")), "a");
+    ctx.addCached(hold(t_import.float_import("/fs/testData/ref_add/in/Const_6_0.idx")), "b");
 
     // reference outputs
-    S_TENSOR ref_out = ctx.add(t_import.float_import("/fs/testData/ref_add/out/ref_add_0.idx", "ref_out"));
+    S_TENSOR ref_out = ctx.addCached(hold(t_import.float_import("/fs/testData/ref_add/out/ref_add_0.idx")), "ref_out");
 
     // Implementation goes here
 
     // modify the checks below:
-    S_TENSOR out = ctx.add(new RamTensor<float>(ref_out->getShape(), "out"));
+    S_TENSOR out = ctx.addCached(hold(new RamTensor<float>(ref_out->getShape())), "out");
     TNameList inputs = {"a", "b"};
     TNameList outputs = {"out"};
     timer_start();
-    ctx.push(new AddOp<float, float>(), inputs, outputs);
+    ctx.push_static(hold(new AddOp<float, float>()), "AddOp", inputs, outputs);
     ctx.eval();
     timer_stop();
 
@@ -255,21 +255,21 @@ class MathOpsTest : public Test {
     ctx.gc();
 
     // reference inputs
-    ctx.add(t_import.float_import("/fs/testData/ref_min/in/Const_2_0.idx", "a"));
-    ctx.add(t_import.int_import("/fs/testData/ref_min/in/Const_3_0.idx", "dim"));
+    ctx.addCached(hold(t_import.float_import("/fs/testData/ref_min/in/Const_2_0.idx")), "a");
+    ctx.addCached(hold(t_import.int_import("/fs/testData/ref_min/in/Const_3_0.idx")), "dim");
 
     // reference outputs
-    S_TENSOR ref_out = ctx.add(t_import.float_import("/fs/testData/ref_min/out/ref_min_0.idx", "ref_out"));
+    S_TENSOR ref_out = ctx.addCached(hold(t_import.float_import("/fs/testData/ref_min/out/ref_min_0.idx")), "ref_out");
 
     // Implementation goes here
 
     // modify the checks below:
-    S_TENSOR out = ctx.add(new RamTensor<float>(ref_out->getShape(), "out"));
+    S_TENSOR out = ctx.addCached(hold(new RamTensor<float>(ref_out->getShape())), "out");
     TNameList inputs = {"a", "dim"};
     TNameList outputs = {"out"};
 
     timer_start();
-    ctx.push(new MinOp(), inputs, outputs);
+    ctx.push_static(hold(new MinOp()), "MinOp", inputs, outputs);
     ctx.eval();
     timer_stop();
 
@@ -284,20 +284,20 @@ class MathOpsTest : public Test {
     ctx.gc();
 
     // reference inputs
-    ctx.add(t_import.float_import("/fs/testData/ref_max/in/Const_2_0.idx", "a"));
-    ctx.add(t_import.int_import("/fs/testData/ref_max/in/Const_4_0.idx", "dim"));
+    ctx.addCached(hold(t_import.float_import("/fs/testData/ref_max/in/Const_2_0.idx")), "a");
+    ctx.addCached(hold(t_import.int_import("/fs/testData/ref_max/in/Const_4_0.idx")), "dim");
 
     // reference outputs
-    S_TENSOR ref_out = ctx.add(t_import.float_import("/fs/testData/ref_max/out/ref_max_0.idx", "ref_out"));
+    S_TENSOR ref_out = ctx.addCached(hold(t_import.float_import("/fs/testData/ref_max/out/ref_max_0.idx")), "ref_out");
 
     // Implementation goes here
 
     // modify the checks below:
-    S_TENSOR out = ctx.add(new RamTensor<float>(ref_out->getShape(), "out"));
+    S_TENSOR out = ctx.addCached(hold(new RamTensor<float>(ref_out->getShape())), "out");
     TNameList inputs = {"a", "dim"};
     TNameList outputs = {"out"};
     timer_start();
-    ctx.push(new MaxOp(), inputs, outputs);
+    ctx.push_static(hold(new MaxOp()), "MaxOp", inputs, outputs);
     ctx.eval();
     timer_stop();
 

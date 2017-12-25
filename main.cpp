@@ -7,16 +7,15 @@
 #include "tensorIdxImporterTests.hpp"
 #include "context.hpp"
 #include "ArrayTests.hpp"
-#include "MathTests.hpp"
 #include "MatrixTests.hpp"
-#include "context_test.hpp"
 #include "tensor_test.hpp"
 #include "NnTests.hpp"
-#include "mlp_test.hpp"
+// #include "mlp_test.hpp"
 #include "deep_mnist_mlp.hpp"
 #include "context_test.hpp"
 #include "MathTests.hpp"
-#include "MatrixTests.hpp"
+#include "sdtest.hpp"
+#include "vmtest.hpp"
 
 Serial pc(USBTX, USBRX, 115200);
 SDBlockDevice bd(MBED_CONF_APP_SD_MOSI, MBED_CONF_APP_SD_MISO,
@@ -26,6 +25,7 @@ FATFileSystem fs("fs");
 int main(int argc, char** argv) {
   ON_ERR(bd.init(), "SDBlockDevice init ");
   ON_ERR(fs.mount(&bd), "Mounting the filesystem on \"/fs\". ");
+  init_env();
 
   printf("Deep MLP on Mbed (Trained with Tensorflow)\r\n\r\n");
   printf("running deep-mlp...\r\n");
@@ -38,6 +38,18 @@ int main(int argc, char** argv) {
   idxTest.runAll();
   printf("IDX import result...\r\n");
   idxTest.printSummary();
+
+  printf("vm: \r\n");
+  vmTest vmtest;
+  vmtest.runAll();
+  printf("VM result...\r\n");
+  vmtest.printSummary();
+
+  printf("SDTensor test:\r\n");
+  SDTensorTest sdtest;
+  sdtest.runAll();
+  printf("sd tensor result...\r\n");
+  sdtest.printSummary();
 
   printf("tesnor test: \r\n");
   tensorTest tenT;
@@ -80,6 +92,7 @@ int main(int argc, char** argv) {
   nnTest.runAll();
   printf("Nn Ops result...\r\n");
   nnTest.printSummary();
+
 
 /*   printf("mlp test: \r\n");
   mlpTest mlpt;
