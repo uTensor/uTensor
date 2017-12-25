@@ -25,12 +25,12 @@ void QuantizeV2(S_TENSOR input, S_TENSOR _min_range, S_TENSOR _max_range,
     std::vector<uint32_t> v;
 
     std::vector<uint32_t> org = input->getShape();
-    for (int i = org.size() - 1; i >= 0; i--) {
+    for (int i = 0; i < org.size(); i++) {
         v.push_back(org[i]);
     }
 
     if(output && output->getSize() == 0) {
-      output->resize<T>(v);
+      output->resize(v);
     }
 
     float max_range = std::max(input_max_range, min_range + epsilon);
@@ -81,7 +81,7 @@ void dequantize(S_TENSOR input, S_TENSOR min_range, S_TENSOR max_range, S_TENSOR
     float max = *(max_range->read<float>(0, 0));
       //auto tensor allocation
     Shape out_shape;
-    output->resize<float>(input->getShape());
+    output->resize(input->getShape());
 
     const T* input_ptr = input->read<T>(0, 0);
     float* output_ptr = output->write<float>(0, 0);
@@ -132,19 +132,13 @@ class DequantizeOp : public Operator {
 template <typename T>
 void reshape(S_TENSOR input, S_TENSOR shape, S_TENSOR output) {
     Shape dim;
-    uint32_t t = input->getShape().size();
-    if (t == 0) {
-        t = 1;
+
+    auto shape_vec = shape->getShape();
+    for(auto i = 0; i < shape_vec.size(); i++) {
+        //This may due to references to zero-tensor's dimensions
+        if(shape_vec[i] == 0) ERR_EXIT("shape tensor contains 0 value entry");
     }
 
-    shape->resize<int>({t});
-
-    if (t == 1) {
-        shape->write<int>(0, 0)[0] = -1;
-    } else {
-        shape->write<int>(0, 0)[0] = input->getSize();
-        shape->write<int>(0, 0)[1] = -1;
-    }
 
     //validating and inferring dimensions
     int infer_index = -1;
@@ -182,7 +176,7 @@ void reshape(S_TENSOR input, S_TENSOR shape, S_TENSOR output) {
         ERR_EXIT("output tensor dimension mismatches supplied shape")
     } else {
         //construct a new tensor and copy
-        output->resize<T>(dim);
+        output->resize(dim);
         T* output_ptr = output->write<T>(0, 0);
         std::memcpy(output_ptr, input_ptr, (std::size_t) input->getSize_in_bytes());
     }

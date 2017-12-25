@@ -5,11 +5,15 @@ void tensorQuantize(Context& ctx, TName input, TName output,
 
     //reshape
     S_TENSOR reduce_dim = ctx.add(new RamTensor<int>({1}), "reduce_dim");
+    *(reduce_dim->write<int>(0, 0)) = 0;
+
     ctx.add(new RamTensor<float>(), "reshape_out");
 
-    ctx.add(new RamTensor<int>(), "reshape_shape");
+    S_TENSOR reshape_shape = ctx.add(new RamTensor<int>({2}), "reshape_shape");
+    auto inputSize = ctx.get(input)->getSize();
+    reshape_shape->write<int>(0, 0)[0] = inputSize;
+    reshape_shape->write<int>(0, 0)[1] = -1;
 
-    *(reduce_dim->write<int>(0, 0)) = 0;
     ctx.push(new ReshapeOp(), {input, "reshape_shape"}, {"reshape_out"});
 
 
@@ -19,7 +23,8 @@ void tensorQuantize(Context& ctx, TName input, TName output,
     ctx.push(new MinOp(), {"reshape_out", "reduce_dim"}, {"min_out"});
     ctx.push(new MaxOp(), {"reshape_out", "reduce_dim"}, {"max_out"});
 
-    ctx.push(new QuantizeV2Op(), {"reshape_out", "min_out", "max_out"}, {output, out_min, out_max});
+    ctx.push(new QuantizeV2Op(), {input, "min_out", "max_out"}, {output, out_min, out_max});
+
 }
 
 void ReluLayer(Context& ctx, TName x, TName x_min, TName x_max,
@@ -32,6 +37,13 @@ void ReluLayer(Context& ctx, TName x, TName x_min, TName x_max,
 
     ctx.add(new RamTensor<float>({1}), "matmul_out_min");
     ctx.add(new RamTensor<float>({1}), "matmul_out_max");
+
+    // printf("QntMulOp Shape:");
+    // printf("\r\nx :");
+    // printVector(ctx.get(x)->getShape());
+    // printf("\r\nw :");
+    // printVector(ctx.get(w)->getShape());
+    // printf("\r\n");
 
     ctx.push(new QntMatMulOp<uint8_t, uint8_t, int>(), {x, x_min, x_max, w, w_min, w_max}, {"out_c", "matmul_out_min", "matmul_out_max"});
 
@@ -116,6 +128,7 @@ int runMLP(string inputIdxFile) {
   ctx.add(new RamTensor<float>(), "z_output"); 
 
   ReluLayer(ctx, "x_quantized", "x_min", "x_max", "w", "w_min", "w_max", "b", "z_output");
+  ctx.eval();
 
   ctx.add(new RamTensor<unsigned char>(), "z_qnt_output");
   ctx.add(new RamTensor<float>({1}), "z_min");
@@ -140,7 +153,7 @@ int runMLP(string inputIdxFile) {
 
   ctx.add(new RamTensor<float>(), "z_output2"); 
   ReluLayer(ctx, "relu_output", "relu_min", "relu_max", "w2", "w_min2", "w_max2", "b2", "z_output2");
-
+  ctx.eval();
 
   ctx.add(new RamTensor<unsigned char>(), "z_qnt_output2");
   ctx.add(new RamTensor<float>({1}), "z_min2");

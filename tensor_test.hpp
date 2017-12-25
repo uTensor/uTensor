@@ -14,7 +14,7 @@ class tensorTest : public Test {
       testStart("tensortest");
           Tensor* a = new RamTensor<int>({3, 2, 3});
           std::vector<uint32_t> v({1, 5, 8});
-          a->resize<int>(v);
+          a->resize(v);
           bool res = testsize(1 * 5 * 8, a->getSize());
          passed(res); 
          delete a;
