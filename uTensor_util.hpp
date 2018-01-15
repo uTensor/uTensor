@@ -45,14 +45,14 @@ void return_error(int ret_val);
 
 #endif
 
+void emscripten_exit(void);
+
 #define ERR_EXIT(MSG, ...)                                      \
   {                                                             \
     printf("[Error] %s:%d @%s ", __FILE__, __LINE__, __func__); \
     printf(MSG, ##__VA_ARGS__);                                 \
     fflush(stdout);                                             \
-#ifndef __EMSCRIPTEN__
-    exit(-1);
-#endif
+    emscripten_exit();                                          \
   }
 
 typedef std::vector<uint32_t> Shape;

@@ -66,3 +66,9 @@ void init_env() {
       }
     }
 }
+
+void emscripten_exit(void) {
+#ifndef __EMSCRIPTEN__
+    exit(-1);
+#endif
+}
