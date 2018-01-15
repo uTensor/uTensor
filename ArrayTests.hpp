@@ -13,7 +13,7 @@ class ArrayOpsTest : public Test {
 public:
     void quantize_v2Test(void) {
         testStart("quantize_v2");
-        
+
         //reference inputs  /Users/neitan01/Documents/mbed/uTensor.git/TESTS/scripts/PRE-GEN/qA
         S_TENSOR b_q_ref = ctx.addCached(hold(t_import.float_import ("/fs/testData/qB/in/Cast_1_0.idx")), "b_q_ref");
         S_TENSOR b_min_q_ref = ctx.addCached(hold(t_import.float_import("/fs/testData/qB/in/Min_1_0.idx")), "b_min_q_ref");
@@ -22,7 +22,7 @@ public:
         //reference outputs
         S_TENSOR ref_b_q = ctx.addCached(hold(t_import.ubyte_import("/fs/testData/qB/out/qB_0.idx")), "ref_b_q");
         S_TENSOR ref_b_min_q = ctx.addCached(hold(t_import.float_import("/fs/testData/qB/out/qB_1.idx")), "ref_b_min_q");
-        S_TENSOR ref_b_max_q = ctx.addCached(hold(t_import.float_import("/fs/testData/qB/out/qb_2.idx")), "ref_b_max_q");
+        S_TENSOR ref_b_max_q = ctx.addCached(hold(t_import.float_import("/fs/testData/qB/out/qB_2.idx")), "ref_b_max_q");
 
         S_TENSOR out_b_q = ctx.addCached(hold(new RamTensor<unsigned char>(b_q_ref->getShape())), "b_q");
         S_TENSOR out_b_min_q = ctx.addCached(hold(new RamTensor<float>(b_min_q_ref->getShape())), "b_min_q");
@@ -77,7 +77,7 @@ public:
 
         //modify the checks below:
         S_TENSOR out_2 = ctx.addCached(hold(new RamTensor<float>(out_ref_2->getShape())), "out_2");
-        
+
 
         timer_start();
         ctx.push_static(hold(new ReshapeOp()), "ReshapeOp", {"ref_a", "ref_dim"}, {"out_2"});

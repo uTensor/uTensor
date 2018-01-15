@@ -5,7 +5,6 @@
 #include <vector>
 #include <iostream>
 #include "mbed.h"
-#include "SDBlockDevice.h"
 
 // #define MAX(A, B) ((A > B)? A:B)
 
@@ -51,7 +50,9 @@ void return_error(int ret_val);
     printf("[Error] %s:%d @%s ", __FILE__, __LINE__, __func__); \
     printf(MSG, ##__VA_ARGS__);                                 \
     fflush(stdout);                                             \
-    exit(-1);                                                   \
+#ifndef __EMSCRIPTEN__
+    exit(-1);
+#endif
   }
 
 typedef std::vector<uint32_t> Shape;
