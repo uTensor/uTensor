@@ -4,9 +4,11 @@
 #include <iostream>
 #include "mbed.h"
 
+using namespace std;
+
 class vm {
   public:
-    
+
     template<typename T>
     void load_data(string& filename, uint8_t unit_size, uint32_t cachesize, uint32_t arrsize, long int offset, T* data);
 
@@ -20,7 +22,7 @@ class vm {
   private:
     template<typename U>
     void load_impl(U* dst, uint8_t unit_size, uint32_t offset, uint32_t arrsize);
-   
+
     template<typename U>
     void flush_impl(U* dst, uint8_t uint_size, uint32_t arrsize);
 
@@ -49,7 +51,7 @@ void vm::load_data(string& filename, uint8_t unit_size, uint32_t cachesize, uint
   buffer = fopen(filename.c_str(), "r");
   int size = std::min(cachesize, arrsize);
   uint32_t offset_t = (uint32_t)offset;
-  
+
   fseek(buffer, offset * unit_size, SEEK_SET);  // need error  handling
   load_impl(data, unit_size, offset_t, size);
   fclose(buffer);
