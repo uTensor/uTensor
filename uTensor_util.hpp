@@ -26,6 +26,7 @@ void return_error(int ret_val);
   {                       \
     printf(" * ");        \
     printf(MSG);          \
+    fflush(stdout);      \
     return_error(FUNC);   \
   }
 
