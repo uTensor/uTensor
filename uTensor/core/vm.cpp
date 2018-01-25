@@ -1,6 +1,6 @@
 #include "uTensor/core/vm.hpp"
 
-FILE* vm::createFile(std::string& filename) {
-  buffer = fopen(filename.c_str(), "w");
+FILE* vm::createFile(const char* filename) {
+  buffer = fopen(filename, "w");
   return buffer;
 }
