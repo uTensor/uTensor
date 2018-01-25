@@ -35,57 +35,57 @@ class TensorIdxImporter {
   HeaderMeta header;
   HeaderMeta parseHeader(void);
   template <typename U>
-  Tensor* loader(string& filename, IDX_DTYPE idx_type);
+  Tensor* loader(const char* filename, IDX_DTYPE idx_type);
   template <typename U>
-  Tensor* sdloader(string& filename, IDX_DTYPE idx_type, uint32_t cachesize);
-  void parseMeta(string& filename, IDX_DTYPE idx_type);
+  Tensor* sdloader(const char* filename, IDX_DTYPE idx_type, uint32_t cachesize);
+  void parseMeta(const char* filename, IDX_DTYPE idx_type);
   template <typename U>
   void load_impl(U* dst, uint8_t unit_size, uint32_t offset, uint32_t arrsize);
   template <typename U>
   void flush_impl(U* dst, uint8_t unit_size, uint32_t arrsize);
-  void open(string filename);
+  void open(const char* filename);
   // void open(FILE *fp);
 
  public:
-  Tensor* ubyte_import(string filename) {
+  Tensor* ubyte_import(const char* filename) {
     return loader<unsigned char>(filename, IDX_DTYPE::idx_ubyte);
   }
-  Tensor* byte_import(string filename) {
+  Tensor* byte_import(const char* filename) {
     return loader<char>(filename, IDX_DTYPE::idx_byte);
   }
-  Tensor* short_import(string filename) {
+  Tensor* short_import(const char* filename) {
     return loader<short>(filename, IDX_DTYPE::idx_short);
   }
-  Tensor* int_import(string filename) {
+  Tensor* int_import(const char* filename) {
     return loader<int>(filename, IDX_DTYPE::idx_int);
   }
-  Tensor* float_import(string filename) {
+  Tensor* float_import(const char* filename) {
     return loader<float>(filename, IDX_DTYPE::idx_float);
   }
-  Tensor* sd_ubyte_import(string filename, uint32_t cachesize) {
+  Tensor* sd_ubyte_import(const char* filename, uint32_t cachesize) {
     return sdloader<unsigned char>(filename, IDX_DTYPE::idx_ubyte, cachesize);
   }
-  Tensor* sd_byte_import(string filename, uint32_t cachesize) {
+  Tensor* sd_byte_import(const char* filename, uint32_t cachesize) {
     return sdloader<char>(filename, IDX_DTYPE::idx_byte, cachesize);
   }
-  Tensor* sd_short_import(string filename, uint32_t cachesize) {
+  Tensor* sd_short_import(const char* filename, uint32_t cachesize) {
     return sdloader<short>(filename, IDX_DTYPE::idx_short, cachesize);
   }
-  Tensor* sd_int_import(string filename, uint32_t cachesize) {
+  Tensor* sd_int_import(const char* filename, uint32_t cachesize) {
     return sdloader<int>(filename, IDX_DTYPE::idx_int, cachesize);
   }
-  Tensor* sd_float_import(string filename, uint32_t cachesize) {
+  Tensor* sd_float_import(const char* filename, uint32_t cachesize) {
     return sdloader<float>(filename, IDX_DTYPE::idx_float, cachesize);
   }
   uint32_t getMagicNumber(unsigned char dtype, unsigned char dim);
   template <typename T>
-  TensorShape load_data(string& filename, IDX_DTYPE idx_type, uint8_t unit_size, uint32_t cachesize, uint32_t arrsize, long int offset, T* data);
+  std::vector<uint32_t> load_data(const char* filename, IDX_DTYPE idx_type, uint8_t unit_size, uint32_t cachesize, uint32_t arrsize, long int offset, T* data);
   template <typename T>
-  void flush_data(string& filename, IDX_DTYPE idx_type, uint8_t unit_size, uint32_t cachesize, uint32_t arrsize, long int offset, T* data);
+  void flush_data(const char* filename, IDX_DTYPE idx_type, uint8_t unit_size, uint32_t cachesize, uint32_t arrsize, long int offset, T* data);
   uint8_t getIdxDTypeSize(IDX_DTYPE dtype);
 
   template<typename U>
-  void exportFile(string& filename, IDX_DTYPE idx_type, SDTensor<U>* t, uint8_t unit_size, uint32_t arrsize);
+  void exportFile(const char* filename, IDX_DTYPE idx_type, SDTensor<U>* t, uint8_t unit_size, uint32_t arrsize);
   ~TensorIdxImporter() {
   }
   TensorIdxImporter() {
@@ -101,7 +101,7 @@ class TensorIdxImporter {
 
 
 template<typename U>
-void TensorIdxImporter::exportFile(string& filename, IDX_DTYPE idx_type, SDTensor<U>* t, uint8_t unit_size, uint32_t arrsize) {
+void TensorIdxImporter::exportFile(const char* filename, IDX_DTYPE idx_type, SDTensor<U>* t, uint8_t unit_size, uint32_t arrsize) {
   vm mem = t->getVM();
   FILE* buffer = mem.getFile();
   U* val = (U*)malloc(unit_size);
@@ -182,7 +182,7 @@ void TensorIdxImporter::flush_impl(U* res, uint8_t unit_size, uint32_t arrsize) 
   free(dst);
 }
 template <typename U>
-Tensor* TensorIdxImporter::loader(string& filename, IDX_DTYPE idx_type) {
+Tensor* TensorIdxImporter::loader(const char* filename, IDX_DTYPE idx_type) {
 
   parseMeta(filename, idx_type);
   fseek(fp, header.dataPos, SEEK_SET);
@@ -199,7 +199,7 @@ Tensor* TensorIdxImporter::loader(string& filename, IDX_DTYPE idx_type) {
 }
 
 template <typename U>
-Tensor* TensorIdxImporter::sdloader(string& filename, IDX_DTYPE idx_type, uint32_t cachesize) {
+Tensor* TensorIdxImporter::sdloader(const char* filename, IDX_DTYPE idx_type, uint32_t cachesize) {
 
   parseMeta(filename, idx_type);
   fseek(fp, header.dataPos, SEEK_SET);
@@ -214,7 +214,7 @@ Tensor* TensorIdxImporter::sdloader(string& filename, IDX_DTYPE idx_type, uint32
 }
 
 template<typename T>
-TensorShape TensorIdxImporter::load_data(string& filename, IDX_DTYPE idx_type, uint8_t unit_size, uint32_t cachesize, uint32_t arrsize, long int offset, T* data) {
+std::vector<uint32_t> TensorIdxImporter::load_data(const char* filename, IDX_DTYPE idx_type, uint8_t unit_size, uint32_t cachesize, uint32_t arrsize, long int offset, T* data) {
   parseMeta(filename, idx_type);
   if (arrsize == 0) {
     for (auto i : header.dim) {
@@ -236,7 +236,7 @@ TensorShape TensorIdxImporter::load_data(string& filename, IDX_DTYPE idx_type, u
   return header.dim;
 }
 template<typename T>
-void TensorIdxImporter::flush_data(string& filename, IDX_DTYPE idx_type, uint8_t unit_size, uint32_t cachesize, uint32_t arrsize, long int offset, T* data) {
+void TensorIdxImporter::flush_data(const char* filename, IDX_DTYPE idx_type, uint8_t unit_size, uint32_t cachesize, uint32_t arrsize, long int offset, T* data) {
   parseMeta(filename, idx_type);
   int size = std::min(cachesize, arrsize);
   fseek(fp, header.dataPos + offset * unit_size, SEEK_SET);
