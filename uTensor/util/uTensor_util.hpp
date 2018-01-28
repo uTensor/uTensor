@@ -67,4 +67,8 @@ uint16_t ntoh16(uint16_t val);
 uint32_t ntoh32(uint32_t val);
 
 void init_env();
+enum Padding {
+   VALID= 1,
+   SAME = 2,
+};
 #endif
