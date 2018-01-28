@@ -62,4 +62,8 @@ uint32_t htonl(uint32_t& val);
 uint16_t ntoh16(uint16_t val);
 uint32_t ntoh32(uint32_t val);
 
+enum Padding {
+   VALID= 1,
+   SAME = 2,
+};
 #endif
