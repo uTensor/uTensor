@@ -220,7 +220,7 @@ void QuantizedMatMul2(S_TENSOR A, S_TENSOR B, S_TENSOR C,
 template<class T1, class T2, class T3>
 void conv(S_TENSOR input_data, int input_batches, int input_height, int input_width,
         int input_depth, int input_offset, S_TENSOR filter_data, int filter_height, int filter_width, 
-        int filter_count, int filter_offset, int stride_rows, int stride_cols, S_TENSOR output_data,
+        int filter_count, int filter_offset, int stride_rows, int stride_cols, Padding padding, S_TENSOR output_data,
         int output_height, int output_width, int output_shift, int output_offset, int output_mult) {
     const int32_t highest = static_cast<int32_t>(std::numeric_limits<T3>::highest());
     const int32_t lowest = static_cast<int32_t>(std::numeric_limits<T3>::lowest());
@@ -270,7 +270,7 @@ void conv(S_TENSOR input_data, int input_batches, int input_height, int input_wi
                         input_data->read<T1>(((batch * input_height * input_width *
                                     input_depth) +
                                    (in_y * input_width * input_depth) +
-                                   (in_x * input_depth) + in_channel), 0);
+                                   (in_x * input_depth) + in_channel), 1);
                     input_value = static_cast<int32_t>(*input_source_ptr) - input_offset;
                   } else {
                     input_value = 0;
@@ -279,7 +279,7 @@ void conv(S_TENSOR input_data, int input_batches, int input_height, int input_wi
                       filter_data->read<T2>((filter_y * filter_width * input_depth *
                                    filter_count) +
                                   (filter_x * input_depth * filter_count) +
-                                  (in_channel * filter_count) + out_channel, 0);
+                                  (in_channel * filter_count) + out_channel, 1);
                   const int32_t filter_value = 
                       static_cast<int32_t>(*filter_ptr) - filter_offset;
                   total += (input_value * filter_value);
@@ -296,7 +296,7 @@ void conv(S_TENSOR input_data, int input_batches, int input_height, int input_wi
             T3 *output = 
             output_data->write<T3>((batch * output_height * output_width * filter_count) +
                         (out_y * output_width * filter_count) +
-                        (out_x * filter_count) + out_channel, 0);
+                        (out_x * filter_count) + out_channel, 1);
             *output = clamped_output;
           }
         }
@@ -304,6 +304,9 @@ void conv(S_TENSOR input_data, int input_batches, int input_height, int input_wi
     }
 }
 
+template<class T1, class T2, class TOut>
+class ConvOp : public Operator {
+};
 template <class T1, class T2, class TOut>
 class QntMatMulOp : public Operator {
     public:
