@@ -1,7 +1,7 @@
 #ifndef UTENSOR_VM
 #define UTENSOR_VM
 #include <vector>
-#include <iostream>
+#include "mbed.h"
 
 using namespace std;
 

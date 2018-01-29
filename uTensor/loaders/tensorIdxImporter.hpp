@@ -5,7 +5,6 @@
 #include "uTensor/core/tensor.hpp"
 #include "uTensor/core/sdtensor.hpp"
 #include <stdio.h>
-#include <iostream>
 #include <stdlib.h>
 #include <vector>
 #include <memory>

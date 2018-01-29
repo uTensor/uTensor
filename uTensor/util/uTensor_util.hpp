@@ -3,9 +3,7 @@
 #include <stdint.h>
 #include <stdio.h>
 #include <vector>
-#include <iostream>
-
-using namespace std;
+#include "mbed.h"
 
 // #define MAX(A, B) ((A > B)? A:B)
 
