@@ -29,7 +29,7 @@ S_TENSOR Context::addCached(std::function<void*(void)> func, TName _name, uint8_
 S_TENSOR Context::add(Tensor* t, TName _name, uint8_t init_count) {
   if(t == nullptr) { ERR_EXIT("null pointer tensor"); }
   if(rTable.find(_name) != rTable.end()) {
-    ERR_EXIT("tensor with name \"%s\" address already exist in rTable", t->getName().c_str());
+    ERR_EXIT("tensor with name \"%d\" address already exist in rTable", t->getName().get_value());
   }
 
   S_TENSOR _sptr(t);
@@ -50,7 +50,7 @@ S_TENSOR Context::add(Tensor* t, TName _name, uint8_t init_count) {
 }
 
 S_TENSOR Context::get(TName const &t_name) {
-  if(rTable.find(t_name) == rTable.end()) ERR_EXIT("No tensor with name: %s", t_name.c_str());
+  if(rTable.find(t_name) == rTable.end()) ERR_EXIT("No tensor with name: %d", t_name.get_value());
   return rTable[t_name].sptr;
 }
 
@@ -93,14 +93,14 @@ void Context::push(Operator* op, TNameList &in_names, TNameList &out_names) {
   //error checking in the Op class
   S_TList _inputs;
   for(auto in:in_names) {
-    if(rTable.find(in) == rTable.end()) { ERR_EXIT("Tensor \"%s\" not found", in.c_str()); }
+    if(rTable.find(in) == rTable.end()) { ERR_EXIT("Tensor \"%d\" not found", in.get_value()); }
     Ref_Record r = rTable[in];
     _inputs.push_back(r.sptr);
   }
 
   S_TList _outputs;
   for(auto out:out_names) {
-    if(rTable.find(out) == rTable.end()) { ERR_EXIT("Tensor \"%s\" not found", out.c_str()); }
+    if(rTable.find(out) == rTable.end()) { ERR_EXIT("Tensor \"%d\" not found", out.get_value()); }
     Ref_Record r = rTable[out];
     _outputs.push_back(r.sptr);
   }
