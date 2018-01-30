@@ -65,9 +65,8 @@ Currently, the binary runs the first sample of the [MNIST dataset](http://yann.l
  
 ## Exporting to uTensor
   
-  At this time, exporting models to uTensor requires the  [node-viewer](https://github.com/neil-tan/tf-node-viewer/) project. This tool is designed to view navigate TensorFlow graphs and export tensors to idx files. The idx files are then used by the uTensor. For further instruction, please refer to this [wiki-page](https://github.com/neil-tan/uTensor/wiki/Tensorflow-model-exporting-note).
+Please refer to [uTensor-CLI](https://github.com/utensor/utensor_cgen)
   
-  uTensor-CLI is a tool planned for the next releases. It would streamline the process of moving TensorFlow models to uTensor environment.
    
 ## Reference
 
