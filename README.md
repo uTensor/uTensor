@@ -90,20 +90,20 @@ Topics to be covered:
   ```
   
   Now, all required libraries have been added. As a good measure, we are issuing `mbed deploy` to ensure all the references are in good shape.
-  
-	```
-  $ mbed deploy
-  [mbed] Updating library "mbed-os" to rev #96d9a00d0a1d
-  [mbed] Updating library "sd-driver" to rev #c46d0779e735
-  [mbed] Updating library "uTensor" to rev #1bdf2b3d5628
-	```
+
+```		
+	$ mbed deploy
+	[mbed] Updating library "mbed-os" to rev #96d9a00d0a1d
+	[mbed] Updating library "sd-driver" to rev #c46d0779e735
+	[mbed] Updating library "uTensor" to rev #1bdf2b3d5628
+```
 	
-Finally, we would like to use uTensor's application profile as a starting template for our configurations:
+  Finally, we would like to use uTensor's application profile as a starting template for our configurations:
 
 ```
-$ cp uTensor/mbed_app.json ./
+	$ cp uTensor/mbed_app.json ./
 ```
-	
+
 ## Graph to C++
   This section shows how one would use utensor-cli to generate the C++ implementation of the model given a quantized graph trained within Tensorflow. Here, we would a graph we prepared for illustration purpose. Overview of the steps are:
   

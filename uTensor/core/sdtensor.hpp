@@ -54,7 +54,7 @@ class SDTensor : public Tensor {
         //2. dirty && not miss state
         dirty = false;
         return (void *)((T*)s->data + offset - cursor);
-      } else if (dirty && (offset + ele > cursor + s->cache_size || offset + ele < cursor)) { 
+      } else if (dirty && (offset + ele > cursor + s->cache_size || offset + ele < cursor)) {
         //1. dirty && miss state
         mem.flush_data<T>(_filename, unit_size(), s->cache_size, s->total_size, cursor, (T*)s->data);
         mem.load_data<T>(_filename, unit_size(), s->cache_size, s->total_size, offset, (T*)s->data);
@@ -64,7 +64,7 @@ class SDTensor : public Tensor {
         //1. shared && miss state
         mem.load_data<T>(_filename, unit_size(), s->cache_size, s->total_size, offset, (T*)s->data);
         cursor = offset;
-      } 
+      }
       return (void *)((T*)s->data);
     }
     virtual void* write(size_t offset, size_t ele) override {
@@ -89,7 +89,7 @@ class SDTensor : public Tensor {
       }
       return (void*)((T*)s->data);
     }
-    void resize(std::vector<uint32_t> v) {
+    void resize(std::vector<uint32_t> v) override {
         Tensor::resize(v);
         initCache();
     }
@@ -110,7 +110,7 @@ class SDTensor : public Tensor {
   virtual uint16_t unit_size(void) override {
     return sizeof(T);
   }
-  
+
   ~SDTensor() {
   }
  private:
