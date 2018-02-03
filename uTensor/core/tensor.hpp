@@ -10,7 +10,7 @@
 #include "uTensor_util.hpp"
 #include <limits>
 
-// enum class DType : char { 
+// enum class DType : char {
 //   uint8,
 //   int8,
 //   uint16,
@@ -32,7 +32,7 @@ public:
  virtual void inFocus(){};
  virtual void deFocus(){};
  virtual std::string getName() { return name; }
- virtual void setName(std::string _name) { 
+ virtual void setName(std::string _name) {
     if(name == "") {
       name = _name;
     } else {
@@ -44,7 +44,7 @@ public:
  virtual ~uTensor() = 0;
 private:
  std::string name;
- 
+
 };
 
 inline uTensor::~uTensor() {}
@@ -63,7 +63,7 @@ class TensorBase {
       if (ret == 0) {
           ret = ele;
       } else {
-          ret *= ele; 
+          ret *= ele;
       }
     }
     total_size = ret;
@@ -75,7 +75,7 @@ class TensorBase {
       data = (void*)malloc(unit_size * total_size);
     }
     if (data == NULL)
-      ERR_EXIT("ran out of memory for %lu malloc", unit_size* total_size);
+      ERR_EXIT("ran out of memory for %u malloc", unit_size * total_size);
   }
 
   ~TensorBase() {
@@ -125,13 +125,13 @@ class Tensor : public uTensor {
 
   virtual void resize(std::vector<uint32_t> v) {
       uint32_t size = s->total_size;
-      
+
       s->initialize(v);
 
       if (size == s->total_size) {
           return;
-      } 
-      
+      }
+
       s->allocate(unit_size());
   }
 
@@ -355,7 +355,7 @@ void tensorChkAlloc(Tensor** t, Shape dim) {
   } else if (*t == nullptr){
       *t = new RamTensor<T>(dim);
   }
-   
+
 }
 
 
