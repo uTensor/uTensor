@@ -13,20 +13,24 @@
 ### Mbed Runtime Library
 
   - Tensor Classes
-  	- Data Holder
-  	- Virtual Memory 
+	- Data Holder
+	- Virtual Memory
+
   - Operators Classes
-   - C reference implementation
-   - Basic operators: MatMal, Add, ReLu, Reshape, Max, Min, ArgMax, Quantization Ops, etc
+	- C reference implementation
+	- Basic operators: MatMal, Add, ReLu, Reshape, Max, Min, ArgMax, Quantization Ops, etc
+
   - Context Class
-   - A resource management class
-   - An interface to utensor-cli's code generation
-   - Describes a graph
+	- A resource management class
+	- An interface to utensor-cli's code generation
+	- Describes a graph
 
   This project is under going constant development. APIs are expected to update rapidly.
   
 ## Overview
-  This document contains the steps you would need to build an uTensor application from ground-up. The application implements a simple 3-layer MLP trained for the MNIST dataset, a hand-written digit recognizer. The example repository created using steps presented below can be found [HERE](https://github.com/neil-tan/utensor-helloworld).
+  This document contains the steps you would need to build an uTensor application from ground-up. The application implements a simple 3-layer MLP trained for the MNIST dataset, a hand-written digit recognizer:
+
+  ![alt text](https://raw.githubusercontent.com/dmlc/web-data/master/mxnet/image/mlp_mnist.png "mxnet Handwritten Digit Recognition")
   
 Topics to be covered:
   
@@ -35,6 +39,8 @@ Topics to be covered:
   - Add main.cpp to perform inference
   - Running on device
 
+    The example repository created using steps presented below can be found [HERE](https://github.com/neil-tan/utensor-helloworld).
+    
   We are working to release an Mbed-online-Simulator version of the example. Stay-tuned!
 
 ## Requirement
@@ -67,6 +73,7 @@ Topics to be covered:
   $ ls #See what `mbed new .` does
   mbed-os          mbed-os.lib      mbed_settings.py
   ```
+  
   Next, we would like to add the uTensor runtime-library to the project:
 
   ```
@@ -74,27 +81,30 @@ Topics to be covered:
   [mbed] Updating library "uTensor" to latest revision in the current branch
 [mbed] Updating reference "uTensor" -> "https://github.com/uTensor/uTensor/...
   ```
+  
   Because uTensor usually require a file system to access the model parameters, we would have to add a filesystem driver. In this case, SD driver is used:
 
   ```
   $ mbed add https://github.com/ARMmbed/sd-driver/#c46d0779e7354169e5a5ad0a84dc0346f55ab3e1
   [mbed] Updating library "sd-driver" to rev #c46d0779e735
   ```
-  Now, all required libraries have been added. As a good measure, we are issuing `mbed deploy` to ensure all the references are in good shape.
   
-  ```
-  $ mbed deploy
-  [mbed] Updating library "mbed-os" to rev #96d9a00d0a1d
-[mbed] Updating library "sd-driver" to rev #c46d0779e735
-[mbed] Updating library "uTensor" to rev #1bdf2b3d5628
+  Now, all required libraries have been added. As a good measure, we are issuing `mbed deploy` to ensure all the references are in good shape.
+
+	```
+		
+	$ mbed deploy
+	[mbed] Updating library "mbed-os" to rev #96d9a00d0a1d
+	[mbed] Updating library "sd-driver" to rev #c46d0779e735
+	[mbed] Updating library "uTensor" to rev #1bdf2b3d5628
 	```
 	
-Finally, we would like to use uTensor's application profile as a starting template for our configurations:
+  Finally, we would like to use uTensor's application profile as a starting template for our configurations:
 
-```
-$ cp uTensor/mbed_app.json ./
-```
-	
+	```
+	$ cp uTensor/mbed_app.json ./
+	```
+
 ## Graph to C++
   This section shows how one would use utensor-cli to generate the C++ implementation of the model given a quantized graph trained within Tensorflow. Here, we would a graph we prepared for illustration purpose. Overview of the steps are:
   
@@ -119,12 +129,11 @@ helloworld
 helloworld  py3_venv
 ```
 
- Clone utensor-cli, checkout the dev branch and install:
+ Clone and install utensor-cli:
 
  ```
   (ut) $ git clone https://github.com/uTensor/utensor_cgen
   (ut) $ cd utensor_cgen
-  (ut) $ git checkout develop
   (ut) $ pip install utensor_cgen
   Collecting utensor_cgen
   Downloading utensor_cgen-0.1.2.tar.gz
@@ -243,6 +252,7 @@ Total Flash memory (text + data): 267890 bytes
 
 Image: ./BUILD/K64F/GCC_ARM/helloworld.bin
 ```
+
 ## Running on device
 - Download [the handwritten sample](https://github.com/uTensor/uTensor/blob/master/TESTS/scripts/PRE-GEN/deep_mlp/import-Placeholder_0.idx) to the root of your SD card and rename it as `tmp.idx`.
 
