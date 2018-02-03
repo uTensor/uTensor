@@ -13,15 +13,17 @@
 ### Mbed Runtime Library
 
   - Tensor Classes
-  	- Data Holder
-  	- Virtual Memory 
+	- Data Holder
+	- Virtual Memory
+
   - Operators Classes
-   - C reference implementation
-   - Basic operators: MatMal, Add, ReLu, Reshape, Max, Min, ArgMax, Quantization Ops, etc
+	- C reference implementation
+	- Basic operators: MatMal, Add, ReLu, Reshape, Max, Min, ArgMax, Quantization Ops, etc
+
   - Context Class
-   - A resource management class
-   - An interface to utensor-cli's code generation
-   - Describes a graph
+	- A resource management class
+	- An interface to utensor-cli's code generation
+	- Describes a graph
 
   This project is under going constant development. APIs are expected to update rapidly.
   
