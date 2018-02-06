@@ -221,7 +221,8 @@ template<class T1, class T2, class T3>
 void conv(S_TENSOR input_data, int input_batches, int input_height, int input_width,
         int input_depth, int input_offset, S_TENSOR filter_data, int filter_height, int filter_width, 
         int filter_count, int filter_offset, int stride_rows, int stride_cols, Padding padding, S_TENSOR output_data,
-        int output_height, int output_width, int output_shift, int output_offset, int output_mult) {
+        int output_height, int output_width, int output_shift, int output_offset, int output_mult) 
+{
     const int32_t highest = static_cast<int32_t>(std::numeric_limits<T3>::highest());
     const int32_t lowest = static_cast<int32_t>(std::numeric_limits<T3>::lowest());
     
@@ -306,10 +307,21 @@ void conv(S_TENSOR input_data, int input_batches, int input_height, int input_wi
 
 template<class T1, class T2, class TOut>
 class ConvOp : public Operator {
+  public:
+  ConvOp(){
+    n_inputs = 19;
+    n_outputs = 1;
+  }
+  virtual void compute() override {
+    conv<T1, T2, TOut>(inputs[0], inputs[1], inputs[2], inputs[3], 
+    inputs[4], inputs[5], inputs[6], inputs[7], inputs[8], inputs[9],
+    inputs[10], inputs[11], inputs[12], inputs[13], ouputs[0],
+    inputs[14], inputs[15], inputs[16], inputs[17], inputs[18]);
+  }
 };
 template <class T1, class T2, class TOut>
 class QntMatMulOp : public Operator {
-    public:
+  public:
   QntMatMulOp() {
     n_inputs = 6;
     n_outputs = 3;
