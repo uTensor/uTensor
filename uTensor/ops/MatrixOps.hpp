@@ -318,7 +318,7 @@ class ConvOp : public Operator {
   virtual void compute() override {
     conv<T1, T2, TOut>(inputs[0], inputs[1], inputs[2], inputs[3], 
     inputs[4], inputs[5], inputs[6], inputs[7], inputs[8], inputs[9],
-    inputs[10], inputs[11], inputs[12], inputs[13], ouputs[0],
+    inputs[10], inputs[11], inputs[12], inputs[13], outputs[0],
     inputs[14], inputs[15], inputs[16], inputs[17], inputs[18]);
   }
 };
