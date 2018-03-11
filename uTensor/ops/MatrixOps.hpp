@@ -1,12 +1,12 @@
 #ifndef UTENSOR_MATRIX_OPS
 #define UTENSOR_MATRIX_OPS
 
+#include "uTensor/util/quantization_utils.hpp"
+#include "uTensor/core/tensor.hpp"
+#include "uTensor/core/uTensorBase.hpp"
 #include <cmath>
 #include <cstdlib>
 #include <limits>
-#include "quantization_utils.hpp"
-#include "tensor.hpp"
-#include "uTensorBase.hpp"
 
 // tensorflow/tensorflow/core/kernels/reference_gemm.h
 

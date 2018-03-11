@@ -1,11 +1,11 @@
 #ifndef UTENSOR_ARRAY_OPS
 #define UTENSOR_ARRAY_OPS
 
+#include "uTensor/util/uTensor_util.hpp"
+#include "uTensor/util/quantization_utils.hpp"
+#include "uTensor/core/uTensorBase.hpp"
 #include <cstring>
 #include <math.h>
-#include "uTensor_util.hpp"
-#include "quantization_utils.hpp"
-#include "uTensorBase.hpp"
 
 //T = inferred
 //mode = MIN_FIRST

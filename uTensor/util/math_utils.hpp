@@ -1,12 +1,12 @@
 #ifndef __MATH_UTILS_HPP
 #define __MATH_UTILS_HPP
 
+#include "uTensor/util/uTensor_util.hpp"
+#include "uTensor/core/tensor.hpp"
 #include <math.h>
 #include <limits>
 #include <string>
 #include <vector>
-#include "uTensor_util.hpp"
-#include "tensor.hpp"
 
 namespace utils {
 template <typename U>
