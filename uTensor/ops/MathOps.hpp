@@ -1,12 +1,12 @@
 #ifndef UTENSOR_MATH_OPS
 #define UTENSOR_MATH_OPS
 
+#include "uTensor/util/quantization_utils.hpp"
+#include "uTensor/core/tensor.hpp"
+#include "uTensor/core/uTensorBase.hpp"
 #include <climits>
 #include <algorithm>
 #include <vector>
-#include "quantization_utils.hpp"
-#include "tensor.hpp"
-#include "uTensorBase.hpp"
 
 template<class T1>
 void CalculateUsedRange(Tensor* input, int32_t* used_min_quan,
