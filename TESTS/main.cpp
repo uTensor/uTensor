@@ -1,12 +1,12 @@
 #include "FATFileSystem.h"
+#include "uTensor/util/uTensor_util.hpp"
+#include "uTensor/core/tensor.hpp"
+#include "uTensor/core/context.hpp"
+// #include "mlp_test.hpp"
+#include "examples/deep_mnist_mlp.hpp"
 #include "SDBlockDevice.h"
 #include "mbed.h"
-#include "stdio.h"
-#include "uTensor_util.hpp"
-#include "tensor.hpp"
-#include "context.hpp"
-// #include "mlp_test.hpp"
-#include "deep_mnist_mlp.hpp"
+#include <stdio.h>
 
 Serial pc(USBTX, USBRX, 115200);
 SDBlockDevice bd(MBED_CONF_APP_SD_MOSI, MBED_CONF_APP_SD_MISO,
