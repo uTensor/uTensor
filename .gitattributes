@@ -1,0 +1,16 @@
+# Set the default behavior, in case people don't have core.autocrlf set.
+* text=auto
+
+# Explicitly declare text files you want to always be normalized and converted
+# to native line endings on checkout.
+*.c text
+*.h text
+*.cpp text
+*.hpp text
+sd-driver.lib text
+mbed-os.lib text
+LICENSE text
+README.md text
+
+# Denote all files that are truly binary and should not be modified.
+*.idx binary

@@ -9,6 +9,8 @@
 #include "uTensor_util.hpp"
 #include "tensor.hpp"
 
+using namespace std;
+
 class Test {
  private:
   Timer timer;
@@ -125,7 +127,7 @@ class Test {
     }
     return pass;
   }
-  
+
   bool testsize(uint32_t src, uint32_t res) {
     bool pass = true;
     if (src != res) {
@@ -167,16 +169,16 @@ class Test {
       ERR_EXIT("Test.sumPercentErr(): dimension mismatch\r\n");
     }
 
-    const U* elemA = A->read<U>(0, 0);
-    const U* elemB = B->read<U>(0, 0);
 
     double accm = 0.0;
     for (uint32_t i = 0; i < A->getSize(); i++) {
-      if (elemA[i] != 0.0f) {
-        accm += (double)fabs(((float)elemB[i] - (float)elemA[i]) /
-                             fabs((float)elemA[i]));
+    const U* elemA = A->read<U>(i, 1);
+    const U* elemB = B->read<U>(i, 1);
+      if (elemA[0] != 0.0f) {
+        accm += (double)fabs(((float)elemB[0] - (float)elemA[0]) /
+                             fabs((float)elemA[0]));
       } else {
-        if (elemB[i] != 0) {
+        if (elemB[0] != 0) {
           accm += std::numeric_limits<float>::quiet_NaN();
         }
       }

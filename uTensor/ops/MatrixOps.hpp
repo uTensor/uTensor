@@ -1,19 +1,20 @@
 #ifndef UTENSOR_MATRIX_OPS
 #define UTENSOR_MATRIX_OPS
 
+#include "uTensor/util/quantization_utils.hpp"
+#include "uTensor/core/tensor.hpp"
+#include "uTensor/core/uTensorBase.hpp"
 #include <cmath>
 #include <cstdlib>
 #include <limits>
-#include "quantization_utils.hpp"
-#include "tensor.hpp"
 
 // tensorflow/tensorflow/core/kernels/reference_gemm.h
 
 template <class T1, class T2, class T3>
 void ReferenceGemmuImpl(bool transpose_a, bool transpose_b, bool transpose_c,
-                        size_t m, size_t n, size_t k, const T1* a,
-                        int32_t offset_a, size_t lda, const T2* b, int offset_b,
-                        size_t ldb, T3* c, int shift_c, int offset_c,
+                        size_t m, size_t n, size_t k, S_TENSOR a,
+                        int32_t offset_a, size_t lda, S_TENSOR b, int offset_b,
+                        size_t ldb, S_TENSOR c, int shift_c, int offset_c,
                         int mult_c, size_t ldc) {
   int a_i_stride = lda;
   int a_l_stride = 1;
@@ -46,12 +47,15 @@ void ReferenceGemmuImpl(bool transpose_a, bool transpose_b, bool transpose_c,
       int32_t total = 0;
       for (l = 0; l < k; l++) {
         const size_t a_index = ((i * a_i_stride) + (l * a_l_stride));
-        const int32_t a_value = static_cast<int32_t>(a[a_index]) - offset_a;
+        const T1* a_data = a->read<T1>(a_index, 1);
+        const int32_t a_value = static_cast<int32_t>(a_data[0]) - offset_a;
         const size_t b_index = ((j * b_j_stride) + (l * b_l_stride));
-        const int32_t b_value = static_cast<int32_t>(b[b_index]) - offset_b;
+        const T2* b_data = b->read<T2>(b_index, 1);
+        const int32_t b_value = static_cast<int32_t>(b_data[0]) - offset_b;
         total += (a_value * b_value);
       }
       const size_t c_index = ((i * c_i_stride) + (j * c_j_stride));
+      T3* c_data = c->write<T3>(c_index, 1);
       int32_t output = ((((total + offset_c) * mult_c) + rounding) >> shift_c);
       if (output > highest) {
         output = highest;
@@ -60,7 +64,7 @@ void ReferenceGemmuImpl(bool transpose_a, bool transpose_b, bool transpose_c,
       if (output < lowest) {
         output = lowest;
       }
-      c[c_index] = static_cast<T3>(output);
+      c_data[0] = static_cast<T3>(output);
     }
   }
 }
@@ -171,10 +175,13 @@ void QuantizedMatMul2(S_TENSOR A, S_TENSOR B, S_TENSOR C,
   const float max_b = *(maxb->read<float>(0, 0));
 
   //auto tensor allocation
-  Shape c_shape;
-  c_shape.push_back((A->getShape())[0]);
-  c_shape.push_back((B->getShape())[1]);
-  C->resize<Toutput>(c_shape);
+  if(C->getSize() == 0) {
+    Shape c_shape;
+    c_shape.push_back((A->getShape())[0]);
+    c_shape.push_back((B->getShape())[1]);
+    C->resize(c_shape);
+  }
+  
 
   const int32_t offset_a = FloatToQuantizedUnclamped<T1>(
       0.0f, min_a, max_a);  // NT: what 0 quantized to; depends on
@@ -190,10 +197,6 @@ void QuantizedMatMul2(S_TENSOR A, S_TENSOR B, S_TENSOR C,
   int a_dim_remaining = 1 - first;
   int b_dim_remaining = 1 - second;
 
-  const T1* A_Data = A->read<T1>(0, 0);
-  const T2* B_Data = B->read<T2>(0, 0);
-  Toutput* C_Data = C->write<Toutput>(0, 0);
-
   const bool transpose_c = false;
   const size_t m = A->getShape()[a_dim_remaining];
   const size_t n = B->getShape()[b_dim_remaining];
@@ -203,8 +206,8 @@ void QuantizedMatMul2(S_TENSOR A, S_TENSOR B, S_TENSOR C,
   const size_t ldc = n;
 
   ReferenceGemmuImpl<T1, T2, Toutput>(
-      transpose_a, transpose_b, transpose_c, m, n, k, A_Data, offset_a, lda,
-      B_Data, offset_b, ldb, C_Data, shift_c, offset_c, mult_c, ldc);
+      transpose_a, transpose_b, transpose_c, m, n, k, A, offset_a, lda,
+      B, offset_b, ldb, C, shift_c, offset_c, mult_c, ldc);
   float min_c_value;
   float max_c_value;
 

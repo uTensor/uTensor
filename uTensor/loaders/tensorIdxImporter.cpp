@@ -1,4 +1,4 @@
-#include "tensorIdxImporter.hpp"
+#include "uTensor/loaders/tensorIdxImporter.hpp"
 
 uint8_t TensorIdxImporter::getIdxDTypeSize(IDX_DTYPE dtype) {
   switch (dtype) {
@@ -52,4 +52,19 @@ HeaderMeta TensorIdxImporter::parseHeader(void) {
   header.dataPos = ftell(fp);
 
   return header;
+}
+
+void TensorIdxImporter::parseMeta(string& filename, IDX_DTYPE idx_type) {
+  fp = fopen(filename.c_str(), "r");
+
+  DEBUG("Opening file %s ", filename.c_str());
+  if (fp == NULL) ERR_EXIT("Error opening file: %s", filename.c_str());
+
+  header = parseHeader();
+
+  if (header.dataType != idx_type) {
+    ERR_EXIT("TensorIdxImporter: header and tensor type mismatch\r\n");
+  }
+
+
 }

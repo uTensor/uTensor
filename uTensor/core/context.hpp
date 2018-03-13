@@ -1,11 +1,11 @@
 #ifndef UTENSOR_CTX_H
 #define UTENSOR_CTX_H
 
+#include "uTensor/core/uTensorBase.hpp"
 #include <memory>
 #include <unordered_map>
 #include <initializer_list>
-#include "uTensorBase.hpp"
-#include "stdio.h"
+#include <stdio.h>
 #include <functional>
 //#include <list>
 
@@ -62,6 +62,8 @@ public:
   void push(Operator* op, std::initializer_list<TName> _inputs, std::initializer_list<TName> _outputs);
   uint32_t gc(void);
   int eval(void);
+
+  //TODO: add a keep(int count = 1) funcion to make graph construction easier?
 
   Context() {
     del_onsight = true;
