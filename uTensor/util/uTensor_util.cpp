@@ -1,4 +1,4 @@
-#include "uTensor_util.hpp"
+#include "uTensor/util/uTensor_util.hpp"
 #include <cstdlib>
 
 void return_error(int ret_val) {
@@ -33,10 +33,10 @@ uint32_t htonl(uint32_t& val) {
 
 uint16_t ntoh16(uint16_t val) {
    uint16_t ret = 0;
- 
+
    ret |= val >> 8;
    ret |= val << 8;
- 
+
    return ret;
  }
 
@@ -50,4 +50,25 @@ uint32_t ntoh32(uint32_t val) {
   ret |= val << 24;
 
   return ret;
+}
+
+void init_env() {
+    int status;
+    DIR* dir = opendir("/fs/tmp");
+    if (dir) {
+        closedir(dir);
+        return;
+    } else {
+
+      status = mkdir("/fs/tmp", 0777);
+      if (status == -1) {
+        ERR_EXIT("env setting failed");
+      }
+    }
+}
+
+void utensor_exit(void) {
+#ifndef __EMSCRIPTEN__
+    exit(-1);
+#endif
 }

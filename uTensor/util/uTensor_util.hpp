@@ -3,6 +3,8 @@
 #include <stdint.h>
 #include <stdio.h>
 #include <vector>
+#include <iostream>
+#include "mbed.h"
 
 // #define MAX(A, B) ((A > B)? A:B)
 
@@ -47,12 +49,14 @@ enum Padding {
 
 #endif
 
+void utensor_exit(void);
+
 #define ERR_EXIT(MSG, ...)                                      \
   {                                                             \
     printf("[Error] %s:%d @%s ", __FILE__, __LINE__, __func__); \
     printf(MSG, ##__VA_ARGS__);                                 \
     fflush(stdout);                                             \
-    exit(-1);                                                   \
+    utensor_exit();                                          \
   }
 
 typedef std::vector<uint32_t> Shape;
@@ -66,8 +70,5 @@ uint32_t htonl(uint32_t& val);
 uint16_t ntoh16(uint16_t val);
 uint32_t ntoh32(uint32_t val);
 
-enum Padding {
-   VALID= 1,
-   SAME = 2,
-};
+void init_env();
 #endif
