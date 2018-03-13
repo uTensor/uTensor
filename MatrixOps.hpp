@@ -217,8 +217,74 @@ void QuantizedMatMul2(S_TENSOR A, S_TENSOR B, S_TENSOR C,
   *c_max = max_c_value;
 }
 
+template <class T1, class T2, class Toutput>
+void QuantizedConv(S_TENSOR input, S_TENSOR filter, S_TENSOR output,
+                     S_TENSOR mina, S_TENSOR minb, S_TENSOR maxa,
+                     S_TENSOR maxb, S_TENSOR outmin,
+                     S_TENSOR outmax, std::vector<int32_t> strides_, 
+                     Padding padding_) {
+  const float min_input = *(mina->read<float>(0, 0));
+  const float max_input = *(maxa->read<float>(0, 0));
+  const float min_filter = *(minb->read<float>(0, 0));
+  const float max_filter = *(maxb->read<float>(0, 0));
+  const int32_t offset_input =  FloatToQuantizedUnclamped<T1>(0.0f, min_input, max_input);
+  const int32_t offset_filter =  FloatToQuantizedUnclamped<T2>(0.0f, min_filter, max_filter);
+  const int32_t offset_output = 0;
+  const int32_t mult_output = 1;
+  const int32_t shift_output = 0;
+
+   const int64_t in_depth = input->getShape()[3];
+   const int64_t out_depth = filter->getShape()[3];
+
+   const int64_t input_rows = input->getShape()[1];
+
+   const int64_t filter_rows = filter->getShape()[0];
+
+
+
+   const int64_t input_cols = input->getShape()[2];
+
+   const int64_t filter_cols = filter->getShape()[1];
+                                        
+   const int64_t batch = input->getShape()[0];
+                                        
+   const int stride = strides_[1];
+                                                                                                      
+   int64_t out_rows = input->getShape()[0]; 
+   int64_t out_cols = filter->getShape()[1]; 
+   int64_t pad_rows = 0, pad_cols = 0;
+   //TensorShape out_shape({batch, out_rows, out_cols, out_depth});
+   Shape c_shape;
+   c_shape.push_back(batch);
+   c_shape.push_back(out_rows);
+   c_shape.push_back(out_cols);
+   c_shape.push_back(out_depth);
+   output->template resize<Toutput>(c_shape);
+                                        
+  const T1* A_Data = input->template read<T1>(0, 0);
+  const T2* B_Data = filter->template read<T2>(0, 0);
+  Toutput* C_Data = output->template write<Toutput>(0, 0);
+
+   conv_functor(A_Data, batch, input_rows,
+           input_cols, in_depth, offset_input, B_Data,
+           filter_rows, filter_cols, out_depth,
+           offset_filter, stride, padding_, C_Data, out_rows, 
+           out_cols, shift_output, offset_output, mult_output);
+                                        
+   float min_output_value;
+   float max_output_value;
+   QuantizationRangeForMultiplication<T1, T2, Toutput>(                                                     
+           min_input, max_input, min_filter, max_filter, &min_output_value,
+           &max_output_value);
+    float* c_min = outmin->write<float>(0, 0);
+    *c_min = min_output_value;
+  float* c_max = outmax->write<float>(0, 0);
+  *c_max = max_output_value;
+                                       
+}
+
 template<class T1, class T2, class T3>
-void conv(S_TENSOR input_data, int input_batches, int input_height, int input_width,
+void conv_functor(S_TENSOR input_data, int input_batches, int input_height, int input_width,
         int input_depth, int input_offset, S_TENSOR filter_data, int filter_height, int filter_width, 
         int filter_count, int filter_offset, int stride_rows, int stride_cols, Padding padding, S_TENSOR output_data,
         int output_height, int output_width, int output_shift, int output_offset, int output_mult) 
@@ -306,17 +372,16 @@ void conv(S_TENSOR input_data, int input_batches, int input_height, int input_wi
 }
 
 template<class T1, class T2, class TOut>
-class ConvOp : public Operator {
+class QntConvOp : public Operator {
   public:
   ConvOp(){
-    n_inputs = 19;
-    n_outputs = 1;
+    n_inputs = 8;
+    n_outputs = 3;
   }
   virtual void compute() override {
-    conv<T1, T2, TOut>(inputs[0], inputs[1], inputs[2], inputs[3], 
-    inputs[4], inputs[5], inputs[6], inputs[7], inputs[8], inputs[9],
-    inputs[10], inputs[11], inputs[12], inputs[13], outputs[0],
-    inputs[14], inputs[15], inputs[16], inputs[17], inputs[18]);
+    conv<T1, T2, TOut>(inputs[0], inputs[1], outputs[0], inputs[2], 
+    inputs[3], inputs[4], inputs[5], outputs[1], outputs[2], inputs[6]
+    inputs[7]);
   }
 };
 template <class T1, class T2, class TOut>
