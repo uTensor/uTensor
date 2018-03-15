@@ -380,4 +380,101 @@ public:
     Add<T1, T2>(inputs[0], inputs[1], outputs[0]);
   }
 };
+
+// Note input_x should have >= the number of elements in input_y
+template <class T1, class T2, class Toutput>
+void QuantizedAdd(S_TENSOR input_x, S_TENSOR input_y, S_TENSOR min_x, S_TENSOR max_x,
+                S_TENSOR min_y, S_TENSOR max_y, S_TENSOR output,
+                S_TENSOR out_min, S_TENSOR out_max) {
+  const float input_x_min = min_x->read<T2>(0, 0)[0];
+  const float input_x_max = max_x->read<T2>(0, 0)[0];
+
+  const float input_y_min = min_y->read<T2>(0, 0)[0];
+  const float input_y_max = max_y->read<T2>(0, 0)[0];
+
+  const float r_output_min = r_min->read<T2>(0, 0)[0];
+  const float r_output_max = r_max->read<T2>(0, 0)[0];
+
+  const T1 *input_x_ptr = input_x->read<T1>(0, 0);
+  const T2 *input_y_ptr = input_y->read<T2>(0, 0);
+
+  if (output->getSize() == 0) output->resize(input_x->getShape());
+  Toutput *out_ptr = output->write<Toutput>(0, 0);
+
+  
+
+//  RequantizeManyInNewRangeReference(input_ptr, input->getSize(),input_min,
+//    input_max, r_output_min, r_output_max, out_ptr);
+
+  Shape one_shape = {1};
+  if(out_min->getSize() == 0) out_min->resize(one_shape);
+  if(out_max->getSize() == 0) out_max->resize(one_shape);
+
+  //Get output min and max for quantized add
+  float* v_out_min = out_min->write<T2>(0, 0);
+  float* v_out_max = out_max->write<T2>(0, 0);
+  *v_out_max = 
+    std::max(input_x_max, std::max(-input_x_min, std::max(input_y_max, 
+                                                          -input_y_min))) * 
+    ( 1 << 17);
+
+  *v_out_min = -(*v_out_max);
+
+  // To do addition properly, we need to compensate for a possibly unbalanced
+  // zero point in the total representation. The quantized value that
+  // represents the real number zero needs to be subtracted before addition to
+  // make sure that the identity of zero + zero = zero holds.
+  const Toutput zero_in_total_space =
+      FloatToQuantized<Toutput>(0.0f, *v_out_min, *v_out_max);
+  
+  const uint32_t input_element_count = input_x->getSize();
+  const uint32_t smaller_input_element_count = input_y->getSize();
+
+  float total_min = *v_out_min;
+  float total_max = *v_out_max;
+
+  const size_t num_iterations = (input_element_count / smaller_input_element_count);
+  for (size_t iteration = 0; iteration < how_many_iterations; ++iteration) {
+    const size_t offset = iteration * smaller_input_element_count;
+    for (int c = 0; c < smaller_input_element_count; ++c) {
+      const int index = (offset + c);
+      // The two numbers we're going to add can each be in very different
+      // ranges (e.g. the quantized value '127' may represent very different
+      // real numbers in both) so we need to convert them to a common range
+      // before we sum them.
+      const T1 input_value = input_x_ptr[index];
+      const T3 input_in_total_space = RequantizationInNewRange<T1, T3>(
+              input_value, input_x_min, input_x_max, total_min, total_max);
+      const T2 smaller_input_value = input_y_ptr[index];
+      const T3 smaller_input_in_total_space = 
+          RequantizationInNewRange<T2, T3>(
+              smaller_input_value, input_y_min, input_y_max, total_min, total_max);
+      const T3 total_pre = input_in_total_space + smaller_input_in_total_space;
+
+      // As noted above, we need to compensate for the offset of the actual
+      // zero point in the space we're operating in.
+      out_ptr[index] = total;
+
+
+    }
+  }
+
+}
+
+
+class QuantizedAddOp : public Operator {
+  public:
+      QuantizedAddOp() {
+      n_inputs = 6;
+      n_outputs = 3;
+    }
+
+    virtual void compute() override {
+        QuantizedAdd<int, float, unsigned char>(inputs[0], inputs[1], 
+                inputs[2], inputs[3], inputs[4], inputs[5],
+                outputs[0], outputs[1], outputs[2]);
+    }
+};
+
+
 #endif  // UTENSOR_MATH_OPS
