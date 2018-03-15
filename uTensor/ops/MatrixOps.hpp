@@ -377,20 +377,30 @@ void conv_functor(S_TENSOR input_data, int input_batches, int input_height, int 
 template<class T1, class T2, class TOut>
 class QntConvOp : public Operator {
   public:
-  QntConvOp(std::vector<int32_t> strides, Padding padding){
-    strides_ = strides;
-    padding_ = padding;
+  QntConvOp(initializer_list<int32_t> strides, Padding padding) {
+    std::vector<int32_t> vec_strides;
+    for (auto s : strides) {
+      vec_strides.push_back(s);
+    }
+    _setup(vec_strides, padding);
+  }
+  QntConvOp(std::vector<int32_t>& strides, Padding& padding) {
+    _setup(strides, padding);
+  }
+  virtual void compute() override {
+    QuantizedConv<T1, T2, TOut>(inputs[0], inputs[1], outputs[0], inputs[2], 
+    inputs[3], inputs[4], inputs[5], outputs[1], outputs[2],
+    _strides, _padding);
+  }
+  private:
+  std::vector<int32_t> _strides;
+  Padding _padding;
+  _setup(std::vector<int32_t>& strides, Padding& padding){
+    _strides = strides;
+    _padding = padding;
     n_inputs = 6;
     n_outputs = 3;
   }
-  virtual void compute() override {
-    conv<T1, T2, TOut>(inputs[0], inputs[1], outputs[0], inputs[2], 
-    inputs[3], inputs[4], inputs[5], outputs[1], outputs[2],
-    strides_, padding_);
-  }
-  private:
-  std::vector<int32_t> strides_;
-  Padding padding_;
 };
 template <class T1, class T2, class TOut>
 class QntMatMulOp : public Operator {
