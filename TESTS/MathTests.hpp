@@ -32,7 +32,7 @@ class MathOpsTest : public Test {
     ctx.addCached(hold(new RamTensor<float>(ctx.get("ref_max")->getShape())), "out_max");
     TNameList inputs = {"a", "a_min", "a_max"};
     TNameList outputs = {"out_min", "out_max"};
-    
+
     timer_start();
     ctx.push_static(hold(new Requantization_RangeOp()), "Requantization_RangeOp", inputs, outputs);
     ctx.eval();
@@ -107,7 +107,7 @@ class MathOpsTest : public Test {
     ctx.addCached(hold(t_import.float_import("/fs/testData/import-MatMul_eightbit_requantize/out/import-MatMul_eightbit_requantize_1.idx")), "ref_a_min");
     ctx.addCached(hold(t_import.float_import("/fs/testData/import-MatMul_eightbit_requantize/out/import-MatMul_eightbit_requantize_2.idx")), "ref_a_max");
 
-    
+
     // modify the checks below:
     ctx.addCached(hold(new RamTensor<unsigned char>(ctx.get("ref_a_q")->getShape())), "a_q");
     ctx.addCached(hold(new RamTensor<float>(ctx.get("ref_a_min")->getShape())), "a_min_q");
@@ -133,9 +133,9 @@ class MathOpsTest : public Test {
         unsigned char* test_ptr = out_val.get()->write<unsigned char>(0, 0);
         for(uint32_t i = 0; i < ref_val->getSize(); i++) {
             if(ref_ptr[i] != test_ptr[i]) {
-                printf("%lu: %d != %d\r\n", i, ref_ptr[i], test_ptr[i]);
+                printf("%u: %d != %d\r\n", i, ref_ptr[i], test_ptr[i]);
             } else {
-                printf("%lu: %d == %d\r\n", i, ref_ptr[i], test_ptr[i]);
+                printf("%u: %d == %d\r\n", i, ref_ptr[i], test_ptr[i]);
             }
         }
     }
@@ -170,7 +170,7 @@ class MathOpsTest : public Test {
 
     // modify the checks below:
     S_TENSOR out = ctx.addCached(hold(new RamTensor<int>(ref_out->getShape())), "out");
-    
+
     TNameList inputs = {"ref_a", "ref_dim"};
     TNameList outputs = {"out"};
 
@@ -178,7 +178,7 @@ class MathOpsTest : public Test {
     ctx.push_static(hold(new ArgMaxOp<float, int>()), "ArgMaxOp", inputs, outputs);
     ctx.eval();
     timer_stop();
-    
+
     Tensor* out_float = TensorCast<int, float>(out.get());  ///NT: /WIP  how to handle the name?
 
     double result = meanPercentErr<float>(ref_out.get(), out_float);

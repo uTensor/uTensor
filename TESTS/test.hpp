@@ -9,6 +9,8 @@
 #include "uTensor_util.hpp"
 #include "tensor.hpp"
 
+using namespace std;
+
 class Test {
  private:
   Timer timer;
@@ -125,7 +127,7 @@ class Test {
     }
     return pass;
   }
-  
+
   bool testsize(uint32_t src, uint32_t res) {
     bool pass = true;
     if (src != res) {
