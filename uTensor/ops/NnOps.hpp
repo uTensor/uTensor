@@ -1,8 +1,8 @@
 #ifndef UTENSOR_NN_OPS
 #define UTENSOR_NN_OPS
 
-#include "quantization_utils.hpp"
-#include "tensor.hpp"
+#include "uTensor/util/quantization_utils.hpp"
+#include "uTensor/core/tensor.hpp"
 
 template <class TIn, class T2, class TOut>
 void Relu(S_TENSOR input, S_TENSOR in_min, S_TENSOR in_max,

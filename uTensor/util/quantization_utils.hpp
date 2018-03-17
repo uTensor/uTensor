@@ -1,9 +1,9 @@
 #ifndef UTENSOR_QUANT_UTILS
 #define UTENSOR_QUANT_UTILS
 
+#include "uTensor/core/tensor.hpp"
 #include <math.h>
 #include <limits>
-#include "tensor.hpp"
 
 // reference: quantization_utils.h:181
 template <class T>

@@ -1,11 +1,11 @@
 #ifndef UTENSOR_CTX_H
 #define UTENSOR_CTX_H
 
+#include "uTensor/core/uTensorBase.hpp"
 #include <memory>
 #include <unordered_map>
 #include <initializer_list>
-#include "uTensorBase.hpp"
-#include "stdio.h"
+#include <stdio.h>
 #include <functional>
 //#include <list>
 
