@@ -222,10 +222,10 @@ void QuantizedMatMul2(S_TENSOR A, S_TENSOR B, S_TENSOR C,
 
 template <class T1, class T2, class Toutput>
 void QuantizedConv(S_TENSOR input, S_TENSOR filter, S_TENSOR output,
-                     S_TENSOR mina, S_TENSOR minb, S_TENSOR maxa,
-                     S_TENSOR maxb, S_TENSOR outmin,
-                     S_TENSOR outmax, std::vector<int32_t> strides_, 
-                     Padding padding_) {
+                   S_TENSOR mina, S_TENSOR minb, 
+                   S_TENSOR maxa, S_TENSOR maxb, 
+                   S_TENSOR outmin, S_TENSOR outmax,
+                   std::vector<int32_t> strides_, Padding padding_) {
   const float min_input = *(mina->read<float>(0, 0));
   const float max_input = *(maxa->read<float>(0, 0));
   const float min_filter = *(minb->read<float>(0, 0));
@@ -377,14 +377,29 @@ void conv_functor(S_TENSOR input_data, int input_batches, int input_height, int 
 template<class T1, class T2, class TOut>
 class QntConvOp : public Operator {
   public:
-  ConvOp(){
-    n_inputs = 8;
-    n_outputs = 3;
+  QntConvOp(initializer_list<int32_t> strides, Padding padding) {
+    std::vector<int32_t> vec_strides;
+    for (auto s : strides) {
+      vec_strides.push_back(s);
+    }
+    _setup(vec_strides, padding);
+  }
+  QntConvOp(std::vector<int32_t>& strides, Padding& padding) {
+    _setup(strides, padding);
   }
   virtual void compute() override {
-    conv<T1, T2, TOut>(inputs[0], inputs[1], outputs[0], inputs[2], 
-    inputs[3], inputs[4], inputs[5], outputs[1], outputs[2], inputs[6]
-    inputs[7]);
+    QuantizedConv<T1, T2, TOut>(inputs[0], inputs[1], outputs[0], inputs[2], 
+    inputs[3], inputs[4], inputs[5], outputs[1], outputs[2],
+    _strides, _padding);
+  }
+  private:
+  std::vector<int32_t> _strides;
+  Padding _padding;
+  _setup(std::vector<int32_t>& strides, Padding& padding){
+    _strides = strides;
+    _padding = padding;
+    n_inputs = 6;
+    n_outputs = 3;
   }
 };
 template <class T1, class T2, class TOut>
