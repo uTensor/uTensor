@@ -1,4 +1,5 @@
 #include "deep_mnist_mlp.hpp"
+#include "math_utils.hpp"
 
 void tensorQuantize(Context& ctx, TName input, TName output,
   TName out_min, TName out_max) {
@@ -188,7 +189,7 @@ int runMLP(string inputIdxFile) {
     "/fs/testData/deep_mlp/runPredLayer/y_pred/outputs/y_pred_0.idx");
   Tensor* ref_pred = TensorCast<float, int>(ref_out);
 
-  double result = Test::meanPercentErr<int>(ref_pred, pred.get());
+  double result = utils::meanPercentErr<int>(ref_pred, pred.get());
   
   if (result < 0.0001) {
     printf("PASSED %.8f\r\n\r\n", result);

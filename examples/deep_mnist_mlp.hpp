@@ -2,7 +2,6 @@
 #define __DEEP_MNIST_MLP_HPP__
 #include "mbed.h"
 #include "tensor.hpp"
-#include "test.hpp"
 #include "tensorIdxImporter.hpp"
 #include "MathOps.hpp"
 #include "MatrixOps.hpp"
