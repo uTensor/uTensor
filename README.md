@@ -26,7 +26,7 @@
 	- Describes a graph
 
   This project is under going constant development. APIs are expected to update rapidly.
-<<<<<<< HEAD
+=======
   
 ## Overview
   This document contains the steps you would need to build an uTensor application from ground-up. The application implements a simple 3-layer MLP trained for the MNIST dataset, a hand-written digit recognizer:
@@ -91,16 +91,8 @@ Topics to be covered:
   ```
   
   Now, all required libraries have been added. As a good measure, we are issuing `mbed deploy` to ensure all the references are in good shape.
-  
-	```
-  $ mbed deploy
-  [mbed] Updating library "mbed-os" to rev #96d9a00d0a1d
-  [mbed] Updating library "sd-driver" to rev #c46d0779e735
-  [mbed] Updating library "uTensor" to rev #1bdf2b3d5628
-	```
-	
-Finally, we would like to use uTensor's application profile as a starting template for our configurations:
 
+<<<<<<< HEAD
 ```
 $ cp uTensor/mbed_app.json ./
 ```
@@ -276,17 +268,20 @@ Topics to be covered:
 
 	```
 		
+=======
+```		
+>>>>>>> b4f24729bc4883433acdad628c7f67c4d526d239
 	$ mbed deploy
 	[mbed] Updating library "mbed-os" to rev #96d9a00d0a1d
 	[mbed] Updating library "sd-driver" to rev #c46d0779e735
 	[mbed] Updating library "uTensor" to rev #1bdf2b3d5628
-	```
+```
 	
   Finally, we would like to use uTensor's application profile as a starting template for our configurations:
 
-	```
+```
 	$ cp uTensor/mbed_app.json ./
-	```
+```
 
 ## Graph to C++
   This section shows how one would use utensor-cli to generate the C++ implementation of the model given a quantized graph trained within Tensorflow. Here, we would a graph we prepared for illustration purpose. Overview of the steps are:

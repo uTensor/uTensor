@@ -1,4 +1,4 @@
-#include "uTensor_util.hpp"
+#include "uTensor/util/uTensor_util.hpp"
 #include <cstdlib>
 
 void return_error(int ret_val) {
