@@ -343,10 +343,7 @@ void QuantizedConv(S_TENSOR input, S_TENSOR filter, S_TENSOR output,
     // SAME
     out_rows = input_rows;
     out_cols = input_cols;
-  }                                         
-  //out_rows = input->getShape()[1]; 
-  //out_cols = filter->getShape()[1]; 
-  //int64_t pad_rows = 0, pad_cols = 0;
+  }
   //TensorShape out_shape({batch, out_rows, out_cols, out_depth});
   Shape c_shape;
   c_shape.push_back(batch);
