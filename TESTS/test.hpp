@@ -6,8 +6,8 @@
 #include <string>
 #include <vector>
 #include "mbed.h"
-#include "uTensor_util.hpp"
-#include "tensor.hpp"
+#include "uTensor/util/uTensor_util.hpp"
+#include "uTensor/core/tensor.hpp"
 
 using namespace std;
 
@@ -147,7 +147,24 @@ class Test {
 
   template <typename U>
   static double meanAbsErr(Tensor* A, Tensor* B) {
+    uint32_t size_A, size_B;
+    size_A = A->getSize();
+    size_B = B->getSize();
     if (A->getSize() != B->getSize()) {
+      Shape shape_A, shape_B;
+      shape_A = A->getShape();
+      shape_B = B->getShape();
+      printf("shape_A: ");
+      for (auto s : shape_A) {
+        printf("%lu, ", s);
+      }
+      printf("\n");
+      printf("shape_B: ");
+      for (auto s : shape_B) {
+        printf("%lu, ", s);
+      }
+      printf("\n");
+      printf("size A: %lu, size B: %lu\r\n", size_A, size_B);
       ERR_EXIT("Test.meanAbsErr(): dimension mismatch\r\n");
     }
 
@@ -165,7 +182,11 @@ class Test {
   // A being the reference
   template <typename U>
   static double sumPercentErr(Tensor* A, Tensor* B) {
+    uint32_t size_A, size_B;
+    size_A = A->getSize();
+    size_B = B->getSize();
     if (A->getSize() != B->getSize()) {
+      
       ERR_EXIT("Test.sumPercentErr(): dimension mismatch\r\n");
     }
 
