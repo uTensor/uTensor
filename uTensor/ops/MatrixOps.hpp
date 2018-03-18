@@ -270,38 +270,37 @@ void conv_functor(S_TENSOR input_data, int input_batches, int input_height, int 
                   int32_t input_value;
                   if ((in_x >= 0) && (in_x < input_width) && (in_y >= 0) &&
                       (in_y < input_height)) {
+                      size_t input_index = batch * input_height * input_width * input_depth +
+                          in_y * input_width * input_depth + in_x * input_depth + in_channel;
                     const T1 *input_source_ptr =  
-                        input_data->template read<T1>(((batch * input_height * input_width *
-                                    input_depth) +
-                                   (in_y * input_width * input_depth) +
-                                   (in_x * input_depth) + in_channel), 1);
-                    input_value = static_cast<int32_t>(*input_source_ptr) - input_offset;
+                        input_data->template read<T1>(input_index, 1);
+                    input_value = static_cast<int32_t>(input_source_ptr[0]) - input_offset;
                   } else {
                     input_value = 0;
                   }
+                  size_t filter_index = filter_y * filter_width * input_depth * filter_count +
+                      filter_x * input_depth * filter_count +
+                      in_channel * filter_count + out_channel;
                   const T2 *filter_ptr =
-                      filter_data->template read<T2>((filter_y * filter_width * input_depth *
-                                   filter_count) +
-                                  (filter_x * input_depth * filter_count) +
-                                  (in_channel * filter_count) + out_channel, 1);
+                      filter_data->template read<T2>(filter_index, 1);
                   const int32_t filter_value = 
-                      static_cast<int32_t>(*filter_ptr) - filter_offset;
+                      static_cast<int32_t>(filter_ptr[0]) - filter_offset;
                   total += (input_value * filter_value);
                 }
               }
             }
-            const int32_t output_val =
+            int32_t output_val =
                 ((((total + output_offset) * output_mult) + rounding) >>
                  output_shift);
             // We need to saturate the results against the largest and smallest
             
-            const int32_t top_clamped_output = std::min(output_val, highest);
-            const int32_t clamped_output = std::max(top_clamped_output, lowest);
+            int32_t top_clamped_output = std::min(output_val, highest);
+            int32_t clamped_output = std::max(top_clamped_output, lowest);
             T3 *output = 
             output_data->template write<T3>((batch * output_height * output_width * filter_count) +
                         (out_y * output_width * filter_count) +
                         (out_x * filter_count) + out_channel, 1);
-            *output = clamped_output;
+            *output = static_cast<T3>(clamped_output);
           }
         }
       }
@@ -309,8 +308,8 @@ void conv_functor(S_TENSOR input_data, int input_batches, int input_height, int 
 }
 template <class T1, class T2, class Toutput>
 void QuantizedConv(S_TENSOR input, S_TENSOR filter, S_TENSOR output,
-                   S_TENSOR mina, S_TENSOR minb, 
-                   S_TENSOR maxa, S_TENSOR maxb, 
+                   S_TENSOR mina, S_TENSOR maxa, 
+                   S_TENSOR minb, S_TENSOR maxb, 
                    S_TENSOR outmin, S_TENSOR outmax,
                    std::vector<int32_t> strides_, Padding padding_) {
   const float min_input = *(mina->read<float>(0, 0));
@@ -338,10 +337,10 @@ void QuantizedConv(S_TENSOR input, S_TENSOR filter, S_TENSOR output,
                                         
    const int64_t batch = input->getShape()[0];
                                         
-   const int stride_col = strides_[1];
-   const int stride_row = strides_[0];
+   const int stride_ = strides_[1];
+   
                                                                                                       
-   int64_t out_rows = input->getShape()[0]; 
+   int64_t out_rows = input->getShape()[1]; 
    int64_t out_cols = filter->getShape()[1]; 
    int64_t pad_rows = 0, pad_cols = 0;
    //TensorShape out_shape({batch, out_rows, out_cols, out_depth});
@@ -351,13 +350,12 @@ void QuantizedConv(S_TENSOR input, S_TENSOR filter, S_TENSOR output,
    c_shape.push_back(out_cols);
    c_shape.push_back(out_depth);
    output->resize(c_shape);
-                                        
 
    //the strides col and row should be decided
    conv_functor<T1, T2, Toutput>(input, batch, input_rows,
            input_cols, in_depth, offset_input, filter,
            filter_rows, filter_cols, out_depth,
-           offset_filter, stride_row, stride_col, padding_, output, out_rows, 
+           offset_filter, stride_, stride_, padding_, output, out_rows, 
            out_cols, shift_output, offset_output, mult_output);
                                         
    float min_output_value;
@@ -365,10 +363,10 @@ void QuantizedConv(S_TENSOR input, S_TENSOR filter, S_TENSOR output,
    QuantizationRangeForMultiplication<T1, T2, Toutput>(                                                     
            min_input, max_input, min_filter, max_filter, &min_output_value,
            &max_output_value);
-    float* c_min = outmin->write<float>(0, 0);
-    *c_min = min_output_value;
-  float* c_max = outmax->write<float>(0, 0);
-  *c_max = max_output_value;
+   float* c_max = outmax->write<float>(0, 0);
+   float* c_min = outmin->write<float>(0, 0);
+   *c_max = max_output_value;
+   *c_min = min_output_value;
                                        
 }
 
