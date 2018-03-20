@@ -78,6 +78,7 @@ inline void RequantizeManyInNewRange(Tensor* input, uint32_t count,
   }
 }
 
+
 //quantization_utils.h : 239
 void RequantizeManyInNewRangeReference(const int* input, int32_t count,
     float min_input, float max_input,
@@ -142,5 +143,12 @@ struct QuantizedToFloatStruct {
   const float range_scale;
   const float range_min_rounded;
 };
+
+template <class T1, class T2>
+inline T2 RequantizeInNewRange(T1 input, float min_input, float max_input,
+                               float min_new, float max_new) {
+  const float input_float = QuantizedToFloat<T1>(input, min_input, max_input);
+  return FloatToQuantized<T2>(input_float, min_new, max_new);
+}
 
 #endif  // UTENSOR_QUANT_UTILS
