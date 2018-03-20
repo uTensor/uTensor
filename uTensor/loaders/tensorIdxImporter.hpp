@@ -5,7 +5,6 @@
 #include <iostream>
 #include <stdlib.h>
 #include <vector>
-#include "mbed.h"
 #include "uTensor_util.hpp"
 #include "tensor.hpp"
 #include <memory>
