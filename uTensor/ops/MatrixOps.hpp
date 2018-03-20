@@ -306,6 +306,7 @@ void conv_functor(S_TENSOR input_data, int input_batches, int input_height, int 
       }
     }
 }
+
 template <class T1, class T2, class Toutput>
 void QuantizedConv(S_TENSOR input, S_TENSOR filter, S_TENSOR output,
                    S_TENSOR mina, S_TENSOR maxa, 
@@ -322,52 +323,51 @@ void QuantizedConv(S_TENSOR input, S_TENSOR filter, S_TENSOR output,
   const int32_t mult_output = 1;
   const int32_t shift_output = 0;
 
-   const int64_t in_depth = input->getShape()[3];
-   const int64_t out_depth = filter->getShape()[3];
+  const int64_t in_depth = input->getShape()[3];
+  const int64_t out_depth = filter->getShape()[3];
+  const int64_t input_rows = input->getShape()[1];
+  const int64_t filter_rows = filter->getShape()[0];
 
-   const int64_t input_rows = input->getShape()[1];
-
-   const int64_t filter_rows = filter->getShape()[0];
-
-
-
-   const int64_t input_cols = input->getShape()[2];
-
-   const int64_t filter_cols = filter->getShape()[1];
-                                        
-   const int64_t batch = input->getShape()[0];
-                                        
-   const int stride_ = strides_[1];
-   
-                                                                                                      
-   int64_t out_rows = input->getShape()[1]; 
-   int64_t out_cols = filter->getShape()[1]; 
-   int64_t pad_rows = 0, pad_cols = 0;
-   //TensorShape out_shape({batch, out_rows, out_cols, out_depth});
-   Shape c_shape;
-   c_shape.push_back(batch);
-   c_shape.push_back(out_rows);
-   c_shape.push_back(out_cols);
-   c_shape.push_back(out_depth);
-   output->resize(c_shape);
-
-   //the strides col and row should be decided
-   conv_functor<T1, T2, Toutput>(input, batch, input_rows,
-           input_cols, in_depth, offset_input, filter,
-           filter_rows, filter_cols, out_depth,
-           offset_filter, stride_, stride_, padding_, output, out_rows, 
-           out_cols, shift_output, offset_output, mult_output);
-                                        
-   float min_output_value;
-   float max_output_value;
-   QuantizationRangeForMultiplication<T1, T2, Toutput>(                                                     
-           min_input, max_input, min_filter, max_filter, &min_output_value,
-           &max_output_value);
-   float* c_max = outmax->write<float>(0, 0);
-   float* c_min = outmin->write<float>(0, 0);
-   *c_max = max_output_value;
-   *c_min = min_output_value;
+  const int64_t input_cols = input->getShape()[2];
+  const int64_t filter_cols = filter->getShape()[1];                                 
+  const int64_t batch = input->getShape()[0];
                                        
+  const int stride_rows = strides_[1];
+  const int stride_cols = strides_[2];
+  
+  int64_t out_rows, out_cols;
+  if (padding_ == VALID) {
+    out_rows = (input_rows - filter_rows) / stride_rows + 1;
+    out_cols = (input_cols - filter_cols) / stride_cols + 1;
+  } else { 
+    // SAME
+    out_rows = input_rows;
+    out_cols = input_cols;
+  }
+  //TensorShape out_shape({batch, out_rows, out_cols, out_depth});
+  Shape c_shape;
+  c_shape.push_back(batch);
+  c_shape.push_back(out_rows);
+  c_shape.push_back(out_cols);
+  c_shape.push_back(out_depth);
+  output->resize(c_shape);
+
+  //the strides col and row should be decided
+  conv_functor<T1, T2, Toutput>(input, batch, input_rows,
+          input_cols, in_depth, offset_input, filter,
+          filter_rows, filter_cols, out_depth,
+          offset_filter, stride_rows, stride_cols, padding_, output, out_rows, 
+          out_cols, shift_output, offset_output, mult_output);
+                                       
+  float min_output_value;
+  float max_output_value;
+  QuantizationRangeForMultiplication<T1, T2, Toutput>(                                                     
+          min_input, max_input, min_filter, max_filter, &min_output_value,
+          &max_output_value);
+  float* c_max = outmax->write<float>(0, 0);
+  float* c_min = outmin->write<float>(0, 0);
+  *c_max = max_output_value;
+  *c_min = min_output_value;                                    
 }
 
 
