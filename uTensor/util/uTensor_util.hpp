@@ -93,6 +93,7 @@ void printVector(std::vector<uint32_t> vec);
 #elif defined(_POSIX_VERSION)
     // POSIX
 #else
+    #include "mbed.h"
 //#   error "Unknown compiler"
     // little endian to big endian
     //uint32_t htonl(uint32_t& val);
