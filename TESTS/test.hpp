@@ -196,8 +196,7 @@ class Test {
     const U* elemA = A->read<U>(i, 1);
     const U* elemB = B->read<U>(i, 1);
       if (elemA[0] != 0.0f) {
-        accm += (double)fabs(((float)elemB[0] - (float)elemA[0]) /
-                             fabs((float)elemA[0]));
+        accm += (double)fabs(((float)elemB[0] - (float)elemA[0]) / ((float)elemA[0]));
       } else {
         if (elemB[0] != 0) {
           accm += std::numeric_limits<float>::quiet_NaN();
@@ -215,5 +214,7 @@ class Test {
 
 // https://stackoverflow.com/questions/111928/is-there-a-printf-converter-to-print-in-binary-format
 void printBits(size_t const size, void const* const ptr);
+
+void printFloatData(Tensor* tensor);
 
 #endif
