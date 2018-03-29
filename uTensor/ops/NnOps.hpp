@@ -53,25 +53,33 @@ void SpatialMaxPooling(S_TENSOR input, S_TENSOR output,
                        int window_rows, int window_cols, 
                        int row_stride, int col_stride, 
                        Padding padding) {
+  /*
+  * Arguments
+  * ---------
+  * input : S_TENSOR
+  *     the intput tensor, assuming format of `NHWC`
+  * output : S_TENSOR
+  *     the output tensor
+  */
   Shape in_shape = input->getShape();
   uint32_t n_batch = in_shape[0];
   uint32_t in_rows = in_shape[1];
   uint32_t in_cols = in_shape[2];
   uint32_t in_channels = in_shape[3];
 
-  size_t half_window_rows = window_rows / 2;
-  size_t half_window_cols = window_cols / 2;
+  int half_window_rows = window_rows / 2;
+  int half_window_cols = window_cols / 2;
 
   uint32_t out_rows, out_cols;
-  size_t row_start_idx, col_start_idx;
+  int row_start_idx, col_start_idx;
   if (padding == VALID) {
     out_rows = (in_rows - window_rows) / row_stride + 1;
     out_cols = (in_cols - window_cols) / col_stride + 1;
     row_start_idx = half_window_rows;
     col_start_idx = half_window_cols;
   } else {
-    out_rows = in_rows;
-    out_cols = in_cols;
+    out_rows = in_rows / ((uint32_t) row_stride);
+    out_cols = in_cols / ((uint32_t) col_stride);
     row_start_idx = 0;
     col_start_idx = 0;
   }
@@ -96,14 +104,14 @@ void SpatialMaxPooling(S_TENSOR input, S_TENSOR output,
 
   for (size_t idx_batch = 0; idx_batch < n_batch; ++idx_batch) {
     for (size_t idx_chnl = 0; idx_chnl < in_channels; ++idx_chnl) {
-      for (size_t c_row_idx = row_start_idx; c_row_idx + half_window_rows < in_rows; c_row_idx += row_stride) {
-        for (size_t c_col_idx = col_start_idx; c_col_idx + half_window_cols < in_cols; c_col_idx += col_stride) {
+      for (int c_row_idx = row_start_idx; c_row_idx + half_window_rows < in_rows; c_row_idx += row_stride) {
+        for (int c_col_idx = col_start_idx; c_col_idx + half_window_cols < in_cols; c_col_idx += col_stride) {
           size_t total_offset = idx_batch*in_batch_stride + idx_chnl*in_chnl_stride +
                                 c_row_idx*in_row_stride + c_col_idx*in_col_stride;
           T max_value = *(input->read<T>(total_offset, 0));
           // scanning window
-          for (size_t i = -half_window_rows; i <= half_window_rows; ++i) {
-            for (size_t j = -half_window_cols; j <= half_window_cols; ++j) {
+          for (int i = -half_window_rows; i <= half_window_rows; ++i) {
+            for (int j = -half_window_cols; j <= half_window_cols; ++j) {
               T current_value;
               if (c_row_idx + i < 0 ||
                   c_row_idx + i >= in_rows ||
