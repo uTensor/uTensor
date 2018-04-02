@@ -3,6 +3,8 @@
 
 #include "uTensor/util/quantization_utils.hpp"
 #include "uTensor/core/tensor.hpp"
+#include <math.h>
+#include <algorithm>
 
 template <class TIn, class T2, class TOut>
 void Relu(S_TENSOR input, S_TENSOR in_min, S_TENSOR in_max,
@@ -52,7 +54,7 @@ template<typename T>
 void SpatialMaxPooling(S_TENSOR input, S_TENSOR output, 
                        int window_rows, int window_cols, 
                        int row_stride, int col_stride, 
-                       Padding padding) {
+                       Padding padding, T pad_value = 0) {
   /*
   * Arguments
   * ---------
@@ -60,6 +62,12 @@ void SpatialMaxPooling(S_TENSOR input, S_TENSOR output,
   *     the intput tensor, assuming format of `NHWC`
   * output : S_TENSOR
   *     the output tensor
+  * 
+  * Notes
+  * -----
+  * - padding
+  *   - https://www.tensorflow.org/api_guides/python/nn#convolution
+  *   - https://www.tensorflow.org/api_guides/python/nn#Notes_on_SAME_Convolution_Padding
   */
   Shape in_shape = input->getShape();
   uint32_t n_batch = in_shape[0];
@@ -67,21 +75,28 @@ void SpatialMaxPooling(S_TENSOR input, S_TENSOR output,
   uint32_t in_cols = in_shape[2];
   uint32_t in_channels = in_shape[3];
 
-  int half_window_rows = window_rows / 2;
-  int half_window_cols = window_cols / 2;
-
-  uint32_t out_rows, out_cols;
-  int row_start_idx, col_start_idx;
+  size_t out_rows, out_cols;
+  int pad_top, pad_left;
   if (padding == VALID) {
-    out_rows = (in_rows - window_rows) / row_stride + 1;
-    out_cols = (in_cols - window_cols) / col_stride + 1;
-    row_start_idx = half_window_rows;
-    col_start_idx = half_window_cols;
-  } else {
-    out_rows = in_rows / ((uint32_t) row_stride);
-    out_cols = in_cols / ((uint32_t) col_stride);
-    row_start_idx = 0;
-    col_start_idx = 0;
+    out_rows = ((size_t) ceil(((float)(in_rows - window_rows) + 1) / ((float)row_stride)));
+    out_cols = ((size_t) ceil(((float)(in_cols - window_cols) + 1) / ((float)col_stride)));
+    // no padding for VALID
+    pad_top = 0;
+    pad_left = 0;
+  } else { 
+    // SAME padding
+    out_rows = ((size_t) ceil(((float)in_rows) / ((float) row_stride)));
+    out_cols = ((size_t) ceil(((float)in_cols) / ((float) col_stride)));
+    if (in_rows % row_stride == 0) {
+      pad_top = max(window_rows - row_stride, 0) / 2;
+    } else {
+      pad_top = max(window_rows - (((int) in_rows) % row_stride), 0) / 2;
+    }
+    if (in_cols % col_stride == 0) {
+      pad_left = max(window_cols - col_stride, 0) / 2;
+    } else {
+      pad_left = max(window_cols - (((int) in_cols) % col_stride), 0) / 2;
+    }
   }
   Shape out_shape;
   out_shape.clear();
@@ -104,23 +119,37 @@ void SpatialMaxPooling(S_TENSOR input, S_TENSOR output,
 
   for (size_t idx_batch = 0; idx_batch < n_batch; ++idx_batch) {
     for (size_t idx_chnl = 0; idx_chnl < in_channels; ++idx_chnl) {
-      for (int c_row_idx = row_start_idx; c_row_idx + half_window_rows < in_rows; c_row_idx += row_stride) {
-        for (int c_col_idx = col_start_idx; c_col_idx + half_window_cols < in_cols; c_col_idx += col_stride) {
-          size_t total_offset = idx_batch*in_batch_stride + idx_chnl*in_chnl_stride +
-                                c_row_idx*in_row_stride + c_col_idx*in_col_stride;
-          T max_value = *(input->read<T>(total_offset, 0));
+      size_t in_base_offset = idx_batch * in_batch_stride + idx_chnl * in_chnl_stride;
+      for (int out_row_idx = 0; out_row_idx < out_rows; ++out_row_idx) {
+        for (int out_col_idx = 0; out_col_idx < out_cols; ++out_col_idx) {
+          T max_value;
+          int base_row_idx = out_row_idx * row_stride - pad_top;
+          int base_col_idx = out_col_idx * col_stride - pad_left;
+          // if out of boundary, pad with pad_value
+          if (base_row_idx < 0 || 
+              base_row_idx >= in_rows ||
+              base_col_idx < 0 ||
+              base_col_idx >= in_cols) {
+            max_value = pad_value;
+          } else {
+            size_t offset = in_base_offset +
+                            ((size_t) base_row_idx) * in_row_stride +
+                            ((size_t) base_col_idx) * in_col_stride;
+            max_value = *(input->read<T>(offset, 0));
+          }
           // scanning window
-          for (int i = -half_window_rows; i <= half_window_rows; ++i) {
-            for (int j = -half_window_cols; j <= half_window_cols; ++j) {
+          for (int i = 0; i < window_rows; ++i) {
+            for (int j = 0; j < window_cols; ++j) {
               T current_value;
-              if (c_row_idx + i < 0 ||
-                  c_row_idx + i >= in_rows ||
-                  c_col_idx + j < 0 ||
-                  c_col_idx + j >= in_cols) {
-                    // padding with zero
-                    current_value = 0;
+              if (base_row_idx + i < 0 || 
+                  base_row_idx + i >= in_rows ||
+                  base_col_idx + j < 0 ||
+                  base_col_idx + j >= in_cols) {
+                current_value = pad_value;
               } else {
-                size_t offset = total_offset + i*in_row_stride + j*in_col_stride;
+                size_t offset = in_base_offset + 
+                                ((size_t) base_row_idx + i) * in_row_stride +
+                                ((size_t) base_col_idx + j) * in_col_stride;
                 current_value = *(input->read<T>(offset, 0));
               }
               if (current_value > max_value) {
@@ -129,10 +158,10 @@ void SpatialMaxPooling(S_TENSOR input, S_TENSOR output,
             }
           }
           // write output
-          size_t out_row_idx = (c_row_idx - row_start_idx) / row_stride;
-          size_t out_col_idx = (c_col_idx - col_start_idx) / col_stride;
-          size_t out_offset = idx_batch*out_batch_stride + idx_chnl*out_chnl_stride +
-                              out_row_idx*out_row_stride + out_col_idx*out_col_stride;
+          size_t out_offset = idx_batch * out_batch_stride +
+                              idx_chnl * out_chnl_stride + 
+                              out_row_idx * out_row_stride + 
+                              out_col_idx * out_col_stride;
           *(output->write<T>(out_offset, 0)) = max_value;
         }
       }
@@ -173,19 +202,29 @@ class QuantizedMaxPoolingOp : public MaxPoolingOp<T> {
     this->n_outputs = 3;
   }
   virtual void compute() override {
+    S_TENSOR in_min_tensor = this->inputs[1];
+    S_TENSOR in_max_tensor = this->inputs[2];
+    float in_min = *(in_min_tensor->read<float>(0, 0));
+    float in_max = *(in_max_tensor->read<float>(0, 0));
+
+    // new range
+    float new_in_max = in_max > 0 ? in_max : 0;
+    float new_in_min = in_min < 0 ? in_min : 0;
+    RequantizeManyInNewRange<T, T>(this->inputs[0].get(), this->inputs[0]->getSize(),
+                                   in_min, in_max, new_in_min, new_in_max, 
+                                   this->inputs[0].get());
+    // write new range
+    S_TENSOR out_min_tensor = this->outputs[1];
+    S_TENSOR out_max_tensor = this->outputs[2];
+    *(out_min_tensor->write<float>(0, 0)) = new_in_min;
+    *(out_max_tensor->write<float>(0, 0)) = new_in_max;
+    // pooling
+    T pad_value = FloatToQuantized<T>(0, new_in_min, new_in_max);
     SpatialMaxPooling<T>(this->inputs[0], this->outputs[0],
                          this->_window_rows, this->_window_cols,
                          this->_row_stride, this->_col_stride,
-                         this->_padding);
-    S_TENSOR in_min_tensor = this->inputs[1];
-    S_TENSOR in_max_tensor = this->inputs[2];
-    float in_min_value = *(in_min_tensor->read<float>(0, 0));
-    float in_max_value = *(in_max_tensor->read<float>(0, 0));
-
-    S_TENSOR out_min_tensor = this->outputs[1];
-    S_TENSOR out_max_tensor = this->outputs[2];
-    *(out_min_tensor->write<float>(0, 0)) = in_min_value;
-    *(out_max_tensor->write<float>(0, 0)) = in_max_value;
+                         this->_padding,
+                         pad_value);
   }
 };
 
