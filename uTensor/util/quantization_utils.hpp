@@ -69,8 +69,8 @@ inline void RequantizeManyInNewRange(Tensor* input, uint32_t count,
                                      float min_input, float max_input,
                                      float min_output, float max_output,
                                      Tensor* output) {
-  T1 *in_ptr = input->read<T1>(0, 0);
-  T2 *out_ptr = output->read<T2>(0, 0);
+  const T1 *in_ptr = input->read<T1>(0, 0);
+  T2 *out_ptr = output->write<T2>(0, 0);
   for (size_t index = 0; index < count; ++index) {
     const float input_float =
         QuantizedToFloat<T1>(in_ptr[index], min_input, max_input);
