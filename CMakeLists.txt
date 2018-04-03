@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.0.2)
+cmake_minimum_required(VERSION 3.5)
 
 project(utensor)
 
@@ -45,6 +45,6 @@ if(GTEST_FOUND)
     
     file(GLOB TEST_SOURCES tests/*.cpp)
     add_executable(uTensorTests ${TEST_SOURCES})
-    target_link_libraries(uTensorTests utensor ${CMAKE_THREAD_LIBS_INIT})
-    GTEST_ADD_TESTS(uTensorTests AUTO)
+    target_link_libraries(uTensorTests utensor ${CMAKE_THREAD_LIBS_INIT} GTest::GTest GTest::Main)
+    GTEST_ADD_TESTS(uTensorTests "" AUTO)
 endif()
