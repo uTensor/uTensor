@@ -1,5 +1,7 @@
 # uTensor (Deep MLP) Hello World
 
+[![CircleCI](https://circleci.com/gh/mbartling/uTensor.svg?style=svg)](https://circleci.com/gh/mbartling/uTensor)
+
 ## Introduction
 
   uTensor is an extremely light-weight Deep-Learning Inference framework built on Mbed and Tensorflow. The project contains a Mbed importable runtime library and [utensor-cli](https://github.com/uTensor/utensor_cgen), an offline-tool which generates embedded C++ code base on supplied quantized-inference-graph.
