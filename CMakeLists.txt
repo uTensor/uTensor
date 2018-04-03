@@ -36,15 +36,21 @@ endif()
 
 add_library(utensor STATIC ${SOURCES})
 
+
 # Configure GTest
 enable_testing()
 find_package(GTest)
 if(GTEST_FOUND)
     find_package(Threads)
     include_directories(${GTEST_INCLUDE_DIRS})
+    add_subdirectory(unity)
+
     
-    file(GLOB TEST_SOURCES tests/*.cpp)
-    add_executable(uTensorTests ${TEST_SOURCES})
-    target_link_libraries(uTensorTests utensor ${CMAKE_THREAD_LIBS_INIT} GTest::GTest GTest::Main)
+    # Add the helper header
+    include_directories(${PROJECT_SOURCE_DIR}/tests)
+
+    file(GLOB TEST_SOURCES tests/*/*/test_*.cpp)
+    add_executable(uTensorTests ${TEST_SOURCES} tests/gtest_main.cpp)
+    target_link_libraries(uTensorTests utensor ${CMAKE_THREAD_LIBS_INIT} GTest::GTest GTest::Main unity)
     GTEST_ADD_TESTS(uTensorTests "" AUTO)
 endif()
