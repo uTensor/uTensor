@@ -40,11 +40,12 @@ utest::v1::status_t greentea_setup(const size_t number_of_cases) {
 #else /* GTest */
 
 #include "gtest/gtest.h"
-#define UTENSOR_TEST_CONFIGURE() {/* pass */}
-#define UTENSOR_TEST(x, y, message) TEST(x, y) { test_ ## x ## _ ## y ## (); }
+#define UTENSOR_TEST_CONFIGURE() /* pass */
+
+#define UTENSOR_TEST(x, y, message) TEST(x, y) { test_ ## x ## _ ## y(); }
 
 // Google does this better than I can
-#define UTENSOR_TEST_RUN() {/* pass */ }
+#define UTENSOR_TEST_RUN() /* pass */ 
 #endif
 
 #endif
