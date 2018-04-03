@@ -1,11 +1,10 @@
-#include "test_dummy_sanity.h"
 #include "test_helper.h"
 
-void test_sanity_check_true(){
+void test_sanity_checkTrue(){
     TEST_ASSERT(true);
 }
 
-void test_sanity_check_equal(){
+void test_sanity_checkEqual(){
     TEST_ASSERT(1 == 1);
 }
 
@@ -13,8 +12,9 @@ void test_sanity_check_equal(){
 UTENSOR_TEST_CONFIGURE()
 
 // Second declare tests to run
-UTENSOR_TEST(sanity, check_true, "Sanity check number 1")
-UTENSOR_TEST(sanity, check_equal, "Sanity check number 2")
+UTENSOR_TEST(sanity, checkTrue, "Sanity check number 1")
+UTENSOR_TEST(sanity, checkEqual, "Sanity check number 2")
+
 
 // Third, run like hell
 UTENSOR_TEST_RUN()
