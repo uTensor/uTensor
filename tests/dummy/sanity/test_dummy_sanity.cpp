@@ -1,4 +1,5 @@
 #include "test_dummy_sanity.h"
+#include "test_helper.h"
 
 void test_sanity_check_true(){
     TEST_ASSERT(true);
@@ -16,4 +17,4 @@ UTENSOR_TEST(sanity, check_true, "Sanity check number 1")
 UTENSOR_TEST(sanity, check_equal, "Sanity check number 2")
 
 // Third, run like hell
-UTENSOR_TEST_RUN();
+UTENSOR_TEST_RUN()
