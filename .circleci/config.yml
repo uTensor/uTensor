@@ -1,0 +1,11 @@
+version: 2
+jobs:
+  build:
+    docker:
+      - image: mbartling/utensor_ci
+    steps:
+      - checkout
+      - run: mkdir build
+      - run: cd build
+      - run: cmake ..
+      - run: make
