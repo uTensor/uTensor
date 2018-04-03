@@ -5,7 +5,5 @@ jobs:
       - image: mbartling/utensor_ci
     steps:
       - checkout
-      - run: mkdir build
-      - run: cd build
-      - run: cmake ..
+      - run: cmake .
       - run: make
