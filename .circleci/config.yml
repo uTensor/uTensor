@@ -7,3 +7,4 @@ jobs:
       - checkout
       - run: cmake .
       - run: make
+      - run: make test
