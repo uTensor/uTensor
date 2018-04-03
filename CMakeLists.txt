@@ -19,8 +19,6 @@ file(GLOB SOURCES uTensor/*/*.cpp)
 file(GLOB INCLUDES uTensor/*/*.hpp)
 
 
-
-
 message(STATUS "SOURCES: " ${SOURCES})
 
 # target_compile_features(utensor PRIVATE cxx_range_for)
@@ -40,5 +38,13 @@ add_library(utensor STATIC ${SOURCES})
 
 # Configure GTest
 enable_testing()
-find_package(GTest REQUIRED)
-include_directories(${GTEST_INCLUDE_DIRS})
+find_package(GTest)
+if(GTEST_FOUND)
+    find_package(Threads)
+    include_directories(${GTEST_INCLUDE_DIRS})
+    
+    file(GLOB TEST_SOURCES tests/*.cpp)
+    add_executable(uTensorTests ${TEST_SOURCES})
+    target_link_libraries(uTensorTests utensor ${CMAKE_THREAD_LIBS_INIT})
+    GTEST_ADD_TESTS(uTensorTests ${TEST_SOURCES})
+endif()
