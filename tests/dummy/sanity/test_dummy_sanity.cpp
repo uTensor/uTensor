@@ -1,11 +1,13 @@
 #include "test_helper.h"
 
+// Default to using GTest like asserts and expects as these give more info that unity
+// We will forward these commands to unity in test_helper.h
 void test_sanity_checkTrue(){
-    TEST_ASSERT(true);
+    EXPECT_EQ(true, true);
 }
 
 void test_sanity_checkEqual(){
-    TEST_ASSERT(1 == 1);
+    EXPECT_EQ(1 == 1, true);
 }
 
 // First configure the uTensor test runner
