@@ -22,6 +22,8 @@ utest::v1::status_t greentea_setup(const size_t number_of_cases) {
     return greentea_test_setup_handler(number_of_cases);
 }
 
+#define EXPECT_EQ(x, y) TEST_ASSERT( (x) == y )
+
 #define UTENSOR_TEST_CONFIGURE() std::vector<Case> cases(); \
     Serial pc(USBTX, USBRX, 115200); \
 +SDBlockDevice bd(MBED_CONF_APP_SD_MOSI, MBED_CONF_APP_SD_MISO, MBED_CONF_APP_SD_CLK, MBED_CONF_APP_SD_CS); \
