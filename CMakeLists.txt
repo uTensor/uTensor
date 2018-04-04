@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.5)
+cmake_minimum_required(VERSION 3.10)
 
 project(utensor)
 
@@ -45,6 +45,7 @@ if(GTEST_FOUND)
     include_directories(${GTEST_INCLUDE_DIRS})
     add_subdirectory(unity)
 
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DGTEST_DONT_DEFINE_FOO=1")
     
     # Add the helper header
     include_directories(${PROJECT_SOURCE_DIR}/tests)
@@ -55,7 +56,11 @@ if(GTEST_FOUND)
         get_filename_component(testname ${testsource} NAME_WE)
         add_executable( ${testname} ${testsource} )
         target_link_libraries(${testname} utensor ${CMAKE_THREAD_LIBS_INIT} GTest::GTest GTest::Main unity)
-        GTEST_ADD_TESTS(${testname} "" AUTO)
+        #add_test(${testname} ${testname})
+        # Need this line to work for more detailed test resultso
+        # F ME https://blog.kitware.com/dynamic-google-test-discovery-in-cmake-3-10/
+        #GTEST_ADD_TESTS(${testname} "" ${testsource})
+        gtest_discover_tests(${testname})
     endforeach( testsource ${TEST_SOURCES} )
 
     #add_executable(uTensorTests ${TEST_SOURCES} tests/gtest_main.cpp)
