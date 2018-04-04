@@ -171,14 +171,14 @@ void reshape(S_TENSOR input, S_TENSOR shape, S_TENSOR output) {
     if(output && output->getSize() > 0 && dim == output->getShape()) {
         //copy
         T* output_ptr = output->write<T>(0, 0);
-        std::memcpy(output_ptr, input_ptr, (std::size_t) input->getSize_in_bytes());
+        memcpy(output_ptr, input_ptr, (std::size_t) input->getSize_in_bytes());
     } else if(output && output->getSize() > 0 && dim != output->getShape()) {
         ERR_EXIT("output tensor dimension mismatches supplied shape")
     } else {
         //construct a new tensor and copy
         output->resize(dim);
         T* output_ptr = output->write<T>(0, 0);
-        std::memcpy(output_ptr, input_ptr, (std::size_t) input->getSize_in_bytes());
+        memcpy(output_ptr, input_ptr, (std::size_t) input->getSize_in_bytes());
     }
 
 }
