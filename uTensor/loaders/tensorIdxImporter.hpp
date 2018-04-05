@@ -1,6 +1,9 @@
 #ifndef UTENSOR_IDX_IMPORTER
 #define UTENSOR_IDX_IMPORTER
 
+#include "uTensor/util/uTensor_util.hpp"
+#include "uTensor/core/tensor.hpp"
+#include "uTensor/core/sdtensor.hpp"
 #include <stdio.h>
 #include <iostream>
 #include <stdlib.h>
@@ -8,7 +11,6 @@
 #include "uTensor_util.hpp"
 #include "tensor.hpp"
 #include <memory>
-#include "sdtensor.hpp"
 
 using namespace std;
 

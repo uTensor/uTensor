@@ -13,3 +13,14 @@ void printBits(size_t const size, void const* const ptr) {
   }
   puts("");
 }
+
+void printFloatData(Tensor* tensor) {
+  float v;
+  const float* ptr_data = tensor->read<float>(0, 0);
+  for (size_t i = 0; i < tensor->getSize(); ++i) {
+    v = *(ptr_data + i);
+    printf("%f, ", v);
+  }
+  printf("\r\n");
+  return;
+}

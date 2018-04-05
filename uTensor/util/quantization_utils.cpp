@@ -1,4 +1,4 @@
-#include "quantization_utils.hpp"
+#include "uTensor/util/quantization_utils.hpp"
 
 void RequantizeManyInNewRangeReference(const int* input, int32_t count,
     float min_input, float max_input,
