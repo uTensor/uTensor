@@ -1,0 +1,12 @@
+version: 2
+jobs:
+  build:
+    docker:
+      - image: mbartling/utensor_ci
+    steps:
+      - checkout
+      - run: git clone https://github.com/ThrowTheSwitch/Unity.git unity_temp
+      - run: mv unity_temp/* unity/
+      - run: cmake .
+      - run: make
+      - run: make test
