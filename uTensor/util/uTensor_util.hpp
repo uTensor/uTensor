@@ -36,6 +36,10 @@ void return_error(int ret_val);
 
 #else  // MBED_CONF_APP_DEBUG_MSG
 
+enum Padding {
+  VALID = 1,
+  SAME = 2,
+};
 // void errno_error(void* ret_val) { /*DOES NOTHING*/
 // }
 
@@ -93,6 +97,7 @@ void printVector(std::vector<uint32_t> vec);
 #elif defined(_POSIX_VERSION)
     // POSIX
 #else
+    #include "mbed.h"
 //#   error "Unknown compiler"
     // little endian to big endian
     //uint32_t htonl(uint32_t& val);

@@ -1,7 +1,7 @@
 #ifndef UTENSOR_SDTENSOR_H
 #define UTENSOR_SDTENSOR_H
-#include "tensor.hpp"
-#include "vm.hpp"
+#include "uTensor/core/tensor.hpp"
+#include "uTensor/core/vm.hpp"
 
 
 ///NT: FIXME: count overflow
