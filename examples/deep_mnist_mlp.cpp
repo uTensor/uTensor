@@ -1,5 +1,5 @@
 #include "deep_mnist_mlp.hpp"
-#include "math_utils.hpp"
+#include "uTensor/util/math_utils.hpp"
 
 void tensorQuantize(Context& ctx, TName input, TName output,
   TName out_min, TName out_max) {
