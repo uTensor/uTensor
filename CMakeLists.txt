@@ -53,7 +53,10 @@ if(GTEST_FOUND)
     foreach( testsource ${TEST_SOURCES} )
         #string( REPLACE ".cpp" "" testnameT ${testsource} )
         get_filename_component(testname ${testsource} NAME_WE)
-        add_executable( ${testname} ${testsource} )
+        get_filename_component(testdir ${testsource} DIRECTORY)
+        file(GLOB TEST_MODEL_SOURCES ${testdir}/models/*.cpp)
+
+        add_executable( ${testname} ${testsource} ${TEST_MODEL_SOURCES} )
         target_link_libraries(${testname} utensor ${CMAKE_THREAD_LIBS_INIT} GTest::GTest GTest::Main unity)
         #add_test(${testname} ${testname})
         # Need this line to work for more detailed test resultso
