@@ -44,7 +44,7 @@ if(GTEST_FOUND)
     include_directories(${GTEST_INCLUDE_DIRS})
     add_subdirectory(unity)
 
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DGTEST_DONT_DEFINE_FOO=1")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DGTEST_DONT_DEFINE_FOO=1 -DHAVE_GTEST")
     
     # Add the helper header
     include_directories(${PROJECT_SOURCE_DIR}/tests)
