@@ -392,8 +392,8 @@ void QuantizedAdd(S_TENSOR input_x, S_TENSOR input_y, S_TENSOR min_x, S_TENSOR m
   const float input_y_min = min_y->read<T2>(0, 0)[0];
   const float input_y_max = max_y->read<T2>(0, 0)[0];
 
-  const float r_output_min = r_min->read<T2>(0, 0)[0];
-  const float r_output_max = r_max->read<T2>(0, 0)[0];
+  const float r_output_min = out_min->read<T2>(0, 0)[0];
+  const float r_output_max = out_max->read<T2>(0, 0)[0];
 
   const T1 *input_x_ptr = input_x->read<T1>(0, 0);
   const T2 *input_y_ptr = input_y->read<T2>(0, 0);
@@ -434,7 +434,7 @@ void QuantizedAdd(S_TENSOR input_x, S_TENSOR input_y, S_TENSOR min_x, S_TENSOR m
   float total_max = *v_out_max;
 
   const size_t num_iterations = (input_element_count / smaller_input_element_count);
-  for (size_t iteration = 0; iteration < how_many_iterations; ++iteration) {
+  for (size_t iteration = 0; iteration < num_iterations; ++iteration) {
     const size_t offset = iteration * smaller_input_element_count;
     for (int c = 0; c < smaller_input_element_count; ++c) {
       const int index = (offset + c);
@@ -443,16 +443,17 @@ void QuantizedAdd(S_TENSOR input_x, S_TENSOR input_y, S_TENSOR min_x, S_TENSOR m
       // real numbers in both) so we need to convert them to a common range
       // before we sum them.
       const T1 input_value = input_x_ptr[index];
-      const T3 input_in_total_space = RequantizationInNewRange<T1, T3>(
+      const Toutput input_in_total_space = RequantizeInNewRange<T1, Toutput>(
               input_value, input_x_min, input_x_max, total_min, total_max);
       const T2 smaller_input_value = input_y_ptr[index];
-      const T3 smaller_input_in_total_space = 
-          RequantizationInNewRange<T2, T3>(
+      const Toutput smaller_input_in_total_space = 
+          RequantizeInNewRange<T2, Toutput>(
               smaller_input_value, input_y_min, input_y_max, total_min, total_max);
-      const T3 total_pre = input_in_total_space + smaller_input_in_total_space;
+      const Toutput total_pre = input_in_total_space + smaller_input_in_total_space;
 
       // As noted above, we need to compensate for the offset of the actual
       // zero point in the space we're operating in.
+      const Toutput total = total_pre + zero_in_total_space;
       out_ptr[index] = total;
 
 
@@ -462,6 +463,7 @@ void QuantizedAdd(S_TENSOR input_x, S_TENSOR input_y, S_TENSOR min_x, S_TENSOR m
 }
 
 
+template<class T1, class T2, class T3>
 class QuantizedAddOp : public Operator {
   public:
       QuantizedAddOp() {
