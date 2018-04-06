@@ -1,6 +1,6 @@
 # uTensor (Deep MLP) Hello World
 
-[![CircleCI](https://circleci.com/gh/mbartling/uTensor.svg?style=svg)](https://circleci.com/gh/mbartling/uTensor)
+[![CircleCI](https://circleci.com/gh/uTensor/uTensor.svg?style=svg)](https://circleci.com/gh/uTensor/uTensor)
 
 ## Introduction
 
