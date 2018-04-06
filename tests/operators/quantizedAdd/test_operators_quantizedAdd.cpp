@@ -14,10 +14,10 @@ Context ctx;
 // We will forward these commands to unity in test_helper.h
 void test_operators_quantizedAdd(){
     get_test_quantized_add_ctx(ctx);
-    S_TENSOR output_z = ctx.get("z:0");
+    S_TENSOR output_z = ctx.get("z_1:0");
     ctx.eval();
 
-    Tensor* ref_z = t_import.float_import("constants/test_quantized_add/idx_data/output_z.idx");
+    Tensor* ref_z = t_import.float_import("/fs/constants/test_quantized_add/output_z.idx");
 
     // compare the results
     double err = meanAbsErr<float>(ref_z, output_z.get());
