@@ -23,7 +23,7 @@ void test_operators_quantizedAdd(){
     double err = meanAbsErr<float>(ref_z, output_z.get());
     //printf("err: %f\n", err);
     cout << "err: " << err << endl;
-    EXPECT_LT(err , 0.0003);
+    EXPECT_LT(err , 0.00035);
 }
 
 
