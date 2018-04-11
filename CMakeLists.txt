@@ -44,16 +44,19 @@ if(GTEST_FOUND)
     include_directories(${GTEST_INCLUDE_DIRS})
     add_subdirectory(unity)
 
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DGTEST_DONT_DEFINE_FOO=1")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DGTEST_DONT_DEFINE_FOO=1 -DHAVE_GTEST")
     
     # Add the helper header
-    include_directories(${PROJECT_SOURCE_DIR}/tests)
+    include_directories(${PROJECT_SOURCE_DIR}/TESTS)
 
-    file(GLOB TEST_SOURCES tests/*/*/test_*.cpp)
+    file(GLOB TEST_SOURCES TESTS/*/*/test_*.cpp)
     foreach( testsource ${TEST_SOURCES} )
         #string( REPLACE ".cpp" "" testnameT ${testsource} )
         get_filename_component(testname ${testsource} NAME_WE)
-        add_executable( ${testname} ${testsource} )
+        get_filename_component(testdir ${testsource} DIRECTORY)
+        file(GLOB TEST_MODEL_SOURCES ${testdir}/models/*.cpp)
+
+        add_executable( ${testname} ${testsource} ${TEST_MODEL_SOURCES} )
         target_link_libraries(${testname} utensor ${CMAKE_THREAD_LIBS_INIT} GTest::GTest GTest::Main unity)
         #add_test(${testname} ${testname})
         # Need this line to work for more detailed test resultso

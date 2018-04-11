@@ -75,7 +75,7 @@ class TensorBase {
       data = (void*)malloc(unit_size * total_size);
     }
     if (data == NULL)
-      ERR_EXIT("ran out of memory for %u malloc", unit_size * total_size);
+      ERR_EXIT("ran out of memory for %u malloc", (unsigned int)(unit_size * total_size));
   }
 
   ~TensorBase() {
