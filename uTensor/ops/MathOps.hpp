@@ -396,7 +396,7 @@ void QuantizedAdd(S_TENSOR input_x, S_TENSOR input_y, S_TENSOR min_x, S_TENSOR m
   const float r_output_max = out_max->read<T2>(0, 0)[0];
 
   const T1 *input_x_ptr = input_x->read<T1>(0, 0);
-  const T2 *input_y_ptr = input_y->read<T2>(0, 0);
+  const T1 *input_y_ptr = input_y->read<T1>(0, 0);
 
   if (output->getSize() == 0) output->resize(input_x->getShape());
   Toutput *out_ptr = output->write<Toutput>(0, 0);
@@ -445,9 +445,9 @@ void QuantizedAdd(S_TENSOR input_x, S_TENSOR input_y, S_TENSOR min_x, S_TENSOR m
       const T1 input_value = input_x_ptr[index];
       const Toutput input_in_total_space = RequantizeInNewRange<T1, Toutput>(
               input_value, input_x_min, input_x_max, total_min, total_max);
-      const T2 smaller_input_value = input_y_ptr[index];
+      const T1 smaller_input_value = input_y_ptr[index];
       const Toutput smaller_input_in_total_space = 
-          RequantizeInNewRange<T2, Toutput>(
+          RequantizeInNewRange<T1, Toutput>(
               smaller_input_value, input_y_min, input_y_max, total_min, total_max);
       const Toutput total_pre = input_in_total_space + smaller_input_in_total_space;
 
@@ -472,9 +472,9 @@ class QuantizedAddOp : public Operator {
     }
 
     virtual void compute() override {
-        QuantizedAdd<int, float, unsigned char>(inputs[0], inputs[1], 
-                inputs[2], inputs[3], inputs[4], inputs[5],
-                outputs[0], outputs[1], outputs[2]);
+        QuantizedAdd<unsigned char, float, int>(inputs[0], inputs[3],  
+            inputs[1], inputs[2], inputs[4], inputs[5],
+            outputs[0], outputs[1], outputs[2]);
     }
 };
 
