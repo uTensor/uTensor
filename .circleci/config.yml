@@ -7,7 +7,7 @@ jobs:
       - checkout
       - run: git clone https://github.com/ThrowTheSwitch/Unity.git unity_temp
       - run: mv unity_temp/* unity/
-      - run: find TESTS -type f -exec sed -e 's/\/fs\//TESTS\//g' -i bak {} \;
+      - run: find TESTS -type f -exec sed -e 's/\/fs\//TESTS\//g' -i {} \;
       - run: cmake .
       - run: make
       - run: ctest -VV
