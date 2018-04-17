@@ -75,7 +75,7 @@ UTENSOR_TEST_CONFIGURE()
 UTENSOR_TEST(core, ntoh32, "test ntoh32")
 UTENSOR_TEST(core, importUchar, "Test unsigned char import")
 UTENSOR_TEST(core, importShort, "Test short inport")
-UTENSOR_TEST(core, importInt, "Test import Int")
+//UTENSOR_TEST(core, importInt, "Test import Int")
 UTENSOR_TEST(core, importFloat, "Test import float")
 
 
