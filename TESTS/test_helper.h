@@ -12,7 +12,7 @@
 #include <vector>
 #include "FATFileSystem.h"
 #include "SDBlockDevice.h"
-	
+
 using namespace utest::v1;
 
 // Custom setup handler required for proper Greentea support
@@ -124,6 +124,45 @@ template<typename U>
 double meanPercentErr(Tensor* A, Tensor* B) {
   double sum = sumPercentErr<U>(A, B);
   return sum / A->getSize();
+}
+
+template<typename U>
+double sum(Tensor* input) {
+  const U* elem = input->read<U>(0, 0);
+  double accm = 0.0;
+  for (uint32_t i = 0; i < input->getSize(); i++) {
+    accm += (double)elem[i];
+  }
+
+  return accm;
+}
+template <typename T>
+bool testshape(std::vector<T> src, std::vector<T> res, std::vector<uint8_t> permute) {
+  bool pass = true;
+  for (size_t i = 0; i < permute.size(); i++) {
+    if (src[permute[i]] != res[i]) {
+      pass = false;
+      return pass;
+    }
+  }
+  return pass;
+}
+
+bool testsize(uint32_t src, uint32_t res) {
+  bool pass = true;
+  if (src != res) {
+      pass = false;
+      return pass;
+  }
+  return pass;
+}
+template <typename T>
+bool testval(T src, T res) {
+  bool pass = true;
+  if (src == res) {
+    return pass;
+  }
+  return false;
 }
 
 #endif
