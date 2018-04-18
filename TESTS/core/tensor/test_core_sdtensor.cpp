@@ -13,8 +13,8 @@ Context ctx;
 
 void test_core_readSDTensor() {
     Tensor* t = nullptr;
-    t = t_import.ubyte_import("/fs/testData/idxImport/uint8_4d_power2.idx");
-    Tensor* s = t_import.sd_ubyte_import("/fs/testData/idxImport/uint8_4d_power2.idx", 10);//the size of data is 10 elements
+    t = t_import.ubyte_import("/fs/constants/idxImport/uint8_4d_power2.idx");
+    Tensor* s = t_import.sd_ubyte_import("/fs/constants/idxImport/uint8_4d_power2.idx", 10);//the size of data is 10 elements
 
     const unsigned char* x = t->read<unsigned char>(0, 0);
     uint32_t x_res = 0;
@@ -25,7 +25,7 @@ void test_core_readSDTensor() {
       y_res += (uint32_t)y[0];
     }
 
-    EXPECT_EQ(x_res == y_res);
+    EXPECT_EQ(x_res, y_res);
     delete t;
     delete s;
 }
