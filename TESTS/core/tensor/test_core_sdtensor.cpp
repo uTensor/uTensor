@@ -1,5 +1,6 @@
 #include "test_helper.h"
 #include "uTensor/loaders/tensorIdxImporter.hpp"
+#include "MatrixOps.hpp"
 
 #include <iostream>
 #include <algorithm>
@@ -33,21 +34,21 @@ void test_core_readSDTensor() {
 
 void test_core_writeSDTensor() {
 
-    Tensor* h = t_import.sd_int_import("/fs/constants/qMatMul/res/wtest.idx", 5);//the size of data is 5 elements
+    Tensor* h = t_import.sd_int_import("/fs/constants/qMatMul/sdstore/wtest.idx", 81);//the size of data is 5 elements
 
-    int* y = h->write<int>(0, 1);
-    uint32_t res_x = 0;
-    uint32_t res_y = 0;
+
+    int res_x = 0;
+    int res_y = 0;
     for (uint32_t i = 0; i < h->getSize(); i++) {
-      y = h->write<int>(i, 1);
-      y[0] = 's';
-      unsigned char a = 's';
-      res_x += (uint32_t)a;
+      int* y = h->write<int>(i, 1);
+      y[0] = 2;
+      int a = 2;
+      res_x += a;
     }
 
     for(uint32_t i = 0; i < h->getSize(); i++) {
       auto y = h->read<int>(i, 1);
-      res_y += (uint32_t) *y;
+      res_y += (int) *y; 
     }
 
     EXPECT_EQ(res_x, res_y);
@@ -70,8 +71,8 @@ void test_core_matmulSDtensor() {
     //we need default constructor here
     //so we can get ride of the shapes here
     S_TENSOR out_c = ctx.add(new SDTensor<int>(128), "out_c");
-    S_TENSOR out_min = ctx.add(t_import.sd_float_import("/fs/constants/qMatMul/res/min.idx", 1), "out_min");
-    S_TENSOR out_max = ctx.add(t_import.sd_float_import("/fs/constants/qMatMul/res/max.idx", 1), "out_max");
+    S_TENSOR out_min = ctx.add(t_import.sd_float_import("/fs/constants/qMatMul/sdstore/min.idx", 1), "out_min");
+    S_TENSOR out_max = ctx.add(t_import.sd_float_import("/fs/constants/qMatMul/sdstore/max.idx", 1), "out_max");
 
 
 
