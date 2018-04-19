@@ -3,11 +3,10 @@
 #include "uTensor/core/tensor.hpp"
 #include "uTensor/core/vm.hpp"
 
-
-#ifdef COMPILE_GREENTEA
-static string tmpprefix = "/fs/tmp/";
+#ifdef MBED_CONF_APP_DEBUG_MSG
+  #define tmpprefix "/fs/tmp/"
 #else
-static string tmpprefix = "/tmp/";
+  #define tmpprefix "/tmp/"
 #endif
 
 ///NT: FIXME: count overflow
