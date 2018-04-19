@@ -4,6 +4,12 @@
 #include "uTensor/core/vm.hpp"
 
 
+#ifdef COMPILE_GREENTEA
+static string tmpprefix = "/fs/tmp/";
+#else
+static string tmpprefix = "/tmp/";
+#endif
+
 ///NT: FIXME: count overflow
 static string getTmpName(void) {
   static uint32_t count = 0;
@@ -14,7 +20,7 @@ template <class T>
 class SDTensor : public Tensor {
   public:
     SDTensor( uint32_t cachesize) : Tensor() {
-        string file = "/fs/tmp/" + getTmpName();
+        string file = tmpprefix + getTmpName();
         _filename = file;
         mem.createFile(_filename);
         s->cache_size = cachesize;
@@ -29,7 +35,7 @@ class SDTensor : public Tensor {
       }
       s->cache_size = cachesize;
       Tensor::init(v);
-      string file = "/fs/tmp/" + getTmpName();
+      string file = tmpprefix + getTmpName();
       _filename = file;
       mem.createFile(_filename);
       cursor = 0;
@@ -39,7 +45,7 @@ class SDTensor : public Tensor {
     SDTensor(std::vector<uint32_t> v, uint32_t cachesize) : Tensor() {
       s->cache_size = cachesize;
       Tensor::init(v);
-      string file = "/fs/tmp/" + getTmpName();
+      string file = tmpprefix + getTmpName();
       _filename = file;
       mem.createFile(_filename);
       cursor = 0;
