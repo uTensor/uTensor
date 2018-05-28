@@ -1,4 +1,6 @@
 #include "uTensor/util/uTensor_util.hpp"
+#include <sys/stat.h>
+#include <dirent.h>
 #include <cstdlib>
 
 void return_error(int ret_val) {
