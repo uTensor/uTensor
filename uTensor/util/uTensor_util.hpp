@@ -5,6 +5,8 @@
 #include <vector>
 #include <iostream>
 
+using namespace std;
+
 // #define MAX(A, B) ((A > B)? A:B)
 
 void return_error(int ret_val);
@@ -61,7 +63,9 @@ void utensor_exit(void);
 typedef std::vector<uint32_t> Shape;
 
 void printVector(std::vector<uint32_t> vec);
-#ifdef _WIN32
+#ifdef TARGET_SIMULATOR
+    // noop
+#elif defined(_WIN32)
    //define something for Windows (32-bit and 64-bit, this part is common)
    #ifdef _WIN64
       //define something for Windows (64-bit only)
