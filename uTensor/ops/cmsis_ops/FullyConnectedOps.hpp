@@ -63,6 +63,25 @@ void FullyConnectedLayerCmsis<q15_t, q15_t, q15_t>(S_TENSOR iV, S_TENSOR mW, S_T
     //Error checking
 }
 
+template<>
+void FullyConnectedLayerCmsis<q15_t, q7_t, q15_t>(S_TENSOR iV, S_TENSOR mW, S_TENSOR b,
+                                           S_TENSOR bShift, S_TENSOR oShift,
+                                           S_TENSOR pOut, S_TENSOR scratch)
+{
+    const q15_t* iV_data = iV->read<q15_t>(0, sizeof(q15_t)); //Read one byte
+    const q7_t* mW_data = mW->read<q15_t>(0, sizeof(q7_t)); //Read one byte
+    const uint16_t dim_vec = iV->getShape()[0];
+    const uint16_t num_of_rows = mW->getShape()[0];
+    const uint16_t bias_shift = *(bShift->read<uint16_t>(0,0));
+    const uint16_t out_shift = *(oShift->read<uint16_t>(0,0));
+    q15_t* pOut_data = pOut->write(0, sizeof(q15_t));
+    q15_t* scratch_data = scratch->write(0, sizeof(q15_t));
+
+    arm_fully_connected_mat_q7_vec_q15(iV_data, mW_data, dim_vec, dim_vec, 
+            num_of_rows, bias_shift, out_shift, pOut_data, scratch_data);
+    //Error checking
+}
+
 /***
  * Here we have two types of kernel functions. The basic function implements the function using regular GEMV approach. The opt functions operates with weights in interleaved formats.
  *
@@ -117,6 +136,25 @@ void FullyConnectedLayerOptCmsis<q15_t, q15_t, q15_t>(S_TENSOR iV, S_TENSOR mW, 
     q15_t* scratch_data = scratch->write(0, sizeof(q15_t));
 
     arm_fully_connected_q15_opt(iV_data, mW_data, dim_vec, dim_vec, 
+            num_of_rows, bias_shift, out_shift, pOut_data, scratch_data);
+    //Error checking
+}
+
+template<>
+void FullyConnectedLayerOptCmsis<q15_t, q7_t, q15_t>(S_TENSOR iV, S_TENSOR mW, S_TENSOR b,
+                                           S_TENSOR bShift, S_TENSOR oShift,
+                                           S_TENSOR pOut, S_TENSOR scratch)
+{
+    const q15_t* iV_data = iV->read<q15_t>(0, sizeof(q15_t)); //Read one byte
+    const q7_t* mW_data = mW->read<q15_t>(0, sizeof(q7_t)); //Read one byte
+    const uint16_t dim_vec = iV->getShape()[0];
+    const uint16_t num_of_rows = mW->getShape()[0];
+    const uint16_t bias_shift = *(bShift->read<uint16_t>(0,0));
+    const uint16_t out_shift = *(oShift->read<uint16_t>(0,0));
+    q15_t* pOut_data = pOut->write(0, sizeof(q15_t));
+    q15_t* scratch_data = scratch->write(0, sizeof(q15_t));
+
+    arm_fully_connected_mat_q7_vec_q15_opt(iV_data, mW_data, dim_vec, dim_vec, 
             num_of_rows, bias_shift, out_shift, pOut_data, scratch_data);
     //Error checking
 }
