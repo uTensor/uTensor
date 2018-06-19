@@ -39,8 +39,8 @@ void FullyConnectedLayerCmsis<q7_t, q7_t, q7_t>(S_TENSOR iV, S_TENSOR mW, S_TENS
     const uint16_t bias_shift = *(bShift->read<uint16_t>(0,0));
     const uint16_t out_shift = *(oShift->read<uint16_t>(0,0));
     pOut->resize(b->getShape());
-    q7_t* pOut_data = pOut->write(0, sizeof(q7_t));
-    q15_t* scratch_data = scratch->write(0, sizeof(q15_t));
+    q7_t* pOut_data = pOut->write<q7_t>(0, sizeof(q7_t));
+    q15_t* scratch_data = scratch->write<q15_t>(0, sizeof(q15_t));
 
     arm_fully_connected_q7(iV_data, mW_data, dim_vec, num_of_rows, 
             bias_shift, out_shift, bias_data, pOut_data, scratch_data);
@@ -61,8 +61,8 @@ void FullyConnectedLayerCmsis<q15_t, q15_t, q15_t>(S_TENSOR iV, S_TENSOR mW, S_T
     const uint16_t bias_shift = *(bShift->read<uint16_t>(0,0));
     const uint16_t out_shift = *(oShift->read<uint16_t>(0,0));
     pOut->resize(b->getShape());
-    q15_t* pOut_data = pOut->write(0, sizeof(q15_t));
-    q15_t* scratch_data = scratch->write(0, sizeof(q15_t));
+    q15_t* pOut_data = pOut->write<q15_t>(0, sizeof(q15_t));
+    q15_t* scratch_data = scratch->write<q15_t>(0, sizeof(q15_t));
 
     arm_fully_connected_q15(iV_data, mW_data, dim_vec, num_of_rows, 
                         bias_shift, out_shift, bias_data, pOut_data, scratch_data);
@@ -75,15 +75,15 @@ void FullyConnectedLayerCmsis<q15_t, q7_t, q15_t>(S_TENSOR iV, S_TENSOR mW, S_TE
                                            S_TENSOR pOut, S_TENSOR scratch)
 {
     const q15_t* iV_data = iV->read<q15_t>(0, sizeof(q15_t)); //Read one byte
-    const q7_t* mW_data = mW->read<q15_t>(0, sizeof(q7_t)); //Read one byte
+    const q7_t* mW_data = mW->read<q7_t>(0, sizeof(q7_t)); //Read one byte
     const q7_t* bias_data = b->read<q7_t>(0, sizeof(q7_t)); //Read one byte
     const uint16_t dim_vec = iV->getShape()[0];
     const uint16_t num_of_rows = mW->getShape()[0];
     const uint16_t bias_shift = *(bShift->read<uint16_t>(0,0));
     const uint16_t out_shift = *(oShift->read<uint16_t>(0,0));
     pOut->resize(b->getShape());
-    q15_t* pOut_data = pOut->write(0, sizeof(q15_t));
-    q15_t* scratch_data = scratch->write(0, sizeof(q15_t));
+    q15_t* pOut_data = pOut->write<q15_t>(0, sizeof(q15_t));
+    q15_t* scratch_data = scratch->write<q15_t>(0, sizeof(q15_t));
 
     arm_fully_connected_mat_q7_vec_q15(iV_data, mW_data, dim_vec, num_of_rows, 
                         bias_shift, out_shift, bias_data, pOut_data, scratch_data);
@@ -124,8 +124,8 @@ void FullyConnectedLayerOptCmsis<q7_t, q7_t, q7_t>(S_TENSOR iV, S_TENSOR mW, S_T
     const uint16_t bias_shift = *(bShift->read<uint16_t>(0,0));
     const uint16_t out_shift = *(oShift->read<uint16_t>(0,0));
     pOut->resize(b->getShape());
-    q7_t* pOut_data = pOut->write(0, sizeof(q7_t));
-    q15_t* scratch_data = scratch->write(0, sizeof(q15_t));
+    q7_t* pOut_data = pOut->write<q7_t>(0, sizeof(q7_t));
+    q15_t* scratch_data = scratch->write<q15_t>(0, sizeof(q15_t));
 
     arm_fully_connected_q7_opt(iV_data, mW_data, dim_vec, num_of_rows, 
                         bias_shift, out_shift, bias_data, pOut_data, scratch_data);
@@ -144,8 +144,8 @@ void FullyConnectedLayerOptCmsis<q15_t, q15_t, q15_t>(S_TENSOR iV, S_TENSOR mW, 
     const uint16_t bias_shift = *(bShift->read<uint16_t>(0,0));
     const uint16_t out_shift = *(oShift->read<uint16_t>(0,0));
     pOut->resize(b->getShape());
-    q15_t* pOut_data = pOut->write(0, sizeof(q15_t));
-    q15_t* scratch_data = scratch->write(0, sizeof(q15_t));
+    q15_t* pOut_data = pOut->write<q15_t>(0, sizeof(q15_t));
+    q15_t* scratch_data = scratch->write<q15_t>(0, sizeof(q15_t));
 
     arm_fully_connected_q15_opt(iV_data, mW_data, dim_vec, num_of_rows, 
                         bias_shift, out_shift, bias_data, pOut_data, scratch_data);
@@ -158,15 +158,15 @@ void FullyConnectedLayerOptCmsis<q15_t, q7_t, q15_t>(S_TENSOR iV, S_TENSOR mW, S
                                            S_TENSOR pOut, S_TENSOR scratch)
 {
     const q15_t* iV_data = iV->read<q15_t>(0, sizeof(q15_t)); //Read one byte
-    const q7_t* mW_data = mW->read<q15_t>(0, sizeof(q7_t)); //Read one byte
+    const q7_t* mW_data = mW->read<q7_t>(0, sizeof(q7_t)); //Read one byte
     const q7_t* bias_data = b->read<q7_t>(0, sizeof(q7_t)); //Read one byte
     const uint16_t dim_vec = iV->getShape()[0];
     const uint16_t num_of_rows = mW->getShape()[0];
     const uint16_t bias_shift = *(bShift->read<uint16_t>(0,0));
     const uint16_t out_shift = *(oShift->read<uint16_t>(0,0));
     pOut->resize(b->getShape());
-    q15_t* pOut_data = pOut->write(0, sizeof(q15_t));
-    q15_t* scratch_data = scratch->write(0, sizeof(q15_t));
+    q15_t* pOut_data = pOut->write<q15_t>(0, sizeof(q15_t));
+    q15_t* scratch_data = scratch->write<q15_t>(0, sizeof(q15_t));
 
     arm_fully_connected_mat_q7_vec_q15_opt(iV_data, mW_data, dim_vec, num_of_rows, 
                         bias_shift, out_shift, bias_data, pOut_data, scratch_data);
