@@ -28,18 +28,11 @@ If you would like to create a new uTensor example repository, please initiate th
 
 ## For uTensor Runtime Library
 
-1. `docker pull mbartling/utensor_cli`
-2. locally install the uTensor, there are some steps:
+1. locally install the uTensor, there are some steps:
     `git clone https://github.com/uTensor`
-3. `git clone https://github.com/ThrowTheSwitch/Unity.git unity_temp`
-4. `mv unity_temp/* uTensor/unity/`
-5. `write your own test for operator`
-6. `find TESTS -type f -exec sed -e 's/\/fs\//TESTS\//g' -i {} \;`
-7. `find uTensor/core/ -type f -exec sed -e 's/\/fs\//\//g' -i {} \;`
-8. `cmake .`
-9. `make`
-10. `ctest -VV`
-  
+2. install circleci tool locally, please refer [Circleci](https://circleci.com/docs/2.0/local-cli/#installing-the-circleci-local-cli-on-macos-and-linux-distros)
+2. In uTensor directory, run `circleci build --job build`  
+
 Please refer to test guideline (https://github.com/uTensor/uTensor/tree/develop/TESTS/README.md) for more information
 
 
