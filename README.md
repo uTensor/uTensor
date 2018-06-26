@@ -71,7 +71,7 @@ This example shows how to buffer time-series data into batches of snapshots. The
 
 ### Creating a New Project
 
-  Please refer to this [guide](docs/newProject.md) for instructions on creating your own project from stretch.
+  Coming soon!
 
 ## Development
 uTensor is young and under going rapid development. Many exciting features are on the way:
