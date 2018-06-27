@@ -9,14 +9,19 @@ $ cd my_uTensor/
 $ ls
 mbed-os          mbed-os.lib      mbed_settings.py
 ```
-We will need the **uTensor runtime library**. It contains all the funcion implementations that will be linked during the compilation time.
+**Mbed OS 5.6** is the latest we have tested. These steps switch the project to Mbed OS 5.6:
+```
+$ cd mbed-os && git checkout mbed-os-5.6 && cd ..
+$ mbed sync
+```
+We will need the **uTensor runtime library**. It contains all the function implementations that will be linked during the compilation time.
 ```
 $ mbed add https://github.com/uTensor/uTensor/#ead2315e68db6f42015d4a09ac6f2d0fb7d4cc74
 $ ls
 mbed-os          mbed_settings.py uTensor.lib
 mbed-os.lib      uTensor
 ```
-Depends on the board you use, you may need to add different **drivers**. For DISCO_F413ZH, we need a couple more things.
+Depends on the board you use, you may need to add different **drivers**. For DISCO_F413ZH, we need the SD card drivers.
 ```
 mbed add https://os.mbed.com/teams/ST/code/BSP_DISCO_F413ZH/#0f07a9ac06f7
 mbed add https://github.com/neil-tan/F413ZH_SD_BlockDevice/#1d8d1497200f7dfe2a1d24cc075f3e0c02afd545
@@ -140,6 +145,7 @@ Image: ./BUILD/DISCO_F413ZH/GCC_ARM/my_uTensor.bin
 ## Expected Output
 Connect to the board via CoolTerm using 115200 as the baudrate. Here is what you should see:
 ```
-
+Simple MNIST end-to-end uTensor cli example (device)
+Predicted label: 7
 ```
 **Congradulations!** You have deployed a neural network on a MCU from scretch!
