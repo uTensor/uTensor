@@ -1,4 +1,14 @@
 # uTensor - Test Release
+[![CircleCI](https://circleci.com/gh/uTensor/uTensor.svg?style=svg)](https://circleci.com/gh/uTensor/uTensor)
+
+## Release Note
+- Updated uTensor ReadMe
+- Updated uTensor-CLI ReadMe
+- Added Contributor Guide
+- Added new uTensor project guide
+- Dropout Support
+
+
 ## Introduction
 ### What is it?
 uTensor is an extremely light-weight machine learning inference framework built on Mbed and Tensorflow. The project contains a runtime library and an offline tool. The total size of graph definition and algorithm implementation of a 3-layer MLP produced by uTensor is less than 32kB in the resulting binary (excluding the weights).
@@ -71,7 +81,7 @@ This example shows how to buffer time-series data into batches of snapshots. The
 
 ### Creating a New Project
 
-  Coming soon!
+  Please refer to this [guide](docs/newProject.md) for instructions on creating your own project from stretch on DISCO-F413ZH. 
 
 ## Development
 uTensor is young and under going rapid development. Many exciting features are on the way:
@@ -82,10 +92,12 @@ uTensor is young and under going rapid development. Many exciting features are o
 - CMSIS-NN integration
 - Smaller binary
 
-You can also check the [project page](https://github.com/orgs/uTensor/projects) for the latest process. If you'd like to take part in this project, please have a look at our contributor guide and feel free to reach out to us.
+You can also check the [project page](https://github.com/orgs/uTensor/projects) for the latest process. If you'd like to take part in this project, please have a look at our **[contributor guide](contribution_guide.md)** and feel free to reach out to us.
 
-## Release Note
-- Updated uTensor ReadMe
-- Updated uTensor-CLI ReadMe
-- Added Contributor Guide
-- Dropout Support
+## Further Reading
+
+- [TensorFlow](https://www.tensorflow.org)
+- [Mbed](https://developer.mbed.org)
+- [Node-Viewer](https://github.com/neil-tan/tf-node-viewer/)
+- [How to Quantize Neural Networks with TensorFlow](https://petewarden.com/2016/05/03/how-to-quantize-neural-networks-with-tensorflow/)
+- [mxnet Handwritten Digit Recognition](https://mxnet.incubator.apache.org/tutorials/python/mnist.html)
