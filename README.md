@@ -92,10 +92,11 @@ uTensor is young and under going rapid development. Many exciting features are o
 - CMSIS-NN integration
 - Smaller binary
 
-You can also check the [project page](https://github.com/orgs/uTensor/projects) for the latest process. If you'd like to take part in this project, please have a look at our **[contributor guide](contribution_guide.md)** and feel free to reach out to us.
+You can also check the [project page](https://github.com/orgs/uTensor/projects) for the latest progress. If you'd like to take part in this project, please have a look at our **[contributor guide](contribution_guide.md)** and feel free to reach out to us.
 
 ## Further Reading
-
+- [Why Edge Computing](https://towardsdatascience.com/why-machine-learning-on-the-edge-92fac32105e6)
+- [Why the Future of Machine Learning is Tiny](https://petewarden.com/2018/06/11/why-the-future-of-machine-learning-is-tiny/)
 - [TensorFlow](https://www.tensorflow.org)
 - [Mbed](https://developer.mbed.org)
 - [Node-Viewer](https://github.com/neil-tan/tf-node-viewer/)
