@@ -1,0 +1,5 @@
+{
+    "name": "utensor",
+    "macros": ["TARGET_MBED"]
+}
+
