@@ -7,7 +7,7 @@ Welcome to uTensor contribution guide. Want to make things better? [Talk to us](
 ### Two kinds of pull request
 
   1. Adding new features to uTensor:
-    -  Create a new [issue](https://github.com/uTensor/uTensor/issues) and discuss the idea with core maintainers. We want to make sure your time is well spent and learn about you.
+    -  Create a new [issue](https://github.com/uTensor/uTensor/issues) and discuss the idea with core maintainers. Through the discussions, we want to make sure your time is well spent and learn about you.
     -  Start the implementing the feature once the feedback is received.
       - uTensor runtime [local build instructions](#localBuild)
       - Code Generator Developer Build
