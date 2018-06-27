@@ -31,7 +31,7 @@ If you would like to create a new uTensor example repository, please initiate th
 1. locally install the uTensor, there are some steps:
     `git clone https://github.com/uTensor`
 2. install circleci tool locally, please refer [Circleci](https://circleci.com/docs/2.0/local-cli/#installing-the-circleci-local-cli-on-macos-and-linux-distros)
-2. In uTensor directory, run `circleci build --job build`  
+2. In uTensor directory, run `circleci build`  
 
 Please refer to test guideline (https://github.com/uTensor/uTensor/tree/develop/TESTS/README.md) for more information
 
