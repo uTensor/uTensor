@@ -21,10 +21,15 @@ $ ls
 mbed-os          mbed_settings.py uTensor.lib
 mbed-os.lib      uTensor
 ```
-Depends on the board you use, you may need to add different **drivers**. For DISCO_F413ZH, we need the SD card drivers.
+Depends on the board you use, you may need to add different **drivers**.
+##### For DISCO_F413ZH, we need custom SD card drivers
 ```
 mbed add https://os.mbed.com/teams/ST/code/BSP_DISCO_F413ZH/#0f07a9ac06f7
 mbed add https://github.com/neil-tan/F413ZH_SD_BlockDevice/#1d8d1497200f7dfe2a1d24cc075f3e0c02afd545
+```
+##### For other boards, use this instead
+```
+mbed add https://github.com/ARMmbed/sd-driver/#c46d0779e7354169e5a5ad0a84dc0346f55ab3e1
 ```
 ## Generating the Model File
 You may have your own step to obtain the .pb file. For the sake of illustraion, let's use the MNIST **training** script:
@@ -79,6 +84,7 @@ Create a main.cpp file at the project root, and fill it with the following code:
 #include "mbed.h"
 
 Serial pc(USBTX, USBRX, 115200);
+//normally, we use this
 // SDBlockDevice bd(MBED_CONF_APP_SD_MOSI, MBED_CONF_APP_SD_MISO,
 //                  MBED_CONF_APP_SD_CLK, MBED_CONF_APP_SD_CS);
 F413ZH_SD_BlockDevice bd; //F413ZH specific
@@ -112,6 +118,7 @@ int main(void) {
   return 0;
 }
 ```
+You may need to comment/uncomment parts of the code if you are not using a DISCO_F413ZH.
 ## Prepare the SD card
 The current version of uTensor still require you to save the weigth and data on the SD card. In the future version, this may not be necessary.
 
