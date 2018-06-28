@@ -10,7 +10,7 @@ Welcome to uTensor contribution guide. Want to make things better? [Talk to us](
     -  Create a new [issue](https://github.com/uTensor/uTensor/issues) and discuss the idea with core maintainers. Through the discussions, we want to make sure your time is well spent and learn about you.
     -  Start the implementing the feature once the feedback is received.
       - uTensor runtime [local build instructions](#localBuild)
-      - Code Generator Developer Build
+      - Code Generator Developer Build [codegen](https://github.com/uTensor/utensor_cgen/tree/develop)
     -  You may need to supply your test cases if there isn't already one.
       - uTensor Runtime [test cases](https://github.com/uTensor/uTensor/tree/develop/TESTS)
       - Code Generator [test cases](https://github.com/uTensor/utensor_cgen/tree/develop/tests)
