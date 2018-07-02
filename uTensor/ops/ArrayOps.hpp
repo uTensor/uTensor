@@ -1,11 +1,11 @@
 #ifndef UTENSOR_ARRAY_OPS
 #define UTENSOR_ARRAY_OPS
 
+#include "uTensor/util/uTensor_util.hpp"
+#include "uTensor/util/quantization_utils.hpp"
+#include "uTensor/core/uTensorBase.hpp"
 #include <cstring>
 #include <math.h>
-#include "uTensor_util.hpp"
-#include "quantization_utils.hpp"
-#include "uTensorBase.hpp"
 
 //T = inferred
 //mode = MIN_FIRST
@@ -171,17 +171,18 @@ void reshape(S_TENSOR input, S_TENSOR shape, S_TENSOR output) {
     if(output && output->getSize() > 0 && dim == output->getShape()) {
         //copy
         T* output_ptr = output->write<T>(0, 0);
-        std::memcpy(output_ptr, input_ptr, (std::size_t) input->getSize_in_bytes());
+        memcpy(output_ptr, input_ptr, (std::size_t) input->getSize_in_bytes());
     } else if(output && output->getSize() > 0 && dim != output->getShape()) {
         ERR_EXIT("output tensor dimension mismatches supplied shape")
     } else {
         //construct a new tensor and copy
         output->resize(dim);
         T* output_ptr = output->write<T>(0, 0);
-        std::memcpy(output_ptr, input_ptr, (std::size_t) input->getSize_in_bytes());
+        memcpy(output_ptr, input_ptr, (std::size_t) input->getSize_in_bytes());
     }
 
 }
+
 class ReshapeOp : public Operator {
   public:
     ReshapeOp() {
@@ -191,6 +192,30 @@ class ReshapeOp : public Operator {
 
     virtual void compute() override {
       reshape<float>(inputs[0], inputs[1], outputs[0]);
+    }
+};
+
+/*
+https://github.com/tensorflow/tensorflow/blob/f7ec99516/tensorflow/core/kernels/quantized_reshape_op.cc
+https://github.com/tensorflow/tensorflow/blob/f7ec99516/tensorflow/core/kernels/reshape_op.h
+*/
+class QuantizedReshapeOp : public ReshapeOp {
+  public:
+    QuantizedReshapeOp() {
+      n_inputs = 4;
+      n_outputs = 1;
+    }
+
+    virtual void compute() override {
+      reshape<uint8_t>(inputs[0], // input tensor
+                       inputs[1], // shape
+                       outputs[0]);
+      S_TENSOR input_min = this->inputs[2];
+      S_TENSOR input_max = this->inputs[3];
+      S_TENSOR output_min = this->outputs[1];
+      S_TENSOR output_max = this->outputs[2];
+      *(output_min->write<float>(0, 0)) = *(input_min->read<float>(0, 0));
+      *(output_max->write<float>(0, 0)) = *(input_max->read<float>(0, 0));
     }
 };
 

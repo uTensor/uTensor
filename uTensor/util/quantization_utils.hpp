@@ -1,9 +1,9 @@
 #ifndef UTENSOR_QUANT_UTILS
 #define UTENSOR_QUANT_UTILS
 
+#include "uTensor/core/tensor.hpp"
 #include <math.h>
 #include <limits>
-#include "tensor.hpp"
 
 // reference: quantization_utils.h:181
 template <class T>
@@ -69,14 +69,15 @@ inline void RequantizeManyInNewRange(Tensor* input, uint32_t count,
                                      float min_input, float max_input,
                                      float min_output, float max_output,
                                      Tensor* output) {
-  T1 *in_ptr = input->read<T1>(0, 0);
-  T2 *out_ptr = output->read<T2>(0, 0);
+  const T1 *in_ptr = input->read<T1>(0, 0);
+  T2 *out_ptr = output->write<T2>(0, 0);
   for (size_t index = 0; index < count; ++index) {
     const float input_float =
         QuantizedToFloat<T1>(in_ptr[index], min_input, max_input);
     out_ptr[index] = FloatToQuantized<T2>(input_float, min_output, max_output);
   }
 }
+
 
 //quantization_utils.h : 239
 void RequantizeManyInNewRangeReference(const int* input, int32_t count,
@@ -142,5 +143,12 @@ struct QuantizedToFloatStruct {
   const float range_scale;
   const float range_min_rounded;
 };
+
+template <class T1, class T2>
+inline T2 RequantizeInNewRange(T1 input, float min_input, float max_input,
+                               float min_new, float max_new) {
+  const float input_float = QuantizedToFloat<T1>(input, min_input, max_input);
+  return FloatToQuantized<T2>(input_float, min_new, max_new);
+}
 
 #endif  // UTENSOR_QUANT_UTILS

@@ -1,13 +1,13 @@
 #ifndef UTENSOR_TENSOR_H
 #define UTENSOR_TENSOR_H
 
+#include "uTensor/util/uTensor_util.hpp"
 #include <initializer_list>
 #include <iostream>
 #include <memory>
 #include <vector>
 #include <algorithm>
-#include "stdlib.h"
-#include "uTensor_util.hpp"
+#include <stdlib.h>
 #include <limits>
 
 // enum class DType : char {
@@ -75,7 +75,7 @@ class TensorBase {
       data = (void*)malloc(unit_size * total_size);
     }
     if (data == NULL)
-      ERR_EXIT("ran out of memory for %u malloc", unit_size * total_size);
+      ERR_EXIT("ran out of memory for %u malloc", (unsigned int)(unit_size * total_size));
   }
 
   ~TensorBase() {

@@ -1,0 +1,1 @@
+This is an exmaple file located in the TESTS/scripts/PRE-GEN folder

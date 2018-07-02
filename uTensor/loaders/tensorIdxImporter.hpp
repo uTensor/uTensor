@@ -1,15 +1,16 @@
 #ifndef UTENSOR_IDX_IMPORTER
 #define UTENSOR_IDX_IMPORTER
 
+#include "uTensor/util/uTensor_util.hpp"
+#include "uTensor/core/tensor.hpp"
+#include "uTensor/core/sdtensor.hpp"
 #include <stdio.h>
 #include <iostream>
 #include <stdlib.h>
 #include <vector>
-#include "mbed.h"
 #include "uTensor_util.hpp"
 #include "tensor.hpp"
 #include <memory>
-#include "sdtensor.hpp"
 
 using namespace std;
 
@@ -161,7 +162,7 @@ void TensorIdxImporter::load_impl(U* dst, uint8_t unit_size, uint32_t offset, ui
 template <typename U>
 void TensorIdxImporter::flush_impl(U* res, uint8_t unit_size, uint32_t arrsize) {
   U* dst = (U*)malloc(unit_size * arrsize);
-  std::memcpy(dst, res, (size_t) (unit_size * arrsize));
+  memcpy(dst, res, (size_t) (unit_size * arrsize));
   for (uint32_t i = 0; i < arrsize; i++) {
     U* val = dst + i;
     switch (unit_size) {

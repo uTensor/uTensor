@@ -33,9 +33,15 @@
 
 #OS stuff
 .DS_Store
+mbed-os
+sd-driver
 
 #Project generated test files
 TESTS/scripts/testData
 
 #Vim stuff
 *.swp
+
+#Others
+dev
+.vscode

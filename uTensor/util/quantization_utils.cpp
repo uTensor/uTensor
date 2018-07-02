@@ -1,4 +1,4 @@
-#include "quantization_utils.hpp"
+#include "uTensor/util/quantization_utils.hpp"
 
 void RequantizeManyInNewRangeReference(const int* input, int32_t count,
     float min_input, float max_input,
@@ -37,8 +37,8 @@ void RequantizeManyInNewRangeReference(const int* input, int32_t count,
         const int64_t offset_intermediate = fp_value - output_offset_fp;
         const int64_t round_intermediate = offset_intermediate + rounding_delta;
         int64_t quantized_int64 = round_intermediate >> fp_shift;
-        quantized_int64 = std::max(quantized_int64, 0LL);
-        quantized_int64 = std::min(quantized_int64, 255LL);
+        quantized_int64 = std::max(quantized_int64, (int64_t) 0);
+        quantized_int64 = std::min(quantized_int64, (int64_t) 255);
         output[index] = static_cast<unsigned char>(static_cast<int32_t>(quantized_int64));
       }
 }
