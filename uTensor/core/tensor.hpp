@@ -123,6 +123,15 @@ class Tensor : public uTensor {
     s->allocate(unit_size());
   }
 
+  virtual void init(std::vector<uint32_t>& v, const void* data) {
+
+    s->initialize(v);
+    if (s->data != NULL) {
+        return;
+    }
+    s->data = (void *)data;
+  }
+
   virtual void resize(std::vector<uint32_t> v) {
       uint32_t size = s->total_size;
 
@@ -161,6 +170,37 @@ class Tensor : public uTensor {
     DEBUG("Tensor Destructed\r\n");
   }
 };
+
+template<class T>
+class BinaryTensor : public Tensor {
+  public:
+  BinaryTensor(std::vector<uint32_t> v, const T* g) : Tensor() {
+    Tensor::init(v, g);
+  }
+
+  virtual uint16_t unit_size(void) override {
+    return sizeof(T);
+  }
+
+  virtual void* read(size_t offset, size_t ele) override {
+    if (ele > s->total_size) {
+        ERR_EXIT("data overflow");
+    }
+    return (void *)((T*)s->data + offset);
+  }
+
+  virtual void* write(size_t offset, size_t ele) override {
+    return nullptr;
+  }
+  ~BinaryTensor() {
+    s->data = nullptr;
+  }
+
+ private:
+  BinaryTensor(const BinaryTensor&);
+  BinaryTensor& operator=(const BinaryTensor&);
+};
+
 template <class T>
 class RamTensor : public Tensor {
   // need deep copy
