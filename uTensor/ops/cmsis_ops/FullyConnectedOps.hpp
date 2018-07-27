@@ -80,29 +80,31 @@ void cmsis_fc_selector_opt<q15_t, q7_t, q7_t>(const q15_t* iV, const q7_t* mW, c
  * @param [in] scratch scrath computation space
  * @param [out] pOut output
  */
-template<typename T1, typename T2, typename T3>
-void FullyConnectedLayerCmsis(S_TENSOR iV, S_TENSOR mW, S_TENSOR b,
-                         S_TENSOR bShift, S_TENSOR oShift,
-                         S_TENSOR pOut, S_TENSOR scratch,
-                         T1 byteme1, T2 byteme2, T3 byteme3)
-{
-    const T1* iV_data  = iV->read<T1>(0, sizeof(T1)); //Read one byte
-    const T2* mW_data  = mW->read<T2>(0, sizeof(T2)); //Read one byte
-    const T3* bias_data = b->read<T3>(0, sizeof(T3)); //Read one byte
-    const uint16_t dim_vec = iV->getShape()[0];
-    const uint16_t num_of_rows = mW->getShape()[0];
-    const uint16_t bias_shift = *(bShift->read<uint16_t>(0,0));
-    const uint16_t out_shift = *(oShift->read<uint16_t>(0,0));
-    pOut->resize(b->getShape());
-    T1* pOut_data = pOut->write<T1>(0, sizeof(T1));
-    q15_t* scratch_data = scratch->write<q15_t>(0, sizeof(q15_t));
-
-    cmsis_fc_selector(iV_data, mW_data, dim_vec, num_of_rows, 
-            bias_shift, out_shift, bias_data, pOut_data, scratch_data);
+struct FullyConnectedLayerCmsis {
+    template<typename T1, typename T2, typename T3>
+    void operator() (S_TENSOR iV, S_TENSOR mW, S_TENSOR b,
+                             S_TENSOR bShift, S_TENSOR oShift,
+                             S_TENSOR pOut, S_TENSOR scratch,
+                             T1 byteme1, T2 byteme2, T3 byteme3)
+    {
+        const T1* iV_data  = iV->read<T1>(0, sizeof(T1)); //Read one byte
+        const T2* mW_data  = mW->read<T2>(0, sizeof(T2)); //Read one byte
+        const T3* bias_data = b->read<T3>(0, sizeof(T3)); //Read one byte
+        const uint16_t dim_vec = iV->getShape()[0];
+        const uint16_t num_of_rows = mW->getShape()[0];
+        const uint16_t bias_shift = *(bShift->read<uint16_t>(0,0));
+        const uint16_t out_shift = *(oShift->read<uint16_t>(0,0));
+        pOut->resize(b->getShape());
+        T1* pOut_data = pOut->write<T1>(0, sizeof(T1));
+        q15_t* scratch_data = scratch->write<q15_t>(0, sizeof(q15_t));
     
-
-    //Error checking
-}
+        cmsis_fc_selector(iV_data, mW_data, dim_vec, num_of_rows, 
+                bias_shift, out_shift, bias_data, pOut_data, scratch_data);
+        
+    
+        //Error checking
+    }
+};
 
 /***
  * Here we have two types of kernel functions. The basic function implements the function using regular GEMV approach. The opt functions operates with weights in interleaved formats.
@@ -117,31 +119,34 @@ void FullyConnectedLayerCmsis(S_TENSOR iV, S_TENSOR mW, S_TENSOR b,
  * @param [in] scratch scrath computation space
  * @param [out] pOut output
  */
-template<typename T1, typename T2, typename T3>
-void FullyConnectedLayerOptCmsis(S_TENSOR iV, S_TENSOR mW, S_TENSOR b,
-                         S_TENSOR bShift, S_TENSOR oShift,
-                         S_TENSOR pOut, S_TENSOR scratch,
-                         T1 byteme1, T2 byteme2, T3 byteme3)
-{
-    const T1* iV_data  = iV->read<T1>(0, sizeof(T1)); //Read one byte
-    const T2* mW_data  = mW->read<T2>(0, sizeof(T2)); //Read one byte
-    const T3* bias_data = b->read<T3>(0, sizeof(T3)); //Read one byte
-    const uint16_t dim_vec = iV->getShape()[0];
-    const uint16_t num_of_rows = mW->getShape()[0];
-    const uint16_t bias_shift = *(bShift->read<uint16_t>(0,0));
-    const uint16_t out_shift = *(oShift->read<uint16_t>(0,0));
-    pOut->resize(b->getShape());
-    T1* pOut_data = pOut->write<T1>(0, sizeof(T1));
-    q15_t* scratch_data = scratch->write<q15_t>(0, sizeof(q15_t));
-
-    cmsis_fc_selector_opt(iV_data, mW_data, dim_vec, num_of_rows, 
-            bias_shift, out_shift, bias_data, pOut_data, scratch_data);
+struct FullyConnectedLayerOptCmsis{
+    template<typename T1, typename T2, typename T3>
+    void operator() (S_TENSOR iV, S_TENSOR mW, S_TENSOR b,
+                             S_TENSOR bShift, S_TENSOR oShift,
+                             S_TENSOR pOut, S_TENSOR scratch,
+                             T1 byteme1, T2 byteme2, T3 byteme3)
+    {
+        const T1* iV_data  = iV->read<T1>(0, sizeof(T1)); //Read one byte
+        const T2* mW_data  = mW->read<T2>(0, sizeof(T2)); //Read one byte
+        const T3* bias_data = b->read<T3>(0, sizeof(T3)); //Read one byte
+        const uint16_t dim_vec = iV->getShape()[0];
+        const uint16_t num_of_rows = mW->getShape()[0];
+        const uint16_t bias_shift = *(bShift->read<uint16_t>(0,0));
+        const uint16_t out_shift = *(oShift->read<uint16_t>(0,0));
+        pOut->resize(b->getShape());
+        T1* pOut_data = pOut->write<T1>(0, sizeof(T1));
+        q15_t* scratch_data = scratch->write<q15_t>(0, sizeof(q15_t));
     
+        cmsis_fc_selector_opt(iV_data, mW_data, dim_vec, num_of_rows, 
+                bias_shift, out_shift, bias_data, pOut_data, scratch_data);
+        
+    
+        //Error checking
+    }
+};
 
-    //Error checking
-}
-
-template <class T1, class T2, class T3>
+//TARGET_OP={FullyConnectedLayerCmsis, FullyConnectedLayerOptCmsis}
+template <class T1, class T2, class T3, class TARGET_OP=FullyConnectedLayerCmsis>
 class FullyConnectedLayerCmsisOp : public Operator {
   public:
   FullyConnectedLayerCmsisOp() {
@@ -152,24 +157,7 @@ class FullyConnectedLayerCmsisOp : public Operator {
     T1 x;
     T2 y;
     T3 byteme;
-    FullyConnectedLayerCmsis(inputs[0], inputs[1], inputs[2], inputs[3],
-      inputs[4], outputs[0], inputs[5], x, y, byteme);
-  }
-};
-
-
-template <class T1, class T2, class T3>
-class FullyConnectedLayerOptCmsisOp : public Operator {
-  public:
-  FullyConnectedLayerOptCmsisOp() {
-    n_inputs = 6;
-    n_outputs = 1;
-  }
-  virtual void compute() override {
-    T1 x;
-    T2 y;
-    T3 byteme;
-    FullyConnectedLayerOptCmsis(inputs[0], inputs[1], inputs[2], inputs[3],
+    TARGET_OP()(inputs[0], inputs[1], inputs[2], inputs[3],
       inputs[4], outputs[0], inputs[5], x, y, byteme);
   }
 };
