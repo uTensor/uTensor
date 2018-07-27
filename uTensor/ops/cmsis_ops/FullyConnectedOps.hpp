@@ -73,10 +73,10 @@ void FullyConnectedLayerCmsis<q15_t, q15_t, q15_t>(S_TENSOR iV, S_TENSOR mW, S_T
 }
 
 template<>
-void FullyConnectedLayerCmsis<q15_t, q7_t, q15_t>(S_TENSOR iV, S_TENSOR mW, S_TENSOR b,
+void FullyConnectedLayerCmsis<q15_t, q7_t, q7_t>(S_TENSOR iV, S_TENSOR mW, S_TENSOR b,
                                            S_TENSOR bShift, S_TENSOR oShift,
                                            S_TENSOR pOut, S_TENSOR scratch,
-                         q15_t byteme1, q7_t byteme2, q15_t byteme3)
+                         q15_t byteme1, q7_t byteme2, q7_t byteme3)
 {
     const q15_t* iV_data = iV->read<q15_t>(0, sizeof(q15_t)); //Read one byte
     const q7_t* mW_data = mW->read<q7_t>(0, sizeof(q7_t)); //Read one byte
@@ -111,7 +111,7 @@ template<typename T1, typename T2, typename TOut>
 void FullyConnectedLayerOptCmsis(S_TENSOR iV, S_TENSOR mW, S_TENSOR b,
                          S_TENSOR bShift, S_TENSOR oShift,
                          S_TENSOR pOut, S_TENSOR scratch,
-                         q15_t byteme1, q7_t byteme2, q15_t byteme3)
+                         T1 byteme1, T2 byteme2, TOut byteme3)
 {
     //Throw error if this gets called
 }
@@ -120,7 +120,7 @@ template<>
 void FullyConnectedLayerOptCmsis<q7_t, q7_t, q7_t>(S_TENSOR iV, S_TENSOR mW, S_TENSOR b,
                                            S_TENSOR bShift, S_TENSOR oShift,
                                            S_TENSOR pOut, S_TENSOR scratch,
-                                           q15_t byteme1, q7_t byteme2, q15_t byteme3)
+                                           q7_t byteme1, q7_t byteme2, q7_t byteme3)
 {
     const q7_t* iV_data = iV->read<q7_t>(0, sizeof(q7_t)); //Read one byte
     const q7_t* mW_data = mW->read<q7_t>(0, sizeof(q7_t)); //Read one byte
@@ -141,7 +141,7 @@ template<>
 void FullyConnectedLayerOptCmsis<q15_t, q15_t, q15_t>(S_TENSOR iV, S_TENSOR mW, S_TENSOR b,
                                            S_TENSOR bShift, S_TENSOR oShift,
                                            S_TENSOR pOut, S_TENSOR scratch,
-                                           q15_t byteme1, q7_t byteme2, q15_t byteme3)
+                                           q15_t byteme1, q15_t byteme2, q15_t byteme3)
 {
     const q15_t* iV_data = iV->read<q15_t>(0, sizeof(q15_t)); //Read one byte
     const q15_t* mW_data = mW->read<q15_t>(0, sizeof(q15_t)); //Read one byte
@@ -160,10 +160,10 @@ void FullyConnectedLayerOptCmsis<q15_t, q15_t, q15_t>(S_TENSOR iV, S_TENSOR mW, 
 }
 
 template<>
-void FullyConnectedLayerOptCmsis<q15_t, q7_t, q15_t>(S_TENSOR iV, S_TENSOR mW, S_TENSOR b,
+void FullyConnectedLayerOptCmsis<q15_t, q7_t, q7_t>(S_TENSOR iV, S_TENSOR mW, S_TENSOR b,
                                            S_TENSOR bShift, S_TENSOR oShift,
                                            S_TENSOR pOut, S_TENSOR scratch,
-                                           q15_t byteme1, q7_t byteme2, q15_t byteme3)
+                                           q15_t byteme1, q7_t byteme2, q7_t byteme3)
 {
     const q15_t* iV_data = iV->read<q15_t>(0, sizeof(q15_t)); //Read one byte
     const q7_t* mW_data = mW->read<q7_t>(0, sizeof(q7_t)); //Read one byte
