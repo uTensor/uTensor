@@ -6,39 +6,33 @@
 #include "arm_nnfunctions.h"
 
 
+template<typename T1>
+void cmsis_softmax_selector(const T1* vec_in, const uint16_t dim_vec, T1* p_out);
+template<>
+void cmsis_softmax_selector<q15_t>(const q15_t* vec_in, const uint16_t dim_vec, q15_t* p_out)
+{
+    arm_softmax_q15(vec_in, dim_vec, p_out);
+}
+template<>
+void cmsis_softmax_selector<q7_t>(const q7_t* vec_in, const uint16_t dim_vec, q7_t* p_out)
+{
+    arm_softmax_q7(vec_in, dim_vec, p_out);
+}
+
 /**
  * @param [in] data input tensor
  */
-template<typename T1, typename TOut>
-void SoftmaxCmsis(S_TENSOR data, S_TENSOR out)
-{
-    //Throw error if this gets called
+template<typename T1>
+void SoftmaxCmsis(S_TENSOR data, S_TENSOR out, T1 x){
+    const T1* in = data->read<T1>(0, sizeof(T1));
+    const uint16_t numel = data->getShape()[0];
+    out->resize(data->getShape());
+    T1* d = out->write<T1>(0, sizeof(T1));
+    cmsis_softmax_selector(in, numel, d);
+
 }
 
-template<>
-void SoftmaxCmsis<q7_t, q7_t>(S_TENSOR data, S_TENSOR out)
-{
-    const q7_t* in = data->read<q7_t>(0, sizeof(q7_t));
-    out->resize(in->getShape());
-    q7_t* d = out->write<q7_t>(0, sizeof(q7_t));
-    uint16_t numel = (uint16_t)in->getSize();
-    arm_softmax_q7(in, numel, d);
-    //Error checking
-}
-
-template<>
-void SoftmaxCmsis<q15_t, q15_t>(S_TENSOR data, S_TENSOR out)
-{
-    const q15_t* in = data->read<q15_t>(0, sizeof(q15_t));
-    out->resize(in->getShape());
-    q15_t* d = out->write<q15_t>(0, sizeof(q15_t));
-    uint16_t numel = (uint16_t)in->getSize();
-    arm_softmax_q15(in, numel, d);
-    //Error checking
-}
-
-
-template <class T1, class TOut>
+template <class T1>
 class SoftmaxCmsisOp : public Operator {
   public:
   SoftmaxCmsisOp() {
@@ -46,7 +40,8 @@ class SoftmaxCmsisOp : public Operator {
     n_outputs = 1;
   }
   virtual void compute() override {
-      SoftmaxCmsis<T1, TOut>(inputs[0], outputs[0]);
+      T1 x;
+      SoftmaxCmsis(inputs[0], outputs[0], x);
   }
 };
 

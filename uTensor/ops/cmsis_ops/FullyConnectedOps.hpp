@@ -18,7 +18,8 @@ void cmsis_fc_selector(const T1* iV, const T2* mW, const uint16_t dim_vec, const
 template<>
 void cmsis_fc_selector<q7_t, q7_t, q7_t>(const q7_t* iV, const q7_t* mW, const uint16_t dim_vec, const uint16_t num_of_rows,
                        const uint16_t bias_shift, const uint16_t out_shift, const q7_t* bias, 
-                       q7_t* pOut, q15_t* scratch_data){
+                       q7_t* pOut, q15_t* scratch_data)
+{
     arm_fully_connected_q7(iV, mW, dim_vec, num_of_rows, 
             bias_shift, out_shift, bias, pOut, scratch_data);
 }
@@ -26,7 +27,8 @@ void cmsis_fc_selector<q7_t, q7_t, q7_t>(const q7_t* iV, const q7_t* mW, const u
 template<>
 void cmsis_fc_selector<q15_t, q15_t, q15_t>(const q15_t* iV, const q15_t* mW, const uint16_t dim_vec, const uint16_t num_of_rows,
                        const uint16_t bias_shift, const uint16_t out_shift, const q15_t* bias, 
-                       q15_t* pOut, q15_t* scratch_data){
+                       q15_t* pOut, q15_t* scratch_data)
+{
     arm_fully_connected_q15(iV, mW, dim_vec, num_of_rows, 
             bias_shift, out_shift, bias, pOut, scratch_data);
 }
@@ -34,7 +36,8 @@ void cmsis_fc_selector<q15_t, q15_t, q15_t>(const q15_t* iV, const q15_t* mW, co
 template<>
 void cmsis_fc_selector<q15_t, q7_t, q7_t>(const q15_t* iV, const q7_t* mW, const uint16_t dim_vec, const uint16_t num_of_rows,
                        const uint16_t bias_shift, const uint16_t out_shift, const q7_t* bias, 
-                       q15_t* pOut, q15_t* scratch_data){
+                       q15_t* pOut, q15_t* scratch_data)
+{
     arm_fully_connected_mat_q7_vec_q15(iV, mW, dim_vec, num_of_rows, 
             bias_shift, out_shift, bias, pOut, scratch_data);
 }
@@ -46,7 +49,8 @@ void cmsis_fc_selector_opt(const T1* iV, const T2* mW, const uint16_t dim_vec, c
 template<>
 void cmsis_fc_selector_opt<q7_t, q7_t, q7_t>(const q7_t* iV, const q7_t* mW, const uint16_t dim_vec, const uint16_t num_of_rows,
                        const uint16_t bias_shift, const uint16_t out_shift, const q7_t* bias, 
-                       q7_t* pOut, q15_t* scratch_data){
+                       q7_t* pOut, q15_t* scratch_data)
+{
     arm_fully_connected_q7_opt(iV, mW, dim_vec, num_of_rows, 
             bias_shift, out_shift, bias, pOut, scratch_data);
 }
@@ -54,7 +58,8 @@ void cmsis_fc_selector_opt<q7_t, q7_t, q7_t>(const q7_t* iV, const q7_t* mW, con
 template<>
 void cmsis_fc_selector_opt<q15_t, q15_t, q15_t>(const q15_t* iV, const q15_t* mW, const uint16_t dim_vec, const uint16_t num_of_rows,
                        const uint16_t bias_shift, const uint16_t out_shift, const q15_t* bias, 
-                       q15_t* pOut, q15_t* scratch_data){
+                       q15_t* pOut, q15_t* scratch_data)
+{
     arm_fully_connected_q15_opt(iV, mW, dim_vec, num_of_rows, 
             bias_shift, out_shift, bias, pOut, scratch_data);
 }
@@ -62,7 +67,8 @@ void cmsis_fc_selector_opt<q15_t, q15_t, q15_t>(const q15_t* iV, const q15_t* mW
 template<>
 void cmsis_fc_selector_opt<q15_t, q7_t, q7_t>(const q15_t* iV, const q7_t* mW, const uint16_t dim_vec, const uint16_t num_of_rows,
                        const uint16_t bias_shift, const uint16_t out_shift, const q7_t* bias, 
-                       q15_t* pOut, q15_t* scratch_data){
+                       q15_t* pOut, q15_t* scratch_data)
+{
     arm_fully_connected_mat_q7_vec_q15_opt(iV, mW, dim_vec, num_of_rows, 
             bias_shift, out_shift, bias, pOut, scratch_data);
 }
