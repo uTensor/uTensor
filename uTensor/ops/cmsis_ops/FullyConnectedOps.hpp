@@ -11,12 +11,8 @@
  * http://www.keil.com/pack/doc/CMSIS/NN/html/group__FC.html#gae3857bb6375692e81dde8cbd70adec08
  */
 
-template<typename T1, typename T2, typename T3>
-void cmsis_fc_selector(const T1* iV, const T2* mW, const uint16_t dim_vec, const uint16_t num_of_rows,
-                       const uint16_t bias_shift, const uint16_t out_shift, const T3* bias, 
-                       T1* pOut, q15_t* scratch_data);
-template<>
-void cmsis_fc_selector<q7_t, q7_t, q7_t>(const q7_t* iV, const q7_t* mW, const uint16_t dim_vec, const uint16_t num_of_rows,
+//I definitely overcomplicated this part. Should just use f*** function overloading
+void cmsis_fc_selector(const q7_t* iV, const q7_t* mW, const uint16_t dim_vec, const uint16_t num_of_rows,
                        const uint16_t bias_shift, const uint16_t out_shift, const q7_t* bias, 
                        q7_t* pOut, q15_t* scratch_data)
 {
@@ -24,8 +20,7 @@ void cmsis_fc_selector<q7_t, q7_t, q7_t>(const q7_t* iV, const q7_t* mW, const u
             bias_shift, out_shift, bias, pOut, scratch_data);
 }
 
-template<>
-void cmsis_fc_selector<q15_t, q15_t, q15_t>(const q15_t* iV, const q15_t* mW, const uint16_t dim_vec, const uint16_t num_of_rows,
+void cmsis_fc_selector(const q15_t* iV, const q15_t* mW, const uint16_t dim_vec, const uint16_t num_of_rows,
                        const uint16_t bias_shift, const uint16_t out_shift, const q15_t* bias, 
                        q15_t* pOut, q15_t* scratch_data)
 {
@@ -33,8 +28,7 @@ void cmsis_fc_selector<q15_t, q15_t, q15_t>(const q15_t* iV, const q15_t* mW, co
             bias_shift, out_shift, bias, pOut, scratch_data);
 }
 
-template<>
-void cmsis_fc_selector<q15_t, q7_t, q7_t>(const q15_t* iV, const q7_t* mW, const uint16_t dim_vec, const uint16_t num_of_rows,
+void cmsis_fc_selector(const q15_t* iV, const q7_t* mW, const uint16_t dim_vec, const uint16_t num_of_rows,
                        const uint16_t bias_shift, const uint16_t out_shift, const q7_t* bias, 
                        q15_t* pOut, q15_t* scratch_data)
 {
@@ -42,12 +36,7 @@ void cmsis_fc_selector<q15_t, q7_t, q7_t>(const q15_t* iV, const q7_t* mW, const
             bias_shift, out_shift, bias, pOut, scratch_data);
 }
 
-template<typename T1, typename T2, typename T3>
-void cmsis_fc_selector_opt(const T1* iV, const T2* mW, const uint16_t dim_vec, const uint16_t num_of_rows,
-                       const uint16_t bias_shift, const uint16_t out_shift, const T3* bias, 
-                       T1* pOut, q15_t* scratch_data);
-template<>
-void cmsis_fc_selector_opt<q7_t, q7_t, q7_t>(const q7_t* iV, const q7_t* mW, const uint16_t dim_vec, const uint16_t num_of_rows,
+void cmsis_fc_selector_opt(const q7_t* iV, const q7_t* mW, const uint16_t dim_vec, const uint16_t num_of_rows,
                        const uint16_t bias_shift, const uint16_t out_shift, const q7_t* bias, 
                        q7_t* pOut, q15_t* scratch_data)
 {
@@ -55,8 +44,7 @@ void cmsis_fc_selector_opt<q7_t, q7_t, q7_t>(const q7_t* iV, const q7_t* mW, con
             bias_shift, out_shift, bias, pOut, scratch_data);
 }
 
-template<>
-void cmsis_fc_selector_opt<q15_t, q15_t, q15_t>(const q15_t* iV, const q15_t* mW, const uint16_t dim_vec, const uint16_t num_of_rows,
+void cmsis_fc_selector_opt(const q15_t* iV, const q15_t* mW, const uint16_t dim_vec, const uint16_t num_of_rows,
                        const uint16_t bias_shift, const uint16_t out_shift, const q15_t* bias, 
                        q15_t* pOut, q15_t* scratch_data)
 {
@@ -64,8 +52,7 @@ void cmsis_fc_selector_opt<q15_t, q15_t, q15_t>(const q15_t* iV, const q15_t* mW
             bias_shift, out_shift, bias, pOut, scratch_data);
 }
 
-template<>
-void cmsis_fc_selector_opt<q15_t, q7_t, q7_t>(const q15_t* iV, const q7_t* mW, const uint16_t dim_vec, const uint16_t num_of_rows,
+void cmsis_fc_selector_opt(const q15_t* iV, const q7_t* mW, const uint16_t dim_vec, const uint16_t num_of_rows,
                        const uint16_t bias_shift, const uint16_t out_shift, const q7_t* bias, 
                        q15_t* pOut, q15_t* scratch_data)
 {
