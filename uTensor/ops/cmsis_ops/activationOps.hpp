@@ -6,36 +6,30 @@
 #include "arm_nnfunctions.h"
 
 
+template<typename T>
+void cmsis_relu_select(T* data, const uint16_t numel);
+template<>
+void cmsis_relu_select<q7_t>(q7_t* data, const uint16_t numel){
+    arm_relu_q7(data, numel);
+}
+template<>
+void cmsis_relu_select<q15_t>(q15_t* data, const uint16_t numel){
+    arm_relu_q15(data, numel);
+}
+
 /**
  * @param [in] data input tensor
  */
-template<typename T1, typename TOut>
-void ReluCmsis(S_TENSOR data, S_TENSOR out)
-{
-    //Throw error if this gets called
-}
-
-template<>
-void ReluCmsis<q7_t, q7_t>(S_TENSOR data, S_TENSOR out)
+template<typename T>
+void ReluCmsis(S_TENSOR data, S_TENSOR out, T x)
 {
     out = data;
-    q7_t* d = out->write<q7_t>(0, sizeof(q7_t));
-    uint16_t numel = (uint16_t)out->getSize();
-    arm_relu_q7(d, numel);
-    //Error checking
+    T* d = out->write<T>(0, sizeof(T));
+    const uint16_t numel = out->getShape()[0];
+    cmsis_relu_select(d, numel);
 }
 
-template<>
-void ReluCmsis<q15_t, q15_t>(S_TENSOR data, S_TENSOR out)
-{
-    out = data;
-    q15_t* d = out->write<q15_t>(0, sizeof(q15_t));
-    uint16_t numel = (uint16_t)out->getSize();
-    arm_relu_q15(d, numel);
-    //Error checking
-}
-
-template <class T1, class TOut>
+template <class T>
 class ReluCmsisOp : public Operator {
   public:
   ReluCmsisOp() {
@@ -43,7 +37,8 @@ class ReluCmsisOp : public Operator {
     n_outputs = 1;
   }
   virtual void compute() override {
-      ReluCmsis<T1, TOut>(inputs[0], outputs[0]);
+      T x;
+      ReluCmsis(inputs[0], outputs[0], x);
   }
 };
 
