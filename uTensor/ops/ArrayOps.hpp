@@ -203,7 +203,7 @@ class QuantizedReshapeOp : public ReshapeOp {
   public:
     QuantizedReshapeOp() {
       n_inputs = 4;
-      n_outputs = 1;
+      n_outputs = 3;
     }
 
     virtual void compute() override {
