@@ -436,7 +436,7 @@ void QuantizedAdd(S_TENSOR input_x, S_TENSOR input_y, S_TENSOR min_x, S_TENSOR m
   const size_t num_iterations = (input_element_count / smaller_input_element_count);
   for (size_t iteration = 0; iteration < num_iterations; ++iteration) {
     const size_t offset = iteration * smaller_input_element_count;
-    for (int c = 0; c < smaller_input_element_count; ++c) {
+    for (uint32_t c = 0; c < smaller_input_element_count; ++c) {
       const int index = (offset + c);
       // The two numbers we're going to add can each be in very different
       // ranges (e.g. the quantized value '127' may represent very different
