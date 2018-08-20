@@ -40,7 +40,7 @@ private:
 
 };
 
-inline uTensor::~uTensor() {}
+//inline uTensor::~uTensor() {}
 class TensorBase {
  public:
   std::vector<uint32_t> shape;
