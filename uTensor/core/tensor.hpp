@@ -55,7 +55,7 @@ class TensorBase {
   uint32_t total_size;
   uint32_t cache_size;
 
-  void initialize(std::vector<uint32_t>& vec) {
+  void initialize(const std::vector<uint32_t>& vec) {
     uint32_t ret = 0;
     shape.clear();
     for (auto ele : vec) {
