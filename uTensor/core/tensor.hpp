@@ -31,15 +31,8 @@ class uTensor {
 public:
  virtual void inFocus(){};
  virtual void deFocus(){};
- virtual std::string getName() { return name; }
- virtual void setName(std::string _name) {
-    if(name == "") {
-      name = _name;
-    } else {
-      ERR_EXIT("Tensor %s already has a name %s\r\n", _name.c_str(), name.c_str());
-    }
-  }
-
+ virtual std::string getName();
+ virtual void setName(std::string _name);
 
  virtual ~uTensor() = 0;
 private:
@@ -55,105 +48,42 @@ class TensorBase {
   uint32_t total_size;
   uint32_t cache_size;
 
-  void initialize(std::vector<uint32_t>& vec) {
-    uint32_t ret = 0;
-    shape.clear();
-    for (auto ele : vec) {
-      shape.push_back(ele);
-      if (ret == 0) {
-          ret = ele;
-      } else {
-          ret *= ele;
-      }
-    }
-    total_size = ret;
-  }
-  void allocate(uint8_t unit_size) {
-    if (total_size > cache_size) {
-      data = (void*)malloc(unit_size * cache_size);
-    } else {
-      data = (void*)malloc(unit_size * total_size);
-    }
-    if (data == NULL)
-      ERR_EXIT("ran out of memory for %u malloc", (unsigned int)(unit_size * total_size));
-  }
+  void initialize(std::vector<uint32_t>& vec);
+  void allocate(uint8_t unit_size);
 
-  ~TensorBase() {
-    if (data != nullptr) {
-      free(data);
-      DEBUG("TensorBase memory freed..\r\n");
-    }
-  }
+  ~TensorBase();
 };
 
 class Tensor : public uTensor {
-  virtual void* read(size_t offset, size_t ele) { return nullptr; }
-  virtual void* write(size_t offset, size_t ele) { return nullptr; }
+  virtual void* read(size_t offset, size_t ele);
+  virtual void* write(size_t offset, size_t ele);
   Tensor(const Tensor&);
   Tensor& operator=(const Tensor&);
 
  protected:
   std::shared_ptr<TensorBase> s;  // short for states
  public:
-  Tensor() {
-    s = std::make_shared<TensorBase>();
-    s->total_size = 0;
-    s->cache_size = std::numeric_limits<uint32_t>::max();
-    s->data = nullptr;
-    setName("");
-  }
+  Tensor();
 
   // returns how far a given dimension is apart
-  size_t getStride(size_t dim_index) {
-    unsigned int size_accm = 1;
-    for (auto it = s->shape.begin() + dim_index + 1; it != s->shape.end();
-         it++) {
-      size_accm *= *it;
-    }
+  size_t getStride(size_t dim_index); 
 
-    return (size_t)size_accm;
-  }
+  virtual void init(std::vector<uint32_t>& v); 
 
-  virtual void init(std::vector<uint32_t>& v) {
+  virtual void init(std::vector<uint32_t>& v, const void* data); 
 
-    s->initialize(v);
-    if (s->data != NULL) {
-        return;
-    }
-    s->allocate(unit_size());
-  }
+  virtual void resize(std::vector<uint32_t> v); 
 
-  virtual void init(std::vector<uint32_t>& v, const void* data) {
+  std::vector<uint32_t> getShape(void); 
 
-    s->initialize(v);
-    if (s->data != NULL) {
-        return;
-    }
-    s->data = (void *)data;
-  }
+  uint32_t getSize(void); 
 
-  virtual void resize(std::vector<uint32_t> v) {
-      uint32_t size = s->total_size;
+  virtual uint16_t unit_size(void); 
 
-      s->initialize(v);
-
-      if (size == s->total_size) {
-          return;
-      }
-
-      s->allocate(unit_size());
-  }
-
-  std::vector<uint32_t> getShape(void) { return s->shape; }
-
-  uint32_t getSize(void) { return s->total_size; }
-
-  virtual uint16_t unit_size(void) { return 0; }
-
-  uint32_t getSize_in_bytes(void) { return s->total_size * unit_size(); }
+  uint32_t getSize_in_bytes(void); 
 
   // returns the number of dimensions in the tensor
-  size_t getDim(void) { return s->shape.size(); }
+  size_t getDim(void); 
 
   template <class T>
   const T* read(size_t offset, size_t ele) {
@@ -165,10 +95,7 @@ class Tensor : public uTensor {
     return (T*)write(offset, ele);
   }
 
-  ~Tensor() {
-    s = nullptr;
-    DEBUG("Tensor Destructed\r\n");
-  }
+  ~Tensor(); 
 };
 
 template<class T>
@@ -300,80 +227,25 @@ class permuteIndexTransform {
   Shape out_shape;
   Shape out_stride;
 
-  void computeOutputShape(void) {
-    out_stride.clear();
-    if (in_shape.empty()) ERR_EXIT("input shape not set");
-    if (permute.empty() || permute.size() != in_shape.size())
-      ERR_EXIT("invalid permute vector");
+  void computeOutputShape(void); 
 
-    for (auto&& curr_axis : permute) {
-      out_shape.push_back(in_shape[curr_axis]);
-    }
-  }
+  size_t evalStride(size_t dim_index, Shape s); 
 
-  size_t evalStride(size_t dim_index, Shape s) {
-    unsigned int size_accm = 1;
-    for (auto it = s.begin() + dim_index + 1; it != s.end(); it++) {
-      size_accm *= *it;
-    }
-
-    return (size_t)size_accm;
-  }
-
-  void computeInputStride(void) {
-    in_stride.clear();
-    for (uint32_t i = 0; i < in_shape.size(); i++) {
-      in_stride.push_back(evalStride(i, in_shape));
-    }
-  }
-  void computeOutputStride(void) {
-    out_stride.clear();
-    for (uint32_t i = 0; i < out_shape.size(); i++) {
-      out_stride.push_back(evalStride(i, out_shape));
-    }
-  }
+  void computeInputStride(void); 
+  void computeOutputStride(void); 
 
  public:
-  permuteIndexTransform(Shape input_shape, std::vector<uint8_t> permute) {
-    setInputShape(input_shape);
-    setPermute(permute);
-    apply();
-  }
+  permuteIndexTransform(Shape input_shape, std::vector<uint8_t> permute); 
 
-  std::vector<uint8_t> getPermute(void) { return permute; }
-  void setPermute(std::vector<uint8_t>& _permute) {
-    permute = _permute;
-    depermute.resize(permute.size());
-    uint8_t i = 0;
-    for (auto a : permute) {
-      depermute[a] = i;
-      i++;
-    }
-  }
+  std::vector<uint8_t> getPermute(void); 
+  void setPermute(std::vector<uint8_t>& _permute); 
 
-  void setInputShape(Shape s) { in_shape = s; }
-  Shape getNewShape(void) { return out_shape; }
+  void setInputShape(Shape s); 
+  Shape getNewShape(void); 
 
-  void apply(void) {
-    computeOutputShape();
-    computeOutputStride();
-    computeInputStride();
-  }
+  void apply(void); 
 
-  size_t operator[](const size_t index) {
-    size_t out_index = 0;
-    size_t rem = index;
-
-    for (size_t curr_dim = 0; curr_dim < in_shape.size(); curr_dim++) {
-      size_t curr_stride = in_stride[curr_dim];
-      out_index += (rem / curr_stride) * out_stride[depermute[curr_dim]];
-      rem = rem % curr_stride;
-    }
-
-    out_index += rem;
-
-    return out_index;
-  }
+  size_t operator[](const size_t index); 
 };
 
 template <typename T>
@@ -413,116 +285,27 @@ class broadcastIndexTransform {
   Shape s_stride;
   bool swap_flag;
 
-  size_t evalStride(size_t dim_index, Shape s) {
-    unsigned int size_accm = 1;
-    for (auto it = s.begin() + dim_index + 1; it != s.end(); it++) {
-      size_accm *= *it;
-    }
+  size_t evalStride(size_t dim_index, Shape s); 
 
-    return (size_t)size_accm;
-  }
+  void computeSStride(void); 
+  void computeLStride(void); 
 
-  void computeSStride(void) {
-    s_stride.clear();
-    for (uint32_t i = 0; i < s_shape.size(); i++) {
-      s_stride.push_back(evalStride(i, s_shape));
-    }
-  }
-  void computeLStride(void) {
-    l_stride.clear();
-    for (uint32_t i = 0; i < l_shape.size(); i++) {
-      l_stride.push_back(evalStride(i, l_shape));
-    }
-  }
+  void sortShape(Shape a, Shape b); 
 
-  void sortShape(Shape a, Shape b) {
-    if(a.size() > b.size()) {
-      l_shape = a;
-      s_shape = b;
-    } else if(a.size() < b.size()) {
-      l_shape = b;
-      s_shape = a;
-      swap_flag = true;
-    } else {
-      auto it = std::find(a.begin(), a.end(), 1);
-      if (it == a.end()) {
-        l_shape = a;
-        s_shape = b;
-      } else {
-        l_shape = b;
-        s_shape = a;
-        swap_flag = true;
-      }
-    }
-  }
-
-  void checkShape(void) {
-    if(l_shape.size() < s_shape.size()) ERR_EXIT("cannot boardcast to fewer dimensions");
-    for(int i = 0; i < (int) l_shape.size(); i++) {
-      int small_i = i - (l_shape.size() - s_shape.size());
-      if(small_i < 0) continue;
-      if(l_shape[i] != s_shape[small_i] && s_shape[small_i] != 1) ERR_EXIT("ValueError: frames are not aligned");
-      if(l_shape[i] < s_shape[small_i]) ERR_EXIT("Only single target broadcast is supported");
-    }
-  }
+  void checkShape(void); 
 
 
 //b_shape being a smaller shape
  public:
-  broadcastIndexTransform(Shape _l_shape, Shape _s_shape) {
-    swap_flag = false;
-    sortShape(_l_shape, _s_shape);
-    checkShape();
-    apply();
-  }
+  broadcastIndexTransform(Shape _l_shape, Shape _s_shape); 
 
-  void apply(void) {
-    //computeOutputShape();
-    computeLStride();
-    computeSStride();
-  }
+  void apply(void); 
 
-  Shape getOutputShape(void) {
-    return l_shape;
-  }
+  Shape getOutputShape(void); 
 
-  bool is_swaped(void) {
-    return swap_flag;
-  }
+  bool is_swaped(void); 
 
-  size_t operator[](const size_t linear_index) {
-    size_t out_index = 0;
-    size_t rem = linear_index;
-    const size_t d_dim = l_shape.size() - s_shape.size();
-    size_t s_dim;
-
-    for (size_t curr_dim = 0; curr_dim < l_shape.size(); curr_dim++) {
-      size_t curr_stride = l_stride[curr_dim];
-
-      if(l_shape.size() - curr_dim <= s_shape.size()) {
-        size_t curr_l_index = (rem / curr_stride);
-        s_dim = curr_dim - d_dim;
-        size_t curr_s_index = (curr_l_index % s_shape[s_dim]);
-        out_index += curr_s_index * s_stride[s_dim];
-      }
-
-      rem = rem % curr_stride;
-    }
-
-    out_index += (rem % s_stride[s_dim]);
-
-    // ///NT: DEBUG CODE
-    // int sum = 0;
-    // for(auto i:l_shape) {
-    //   sum += i;
-    // }
-    // if((int)out_index > sum) {
-    //   ERR_EXIT("index out of range, linear_index: %d, sum: %d, out_index: %d", linear_index, sum, out_index);
-    // }
-    // ///
-
-    return out_index;
-  }
+  size_t operator[](const size_t linear_index); 
 };
 
 #endif
