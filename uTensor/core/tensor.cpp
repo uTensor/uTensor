@@ -66,7 +66,7 @@ size_t Tensor::getStride(size_t dim_index) {
     return (size_t)size_accm;
 }
 
-void Tensor::init(std::vector<uint32_t>& v) {
+void Tensor::init(const std::vector<uint32_t>& v) {
 
     s->initialize(v);
     if (s->data != NULL) {
@@ -75,7 +75,7 @@ void Tensor::init(std::vector<uint32_t>& v) {
     s->allocate(unit_size());
 }
 
-void Tensor::init(std::vector<uint32_t>& v, const void* data) {
+void Tensor::init(const std::vector<uint32_t>& v, const void* data) {
 
     s->initialize(v);
     if (s->data != NULL) {
@@ -84,7 +84,7 @@ void Tensor::init(std::vector<uint32_t>& v, const void* data) {
     s->data = (void *)data;
 }
 
-void Tensor::resize(std::vector<uint32_t> v) {
+void Tensor::resize(const std::vector<uint32_t>& v) {
     uint32_t size = s->total_size;
 
     s->initialize(v);
@@ -96,7 +96,7 @@ void Tensor::resize(std::vector<uint32_t> v) {
     s->allocate(unit_size());
 }
 
-std::vector<uint32_t> Tensor::getShape(void) { return s->shape; }
+std::vector<uint32_t> Tensor::getShape(void) const { return s->shape; }
 
 uint32_t Tensor::getSize(void) { return s->total_size; }
 
@@ -146,14 +146,15 @@ void permuteIndexTransform::computeOutputStride(void) {
     }
 }
 
-permuteIndexTransform::permuteIndexTransform(Shape input_shape, std::vector<uint8_t> permute) {
+permuteIndexTransform::permuteIndexTransform(Shape input_shape, const std::vector<uint8_t>& permute) {
     setInputShape(input_shape);
     setPermute(permute);
     apply();
 }
 
 std::vector<uint8_t> permuteIndexTransform::getPermute(void) { return permute; }
-void permuteIndexTransform::setPermute(std::vector<uint8_t>& _permute) {
+
+void permuteIndexTransform::setPermute(const std::vector<uint8_t>& _permute) {
     permute = _permute;
     depermute.resize(permute.size());
     uint8_t i = 0;
