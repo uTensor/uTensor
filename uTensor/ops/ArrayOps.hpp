@@ -25,7 +25,7 @@ void QuantizeV2(S_TENSOR input, S_TENSOR _min_range, S_TENSOR _max_range,
     std::vector<uint32_t> v;
 
     std::vector<uint32_t> org = input->getShape();
-    for (int i = 0; i < org.size(); i++) {
+    for (size_t i = 0; i < org.size(); i++) {
         v.push_back(org[i]);
     }
 
@@ -134,7 +134,7 @@ void reshape(S_TENSOR input, S_TENSOR shape, S_TENSOR output) {
     Shape dim;
 
     auto shape_vec = shape->getShape();
-    for(auto i = 0; i < shape_vec.size(); i++) {
+    for(size_t i = 0; i < shape_vec.size(); i++) {
         //This may due to references to zero-tensor's dimensions
         if(shape_vec[i] == 0) ERR_EXIT("shape tensor contains 0 value entry");
     }
@@ -203,7 +203,7 @@ class QuantizedReshapeOp : public ReshapeOp {
   public:
     QuantizedReshapeOp() {
       n_inputs = 4;
-      n_outputs = 1;
+      n_outputs = 3;
     }
 
     virtual void compute() override {

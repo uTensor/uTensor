@@ -3,6 +3,7 @@
 
 #include "uTensor/util/quantization_utils.hpp"
 #include "uTensor/core/tensor.hpp"
+#include "uTensor/core/uTensorBase.hpp"
 #include <math.h>
 #include <algorithm>
 

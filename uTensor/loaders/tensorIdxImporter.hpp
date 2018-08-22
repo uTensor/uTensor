@@ -8,8 +8,6 @@
 #include <iostream>
 #include <stdlib.h>
 #include <vector>
-#include "uTensor_util.hpp"
-#include "tensor.hpp"
 #include <memory>
 
 using namespace std;
