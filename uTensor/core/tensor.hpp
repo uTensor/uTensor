@@ -68,13 +68,13 @@ class Tensor : public uTensor {
   // returns how far a given dimension is apart
   size_t getStride(size_t dim_index); 
 
-  virtual void init(std::vector<uint32_t>& v); 
+  virtual void init(const std::vector<uint32_t>& v); 
 
-  virtual void init(std::vector<uint32_t>& v, const void* data); 
+  virtual void init(const std::vector<uint32_t>& v, const void* data); 
 
-  virtual void resize(std::vector<uint32_t> v); 
+  virtual void resize(const std::vector<uint32_t>& v); 
 
-  std::vector<uint32_t> getShape(void); 
+  std::vector<uint32_t> getShape(void) const; 
 
   uint32_t getSize(void); 
 
@@ -101,7 +101,7 @@ class Tensor : public uTensor {
 template<class T>
 class BinaryTensor : public Tensor {
   public:
-  BinaryTensor(std::vector<uint32_t> v, const T* g) : Tensor() {
+  BinaryTensor(const std::vector<uint32_t>& v, const T* g) : Tensor() {
     Tensor::init(v, g);
   }
 
@@ -144,7 +144,7 @@ class RamTensor : public Tensor {
     Tensor::init(v);
   }
 
-  RamTensor(std::vector<uint32_t> v) : Tensor() {
+  RamTensor(const std::vector<uint32_t>& v) : Tensor() {
     Tensor::init(v);
   }
 
@@ -191,7 +191,7 @@ Tensor* TensorCast(Tensor* input) {
 }
 
 template <typename T>
-Tensor* TensorConstant(std::vector<uint32_t> shape, T c) {
+Tensor* TensorConstant(const std::vector<uint32_t>& shape, T c) {
   Tensor* output = new RamTensor<T>(shape);
   T* outPrt = output->write<T>(0, 0);
 
@@ -235,10 +235,10 @@ class permuteIndexTransform {
   void computeOutputStride(void); 
 
  public:
-  permuteIndexTransform(Shape input_shape, std::vector<uint8_t> permute); 
+  permuteIndexTransform(Shape input_shape, const std::vector<uint8_t>& permute); 
 
   std::vector<uint8_t> getPermute(void); 
-  void setPermute(std::vector<uint8_t>& _permute); 
+  void setPermute(const std::vector<uint8_t>& _permute); 
 
   void setInputShape(Shape s); 
   Shape getNewShape(void); 
