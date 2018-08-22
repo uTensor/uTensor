@@ -5,7 +5,7 @@
 #include "uTensor/util/quantization_utils.hpp"
 #include "uTensor/core/uTensorBase.hpp"
 #include <cstring>
-#include <math.h>
+#include <cmath>
 
 //T = inferred
 //mode = MIN_FIRST
