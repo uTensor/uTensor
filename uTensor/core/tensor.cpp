@@ -11,7 +11,7 @@ void uTensor::setName(std::string _name)
 std::string uTensor::getName() { return name; }
 inline uTensor::~uTensor(){}
 
-void TensorBase::initialize(std::vector<uint32_t>& vec) 
+void TensorBase::initialize(const std::vector<uint32_t>& vec) 
 {
     uint32_t ret = 0;
     shape.clear();
