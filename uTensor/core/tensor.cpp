@@ -8,7 +8,7 @@ void uTensor::setName(std::string _name)
         ERR_EXIT("Tensor %s already has a name %s\r\n", _name.c_str(), name.c_str());
     }
 }
-std::string uTensor::getName() { return name; }
+const std::string& uTensor::getName() const { return name; }
 inline uTensor::~uTensor(){}
 
 void TensorBase::initialize(const std::vector<uint32_t>& vec) 
@@ -96,7 +96,7 @@ void Tensor::resize(const std::vector<uint32_t>& v) {
     s->allocate(unit_size());
 }
 
-std::vector<uint32_t> Tensor::getShape(void) const { return s->shape; }
+const std::vector<uint32_t>& Tensor::getShape(void) const { return s->shape; }
 
 uint32_t Tensor::getSize(void) { return s->total_size; }
 
@@ -124,7 +124,7 @@ void permuteIndexTransform::computeOutputShape(void) {
     }
 }
 
-size_t permuteIndexTransform::evalStride(size_t dim_index, Shape s) {
+size_t permuteIndexTransform::evalStride(size_t dim_index, const Shape& s) {
     unsigned int size_accm = 1;
     for (auto it = s.begin() + dim_index + 1; it != s.end(); it++) {
         size_accm *= *it;
@@ -146,13 +146,15 @@ void permuteIndexTransform::computeOutputStride(void) {
     }
 }
 
-permuteIndexTransform::permuteIndexTransform(Shape input_shape, const std::vector<uint8_t>& permute) {
+permuteIndexTransform::permuteIndexTransform(const Shape& input_shape, const std::vector<uint8_t>& permute) {
     setInputShape(input_shape);
     setPermute(permute);
     apply();
 }
 
-std::vector<uint8_t> permuteIndexTransform::getPermute(void) { return permute; }
+const std::vector<uint8_t>& permuteIndexTransform::getPermute(void) const {
+    return permute;
+}
 
 void permuteIndexTransform::setPermute(const std::vector<uint8_t>& _permute) {
     permute = _permute;
@@ -164,7 +166,7 @@ void permuteIndexTransform::setPermute(const std::vector<uint8_t>& _permute) {
     }
 }
 
-void permuteIndexTransform::setInputShape(Shape s) { in_shape = s; }
+void permuteIndexTransform::setInputShape(const Shape& s) { in_shape = s; }
 Shape permuteIndexTransform::getNewShape(void) { return out_shape; }
 
 void permuteIndexTransform::apply(void) {
@@ -189,7 +191,7 @@ size_t permuteIndexTransform::operator[](const size_t index) {
 }
 
 
-size_t broadcastIndexTransform::evalStride(size_t dim_index, Shape s) {
+size_t broadcastIndexTransform::evalStride(size_t dim_index, const Shape& s) {
     unsigned int size_accm = 1;
     for (auto it = s.begin() + dim_index + 1; it != s.end(); it++) {
         size_accm *= *it;
@@ -211,7 +213,7 @@ void broadcastIndexTransform::computeLStride(void) {
     }
 }
 
-void broadcastIndexTransform::sortShape(Shape a, Shape b) {
+void broadcastIndexTransform::sortShape(const Shape& a, const Shape& b) {
     if(a.size() > b.size()) {
         l_shape = a;
         s_shape = b;
@@ -242,7 +244,7 @@ void broadcastIndexTransform::checkShape(void) {
     }
 }
 
-broadcastIndexTransform::broadcastIndexTransform(Shape _l_shape, Shape _s_shape) {
+broadcastIndexTransform::broadcastIndexTransform(const Shape& _l_shape, const Shape& _s_shape) {
     swap_flag = false;
     sortShape(_l_shape, _s_shape);
     checkShape();
@@ -255,7 +257,7 @@ void broadcastIndexTransform::apply(void) {
     computeSStride();
 }
 
-Shape broadcastIndexTransform::getOutputShape(void) {
+const Shape& broadcastIndexTransform::getOutputShape(void) const {
     return l_shape;
 }
 

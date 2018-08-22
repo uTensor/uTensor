@@ -31,7 +31,7 @@ class uTensor {
 public:
  virtual void inFocus(){};
  virtual void deFocus(){};
- virtual std::string getName();
+ virtual const std::string& getName() const;
  virtual void setName(std::string _name);
 
  virtual ~uTensor() = 0;
@@ -74,7 +74,7 @@ class Tensor : public uTensor {
 
   virtual void resize(const std::vector<uint32_t>& v); 
 
-  std::vector<uint32_t> getShape(void) const; 
+  const std::vector<uint32_t>& getShape(void) const; 
 
   uint32_t getSize(void); 
 
@@ -229,18 +229,18 @@ class permuteIndexTransform {
 
   void computeOutputShape(void); 
 
-  size_t evalStride(size_t dim_index, Shape s); 
+  size_t evalStride(size_t dim_index, const Shape& s); 
 
   void computeInputStride(void); 
   void computeOutputStride(void); 
 
  public:
-  permuteIndexTransform(Shape input_shape, const std::vector<uint8_t>& permute); 
+  permuteIndexTransform(const Shape& input_shape, const std::vector<uint8_t>& permute); 
 
-  std::vector<uint8_t> getPermute(void); 
+  const std::vector<uint8_t>& getPermute(void) const;
   void setPermute(const std::vector<uint8_t>& _permute); 
 
-  void setInputShape(Shape s); 
+  void setInputShape(const Shape& s); 
   Shape getNewShape(void); 
 
   void apply(void); 
@@ -259,7 +259,7 @@ void printDim(Tensor* t) {
 }
 
 template <typename T>
-void tensorChkAlloc(Tensor** t, Shape dim) {
+void tensorChkAlloc(Tensor** t, const Shape& dim) {
   if (*t && (*t)->getSize() == 0) {
     (*t)->init(dim);
   } else if (*t && (*t)->getShape() != dim) {
@@ -285,23 +285,23 @@ class broadcastIndexTransform {
   Shape s_stride;
   bool swap_flag;
 
-  size_t evalStride(size_t dim_index, Shape s); 
+  size_t evalStride(size_t dim_index, const Shape& s); 
 
   void computeSStride(void); 
   void computeLStride(void); 
 
-  void sortShape(Shape a, Shape b); 
+  void sortShape(const Shape& a, const Shape& b); 
 
   void checkShape(void); 
 
 
 //b_shape being a smaller shape
  public:
-  broadcastIndexTransform(Shape _l_shape, Shape _s_shape); 
+  broadcastIndexTransform(const Shape& _l_shape, const Shape& _s_shape); 
 
   void apply(void); 
 
-  Shape getOutputShape(void); 
+  const Shape& getOutputShape(void) const;
 
   bool is_swaped(void); 
 
