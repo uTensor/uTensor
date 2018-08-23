@@ -31,7 +31,7 @@ class uTensor {
 public:
  virtual void inFocus(){};
  virtual void deFocus(){};
- virtual std::string getName();
+ virtual const std::string& getName() const;
  virtual void setName(std::string _name);
 
  virtual ~uTensor() = 0;
@@ -48,7 +48,7 @@ class TensorBase {
   uint32_t total_size;
   uint32_t cache_size;
 
-  void initialize(std::vector<uint32_t>& vec);
+  void initialize(const std::vector<uint32_t>& vec);
   void allocate(uint8_t unit_size);
 
   ~TensorBase();
@@ -68,13 +68,13 @@ class Tensor : public uTensor {
   // returns how far a given dimension is apart
   size_t getStride(size_t dim_index); 
 
-  virtual void init(std::vector<uint32_t>& v); 
+  virtual void init(const std::vector<uint32_t>& v); 
 
-  virtual void init(std::vector<uint32_t>& v, const void* data); 
+  virtual void init(const std::vector<uint32_t>& v, const void* data); 
 
-  virtual void resize(std::vector<uint32_t> v); 
+  virtual void resize(const std::vector<uint32_t>& v); 
 
-  std::vector<uint32_t> getShape(void); 
+  const std::vector<uint32_t>& getShape(void) const; 
 
   uint32_t getSize(void); 
 
@@ -101,7 +101,7 @@ class Tensor : public uTensor {
 template<class T>
 class BinaryTensor : public Tensor {
   public:
-  BinaryTensor(std::vector<uint32_t> v, const T* g) : Tensor() {
+  BinaryTensor(const std::vector<uint32_t>& v, const T* g) : Tensor() {
     Tensor::init(v, g);
   }
 
@@ -144,7 +144,7 @@ class RamTensor : public Tensor {
     Tensor::init(v);
   }
 
-  RamTensor(std::vector<uint32_t> v) : Tensor() {
+  RamTensor(const std::vector<uint32_t>& v) : Tensor() {
     Tensor::init(v);
   }
 
@@ -191,7 +191,7 @@ Tensor* TensorCast(Tensor* input) {
 }
 
 template <typename T>
-Tensor* TensorConstant(std::vector<uint32_t> shape, T c) {
+Tensor* TensorConstant(const std::vector<uint32_t>& shape, T c) {
   Tensor* output = new RamTensor<T>(shape);
   T* outPrt = output->write<T>(0, 0);
 
@@ -229,18 +229,18 @@ class permuteIndexTransform {
 
   void computeOutputShape(void); 
 
-  size_t evalStride(size_t dim_index, Shape s); 
+  size_t evalStride(size_t dim_index, const Shape& s); 
 
   void computeInputStride(void); 
   void computeOutputStride(void); 
 
  public:
-  permuteIndexTransform(Shape input_shape, std::vector<uint8_t> permute); 
+  permuteIndexTransform(const Shape& input_shape, const std::vector<uint8_t>& permute); 
 
-  std::vector<uint8_t> getPermute(void); 
-  void setPermute(std::vector<uint8_t>& _permute); 
+  const std::vector<uint8_t>& getPermute(void) const;
+  void setPermute(const std::vector<uint8_t>& _permute); 
 
-  void setInputShape(Shape s); 
+  void setInputShape(const Shape& s); 
   Shape getNewShape(void); 
 
   void apply(void); 
@@ -259,7 +259,7 @@ void printDim(Tensor* t) {
 }
 
 template <typename T>
-void tensorChkAlloc(Tensor** t, Shape dim) {
+void tensorChkAlloc(Tensor** t, const Shape& dim) {
   if (*t && (*t)->getSize() == 0) {
     (*t)->init(dim);
   } else if (*t && (*t)->getShape() != dim) {
@@ -285,23 +285,23 @@ class broadcastIndexTransform {
   Shape s_stride;
   bool swap_flag;
 
-  size_t evalStride(size_t dim_index, Shape s); 
+  size_t evalStride(size_t dim_index, const Shape& s); 
 
   void computeSStride(void); 
   void computeLStride(void); 
 
-  void sortShape(Shape a, Shape b); 
+  void sortShape(const Shape& a, const Shape& b); 
 
   void checkShape(void); 
 
 
 //b_shape being a smaller shape
  public:
-  broadcastIndexTransform(Shape _l_shape, Shape _s_shape); 
+  broadcastIndexTransform(const Shape& _l_shape, const Shape& _s_shape); 
 
   void apply(void); 
 
-  Shape getOutputShape(void); 
+  const Shape& getOutputShape(void) const;
 
   bool is_swaped(void); 
 
