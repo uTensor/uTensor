@@ -1,6 +1,13 @@
 # Creating a New Project
 This is a quick start guide highlighting the key steps to create your own uTensor Project from scretch. We will use the MNIST MLP training script to generate the model file. The flow is based on Mbed-CLI and an UNIX-like environment. The target is [FRDM-K66F](https://os.mbed.com/platforms/FRDM-K66F/).
 
+## Requirement
+- [Mbed Cli](https://github.com/ARMmbed/mbed-cli)
+- [uTensor Cli](https://github.com/uTensor/utensor_cgen)
+- Tensorflow (comes with uTensor Cli installation)
+- [FRDM-K66F](https://os.mbed.com/platforms/FRDM-K66F/), or any Mbed board with sufficient memory
+- A micro-SD card (32GB or less, for demostration purpose)
+
 ## Setting it up
 Let's start with creating a **new Mbed project**.
 
@@ -151,8 +158,10 @@ Image: ./BUILD/DISCO_F413ZH/GCC_ARM/my_uTensor.bin
 
 ## Expected Output
 Connect to the board via CoolTerm using 115200 as the baudrate. Here is what you should see:
+
 ```
 Simple MNIST end-to-end uTensor cli example (device)
 Predicted label: 7
 ```
+
 **Congradulations!** You have deployed a neural network on a MCU from scretch!
