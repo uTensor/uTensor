@@ -121,13 +121,6 @@ void Add(Tensor* input, Tensor* input2, Tensor** out) {
   }
 }
 
-// void reduceShapeHelper(Shape input, Shape dim, Shape &reduce_shape, Shape &out_shape, std::vector<uint8_t> &perm, size_t &reduce_size);
-
-// template <class TIn, class TOut>
-// std::vector<TOut> tensorToLinearVec(S_TENSOR input);
-
-
-
 //reduce_shape actual output shape without the reduce dim
 //out_shape intermediate shape with reduce dim in the last orders
 inline void reduceShapeHelper(Shape input, Shape dim, Shape &reduce_shape, Shape &out_shape, std::vector<uint8_t> &perm, size_t &reduce_size) {
@@ -227,40 +220,6 @@ class MinOp : public Operator {
       MinMaxHelper<float, int, float>(inputs[0], inputs[1], outputs[0], true);
     }
 };
-// template <class TIn, class Td, class TOut>
-// void Max(S_TENSOR input, S_TENSOR dim, S_TENSOR out) {
-//   const TIn* p_in = input->read<TIn>(0, 0);
-//   const Td* p_in2 = dim->read<Td>(0, 0);
-
-//   Shape one_shape = {1};
-//   if(out->getSize() == 0) out->resize<TOut>(one_shape);
-//   TOut* p_out = out->write<TOut>(0, 0);
-
-//   Td n_dim = p_in2[0];
-//   std::vector<uint8_t> permute;
-//   for (uint32_t i_dim = 0; i_dim < input->getShape().size(); i_dim++) {
-//     permute.push_back(i_dim);
-//   }
-//   permute.push_back(n_dim);
-//   permute.erase(permute.begin() + n_dim);
-//   Shape outShape = input->getShape();
-//   size_t reduce_size = outShape[n_dim];
-//   outShape.erase(outShape.begin() + n_dim);
-//   outShape.push_back(reduce_size);
-//   size_t out_index = 0;
-//   permuteIndexTransform trans(outShape, permute);
-//   for (uint32_t j = 0; j < input->getSize(); j += reduce_size) {
-//     TIn max_val = std::numeric_limits<TIn>::lowest();
-//     for (size_t k = 0; k < reduce_size; k++) {
-//       TIn val = p_in[trans[j + k]];
-//       if (val > max_val) {
-//         max_val = val;
-//       }
-//     }
-//     p_out[out_index] = max_val;
-//     out_index++;
-//   }
-// }
 
 class MaxOp : public Operator {
   public:
