@@ -9,7 +9,7 @@ void uTensor::setName(std::string _name)
     }
 }
 const std::string& uTensor::getName() const { return name; }
-inline uTensor::~uTensor(){}
+uTensor::~uTensor(){}
 
 void TensorBase::initialize(const std::vector<uint32_t>& vec) 
 {
