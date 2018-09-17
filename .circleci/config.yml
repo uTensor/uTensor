@@ -11,4 +11,17 @@ jobs:
       - run: find uTensor/core/ -type f -exec sed -e 's/\/fs\//\//g' -i {} \;
       - run: cmake .
       - run: make
-      - run: ctest -VV
+      - run: 
+          name: Test
+          command: ctest -VV
+      - run:
+          name: Generate code coverage
+          command: lcov -c --directory . --output-file main_coverage.info
+      - run: genhtml main_coverage.info --output-directory coverage
+      - store_artifacts:
+          path: test-results.xml
+          prefix: tests
+      - store_artifacts:
+          path: coverage
+          prefix: coverage
+        
