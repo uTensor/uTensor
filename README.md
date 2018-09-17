@@ -4,14 +4,12 @@
 ## Release Note
 - Updated uTensor ReadMe
 - Updated uTensor-CLI ReadMe
-- Added Contributor Guide
-- Added new uTensor project guide
-- Dropout Support
+- ROM Tensor support
 
 
 ## Introduction
 ### What is it?
-uTensor is an extremely light-weight machine learning inference framework built on Mbed and Tensorflow. The project contains a runtime library and an offline tool. The total size of graph definition and algorithm implementation of a 3-layer MLP produced by uTensor is less than 32kB in the resulting binary (excluding the weights).
+uTensor is an extremely light-weight machine learning inference framework built on Mbed and Tensorflow. It consists of a runtime library and an offline tool. The total size of graph definition and algorithm implementation of a 3-layer MLP produced by uTensor is less than 32kB in the resulting binary (excluding the weights).
 
 ### How does it work?
 <div><img src=docs/img/uTensorFlow.jpg width=600 align=center/></div>
@@ -34,6 +32,7 @@ The .hpp and .cpp files can be generated given a model (protocal buffer) file, f
 ```
 $ utensor-cli deep_mlp.pb --output-nodes=y_pred
 ...
+... Generate weight file: models/deep_mlp_weight.hpp
 ... Generate header file: models/deep_mlp.hpp
 ... Generate source file: models/deep_mlp.cpp
 ```
@@ -57,40 +56,39 @@ The project is work-in-progress. Here are the operators, of their __quantized__ 
 
 uTensor should support any [Mbed enabled board](https://os.mbed.com/platforms/?mbed-os=21&mbed-os=22&mbed-os=25&mbed-os=26&mbed-os=33) that has sufficient memory (128+ kB RAM and 512kB+ flash recommended). However, these two boards are popular among the core developers:
 
+- [FRDM-K66F](https://os.mbed.com/platforms/FRDM-K66F/): reference development environment
 - [DISCO-F413ZH](https://os.mbed.com/platforms/ST-Discovery-F413H/): a good demo/application prototyping platform, wi-fi
-- [K64F](https://os.mbed.com/platforms/FRDM-K64F/): rock-solid development environment
-
-You will need a FAT32 formated SD card. Please note, the size of the SD card has to be less than 32GB. An SD card will be made optional in the future releases.
+- Any [Mbed board](https://os.mbed.com/platforms/?mbed-os=21&mbed-os=22&mbed-os=25&mbed-os=26&mbed-os=33&mbed-os=34) with sufficient memory
 
 ### The Environment
 There are two flows to get started with uTensor. For Windows users, please choose the Cloud9 flow as shown below.
 
+- Local Installation
+  - Requires [Mbed-CLI](https://github.com/ARMmbed/mbed-cli) installation
+  - Requires [uTensor-CLI](https://github.com/uTensor/utensor_cgen) installation
 - The [Cloud9 Flow](https://github.com/uTensor/cloud9-installer)
   - Requires Amazon Cloud9 Account
   - Does not support runtime debugging
-- Local Installation
-  - Requires [Mbed-CLI](https://github.com/ARMmbed/mbed-cli) installation (Python 2)
-  - Requires [uTensor-CLI](https://github.com/uTensor/utensor_cgen) installation
 
-### The Examples
+### Getting Started
+#### [Creating a New Project](docs/newProject.md)
+Step-by-step instructions on how to create your own uTensor project from scratch. You will need a [K66F](https://os.mbed.com/platforms/FRDM-K66F/) board a micro-SD card (32GB max) for this guide.
+
 #### [MNIST Touch Screen](https://github.com/uTensor/utensor-mnist-demo)
 The example uses a 3-layer MLP trained on the MNIST dataset. The touch screen input is fed into the neural network for processing and the result is printed on the screen.
 
 #### [The Activity of Daily Living (ADL)](https://github.com/uTensor/ADL_demo)
 This example shows how to buffer time-series data into batches of snapshots. These snapshots are then fed into the neural network for inferencing. The model a small multi-layer MLP trained on the [ADL dataset](https://archive.ics.uci.edu/ml/datasets/Dataset+for+ADL+Recognition+with+Wrist-worn+Accelerometer).
 
-### Creating a New Project
-
-  Please refer to this [guide](docs/newProject.md) for instructions on creating your own project from stretch on DISCO-F413ZH. 
 
 ## Development
 uTensor is young and under going rapid development. Many exciting features are on the way:
 
 - Convolution
 - Pooling
-- SD cards optional: ability to store weights in on-board flash
 - CMSIS-NN integration
 - Smaller binary
+- More efficient Run-time
 
 You can also check the [project page](https://github.com/orgs/uTensor/projects) for the latest progress. If you'd like to take part in this project, please have a look at our **[contributor guide](contribution_guide.md)** and feel free to reach out to us.
 

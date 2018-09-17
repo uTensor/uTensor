@@ -1,6 +1,8 @@
 #include "uTensor/util/uTensor_util.hpp"
+#ifndef TARGET_MBED
 #include <sys/stat.h>
 #include <dirent.h>
+#endif
 #include <cstdlib>
 
 void return_error(int ret_val) {
