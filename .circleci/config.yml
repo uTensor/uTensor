@@ -5,6 +5,7 @@ jobs:
       - image: mbartling/utensor_ci
     steps:
       - checkout
+      - run: mkdir -p /tmp/coverage && mkdir -p /tmp/test_results
       - run: git clone https://github.com/ThrowTheSwitch/Unity.git unity_temp
       - run: mv unity_temp/* unity/
       - run: find TESTS -type f -exec sed -e 's/\/fs\//TESTS\//g' -i {} \;
@@ -13,15 +14,14 @@ jobs:
       - run: make
       - run: 
           name: Test
-          command: ctest -VV
+          command: ctest -VV -o /tmp/test_results/test-results.txt
       - run:
           name: Generate code coverage
-          command: lcov -c --directory . --output-file main_coverage.info
-      - run: genhtml main_coverage.info --output-directory coverage
+          command: lcov -c --directory . --output-file main_coverage.info > /tmp/test_results/coverage_summary.txt
+      - run: genhtml main_coverage.info --output-directory /tmp/coverage
+      - store_test_results:
+          path: /tmp/test_results
       - store_artifacts:
-          path: test-results.xml
-          prefix: tests
-      - store_artifacts:
-          path: coverage
+          path: /tmp/coverage
           prefix: coverage
         
