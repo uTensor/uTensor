@@ -63,7 +63,7 @@ deep_mlp.pb
 ## Code Generation
 The uTensor-Cli can be installed with:
 
-```pip install utensor-cli```
+```pip install utensor_cgen```
 
 Fire up your **utensor-cli**. Depends on your installation, you may need to activate your **virtual environment**. Supply your .pb file and the name of your output node.
 

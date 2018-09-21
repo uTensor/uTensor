@@ -39,6 +39,12 @@
             "sd-miso": "D12",
             "sd-clk": "D13",
             "sd-cs": "D9"
+        },
+        "TB_SENSE_12": {
+            "sd-mosi": "PK0",
+            "sd-miso": "PK2",
+            "sd-clk": "PF7",
+            "sd-cs": "PA5"
         }
     }
 }
