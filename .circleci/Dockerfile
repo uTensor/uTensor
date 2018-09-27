@@ -8,6 +8,7 @@ RUN apt-get install -y \
     cmake \
     gcc \
     wget \
+    lcov \
     g++ 
 
 # Install latest CMAKE
