@@ -87,11 +87,12 @@ double meanAbsErr(Tensor* A, Tensor* B) {
   const U* elemB = B->read<U>(0, 0);
 
   double accm = 0.0;
+  double total_size = (double) A->getSize();
   for (uint32_t i = 0; i < A->getSize(); i++) {
     accm += (double)fabs((float)elemB[i] - (float)elemA[i]);
   }
 
-  return accm;
+  return accm / total_size;
 }
 
 // A being the reference
