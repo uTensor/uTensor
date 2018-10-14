@@ -17,7 +17,7 @@ void test_operators_quantizedAdd(){
     S_TENSOR output_z = ctx.get("z:0");
     ctx.eval();
 
-    Tensor* ref_z = t_import.float_import("/fs/constants/add_graph/ref_z.idx");
+    Tensor* ref_z = t_import.float_import("/fs/constants/test_quantized_add/ref_z.idx");
 
     // compare the results
     double err = meanAbsErr<float>(ref_z, output_z.get());
