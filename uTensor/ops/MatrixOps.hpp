@@ -11,6 +11,125 @@
 // tensorflow/tensorflow/core/kernels/reference_gemm.h
 
 template <class T1, class T2, class T3>
+void CMSIS_GemmuImpl(bool transpose_a, bool transpose_b, bool transpose_c,
+                        size_t m, size_t n, size_t k, S_TENSOR a,
+                        int32_t offset_a, size_t lda, S_TENSOR b, int offset_b,
+                        size_t ldb, S_TENSOR c, int shift_c, int offset_c,
+                        int mult_c, size_t ldc) {
+// arm_fully_connected_no_shift(const q7_t * pV,
+//                        const q7_t * pM,
+//                        const uint16_t dim_vec,
+//                        const uint16_t num_of_rows,
+//                        const q7_t * bias, T_OUT * pOut, q15_t * vec_buffer)
+// {
+
+    /* Run the following code for Cortex-M4 and Cortex-M7 */
+
+    // returns a regular pointers 
+    pV = a->read<T1>(0, 1); //TODO: Expect uint8; modify arm_q7_to_q15_reordered_no_shift
+    pM = a->read<T1>(0, 1); //TODO: Expect uint8, runtime conversion, including offset; modify read_and_pad_reordered
+    pOut = c->write<T3>(0, 1); //TODO: pOut should be in uint8
+
+
+    const q7_t *pB = pM;
+    const q7_t *pB2;
+    T_OUT     *pO = pOut;
+    const q7_t *pBias = bias;
+    q15_t    *pA;
+    uint16_t  rowCnt = num_of_rows >> 1;
+
+    /* expand the vector into the buffer */
+    arm_q7_to_q15_reordered_no_shift(pV, vec_buffer, dim_vec);
+
+    while (rowCnt)
+    {
+        q31_t     sum =  (q31_t)(*pBias++);
+        q31_t     sum2 = (q31_t)(*pBias++);
+        uint16_t  colCnt = dim_vec >> 2;
+
+        pA = vec_buffer;
+        pB2 = pB + dim_vec;
+
+        while (colCnt)
+        {
+            q31_t     inV, inM11, inM12, inM21, inM22;
+            pB = (q7_t *) read_and_pad_reordered((void *)pB, &inM11, &inM12);
+            pB2 = (q7_t *) read_and_pad_reordered((void *)pB2, &inM21, &inM22);
+
+            inV = *__SIMD32(pA)++;
+
+            sum = __SMLAD(inV, inM11, sum);
+            sum2 = __SMLAD(inV, inM21, sum2);
+
+            inV = *__SIMD32(pA)++;
+
+            sum = __SMLAD(inV, inM12, sum);
+            sum2 = __SMLAD(inV, inM22, sum2);
+
+            colCnt--;
+        }
+        colCnt = dim_vec & 0x3;
+        while (colCnt)
+        {
+            q7_t      inV = *pA++;
+            q15_t     inM = *pB++;
+            q15_t     inM2 = *pB2++;
+
+            sum += inV * inM;
+            sum2 += inV * inM2;
+            colCnt--;
+        }                       /* while over colCnt */
+        *pO++ = sum;
+        *pO++ = sum2;
+
+        /* adjust the pointers and counters */
+        pB += dim_vec;
+        rowCnt--;
+    }
+
+    /* left-over part of the rows */
+    rowCnt = num_of_rows & 0x1;
+
+    while (rowCnt)
+    {
+        uint16_t  colCnt = dim_vec >> 2;
+        q31_t     sum = (q31_t)(*pBias++);
+
+        pA = vec_buffer;
+
+        while (colCnt)
+        {
+            q31_t     inV1, inV2, inM11, inM12;
+
+            pB = (q7_t *) read_and_pad_reordered((void *)pB, &inM11, &inM12);
+
+            inV1 = *__SIMD32(pA)++;
+            sum = __SMLAD(inV1, inM11, sum);
+
+            inV2 = *__SIMD32(pA)++;
+            sum = __SMLAD(inV2, inM12, sum);
+
+            colCnt--;
+        }
+
+        /* left-over of the vector */
+        colCnt = dim_vec & 0x3;
+        while (colCnt)
+        {
+            q7_t      inV = *pA++;
+            q15_t     inM = *pB++;
+            sum += inV * inM;
+            colCnt--;
+        }
+
+        *pO++ = sum;
+
+        rowCnt--;
+    }
+
+}
+
+template <class T1, class T2, class T3>
 void ReferenceGemmuImpl(bool transpose_a, bool transpose_b, bool transpose_c,
                         size_t m, size_t n, size_t k, S_TENSOR a,
                         int32_t offset_a, size_t lda, S_TENSOR b, int offset_b,
@@ -220,6 +339,66 @@ void QuantizedMatMul2(S_TENSOR A, S_TENSOR B, S_TENSOR C,
   *c_max = max_c_value;
 }
 
+
+
+
+template <class T1, class T2, class Toutput>
+void CMSIS_QuantizedMatMul(S_TENSOR A, S_TENSOR B, S_TENSOR C,
+                     S_TENSOR mina, S_TENSOR minb, S_TENSOR maxa,
+                     S_TENSOR maxb, S_TENSOR outmin,
+                     S_TENSOR outmax, bool transpose_a = false,
+                     bool transpose_b = false) {
+  const float min_a = *(mina->read<float>(0, 0));
+  const float max_a = *(maxa->read<float>(0, 0));
+  const float min_b = *(minb->read<float>(0, 0));
+  const float max_b = *(maxb->read<float>(0, 0));
+
+  //auto tensor allocation
+  if(C->getSize() == 0) {
+    Shape c_shape;
+    c_shape.push_back((A->getShape())[0]);
+    c_shape.push_back((B->getShape())[1]);
+    C->resize(c_shape);
+  }
+  
+
+  const int32_t offset_a = FloatToQuantizedUnclamped<T1>(
+      0.0f, min_a, max_a);  // NT: what 0 quantized to; depends on
+                            // Eigen::NumTraits<T>::lowest()
+  const int32_t offset_b = FloatToQuantizedUnclamped<T2>(0.0f, min_b, max_b);
+  const int32_t offset_c = 0;
+  const int32_t mult_c = 1;
+  const int32_t shift_c = 0;
+
+  int first = transpose_a ? 0 : 1;
+  int second = transpose_b ? 1 : 0;
+
+  int a_dim_remaining = 1 - first;
+  int b_dim_remaining = 1 - second;
+
+  const bool transpose_c = false;
+  const size_t m = A->getShape()[a_dim_remaining];
+  const size_t n = B->getShape()[b_dim_remaining];
+  const size_t k = A->getShape()[first];
+  const size_t lda = A->getShape()[1];
+  const size_t ldb = B->getShape()[1];
+  const size_t ldc = n;
+
+  CMSIS_GemmuImpl<T1, T2, Toutput>(
+      transpose_a, transpose_b, transpose_c, m, n, k, A, offset_a, lda,
+      B, offset_b, ldb, C, shift_c, offset_c, mult_c, ldc);
+  float min_c_value;
+  float max_c_value;
+
+  QuantizationRangeForMultiplication<T1, T2, Toutput>(
+      min_a, max_a, min_b, max_b, &min_c_value, &max_c_value);
+
+  float* c_min = outmin->write<float>(0, 0);
+  *c_min = min_c_value;
+  float* c_max = outmax->write<float>(0, 0);
+  *c_max = max_c_value;
+}
+
 template<class T1, class T2, class T3>
 void conv_functor(S_TENSOR input_data, int input_batches, int input_height, int input_width,
         int input_depth, int input_offset, S_TENSOR filter_data, int filter_height, int filter_width, 
@@ -408,6 +587,20 @@ class QntMatMulOp : public Operator {
   }
   virtual void compute() override {
     QuantizedMatMul2<T1, T2, TOut>(inputs[0], inputs[3],
+     outputs[0], inputs[1], inputs[4], inputs[2], inputs[5],
+      outputs[1], outputs[2]);
+  }
+};
+
+template <class T1, class T2, class TOut>
+class CMSIS_QntMatMulOp : public Operator {
+  public:
+  QntMatMulOp() {
+    n_inputs = 6;
+    n_outputs = 3;
+  }
+  virtual void compute() override {
+    CMSIS_QuantizedMatMul<T1, T2, TOut>(inputs[0], inputs[3],
      outputs[0], inputs[1], inputs[4], inputs[2], inputs[5],
       outputs[1], outputs[2]);
   }

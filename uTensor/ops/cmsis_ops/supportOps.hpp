@@ -39,9 +39,9 @@ class Uint8Q7OriginOp : public Operator {
 };
 
 template <class T1, class T2, class Toutput>
-class QuantRangeForMultiplication : public Operator {
+class QuantRangeForMultiplicationOp : public Operator {
   public:
-  QuantRangeForMultiplication() {
+  QuantRangeForMultiplicationOp() {
     n_inputs = 4;
     n_outputs = 2;
   }
