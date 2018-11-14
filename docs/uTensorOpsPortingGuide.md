@@ -71,6 +71,13 @@ class Uint8Q7OriginSnippet(Snippet):
     self.template_vars["output"] = output
     self.template_vars["to_eval"] = to_eval
 ```
+Register it with the package:
+
+```
+__all__ = ["Snippet", "SnippetContainerBase",
+			...
+"QuantRangeForMultiplicationSnippet", "Uint8Q7OriginSnippet"]
+```
 
 ### Creating the Source Template
 Create a Jinja2 template file under the location specified by the `__template_name__` in the previus step.

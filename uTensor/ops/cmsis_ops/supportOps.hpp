@@ -22,9 +22,9 @@ class Uint8Q7OriginOp : public Operator {
     n_outputs = 1;
   }
   virtual void compute() override {
-    uint8_t *input = inputs[0]->read<uint8_t>(0, 1);
-    float min = inputs[1]->read<float>(0, 1);
-    float max = inputs[2]->read<float>(0, 1);
+    uint8_t *input = inputs[0]->write<uint8_t>(0, 1);
+    float min = *(inputs[1]->read<float>(0, 1));
+    float max = *(inputs[2]->read<float>(0, 1));
 
     if(outputs[0]->getSize() == 0) {
       Shape out_shape;
@@ -34,7 +34,7 @@ class Uint8Q7OriginOp : public Operator {
 
     q7_t *out = outputs[0]->write<q7_t>(0, 1);
 
-    uint8_to_q7_origin(inputs[0], min, max, out, inputs[0]->getSize());
+    uint8_to_q7_origin(input, min, max, out, inputs[0]->getSize());
   }
 };
 
@@ -46,10 +46,10 @@ class QuantRangeForMultiplicationOp : public Operator {
     n_outputs = 2;
   }
   virtual void compute() override {
-    float min_a = inputs[0]->read<float>(0, 1);
-    float max_a = inputs[1]->read<float>(0, 1);
-    float min_b = inputs[2]->read<float>(0, 1);
-    float max_b = inputs[3]->read<float>(0, 1);
+    float min_a = *(inputs[0]->read<float>(0, 1));
+    float max_a = *(inputs[1]->read<float>(0, 1));
+    float min_b = *(inputs[2]->read<float>(0, 1));
+    float max_b = *(inputs[3]->read<float>(0, 1));
 
     if(outputs[0]->getSize() == 0) {
       Shape out_shape;

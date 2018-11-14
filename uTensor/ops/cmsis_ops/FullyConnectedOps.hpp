@@ -147,7 +147,7 @@ arm_fully_connected_q7_tout(const q7_t * pV,
 //I definitely overcomplicated this part. Should just use f*** function overloading
 void cmsis_fc_selector(const q7_t* iV, const q7_t* mW, const uint16_t dim_vec, const uint16_t num_of_rows,
                        const uint16_t bias_shift, const uint16_t out_shift, const q7_t* bias, 
-                       uint32* pOut, q15_t* scratch_data)
+                       uint32_t* pOut, q15_t* scratch_data)
 {
     arm_fully_connected_q7_tout(iV, mW, dim_vec, num_of_rows, 
             bias_shift, out_shift, bias, pOut, scratch_data);
@@ -290,12 +290,14 @@ struct FullyConnectedLayerOptCmsis{
 //   }
 // };
 
+template<class TOUT>
 class FullyConnectedLayerCmsisOp : public Operator {
   public:
   FullyConnectedLayerCmsisOp() {
     n_inputs = 6;
     n_outputs = 1;
   }
+
   virtual void compute() override {
     S_TENSOR iV = inputs[0];
     S_TENSOR mW = inputs[1];
@@ -313,10 +315,10 @@ class FullyConnectedLayerCmsisOp : public Operator {
     const uint16_t bias_shift = *(bShift->read<uint16_t>(0,0));
     const uint16_t out_shift = *(oShift->read<uint16_t>(0,0));
     pOut->resize(b->getShape());
-        int32_t* pOut_data = pOut->write<int32_t>(0, 1);
+        TOUT* pOut_data = pOut->write<TOUT>(0, 1);
         q15_t* scratch_data = scratch->write<q15_t>(0, 1);
     
-        arm_fully_connected_q7_tout<T_OUT>(iV_data, mW_data, dim_vec, num_of_rows, 
+        arm_fully_connected_q7_tout(iV_data, mW_data, dim_vec, num_of_rows, 
             bias_shift, out_shift, bias_data, pOut_data, scratch_data);
   }
 };
