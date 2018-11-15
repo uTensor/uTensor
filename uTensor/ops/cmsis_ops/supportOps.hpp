@@ -2,6 +2,7 @@
 #define UTENSOR_SUPPORT_OPS
 #include "uTensor/core/tensor.hpp"
 #include "uTensor/core/uTensorBase.hpp"
+#include "uTensor/uTensor/ops/MatrixOps.hpp"
 #include "uTensor/util/quantization_utils.hpp"
 #include "arm_math.h"
 #include "arm_nnfunctions.h"
@@ -11,7 +12,7 @@ void uint8_to_q7_origin(uint8_t *input, float &min, float &max, q7_t *out, size_
   const int32_t offset = FloatToQuantizedUnclamped<uint8_t>(
       0.0f, min, max) - 128;
   for(size_t i = 0; i < length; i++) {
-    out[i] = (q7_t) (input[i] - offset);
+    out[i] = (q7_t) (input[i] + offset);
   }
 }
 
@@ -27,9 +28,7 @@ class Uint8Q7OriginOp : public Operator {
     float max = *(inputs[2]->read<float>(0, 1));
 
     if(outputs[0]->getSize() == 0) {
-      Shape out_shape;
-      out_shape.push_back((inputs[0]->getShape())[0]);
-      outputs[0]->resize(out_shape);
+      outputs[0]->resize(inputs[0]->getShape());
     }
 
     q7_t *out = outputs[0]->write<q7_t>(0, 1);
@@ -63,7 +62,7 @@ class QuantRangeForMultiplicationOp : public Operator {
       outputs[1]->resize(out_shape);
     }
 
-    q7_t *out = outputs[0]->write<q7_t>(0, 1);
+    // q7_t *out = outputs[0]->write<q7_t>(0, 1);  //unused variable?
 
     float *min_c_value = outputs[0]->write<float>(0, 1);
     float *max_c_value = outputs[1]->write<float>(0, 1);
