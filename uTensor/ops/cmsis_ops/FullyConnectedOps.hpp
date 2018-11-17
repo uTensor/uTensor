@@ -310,7 +310,7 @@ class FullyConnectedLayerCmsisOp : public Operator {
     const q7_t* iV_data  = iV->read<q7_t>(0, 1); //Read one byte
     const q7_t* mW_data  = mW->read<q7_t>(0, 1); //Read one byte
     const q7_t* bias_data = b->read<q7_t>(0, 1); //Read one byte
-    const uint16_t dim_vec = iV->getShape()[0];
+    const uint16_t dim_vec = iV->getShape()[1];
     const uint16_t num_of_rows = mW->getShape()[0];
     const uint16_t bias_shift = *(bShift->read<uint16_t>(0,0));
     const uint16_t out_shift = *(oShift->read<uint16_t>(0,0));
