@@ -8,6 +8,7 @@
 
 #define ARM_MATH_DSP
 
+
 template <class T_OUT=q7_t>
 arm_status
 
@@ -147,59 +148,31 @@ arm_fully_connected_q7_tout(const q7_t * pV,
 //I definitely overcomplicated this part. Should just use f*** function overloading
 void cmsis_fc_selector(const q7_t* iV, const q7_t* mW, const uint16_t dim_vec, const uint16_t num_of_rows,
                        const uint16_t bias_shift, const uint16_t out_shift, const q7_t* bias, 
-                       uint32_t* pOut, q15_t* scratch_data)
-{
-    arm_fully_connected_q7_tout(iV, mW, dim_vec, num_of_rows, 
-            bias_shift, out_shift, bias, pOut, scratch_data);
-}
+                       uint32_t* pOut, q15_t* scratch_data);
 
 void cmsis_fc_selector(const q7_t* iV, const q7_t* mW, const uint16_t dim_vec, const uint16_t num_of_rows,
                        const uint16_t bias_shift, const uint16_t out_shift, const q7_t* bias, 
-                       q7_t* pOut, q15_t* scratch_data)
-{
-    arm_fully_connected_q7(iV, mW, dim_vec, num_of_rows, 
-            bias_shift, out_shift, bias, pOut, scratch_data);
-}
+                       q7_t* pOut, q15_t* scratch_data);
 
 void cmsis_fc_selector(const q15_t* iV, const q15_t* mW, const uint16_t dim_vec, const uint16_t num_of_rows,
                        const uint16_t bias_shift, const uint16_t out_shift, const q15_t* bias, 
-                       q15_t* pOut, q15_t* scratch_data)
-{
-    arm_fully_connected_q15(iV, mW, dim_vec, num_of_rows, 
-            bias_shift, out_shift, bias, pOut, scratch_data);
-}
+                       q15_t* pOut, q15_t* scratch_data);
 
 void cmsis_fc_selector(const q15_t* iV, const q7_t* mW, const uint16_t dim_vec, const uint16_t num_of_rows,
                        const uint16_t bias_shift, const uint16_t out_shift, const q7_t* bias, 
-                       q15_t* pOut, q15_t* scratch_data)
-{
-    arm_fully_connected_mat_q7_vec_q15(iV, mW, dim_vec, num_of_rows, 
-            bias_shift, out_shift, bias, pOut, scratch_data);
-}
+                       q15_t* pOut, q15_t* scratch_data);
 
 void cmsis_fc_selector_opt(const q7_t* iV, const q7_t* mW, const uint16_t dim_vec, const uint16_t num_of_rows,
                        const uint16_t bias_shift, const uint16_t out_shift, const q7_t* bias, 
-                       q7_t* pOut, q15_t* scratch_data)
-{
-    arm_fully_connected_q7_opt(iV, mW, dim_vec, num_of_rows, 
-            bias_shift, out_shift, bias, pOut, scratch_data);
-}
+                       q7_t* pOut, q15_t* scratch_data);
 
 void cmsis_fc_selector_opt(const q15_t* iV, const q15_t* mW, const uint16_t dim_vec, const uint16_t num_of_rows,
                        const uint16_t bias_shift, const uint16_t out_shift, const q15_t* bias, 
-                       q15_t* pOut, q15_t* scratch_data)
-{
-    arm_fully_connected_q15_opt(iV, mW, dim_vec, num_of_rows, 
-            bias_shift, out_shift, bias, pOut, scratch_data);
-}
+                       q15_t* pOut, q15_t* scratch_data);
 
 void cmsis_fc_selector_opt(const q15_t* iV, const q7_t* mW, const uint16_t dim_vec, const uint16_t num_of_rows,
                        const uint16_t bias_shift, const uint16_t out_shift, const q7_t* bias, 
-                       q15_t* pOut, q15_t* scratch_data)
-{
-    arm_fully_connected_mat_q7_vec_q15_opt(iV, mW, dim_vec, num_of_rows, 
-            bias_shift, out_shift, bias, pOut, scratch_data);
-}
+                       q15_t* pOut, q15_t* scratch_data);
 
 /**
  * @param [in] iV input vector
@@ -310,7 +283,7 @@ class FullyConnectedLayerCmsisOp : public Operator {
     const q7_t* iV_data  = iV->read<q7_t>(0, 1); //Read one byte
     const q7_t* mW_data  = mW->read<q7_t>(0, 1); //Read one byte
     const q7_t* bias_data = b->read<q7_t>(0, 1); //Read one byte
-    const uint16_t dim_vec = iV->getShape()[1];
+    const uint16_t dim_vec = iV->getShape()[0]; //W * v only
     const uint16_t num_of_rows = mW->getShape()[0];
     const uint16_t bias_shift = *(bShift->read<uint16_t>(0,0));
     const uint16_t out_shift = *(oShift->read<uint16_t>(0,0));
@@ -318,6 +291,8 @@ class FullyConnectedLayerCmsisOp : public Operator {
         TOUT* pOut_data = pOut->write<TOUT>(0, 1);
         q15_t* scratch_data = scratch->write<q15_t>(0, 1);
     
+    printf("FC: v dim: [%d, %d]", iV->getShape()[0], iV->getShape()[1]);
+    printf("FC: w dim: [%d, %d]", mW->getShape()[0], mW->getShape()[1]);
         arm_fully_connected_q7_tout(iV_data, mW_data, dim_vec, num_of_rows, 
             bias_shift, out_shift, bias_data, pOut_data, scratch_data);
   }
