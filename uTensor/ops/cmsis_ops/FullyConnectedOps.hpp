@@ -287,7 +287,7 @@ class FullyConnectedLayerCmsisOp : public Operator {
     const uint16_t num_of_rows = mW->getShape()[0];
     const uint16_t bias_shift = *(bShift->read<uint16_t>(0,0));
     const uint16_t out_shift = *(oShift->read<uint16_t>(0,0));
-    pOut->resize(b->getShape());
+    pOut->resize(b->getShape());  //FIXME: compute the shape properly here
         TOUT* pOut_data = pOut->write<TOUT>(0, 1);
         q15_t* scratch_data = scratch->write<q15_t>(0, 1);
     
