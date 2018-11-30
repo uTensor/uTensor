@@ -308,4 +308,15 @@ class broadcastIndexTransform {
   size_t operator[](const size_t linear_index); 
 };
 
+
+template <typename T>
+void printTensor(const S_TENSOR input, size_t ele) {
+    printf("%s data:\r\n", input->getName().c_str());
+    for(auto i=0; i < ele; i++) {
+      printf("%d ", (int) *(input->read<T>(i, 1)));
+    }
+    printf("\r\n\r\n");
+}
+
+
 #endif

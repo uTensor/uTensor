@@ -7,7 +7,10 @@
 #include "arm_math.h"
 #include "arm_nnfunctions.h"
 
-extern void uint8_to_q7_origin(uint8_t *input, float &min, float &max, q7_t *out, size_t length);
+extern void uint8_to_q7_origin(const uint8_t *input, float &min, float &max, q7_t *out, size_t length);
+
+template <typename TIn, typename TOut>
+extern void right_shift(const TIn *input, TOut *out, const uint8_t shift, const size_t length);
 
 class Uint8Q7OriginOp : public Operator {
   public:
@@ -16,7 +19,7 @@ class Uint8Q7OriginOp : public Operator {
     n_outputs = 1;
   }
   virtual void compute() override {
-    uint8_t *input = inputs[0]->write<uint8_t>(0, 1);
+    const uint8_t *input = inputs[0]->read<uint8_t>(0, 1);
     float min = *(inputs[1]->read<float>(0, 1));
     float max = *(inputs[2]->read<float>(0, 1));
 
@@ -27,6 +30,8 @@ class Uint8Q7OriginOp : public Operator {
     q7_t *out = outputs[0]->write<q7_t>(0, 1);
 
     uint8_to_q7_origin(input, min, max, out, inputs[0]->getSize());
+    // printTensor<q7_t>(outputs[0], 16);
+
   }
 };
 

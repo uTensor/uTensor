@@ -407,9 +407,20 @@ class QntMatMulOp : public Operator {
     n_outputs = 3;
   }
   virtual void compute() override {
+    // printf("ref MatMal data:\r\n");
+    // for(auto i=0; i<16; i++) {
+    //   printf("%d ", *(inputs[0]->read<uint8_t>(i, 1)));
+    // }
+    // printf("\r\n");
+
+    // printTensor<uint8_t>(inputs[3], 16);
+    // printTensor<uint8_t>(inputs[0], 16);
+
     QuantizedMatMul2<T1, T2, TOut>(inputs[0], inputs[3],
      outputs[0], inputs[1], inputs[4], inputs[2], inputs[5],
       outputs[1], outputs[2]);
+
+    // printTensor<uint8_t>(outputs[0], 16);
   }
 };
 
