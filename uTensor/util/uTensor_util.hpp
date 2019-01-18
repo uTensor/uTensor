@@ -60,7 +60,7 @@ void utensor_exit(void);
     utensor_exit();                                          \
   }
 
-typedef std::vector<uint32_t> Shape;
+//typedef std::vector<uint32_t> Shape;
 
 void printVector(std::vector<uint32_t> vec);
 #ifdef TARGET_SIMULATOR

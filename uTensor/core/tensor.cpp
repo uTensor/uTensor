@@ -11,7 +11,7 @@ void uTensor::setName(std::string _name)
 const std::string& uTensor::getName() const { return name; }
 uTensor::~uTensor(){}
 
-void TensorBase::initialize(const std::vector<uint32_t>& vec) 
+void TensorBase::initialize(const TensorShape& vec) 
 {
     uint32_t ret = 0;
     shape.clear();
@@ -66,7 +66,7 @@ size_t Tensor::getStride(size_t dim_index) {
     return (size_t)size_accm;
 }
 
-void Tensor::init(const std::vector<uint32_t>& v) {
+void Tensor::init(const TensorShape& v) {
 
     s->initialize(v);
     if (s->data != NULL) {
@@ -75,7 +75,7 @@ void Tensor::init(const std::vector<uint32_t>& v) {
     s->allocate(unit_size());
 }
 
-void Tensor::init(const std::vector<uint32_t>& v, const void* data) {
+void Tensor::init(const TensorShape& v, const void* data) {
 
     s->initialize(v);
     if (s->data != NULL) {
@@ -84,7 +84,7 @@ void Tensor::init(const std::vector<uint32_t>& v, const void* data) {
     s->data = (void *)data;
 }
 
-void Tensor::resize(const std::vector<uint32_t>& v) {
+void Tensor::resize(const TensorShape& v) {
     uint32_t size = s->total_size;
 
     s->initialize(v);
@@ -96,7 +96,7 @@ void Tensor::resize(const std::vector<uint32_t>& v) {
     s->allocate(unit_size());
 }
 
-const std::vector<uint32_t>& Tensor::getShape(void) const { return s->shape; }
+const TensorShape& Tensor::getShape(void) const { return s->shape; }
 
 uint32_t Tensor::getSize(void) { return s->total_size; }
 
@@ -124,7 +124,7 @@ void permuteIndexTransform::computeOutputShape(void) {
     }
 }
 
-size_t permuteIndexTransform::evalStride(size_t dim_index, const Shape& s) {
+size_t permuteIndexTransform::evalStride(size_t dim_index, const TensorShape& s) {
     unsigned int size_accm = 1;
     for (auto it = s.begin() + dim_index + 1; it != s.end(); it++) {
         size_accm *= *it;
@@ -146,7 +146,7 @@ void permuteIndexTransform::computeOutputStride(void) {
     }
 }
 
-permuteIndexTransform::permuteIndexTransform(const Shape& input_shape, const std::vector<uint8_t>& permute) {
+permuteIndexTransform::permuteIndexTransform(const TensorShape& input_shape, const std::vector<uint8_t>& permute) {
     setInputShape(input_shape);
     setPermute(permute);
     apply();
@@ -166,8 +166,8 @@ void permuteIndexTransform::setPermute(const std::vector<uint8_t>& _permute) {
     }
 }
 
-void permuteIndexTransform::setInputShape(const Shape& s) { in_shape = s; }
-Shape permuteIndexTransform::getNewShape(void) { return out_shape; }
+void permuteIndexTransform::setInputShape(const TensorShape& s) { in_shape = s; }
+TensorShape permuteIndexTransform::getNewShape(void) { return out_shape; }
 
 void permuteIndexTransform::apply(void) {
     computeOutputShape();
@@ -191,7 +191,7 @@ size_t permuteIndexTransform::operator[](const size_t index) {
 }
 
 
-size_t broadcastIndexTransform::evalStride(size_t dim_index, const Shape& s) {
+size_t broadcastIndexTransform::evalStride(size_t dim_index, const TensorShape& s) {
     unsigned int size_accm = 1;
     for (auto it = s.begin() + dim_index + 1; it != s.end(); it++) {
         size_accm *= *it;
@@ -213,7 +213,7 @@ void broadcastIndexTransform::computeLStride(void) {
     }
 }
 
-void broadcastIndexTransform::sortShape(const Shape& a, const Shape& b) {
+void broadcastIndexTransform::sortShape(const TensorShape& a, const TensorShape& b) {
     if(a.size() > b.size()) {
         l_shape = a;
         s_shape = b;
@@ -244,7 +244,7 @@ void broadcastIndexTransform::checkShape(void) {
     }
 }
 
-broadcastIndexTransform::broadcastIndexTransform(const Shape& _l_shape, const Shape& _s_shape) {
+broadcastIndexTransform::broadcastIndexTransform(const TensorShape& _l_shape, const TensorShape& _s_shape) {
     swap_flag = false;
     sortShape(_l_shape, _s_shape);
     checkShape();
@@ -257,7 +257,7 @@ void broadcastIndexTransform::apply(void) {
     computeSStride();
 }
 
-const Shape& broadcastIndexTransform::getOutputShape(void) const {
+const TensorShape& broadcastIndexTransform::getOutputShape(void) const {
     return l_shape;
 }
 

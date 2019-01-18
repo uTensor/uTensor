@@ -28,7 +28,7 @@ class SDTensor : public Tensor {
     }
 
     SDTensor(std::initializer_list<uint32_t> l, uint32_t cachesize) : Tensor() {
-      std::vector<uint32_t> v;
+      TensorShape v;
       for (auto i : l) {
          v.push_back(i);
       }
@@ -41,7 +41,7 @@ class SDTensor : public Tensor {
       dirty = false;
     }
 
-    SDTensor(const std::vector<uint32_t>& v, uint32_t cachesize) : Tensor() {
+    SDTensor(const TensorShape& v, uint32_t cachesize) : Tensor() {
       s->cache_size = cachesize;
       Tensor::init(v);
       string file = tmpprefix + getTmpName();
@@ -94,7 +94,7 @@ class SDTensor : public Tensor {
       }
       return (void*)((T*)s->data);
     }
-    void resize(const std::vector<uint32_t>& v) override {
+    void resize(const TensorShape& v) override {
         Tensor::resize(v);
         initCache();
     }

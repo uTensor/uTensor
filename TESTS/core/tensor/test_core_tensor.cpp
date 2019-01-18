@@ -13,7 +13,7 @@ Context ctx;
 
 void test_core_resizeTensor() {
     Tensor* a = new RamTensor<int>({3, 2, 3});
-    std::vector<uint32_t> v({1, 5, 8});
+    TensorShape v({1, 5, 8});
     a->resize(v);
     bool res = testsize(1 * 5 * 8, a->getSize());
     EXPECT_EQ(res, true); 
@@ -25,18 +25,18 @@ void test_core_reshapeTensor() {
 
   for (int i = 0; i < 9; i++) {
     std::default_random_engine gen;
-    vector<uint32_t> tmp({2, 3, 4, 5});
+    TensorShape tmp({2, 3, 4, 5});
     std::string a_s = "input" + std::to_string(i);
     S_TENSOR inputTensor = ctx.add(new RamTensor<int>(tmp), a_s);
     vector<uint8_t> permute = {2, 3, 1, 0};
-    vector<uint32_t> g = inputTensor->getShape();
+    TensorShape g = inputTensor->getShape();
     std::shuffle(permute.begin(), permute.end(), gen);
 
     permuteIndexTransform trans(inputTensor->getShape(), permute);
 
     std::string a_o = "output" + std::to_string(i);
     S_TENSOR output = ctx.add(new RamTensor<int>(trans.getNewShape()), a_o);
-    vector<uint32_t> s = output->getShape();
+    TensorShape s = output->getShape();
     res = testshape<uint32_t>(g, s, permute);
     if (!res) {
       break;
