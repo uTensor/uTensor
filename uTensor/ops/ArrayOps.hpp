@@ -22,9 +22,9 @@ void QuantizeV2(S_TENSOR input, S_TENSOR _min_range, S_TENSOR _max_range,
     float min_range = std::min(0.0f, input_min_range);
     const float epsilon = std::max(1.0f, std::max(fabsf(input_min_range),
                                                    fabsf(input_max_range))) / 100.0f;
-    std::vector<uint32_t> v;
+    TensorShape v;
 
-    std::vector<uint32_t> org = input->getShape();
+    TensorShape org = input->getShape();
     for (size_t i = 0; i < org.size(); i++) {
         v.push_back(org[i]);
     }
@@ -80,7 +80,7 @@ void dequantize(S_TENSOR input, S_TENSOR min_range, S_TENSOR max_range, S_TENSOR
     float min = *(min_range->read<float>(0, 0));
     float max = *(max_range->read<float>(0, 0));
       //auto tensor allocation
-    Shape out_shape;
+    TensorShape out_shape;
     output->resize(input->getShape());
 
     const T* input_ptr = input->read<T>(0, 0);
@@ -131,7 +131,7 @@ class DequantizeOp : public Operator {
 ///NT: This Op hasn't been tested extensively. We will have to increase the test-coverage for this function.
 template <typename T>
 void reshape(S_TENSOR input, S_TENSOR shape, S_TENSOR output) {
-    Shape dim;
+    TensorShape dim;
 
     auto shape_vec = shape->getShape();
     for(size_t i = 0; i < shape_vec.size(); i++) {

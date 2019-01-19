@@ -70,7 +70,7 @@ void SpatialMaxPooling(S_TENSOR input, S_TENSOR output,
   *   - https://www.tensorflow.org/api_guides/python/nn#convolution
   *   - https://www.tensorflow.org/api_guides/python/nn#Notes_on_SAME_Convolution_Padding
   */
-  Shape in_shape = input->getShape();
+  TensorShape in_shape = input->getShape();
   uint32_t n_batch = in_shape[0];
   uint32_t in_rows = in_shape[1];
   uint32_t in_cols = in_shape[2];
@@ -99,7 +99,7 @@ void SpatialMaxPooling(S_TENSOR input, S_TENSOR output,
       pad_left = max(window_cols - (((int) in_cols) % col_stride), 0) / 2;
     }
   }
-  Shape out_shape;
+  TensorShape out_shape;
   out_shape.clear();
   out_shape.push_back(n_batch);
   out_shape.push_back(out_rows);

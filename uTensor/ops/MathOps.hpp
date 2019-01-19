@@ -36,7 +36,7 @@ void Requantization_Range(S_TENSOR input, S_TENSOR min, S_TENSOR max,
   int32_t used_max_quan;
   CalculateUsedRange<T1>(input.get(), &used_min_quan, &used_max_quan);
 
-  Shape one_shape = {1};
+  TensorShape one_shape = {1};
   if(out_min->getSize() == 0) out_min->resize(one_shape);
   if(out_max->getSize() == 0) out_max->resize(one_shape);
 
@@ -81,7 +81,7 @@ void Requantize(S_TENSOR input, S_TENSOR in_min, S_TENSOR in_max,
   RequantizeManyInNewRangeReference(input_ptr, input->getSize(),input_min,
     input_max, r_output_min, r_output_max, out_ptr);
 
-    Shape one_shape = {1};
+    TensorShape one_shape = {1};
     if(out_min->getSize() == 0) out_min->resize(one_shape);
     if(out_max->getSize() == 0) out_max->resize(one_shape);
 
@@ -124,7 +124,7 @@ void Add(Tensor* input, Tensor* input2, Tensor** out) {
 
 //reduce_shape actual output shape without the reduce dim
 //out_shape intermediate shape with reduce dim in the last orders
-inline void reduceShapeHelper(Shape input, Shape dim, Shape &reduce_shape, Shape &out_shape, std::vector<uint8_t> &perm, size_t &reduce_size) {
+inline void reduceShapeHelper(TensorShape input, TensorShape dim, TensorShape &reduce_shape, TensorShape &out_shape, std::vector<uint8_t> &perm, size_t &reduce_size) {
   reduce_shape.empty();
   out_shape.empty();
   perm.empty();
@@ -151,8 +151,8 @@ inline void reduceShapeHelper(Shape input, Shape dim, Shape &reduce_shape, Shape
 }
 
 template <class TIn, class TOut>
-inline std::vector<TOut> tensorToLinearVec(S_TENSOR input, S_TENSOR dim) {
-  std::vector<TOut> vec;
+inline TensorShape tensorToLinearVec(S_TENSOR input, S_TENSOR dim) {
+  TensorShape vec;
   const TIn* ptr = dim->read<TIn>(0, 0);
   for(auto i = 0; i < (int) dim->getSize(); i++) {
     TIn curr_dim = ptr[i];
@@ -171,14 +171,14 @@ inline std::vector<TOut> tensorToLinearVec(S_TENSOR input, S_TENSOR dim) {
 template <class TIn, class Td, class TOut>
 void MinMaxHelper(S_TENSOR input, S_TENSOR dim, S_TENSOR out, bool find_min) {
   const TIn* p_in = input->read<TIn>(0, 0);
-  Shape dim_vec = tensorToLinearVec<Td, uint32_t>(input, dim);
+  TensorShape dim_vec = tensorToLinearVec<Td, uint32_t>(input, dim);
 
-  Shape outShape;
+  TensorShape outShape;
   std::vector<uint8_t> permute;
   size_t reduce_size;
-  Shape reduce_shape;
+  TensorShape reduce_shape;
   reduceShapeHelper(input->getShape(), dim_vec, reduce_shape, outShape, permute, reduce_size);
-  Shape one_shape = {1};
+  TensorShape one_shape = {1};
   if(out->getSize() == 0) out->resize(reduce_shape);  //TODO: dimension check here
   TOut* p_out = out->write<TOut>(0, 0);
 
@@ -237,7 +237,7 @@ class MaxOp : public Operator {
 template <class TIn, class TOut>
 void ArgMax(S_TENSOR input, S_TENSOR dim, S_TENSOR out) {
   int dim_reduce = *(dim->read<int>(0, 0));
-  Shape outShape = input->getShape();
+  TensorShape outShape = input->getShape();
   uint32_t reduce_dim_size = outShape[dim_reduce];
   outShape.erase(outShape.begin() + dim_reduce);
 
@@ -261,7 +261,7 @@ void ArgMax(S_TENSOR input, S_TENSOR dim, S_TENSOR out) {
   
 
   // construct the origin-shape for permuteIndexTransform
-  Shape vOutShape = outShape;
+  TensorShape vOutShape = outShape;
   vOutShape.push_back(reduce_dim_size);
   /// NT: easy way to remember...
   // trans(originShape, permute)
