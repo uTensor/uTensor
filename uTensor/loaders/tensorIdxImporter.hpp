@@ -25,7 +25,7 @@ class HeaderMeta {
  public:
   IDX_DTYPE dataType;
   unsigned char numDim;
-  vector<uint32_t> dim;
+  TensorShape dim;
   long int dataPos;
 };
 
@@ -79,7 +79,7 @@ class TensorIdxImporter {
   }
   uint32_t getMagicNumber(unsigned char dtype, unsigned char dim);
   template <typename T>
-  std::vector<uint32_t> load_data(string& filename, IDX_DTYPE idx_type, uint8_t unit_size, uint32_t cachesize, uint32_t arrsize, long int offset, T* data);
+  TensorShape load_data(string& filename, IDX_DTYPE idx_type, uint8_t unit_size, uint32_t cachesize, uint32_t arrsize, long int offset, T* data);
   template <typename T>
   void flush_data(string& filename, IDX_DTYPE idx_type, uint8_t unit_size, uint32_t cachesize, uint32_t arrsize, long int offset, T* data);
   uint8_t getIdxDTypeSize(IDX_DTYPE dtype);
@@ -214,7 +214,7 @@ Tensor* TensorIdxImporter::sdloader(string& filename, IDX_DTYPE idx_type, uint32
 }
 
 template<typename T>
-std::vector<uint32_t> TensorIdxImporter::load_data(string& filename, IDX_DTYPE idx_type, uint8_t unit_size, uint32_t cachesize, uint32_t arrsize, long int offset, T* data) {
+TensorShape TensorIdxImporter::load_data(string& filename, IDX_DTYPE idx_type, uint8_t unit_size, uint32_t cachesize, uint32_t arrsize, long int offset, T* data) {
   parseMeta(filename, idx_type);
   if (arrsize == 0) {
     for (auto i : header.dim) {
