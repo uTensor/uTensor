@@ -1,5 +1,6 @@
 # uTensor - Test Release
 [![CircleCI](https://circleci.com/gh/uTensor/uTensor.svg?style=svg)](https://circleci.com/gh/uTensor/uTensor)
+Note: If you are looking for stable releases, checkout master.
 
 ## Release Note
 - Updated uTensor ReadMe
