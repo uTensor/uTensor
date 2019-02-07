@@ -70,4 +70,46 @@ class QuantRangeForMultiplicationOp : public Operator {
   }
 };
 
+template <class T1, class T2, class Toutput>
+class QuantRangeForFullyConnectedOp : public Operator {
+  public:
+  QuantRangeForFullyConnectedOp() {
+    n_inputs = 6;
+    n_outputs = 2;
+  }
+  virtual void compute() override {
+    float min_v = *(inputs[0]->read<float>(0, 1));
+    float max_v = *(inputs[1]->read<float>(0, 1));
+    float min_m = *(inputs[2]->read<float>(0, 1));
+    float max_m = *(inputs[3]->read<float>(0, 1));
+    float min_b = *(inputs[4]->read<float>(0, 1));
+    float max_b = *(inputs[5]->read<float>(0, 1));
+
+    if(outputs[0]->getSize() == 0) {
+      Shape out_shape;
+      out_shape.push_back(1);
+      outputs[0]->resize(out_shape);
+    }
+
+    if(outputs[1]->getSize() == 0) {
+      Shape out_shape;
+      out_shape.push_back(1);
+      outputs[1]->resize(out_shape);
+    }
+
+    float *value_out_min = outputs[0]->write<float>(0, 1);
+    float *value_out_max = outputs[1]->write<float>(0, 1);
+
+    float min_matmul;
+    float max_matmul;
+
+    QuantizationRangeForMultiplication<T1, T2, Toutput>(
+      min_v, max_v, min_m, max_m, &min_matmul, &max_matmul);
+
+    *value_out_min = std::min(min_matmul, min_b);
+    *value_out_max = std::max(max_matmul, max_b);
+  }
+};
+
+
 #endif
