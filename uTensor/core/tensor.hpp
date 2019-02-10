@@ -137,6 +137,8 @@ class BinaryTensor : public Tensor {
 template <class T>
 class RamTensor : public Tensor {
   // need deep copy
+ protected:
+    using Tensor::s;
  public:
   //RamTensor(TName _name) : Tensor(_name) {}
   RamTensor() {};
@@ -180,6 +182,47 @@ class RamTensor : public Tensor {
  private:
   RamTensor(const RamTensor&);
   RamTensor& operator=(const RamTensor&);
+
+};
+
+
+// application owns the pointer
+// the printer may be modified outside of the application
+template <class T>
+class WrappedRamTensor : public RamTensor<T> {
+
+ protected:
+  using RamTensor<T>::s;
+
+ public:
+  WrappedRamTensor() {};
+
+  WrappedRamTensor(std::initializer_list<uint32_t> l, T* ptr) {
+    TensorShape v;
+    for (auto i : l) {
+      v.push_back(i);
+    }
+
+    void* data = (void *) ptr;
+    
+    Tensor::init(v, data);
+  }
+
+  void setPointer(void* ptr) {
+    s->data = ptr;
+  }
+
+  T* getPointer(void) {
+    return (T*) s->data;
+  }
+
+  ~WrappedRamTensor() {
+    s->data = nullptr;
+  }
+
+ private:
+  WrappedRamTensor(const WrappedRamTensor&);
+  WrappedRamTensor& operator=(const WrappedRamTensor&);
 
 };
 
