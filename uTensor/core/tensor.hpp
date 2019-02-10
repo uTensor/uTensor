@@ -198,12 +198,14 @@ class WrappedRamTensor : public RamTensor<T> {
   WrappedRamTensor() {};
 
   WrappedRamTensor(std::initializer_list<uint32_t> l, T* ptr) {
-    std::vector<uint32_t> v;
+    TensorShape v;
     for (auto i : l) {
       v.push_back(i);
     }
+
+    void* data = (void *) ptr;
     
-    Tensor::init(v, ptr);
+    Tensor::init(v, data);
   }
 
   void setPointer(void* ptr) {
