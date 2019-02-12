@@ -62,18 +62,14 @@ uTensor should support any [Mbed enabled board](https://os.mbed.com/platforms/?m
 - Any [Mbed board](https://os.mbed.com/platforms/?mbed-os=21&mbed-os=22&mbed-os=25&mbed-os=26&mbed-os=33&mbed-os=34) with sufficient memory
 
 ### The Environment
-There are two flows to get started with uTensor. For Windows users, please choose the Cloud9 flow as shown below.
 
-- Local Installation
-  - Requires [Mbed-CLI](https://github.com/ARMmbed/mbed-cli) installation
-  - Requires [uTensor-CLI](https://github.com/uTensor/utensor_cgen) installation
-- The [Cloud9 Flow](https://github.com/uTensor/cloud9-installer)
-  - Requires Amazon Cloud9 Account
-  - Does not support runtime debugging
+  - [Mbed-CLI](https://github.com/ARMmbed/mbed-cli)
+  - [uTensor-CLI](https://github.com/uTensor/utensor_cgen)
+
 
 ### Getting Started
-#### [Creating a New Project](docs/newProject.md)
-Step-by-step instructions on how to create your own uTensor project from scratch. You will need a [K66F](https://os.mbed.com/platforms/FRDM-K66F/) board a micro-SD card (32GB max) for this guide.
+#### [Creating a New Project](https://blog.hackster.io/simple-neural-network-on-mcus-a7cbd3dc108c)
+An end-to-end tutorial going from training a neural network to deployment on a device. You will need a [K66F](https://os.mbed.com/platforms/FRDM-K66F/) or a smiliar board for this tutorial.
 
 #### [MNIST Touch Screen](https://github.com/uTensor/utensor-mnist-demo)
 The example uses a 3-layer MLP trained on the MNIST dataset. The touch screen input is fed into the neural network for processing and the result is printed on the screen.
