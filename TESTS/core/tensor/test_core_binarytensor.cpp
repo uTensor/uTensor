@@ -14,7 +14,7 @@ const int val[18] = {3, 5, 6, 7, 8, 9, 10, 21, 9, 32,
                 1, 2, 9, 3, 8, 67, 8, 9};
 void test_core_resizeBinaryTensor() {
     Tensor* a = new BinaryTensor<int>({3, 2, 3}, val);
-    std::vector<uint32_t> v({1, 5, 8});
+    TensorShape v({1, 5, 8});
     a->resize(v);
     bool res = testsize(1 * 5 * 8, a->getSize());
     EXPECT_EQ(res, true); 
@@ -26,18 +26,18 @@ void test_core_reshapeBinaryTensor() {
 
   for (int i = 0; i < 9; i++) {
     std::default_random_engine gen;
-    vector<uint32_t> tmp({3, 2, 3});
+    TensorShape tmp({3, 2, 3});
     std::string a_s = "input" + to_string(i);
     S_TENSOR inputTensor = ctx.add(new BinaryTensor<int>(tmp, val), a_s);
     vector<uint8_t> permute = {2, 1, 0};
-    vector<uint32_t> g = inputTensor->getShape();
+    TensorShape g = inputTensor->getShape();
     std::shuffle(permute.begin(), permute.end(), gen);
 
     permuteIndexTransform trans(inputTensor->getShape(), permute);
 
     std::string a_o = "output" + to_string(i);
     S_TENSOR output = ctx.add(new BinaryTensor<int>(trans.getNewShape(), val), a_o);
-    vector<uint32_t> s = output->getShape();
+    TensorShape s = output->getShape();
     res = testshape<uint32_t>(g, s, permute);
     if (!res) {
       break;

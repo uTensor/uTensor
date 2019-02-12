@@ -27,6 +27,12 @@ typedef std::vector<TName> TNameList;
 typedef std::shared_ptr<Tensor> S_TENSOR;
 typedef std::vector<S_TENSOR> S_TList;
 
+class TensorShape: public std::vector<uint32_t> {
+    public:
+        using std::vector<uint32_t>::vector;
+
+};
+
 class uTensor {
 public:
  virtual void inFocus(){};
@@ -43,12 +49,12 @@ private:
 //inline uTensor::~uTensor() {}
 class TensorBase {
  public:
-  std::vector<uint32_t> shape;
+  TensorShape shape;
   void* data;
   uint32_t total_size;
   uint32_t cache_size;
 
-  void initialize(const std::vector<uint32_t>& vec);
+  void initialize(const TensorShape& vec);
   void allocate(uint8_t unit_size);
 
   ~TensorBase();
@@ -68,13 +74,13 @@ class Tensor : public uTensor {
   // returns how far a given dimension is apart
   size_t getStride(size_t dim_index); 
 
-  virtual void init(const std::vector<uint32_t>& v); 
+  virtual void init(const TensorShape& v); 
 
-  virtual void init(const std::vector<uint32_t>& v, const void* data); 
+  virtual void init(const TensorShape& v, const void* data); 
 
-  virtual void resize(const std::vector<uint32_t>& v); 
+  virtual void resize(const TensorShape& v); 
 
-  const std::vector<uint32_t>& getShape(void) const; 
+  const TensorShape& getShape(void) const; 
 
   uint32_t getSize(void); 
 
@@ -101,7 +107,7 @@ class Tensor : public uTensor {
 template<class T>
 class BinaryTensor : public Tensor {
   public:
-  BinaryTensor(const std::vector<uint32_t>& v, const T* g) : Tensor() {
+  BinaryTensor(const TensorShape& v, const T* g) : Tensor() {
     Tensor::init(v, g);
   }
 
@@ -131,12 +137,14 @@ class BinaryTensor : public Tensor {
 template <class T>
 class RamTensor : public Tensor {
   // need deep copy
+ protected:
+    using Tensor::s;
  public:
   //RamTensor(TName _name) : Tensor(_name) {}
   RamTensor() {};
 
   RamTensor(std::initializer_list<uint32_t> l) {
-    std::vector<uint32_t> v;
+    TensorShape v;
     for (auto i : l) {
       v.push_back(i);
     }
@@ -144,7 +152,7 @@ class RamTensor : public Tensor {
     Tensor::init(v);
   }
 
-  RamTensor(const std::vector<uint32_t>& v) : Tensor() {
+  RamTensor(const TensorShape& v) : Tensor() {
     Tensor::init(v);
   }
 
@@ -177,6 +185,47 @@ class RamTensor : public Tensor {
 
 };
 
+
+// application owns the pointer
+// the printer may be modified outside of the application
+template <class T>
+class WrappedRamTensor : public RamTensor<T> {
+
+ protected:
+  using RamTensor<T>::s;
+
+ public:
+  WrappedRamTensor() {};
+
+  WrappedRamTensor(std::initializer_list<uint32_t> l, T* ptr) {
+    TensorShape v;
+    for (auto i : l) {
+      v.push_back(i);
+    }
+
+    void* data = (void *) ptr;
+    
+    Tensor::init(v, data);
+  }
+
+  void setPointer(void* ptr) {
+    s->data = ptr;
+  }
+
+  T* getPointer(void) {
+    return (T*) s->data;
+  }
+
+  ~WrappedRamTensor() {
+    s->data = nullptr;
+  }
+
+ private:
+  WrappedRamTensor(const WrappedRamTensor&);
+  WrappedRamTensor& operator=(const WrappedRamTensor&);
+
+};
+
 template <typename Tin, typename Tout>
 Tensor* TensorCast(Tensor* input) {
   Tensor* output = new RamTensor<Tout>(input->getShape());
@@ -191,7 +240,7 @@ Tensor* TensorCast(Tensor* input) {
 }
 
 template <typename T>
-Tensor* TensorConstant(const std::vector<uint32_t>& shape, T c) {
+Tensor* TensorConstant(const TensorShape& shape, T c) {
   Tensor* output = new RamTensor<T>(shape);
   T* outPrt = output->write<T>(0, 0);
 
@@ -204,7 +253,7 @@ Tensor* TensorConstant(const std::vector<uint32_t>& shape, T c) {
 
 template <typename T>
 Tensor* TensorConstant(std::initializer_list<uint32_t> l, T c) {
-  std::vector<uint32_t> v;
+  TensorShape v;
   for (auto i : l) {
     v.push_back(i);
   }
@@ -222,26 +271,26 @@ class permuteIndexTransform {
  private:
   std::vector<uint8_t> permute;
   std::vector<uint8_t> depermute;
-  Shape in_shape;
-  Shape in_stride;
-  Shape out_shape;
-  Shape out_stride;
+  TensorShape in_shape;
+  TensorShape in_stride;
+  TensorShape out_shape;
+  TensorShape out_stride;
 
   void computeOutputShape(void); 
 
-  size_t evalStride(size_t dim_index, const Shape& s); 
+  size_t evalStride(size_t dim_index, const TensorShape& s); 
 
   void computeInputStride(void); 
   void computeOutputStride(void); 
 
  public:
-  permuteIndexTransform(const Shape& input_shape, const std::vector<uint8_t>& permute); 
+  permuteIndexTransform(const TensorShape& input_shape, const std::vector<uint8_t>& permute); 
 
   const std::vector<uint8_t>& getPermute(void) const;
   void setPermute(const std::vector<uint8_t>& _permute); 
 
-  void setInputShape(const Shape& s); 
-  Shape getNewShape(void); 
+  void setInputShape(const TensorShape& s); 
+  TensorShape getNewShape(void); 
 
   void apply(void); 
 
@@ -251,7 +300,7 @@ class permuteIndexTransform {
 template <typename T>
 void printDim(Tensor* t) {
   printf("Dimension: ");
-  Shape s = t->getShape();
+  TensorShape s = t->getShape();
   for (auto d : s) {
     printf("[%lu] ", d);
   }
@@ -259,7 +308,7 @@ void printDim(Tensor* t) {
 }
 
 template <typename T>
-void tensorChkAlloc(Tensor** t, const Shape& dim) {
+void tensorChkAlloc(Tensor** t, const TensorShape& dim) {
   if (*t && (*t)->getSize() == 0) {
     (*t)->init(dim);
   } else if (*t && (*t)->getShape() != dim) {
@@ -279,29 +328,29 @@ void tensorChkAlloc(Tensor** t, const Shape& dim) {
 
 class broadcastIndexTransform {
  private:
-  Shape l_shape;
-  Shape l_stride;
-  Shape s_shape;
-  Shape s_stride;
+  TensorShape l_shape;
+  TensorShape l_stride;
+  TensorShape s_shape;
+  TensorShape s_stride;
   bool swap_flag;
 
-  size_t evalStride(size_t dim_index, const Shape& s); 
+  size_t evalStride(size_t dim_index, const TensorShape& s); 
 
   void computeSStride(void); 
   void computeLStride(void); 
 
-  void sortShape(const Shape& a, const Shape& b); 
+  void sortShape(const TensorShape& a, const TensorShape& b); 
 
   void checkShape(void); 
 
 
 //b_shape being a smaller shape
  public:
-  broadcastIndexTransform(const Shape& _l_shape, const Shape& _s_shape); 
+  broadcastIndexTransform(const TensorShape& _l_shape, const TensorShape& _s_shape); 
 
   void apply(void); 
 
-  const Shape& getOutputShape(void) const;
+  const TensorShape& getOutputShape(void) const;
 
   bool is_swaped(void); 
 

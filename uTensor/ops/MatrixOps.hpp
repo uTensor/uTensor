@@ -116,7 +116,7 @@ void QuantizedMatMul(Tensor* A, Tensor* B, Tensor** C,
   const float max_b = *(maxb->read<float>(0, 0));
 
   //auto tensor allocation
-  Shape c_shape;
+  TensorShape c_shape;
   c_shape.push_back((A->getShape())[0]);
   c_shape.push_back((B->getShape())[1]);
   tensorChkAlloc<Toutput>(C, c_shape);
@@ -176,7 +176,7 @@ void QuantizedMatMul2(S_TENSOR A, S_TENSOR B, S_TENSOR C,
 
   //auto tensor allocation
   if(C->getSize() == 0) {
-    Shape c_shape;
+    TensorShape c_shape;
     c_shape.push_back((A->getShape())[0]);
     c_shape.push_back((B->getShape())[1]);
     C->resize(c_shape);
@@ -345,7 +345,7 @@ void QuantizedConv(S_TENSOR input, S_TENSOR filter, S_TENSOR output,
     out_cols = input_cols;
   }
   //TensorShape out_shape({batch, out_rows, out_cols, out_depth});
-  Shape c_shape;
+  TensorShape c_shape;
   c_shape.push_back(batch);
   c_shape.push_back(out_rows);
   c_shape.push_back(out_cols);

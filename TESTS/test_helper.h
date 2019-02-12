@@ -65,7 +65,7 @@ double meanAbsErr(Tensor* A, Tensor* B) {
   size_B = B->getSize();
   if (A->getSize() != B->getSize()) {
     /* %lu is different for 64bit machines. Need to make this cross platform
-    Shape shape_A, shape_B;
+    TensorShape shape_A, shape_B;
     shape_A = A->getShape();
     shape_B = B->getShape();
     printf("shape_A: ");
@@ -86,12 +86,13 @@ double meanAbsErr(Tensor* A, Tensor* B) {
   const U* elemA = A->read<U>(0, 0);
   const U* elemB = B->read<U>(0, 0);
 
-  double accm = 0.0;
+  double accm_err = 0.0;
+  double total_size = (double) A->getSize();
   for (uint32_t i = 0; i < A->getSize(); i++) {
-    accm += (double)fabs((float)elemB[i] - (float)elemA[i]);
+    accm_err += ((double)fabs((float)elemB[i] - (float)elemA[i]))/ total_size;
   }
 
-  return accm;
+  return accm_err;
 }
 
 // A being the reference
