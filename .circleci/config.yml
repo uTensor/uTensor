@@ -29,7 +29,7 @@ jobs:
     docker:
       - image: mbartling/utensor-mbed-ci
     steps:
-      - run: git clone https://github.com/uTensor/utensor-mnist-demo && mv utensor-mnist-demo/* . && rm -rf utensor-mnist-demo && rm uTensor.lib
+      - run: git clone https://github.com/uTensor/utensor-mnist-demo && cd utensor-mnist-demo && git checkout develop && cd .. && mv utensor-mnist-demo/* . && rm -rf utensor-mnist-demo && rm uTensor.lib
       - run: mkdir -p uTensor
       - checkout:
           path: ./uTensor
