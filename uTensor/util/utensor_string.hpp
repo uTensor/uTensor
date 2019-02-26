@@ -4,6 +4,7 @@ namespace utensor {
     class string{
         private:
             uint32_t value;
+            const char* cstr = NULL;
 
             uint32_t hash(const char* c){
                 int v = 7;
@@ -18,6 +19,7 @@ namespace utensor {
         public:
             string(const char* that){
                 value = hash(that);
+                cstr = that;
             }
             string(){
                 value = hash("");
@@ -28,6 +30,7 @@ namespace utensor {
             bool operator == (const string& that) const { return this->value == that.value; }
 
             uint32_t get_value() const { return value; }
+            const char* c_str() const { return cstr; }
     };
 
 }
