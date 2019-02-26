@@ -1,7 +1,9 @@
 #ifndef UTENSOR_VM
 #define UTENSOR_VM
 #include <vector>
-#include "mbed.h"
+#include <cstdio>
+#include <cstdint>
+#include <cstdlib>
 
 using namespace std;
 
