@@ -3,7 +3,7 @@
 
 #include "uTensor/util/uTensor_util.hpp"
 #include <initializer_list>
-#include <iostream>
+#include "utensor_string.hpp"
 #include <memory>
 #include <vector>
 #include <algorithm>
@@ -21,8 +21,8 @@
 
 class Tensor;
 class TensorIdxImporter;
-typedef std::string TName;
-typedef std::string OpName;
+typedef utensor::string TName;
+typedef utensor::string OpName;
 typedef std::vector<TName> TNameList;
 typedef std::shared_ptr<Tensor> S_TENSOR;
 typedef std::vector<S_TENSOR> S_TList;
@@ -37,12 +37,12 @@ class uTensor {
 public:
  virtual void inFocus(){};
  virtual void deFocus(){};
- virtual const std::string& getName() const;
- virtual void setName(std::string _name);
+ virtual const utensor::string& getName() const;
+ virtual void setName(utensor::string _name);
 
  virtual ~uTensor() = 0;
 private:
- std::string name;
+ utensor::string name;
 
 };
 

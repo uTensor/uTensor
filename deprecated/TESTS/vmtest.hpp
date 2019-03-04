@@ -14,17 +14,17 @@ class vmTest : public Test {
         string tmp_file = "/fs/tmp/tmp.txt";
         vm g;
         unsigned char* data_g = (unsigned char*)malloc(t->getSize_in_bytes());
-        g.createFile(tmp_file);
-        g.flush_data<unsigned char>(tmp_file, t->unit_size(), 30, t->getSize(), 0,  data);
-        g.load_data<unsigned char>(tmp_file, t->unit_size(), 30, t->getSize(), 0,  data_g);
+        g.createFile(tmp_file.c_str());
+        g.flush_data<unsigned char>(tmp_file.c_str(), t->unit_size(), 30, t->getSize(), 0,  data);
+        g.load_data<unsigned char>(tmp_file.c_str(), t->unit_size(), 30, t->getSize(), 0,  data_g);
         uint32_t res_x = 0;
         uint32_t res_y = 0;
         for (unsigned int i = 0; i < 30; i++) {
            res_x += data_g[i];
            res_y += data[i];
         }
-        g.flush_data<unsigned char>(tmp_file, t->unit_size(), 30, t->getSize(), 30,  data + 30);
-        g.load_data<unsigned char>(tmp_file, t->unit_size(), 30, t->getSize(), 30,  data_g);
+        g.flush_data<unsigned char>(tmp_file.c_str(), t->unit_size(), 30, t->getSize(), 30,  data + 30);
+        g.load_data<unsigned char>(tmp_file.c_str(), t->unit_size(), 30, t->getSize(), 30,  data_g);
         for (unsigned int i = 0; i < 30; i++) {
            res_x += data_g[i];
            res_y += data[i + 30];
@@ -40,20 +40,20 @@ class vmTest : public Test {
         unsigned char* data = t->write<unsigned char>(0, 0);
         string tmp_file = "/fs/tmp/tmp2.txt";
         vm g;
-        FILE *buf = g.createFile(tmp_file);  
+        FILE *buf = g.createFile(tmp_file.c_str());  
         uint8_t size = (uint8_t)t->unit_size();
         uint32_t totalsize = t->getSize();
-        g.flush_data<unsigned char>(tmp_file, t->unit_size(), 30, t->getSize(), 0,  data);
-        g.flush_data<unsigned char>(tmp_file, t->unit_size(), 30, t->getSize(), 30,  data + 30);
+        g.flush_data<unsigned char>(tmp_file.c_str(), t->unit_size(), 30, t->getSize(), 0,  data);
+        g.flush_data<unsigned char>(tmp_file.c_str(), t->unit_size(), 30, t->getSize(), 30,  data + 30);
         unsigned char* data_g = (unsigned char*)malloc(t->unit_size() * 30);
-        g.load_data<unsigned char>(tmp_file, t->unit_size(), 30, t->getSize(), 0,  data_g);
+        g.load_data<unsigned char>(tmp_file.c_str(), t->unit_size(), 30, t->getSize(), 0,  data_g);
         uint32_t res_x = 0;
         uint32_t res_y = 0;
         for (unsigned int i = 0; i < 30; i++) {
            res_x += data_g[i];
            res_y += data[i];
         }
-        g.load_data<unsigned char>(tmp_file, t->unit_size(), 30, t->getSize(), 30,  data_g);
+        g.load_data<unsigned char>(tmp_file.c_str(), t->unit_size(), 30, t->getSize(), 30,  data_g);
         for (unsigned int i = 0; i < 30; i++) {
            res_x += data_g[i];
            res_y += data[i + 30];

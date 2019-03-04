@@ -105,7 +105,7 @@ void PredLayer(Context &ctx, TName input, TName input_min,
   ctx.push(new ArgMaxOp<float, int>(), {"output_z_pred", dim}, {output});
 }
 
-int runMLP(string inputIdxFile) {
+int runMLP(const char* inputIdxFile) {
   TensorIdxImporter t_import;
   Context ctx;
   ctx.add(new RamTensor<unsigned char>(), "x_quantized"); 
