@@ -1,6 +1,6 @@
 #include "tensor.hpp"
 
-void uTensor::setName(std::string _name)
+void uTensor::setName(utensor::string _name)
 {
     if(name == "") {
         name = _name;
@@ -8,7 +8,7 @@ void uTensor::setName(std::string _name)
         ERR_EXIT("Tensor %s already has a name %s\r\n", _name.c_str(), name.c_str());
     }
 }
-const std::string& uTensor::getName() const { return name; }
+const utensor::string& uTensor::getName() const { return name; }
 uTensor::~uTensor(){}
 
 void TensorBase::initialize(const TensorShape& vec) 

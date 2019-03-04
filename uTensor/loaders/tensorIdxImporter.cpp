@@ -54,11 +54,11 @@ HeaderMeta TensorIdxImporter::parseHeader(void) {
   return header;
 }
 
-void TensorIdxImporter::parseMeta(string& filename, IDX_DTYPE idx_type) {
-  fp = fopen(filename.c_str(), "r");
+void TensorIdxImporter::parseMeta(const char* filename, IDX_DTYPE idx_type) {
+  fp = fopen(filename, "r");
 
-  DEBUG("Opening file %s ", filename.c_str());
-  if (fp == NULL) ERR_EXIT("Error opening file: %s", filename.c_str());
+  DEBUG("Opening file %s ", filename);
+  if (fp == NULL) ERR_EXIT("Error opening file: %s", filename);
 
   header = parseHeader();
 
