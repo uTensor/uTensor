@@ -7,8 +7,86 @@
 #include <math.h>
 #include <algorithm>
 
+
+
+void Softmax(S_TENSOR input, S_TENSOR output)
+{
+    if(input->getDim() != 1)
+    {
+        for(int i = 0; i < input->getDim() - 1; i++)
+        {
+            if(input->getShape().at(i) != 1)
+            {
+                ERR_EXIT("Softmax is supported only for flatten Tensor");
+            }
+        }
+    }
+
+    if (output && output->getSize() == 0) {
+        output->resize(input->getShape());
+    }
+
+
+    float* out_ptr = output->write<float>(0,0);
+    const float* in_ptr = input->read<float>(0, 0);
+
+    float reduced_sum = 0;
+    for(int i = 0; i < input->getSize(); i++)
+    {
+        reduced_sum += exp(in_ptr[i]);
+    }
+
+    for(int i = 0; i < output->getSize(); i++)
+    {
+        out_ptr[i] = exp(in_ptr[i]) / reduced_sum;
+    }
+
+}
+
+class SoftmaxOp : public Operator {
+  public:
+  SoftmaxOp() {
+    n_inputs = 1;
+    n_outputs = 1;
+  }
+  virtual void compute() override {
+    Softmax(inputs[0], outputs[0]);
+  }
+};
+
+template <class TIn, class TOut>
+void Relu(S_TENSOR input,
+          S_TENSOR output) {
+
+  const TIn* in = input->read<TIn>(0, 0);
+  if (output && output->getSize() == 0) {
+      output->resize(input->getShape());
+  }
+  TOut* out = output->write<TOut>(0, 0);
+  for (uint32_t i = 0; i < output->getSize(); i++) {
+    if (in[i] > 0.0) {
+      out[i] = in[i];
+    } else {
+      out[i] = 0.0;
+    }
+  }
+}
+
+template<class T1, class TOut>
+class ReluOp : public Operator {
+  public:
+  ReluOp() {
+    n_inputs = 1;
+    n_outputs = 1;
+  }
+  virtual void compute() override {
+    Relu<T1, TOut>(inputs[0], outputs[0]);
+  }
+};
+
+
 template <class TIn, class T2, class TOut>
-void Relu(S_TENSOR input, S_TENSOR in_min, S_TENSOR in_max,
+void QuantizedRelu(S_TENSOR input, S_TENSOR in_min, S_TENSOR in_max,
           S_TENSOR output, S_TENSOR out_min, S_TENSOR out_max) {
   const float input_min = in_min->read<T2>(0, 0)[0];
   const float input_max = in_max->read<T2>(0, 0)[0];
@@ -34,14 +112,14 @@ void Relu(S_TENSOR input, S_TENSOR in_min, S_TENSOR in_max,
 }
 
 template<class T1, class T2, class TOut>
-class ReluOp : public Operator {
+class QuantizedReluOp : public Operator {
   public:
-  ReluOp() {
+  QuantizedReluOp() {
     n_inputs = 3;
     n_outputs = 3;
   }
   virtual void compute() override {
-    Relu<T1, T2, TOut>(inputs[0], inputs[1], inputs[2], outputs[0], outputs[1], outputs[2]);
+    QuantizedRelu<T1, T2, TOut>(inputs[0], inputs[1], inputs[2], outputs[0], outputs[1], outputs[2]);
   }
 };
 
@@ -89,14 +167,14 @@ void SpatialMaxPooling(S_TENSOR input, S_TENSOR output,
     out_rows = ((size_t) ceil(((float)in_rows) / ((float) row_stride)));
     out_cols = ((size_t) ceil(((float)in_cols) / ((float) col_stride)));
     if (in_rows % row_stride == 0) {
-      pad_top = max(window_rows - row_stride, 0) / 2;
+      pad_top = std::max(window_rows - row_stride, 0) / 2;
     } else {
-      pad_top = max(window_rows - (((int) in_rows) % row_stride), 0) / 2;
+      pad_top = std::max(window_rows - (((int) in_rows) % row_stride), 0) / 2;
     }
     if (in_cols % col_stride == 0) {
-      pad_left = max(window_cols - col_stride, 0) / 2;
+      pad_left = std::max(window_cols - col_stride, 0) / 2;
     } else {
-      pad_left = max(window_cols - (((int) in_cols) % col_stride), 0) / 2;
+      pad_left = std::max(window_cols - (((int) in_cols) % col_stride), 0) / 2;
     }
   }
   TensorShape out_shape;
