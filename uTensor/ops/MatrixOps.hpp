@@ -164,6 +164,72 @@ void QuantizedMatMul(Tensor* A, Tensor* B, Tensor** C,
 
 //////////////////////////////////////////////////////
 template <class T1, class T2, class Toutput>
+void MatMul2(S_TENSOR A, S_TENSOR B, S_TENSOR C,
+                     bool transpose_a = false,
+                     bool transpose_b = false) {
+
+  //auto tensor allocation
+  if(C->getSize() == 0) {
+    TensorShape c_shape;
+    c_shape.push_back((A->getShape())[0]);
+    c_shape.push_back((B->getShape())[1]);
+    C->resize(c_shape);
+  }
+
+  int first = transpose_a ? 0 : 1;
+  int second = transpose_b ? 1 : 0;
+
+  int a_dim_remaining = 1 - first;
+  int b_dim_remaining = 1 - second;
+
+  const bool transpose_c = false;
+  const size_t m = A->getShape()[a_dim_remaining];
+  const size_t n = B->getShape()[b_dim_remaining];
+  const size_t k = A->getShape()[first];
+  const size_t lda = A->getShape()[1];
+  const size_t ldb = B->getShape()[1];
+  const size_t ldc = n;
+
+  int a_i_stride = lda;
+  int a_l_stride = 1;
+  if (transpose_a) {
+    a_i_stride = 1;
+    a_l_stride = lda;
+  }
+
+  int b_j_stride = 1;
+  int b_l_stride = ldb;
+  if (transpose_b) {
+    b_j_stride = ldb;
+    b_l_stride = 1;
+  }
+
+  int c_i_stride = ldc;
+  int c_j_stride = 1;
+  if (transpose_c) {
+    c_i_stride = 1;
+    c_j_stride = ldc;
+  }
+
+  size_t i, j, l;
+  for (j = 0; j < n; j++) {
+    for (i = 0; i < m; i++) {
+      Toutput output = 0;
+      for (l = 0; l < k; l++) {
+        const size_t a_index = ((i * a_i_stride) + (l * a_l_stride));
+        const T1* a_value = A->read<T1>(a_index, 1);
+        const size_t b_index = ((j * b_j_stride) + (l * b_l_stride));
+        const T2* b_value = B->read<T2>(b_index, 1);
+        output += (a_value[0] * b_value[0]);
+      }
+      const size_t c_index = ((i * c_i_stride) + (j * c_j_stride));
+      Toutput* c_data = C->write<Toutput>(c_index, 1);
+      c_data[0] = static_cast<Toutput>(output);
+    }
+  }
+}
+
+template <class T1, class T2, class Toutput>
 void QuantizedMatMul2(S_TENSOR A, S_TENSOR B, S_TENSOR C,
                      S_TENSOR mina, S_TENSOR minb, S_TENSOR maxa,
                      S_TENSOR maxb, S_TENSOR outmin,
@@ -222,6 +288,81 @@ void QuantizedMatMul2(S_TENSOR A, S_TENSOR B, S_TENSOR C,
 
 template<class T1, class T2, class T3>
 void conv_functor(S_TENSOR input_data, int input_batches, int input_height, int input_width,
+        int input_depth, S_TENSOR filter_data, int filter_height, int filter_width,
+        int filter_count, int stride_rows, int stride_cols, Padding padding, S_TENSOR output_data,
+        int output_height, int output_width)
+{
+
+    // When we're converting the 32 bit accumulator to a lower bit depth, we
+    int filter_left_offset;
+    int filter_top_offset;
+    if (padding == VALID) {
+      filter_left_offset =
+          ((output_width - 1) * stride_cols + filter_width - input_width + 1) /
+          2;
+      filter_top_offset = ((output_height - 1) * stride_rows + filter_height -
+                           input_height + 1) /
+                          2;
+    } else {
+      filter_left_offset =
+          ((output_width - 1) * stride_cols + filter_width - input_width) / 2;
+      filter_top_offset =
+          ((output_height - 1) * stride_rows + filter_height - input_height) /
+          2;
+    }
+
+    // If we've got multiple images in our input, work through each of them.
+    for (int batch = 0; batch < input_batches; ++batch) {
+      // Walk through all the output image values, sliding the filter to
+      // different positions in the input.
+      for (int out_y = 0; out_y < output_height; ++out_y) {
+        for (int out_x = 0; out_x < output_width; ++out_x) {
+          // Each filter kernel produces one output channel.
+          for (int out_channel = 0; out_channel < filter_count; ++out_channel) {
+            const int in_x_origin = (out_x * stride_cols) - filter_left_offset;
+            const int in_y_origin = (out_y * stride_rows) - filter_top_offset;
+            T3 output_val = 0;
+            for (int filter_y = 0; filter_y < filter_height; ++filter_y) {
+              for (int filter_x = 0; filter_x < filter_width; ++filter_x) {
+                for (int in_channel = 0; in_channel < input_depth;
+                     ++in_channel) {
+                  const int in_x = in_x_origin + filter_x;
+                  const int in_y = in_y_origin + filter_y;
+                  T1 input_value;
+                  if ((in_x >= 0) && (in_x < input_width) && (in_y >= 0) &&
+                      (in_y < input_height)) {
+                      size_t input_index = batch * input_height * input_width * input_depth +
+                          in_y * input_width * input_depth + in_x * input_depth + in_channel;
+                    const T1 *input_source_ptr =
+                        input_data->template read<T1>(input_index, 1);
+                    input_value = input_source_ptr[0];
+                  } else {
+                    input_value = 0;
+                  }
+                  size_t filter_index = filter_y * filter_width * input_depth * filter_count +
+                      filter_x * input_depth * filter_count +
+                      in_channel * filter_count + out_channel;
+                  const T2 *filter_ptr =
+                      filter_data->template read<T2>(filter_index, 1);
+                  const T2 filter_value = filter_ptr[0];
+                  output_val += (input_value * filter_value);
+                }
+              }
+            }
+
+            T3 *output =
+            output_data->template write<T3>((batch * output_height * output_width * filter_count) +
+                        (out_y * output_width * filter_count) +
+                        (out_x * filter_count) + out_channel, 1);
+            output[0] = static_cast<T3>(output_val);
+          }
+        }
+      }
+    }
+}
+
+template<class T1, class T2, class T3>
+void quant_conv_functor(S_TENSOR input_data, int input_batches, int input_height, int input_width,
         int input_depth, int input_offset, S_TENSOR filter_data, int filter_height, int filter_width, 
         int filter_count, int filter_offset, int stride_rows, int stride_cols, Padding padding, S_TENSOR output_data,
         int output_height, int output_width, int output_shift, int output_offset, int output_mult) 
@@ -308,6 +449,47 @@ void conv_functor(S_TENSOR input_data, int input_batches, int input_height, int 
 }
 
 template <class T1, class T2, class Toutput>
+void Conv(S_TENSOR input, S_TENSOR filter, S_TENSOR output,
+                   std::vector<int32_t> strides_, Padding padding_) {
+  const int32_t in_depth = input->getShape()[3];
+  const int32_t out_depth = filter->getShape()[3];
+  const int32_t input_rows = input->getShape()[1];
+  const int32_t filter_rows = filter->getShape()[0];
+
+  const int32_t input_cols = input->getShape()[2];
+  const int32_t filter_cols = filter->getShape()[1];
+  const int32_t batch = input->getShape()[0];
+
+  const int stride_rows = strides_[1];
+  const int stride_cols = strides_[2];
+
+  int32_t out_rows, out_cols;
+  if (padding_ == VALID) {
+    out_rows = (input_rows - filter_rows) / stride_rows + 1;
+    out_cols = (input_cols - filter_cols) / stride_cols + 1;
+  } else {
+    // SAME
+    out_rows = input_rows;
+    out_cols = input_cols;
+  }
+  //TensorShape out_shape({batch, out_rows, out_cols, out_depth});
+  TensorShape c_shape;
+  c_shape.push_back(batch);
+  c_shape.push_back(out_rows);
+  c_shape.push_back(out_cols);
+  c_shape.push_back(out_depth);
+  output->resize(c_shape);
+
+
+  //the strides col and row should be decided
+  conv_functor<T1, T2, Toutput>(input, batch, input_rows,
+          input_cols, in_depth, filter,
+          filter_rows, filter_cols, out_depth,
+          stride_rows, stride_cols, padding_, output, out_rows,
+          out_cols);
+}
+
+template <class T1, class T2, class Toutput>
 void QuantizedConv(S_TENSOR input, S_TENSOR filter, S_TENSOR output,
                    S_TENSOR mina, S_TENSOR maxa, 
                    S_TENSOR minb, S_TENSOR maxb, 
@@ -353,7 +535,7 @@ void QuantizedConv(S_TENSOR input, S_TENSOR filter, S_TENSOR output,
   output->resize(c_shape);
 
   //the strides col and row should be decided
-  conv_functor<T1, T2, Toutput>(input, batch, input_rows,
+  quant_conv_functor<T1, T2, Toutput>(input, batch, input_rows,
           input_cols, in_depth, offset_input, filter,
           filter_rows, filter_cols, out_depth,
           offset_filter, stride_rows, stride_cols, padding_, output, out_rows, 
@@ -372,9 +554,49 @@ void QuantizedConv(S_TENSOR input, S_TENSOR filter, S_TENSOR output,
 
 
 template<class T1, class T2, class TOut>
+class ConvOp : public Operator {
+  public:
+  ConvOp(std::initializer_list<int32_t> strides, Padding padding) {
+    std::vector<int32_t> vec_strides;
+    for (auto s : strides) {
+      vec_strides.push_back(s);
+    }
+    _setup(vec_strides, padding);
+  }
+  ConvOp(std::vector<int32_t>& strides, Padding& padding) {
+    _setup(strides, padding);
+  }
+  virtual void compute() override {
+    Conv<T1, T2, TOut>(inputs[0], inputs[1], outputs[0], _strides, _padding);
+  }
+  private:
+  std::vector<int32_t> _strides;
+  Padding _padding;
+  void _setup(std::vector<int32_t>& strides, Padding& padding){
+    _strides = strides;
+    _padding = padding;
+    n_inputs = 2;
+    n_outputs = 1;
+  }
+};
+template <class T1, class T2, class TOut>
+class MatMulOp : public Operator {
+  public:
+  MatMulOp() {
+    n_inputs = 2;
+    n_outputs = 1;
+  }
+  virtual void compute() override {
+    MatMul2<T1, T2, TOut>(inputs[0], inputs[1],
+     outputs[0]);
+  }
+};
+
+
+template<class T1, class T2, class TOut>
 class QntConvOp : public Operator {
   public:
-  QntConvOp(initializer_list<int32_t> strides, Padding padding) {
+  QntConvOp(std::initializer_list<int32_t> strides, Padding padding) {
     std::vector<int32_t> vec_strides;
     for (auto s : strides) {
       vec_strides.push_back(s);
