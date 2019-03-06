@@ -213,7 +213,7 @@ uint32_t Context::gc(void) {
 
   for ( auto it : rTable) {
     Ref_Record r = it.second;
-    if(r.count < 1) {
+    if(r.count <= 1) {
       nlist.push_back(it.first);
     }
   }
