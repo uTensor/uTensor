@@ -25,3 +25,24 @@ jobs:
           path: /tmp/coverage
           prefix: coverage
         
+  mbedCI:
+    docker:
+      - image: mbartling/utensor-mbed-ci
+    steps:
+      - run: git clone https://github.com/uTensor/utensor-mnist-demo && cd utensor-mnist-demo && git checkout develop && cd .. && mv utensor-mnist-demo/* . && mv utensor-mnist-demo/.git . && rm -rf utensor-mnist-demo && rm uTensor.lib
+      - run: mkdir -p uTensor
+      - checkout:
+          path: ./uTensor
+      - run: mkdir -p /tmp/coverage && mkdir -p /tmp/test_results
+      - run: git clone https://github.com/ThrowTheSwitch/Unity.git uTensor/unity_temp
+      - run: mv uTensor/unity_temp/* uTensor/unity/
+      - run: mbed config root .
+      - run: mbed deploy
+      - run: mbed compile -m DISCO_F413ZH -t GCC_ARM --profile=uTensor/build_profile/release.json
+        
+workflows:
+    version: 2
+    run_ci:
+        jobs:
+            - build
+            - mbedCI
