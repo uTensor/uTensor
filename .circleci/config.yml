@@ -34,8 +34,8 @@ jobs:
       - checkout:
           path: ./uTensor
       - run: mkdir -p /tmp/coverage && mkdir -p /tmp/test_results
-      - run: git clone https://github.com/ThrowTheSwitch/Unity.git uTensor/unity_temp
-      - run: mv uTensor/unity_temp/* uTensor/unity/
+        #      - run: git clone https://github.com/ThrowTheSwitch/Unity.git uTensor/unity_temp
+        #- run: mv uTensor/unity_temp/* uTensor/unity/
       - run: mbed config root .
       - run: mbed deploy
       - run: mbed compile -m DISCO_F413ZH -t GCC_ARM --profile=uTensor/build_profile/release.json
