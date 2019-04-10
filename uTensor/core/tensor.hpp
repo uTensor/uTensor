@@ -101,7 +101,7 @@ class Tensor : public uTensor {
     return (T*)write(offset, ele);
   }
 
-  ~Tensor(); 
+  virtual ~Tensor(); 
 };
 
 template<class T>
@@ -125,7 +125,8 @@ class BinaryTensor : public Tensor {
   virtual void* write(size_t offset, size_t ele) override {
     return nullptr;
   }
-  ~BinaryTensor() {
+  
+  virtual ~BinaryTensor() {
     s->data = nullptr;
   }
 
@@ -178,7 +179,8 @@ class RamTensor : public Tensor {
   virtual uint16_t unit_size(void) override {
     return sizeof(T);
   }
-  ~RamTensor() {}
+  
+  virtual ~RamTensor() {}
  private:
   RamTensor(const RamTensor&);
   RamTensor& operator=(const RamTensor&);
@@ -216,6 +218,7 @@ class WrappedRamTensor : public RamTensor<T> {
     return (T*) s->data;
   }
 
+  virtual
   ~WrappedRamTensor() {
     s->data = nullptr;
   }
