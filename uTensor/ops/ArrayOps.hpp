@@ -256,17 +256,17 @@ void Pack(unsigned int N, S_TList inputs, S_TENSOR output, int axis )
 template<typename T>
 class PackOp : public Operator {
   public:
-  PackOp(unsigned int N, int axis) : _N(N),_axis(axis) {
+  PackOp(unsigned int N, int axis) : _NN(N),_axis(axis) {
     n_inputs = N;
     n_outputs = 1;
   }
   virtual void compute() override {
 
-      Pack<T>(_N, inputs, outputs[0], _axis);
+      Pack<T>(_NN, inputs, outputs[0], _axis);
   }
 
   protected:
-  const int _N;
+  /*const*/ int _NN;
   int _axis;
 };
 
