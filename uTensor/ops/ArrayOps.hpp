@@ -342,7 +342,7 @@ void QuantizeV2(S_TENSOR input, S_TENSOR _min_range, S_TENSOR _max_range,
 
     ///NT: need error checking at some point...
     for(uint32_t i = 0; i < input->getSize(); i++) {
-        float val = std::round(input_ptr[i] * f2q.range_scale);
+        float val = ::round(input_ptr[i] * f2q.range_scale);
         val -= f2q.range_min_scaled - f2q.lowest_quantized();
         val = std::max(val, f2q.lower_bound_float());
         val = std::min(val, f2q.upper_bound_float());
