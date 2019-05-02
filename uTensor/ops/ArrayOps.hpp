@@ -479,6 +479,33 @@ void reshape(S_TENSOR input, S_TENSOR shape, S_TENSOR output) {
 
 }
 
+template <typename T>
+void gather(S_TENSOR input, S_TENSOR indices, S_TENSOR output) {
+    const T* input_ptr = input->read<T>(0,0);
+    T* out_ptr = output->write<T>(0,0);
+    const uint32_t* indices_ptr = indices->read<uint32_t>(0,0); //Can probably templatize this 
+
+    for(uint32_t i = 0; i < indices->getSize(); i++){
+        if(indices_ptr[i] > input->getSize());
+            ERR_EXIT("Gather indices out of input bound");
+        out_ptr[i] = input_ptr[indices_ptr[i]];
+    }
+
+}
+
+template <typename T>
+class GatherOp : public Operator {
+  public:
+    GatherOp() {
+      n_inputs = 2;
+      n_outputs = 1;
+    }
+
+    virtual void compute() override {
+      gather<T>(inputs[0], inputs[1], outputs[0]);
+    }
+};
+
 class ReshapeOp : public Operator {
   public:
     ReshapeOp() {
