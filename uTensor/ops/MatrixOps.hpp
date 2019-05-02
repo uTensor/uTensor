@@ -378,16 +378,17 @@ void fused_conv_maxpool_functor(S_TENSOR input_data, int input_batches, int inpu
     //Need to make sure these padding values are still valid
     if (padding == VALID) {
       filter_left_offset =
-          ((output_width - 1) * stride_cols + filter_width - input_width + 1) /
+          //((output_width - 1) * stride_cols + filter_width - input_width + 1) /
+          (((input_width - filter_width)/stride_cols) * stride_cols + filter_width - input_width + 1) /
           2;
-      filter_top_offset = ((output_height - 1) * stride_rows + filter_height -
+      filter_top_offset = (((input_height - filter_height)/stride_rows) * stride_rows + filter_height -
                            input_height + 1) /
                           2;
     } else {
       filter_left_offset =
-          ((output_width - 1) * stride_cols + filter_width - input_width) / 2;
+          ((input_width - 1) * stride_cols + filter_width - input_width) / 2;
       filter_top_offset =
-          ((output_height - 1) * stride_rows + filter_height - input_height) /
+          ((input_height - 1) * stride_rows + filter_height - input_height) /
           2;
     }
 
@@ -446,7 +447,7 @@ void fused_conv_maxpool_functor(S_TENSOR input_data, int input_batches, int inpu
             output_data->template write<T3>((batch * output_height * output_width * filter_count) +
                         (max_out_y * output_width * filter_count) +
                         (max_out_x * filter_count) + out_channel, 1);
-            output[0] = static_cast<T3>(max_pool_val);
+            output[0] = static_cast<T3>(max_pool_value);
           }
         }
       }
@@ -755,6 +756,7 @@ class FusedConvMaxpoolOp : public Operator {
     n_outputs = 1;
   }
 };
+
 template <class T1, class T2, class TOut>
 class MatMulOp : public Operator {
   public:
