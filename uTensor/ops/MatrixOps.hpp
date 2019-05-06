@@ -402,7 +402,7 @@ void fused_conv_maxpool_functor(S_TENSOR input_data, int input_batches, int inpu
         for (int max_out_y = 0; max_out_y < output_height; ++max_out_y) {
           for (int max_out_x = 0; max_out_x < output_width; ++max_out_x) {
             //Expand the max pool
-            T3 max_pool_value = 0;
+            T3 max_pool_value = std::numeric_limits<T3>::lowest();
             for(int max_i_y = 0; max_i_y < max_pool_height; ++max_i_y){
               for(int max_i_x = 0; max_i_x < max_pool_width; ++max_i_x){
                 //Run the conv filter
