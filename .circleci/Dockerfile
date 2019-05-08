@@ -12,7 +12,7 @@ RUN apt-get install -y \
     g++ 
 
 # Install latest CMAKE
-ARG version=3.11
+ARG version=3.14
 ARG build=0
 
 RUN apt-get purge -y cmake
