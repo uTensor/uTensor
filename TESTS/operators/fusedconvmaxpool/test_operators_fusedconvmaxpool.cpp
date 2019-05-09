@@ -204,6 +204,7 @@ void test_operators_fusedConvMaxpool34(void) {
     ctx.eval();
 
     double result = meanPercentErr<float>(ref.get(), out.get());
+    printf("Mean Percent Error %f", result);
     EXPECT_EQ(result, 0);
 
 }
