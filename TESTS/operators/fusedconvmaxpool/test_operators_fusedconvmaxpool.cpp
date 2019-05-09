@@ -22,7 +22,7 @@ void test_operators_fusedConvMaxpool12(void) {
     //Outputs
     S_TENSOR out = ctx.add(new RamTensor<float>(ref->getShape()), "out_1_2");
 
-    ctx.push(new FusedConvMaxpoolOp<float,float,float>({ 1, 1 }, { 1, 2, 2, 1 },VALID),
+    ctx.push(new FusedConvMaxpoolOp<float,float,float>({ 1, 1 }, { 1, 2, 2, 1 },SAME),
             { "x_1_2", "w_1_2"}, {"out_1_2"});
 
     ctx.eval();
@@ -44,7 +44,7 @@ void test_operators_fusedConvMaxpool13(void) {
     //Outputs
     S_TENSOR out = ctx.add(new RamTensor<float>(ref->getShape()), "out_1_3");
 
-    ctx.push(new FusedConvMaxpoolOp<float,float,float>({ 1, 1 }, { 1, 3, 3, 1 },VALID),
+    ctx.push(new FusedConvMaxpoolOp<float,float,float>({ 1, 1 }, { 1, 3, 3, 1 },SAME),
             { "x_1_3", "w_1_3"}, {"out_1_3"});
 
     ctx.eval();
@@ -66,7 +66,7 @@ void test_operators_fusedConvMaxpool14(void) {
     //Outputs
     S_TENSOR out = ctx.add(new RamTensor<float>(ref->getShape()), "out_1_4");
 
-    ctx.push(new FusedConvMaxpoolOp<float,float,float>({ 1, 1 }, { 1, 4, 4, 1 },VALID),
+    ctx.push(new FusedConvMaxpoolOp<float,float,float>({ 1, 1 }, { 1, 4, 4, 1 },SAME),
             { "x_1_4", "w_1_4"}, {"out_1_4"});
 
     ctx.eval();
@@ -88,7 +88,7 @@ void test_operators_fusedConvMaxpool22(void) {
     //Outputs
     S_TENSOR out = ctx.add(new RamTensor<float>(ref->getShape()), "out_2_2");
 
-    ctx.push(new FusedConvMaxpoolOp<float,float,float>({ 1, 1 }, { 1, 2, 2, 1 },VALID),
+    ctx.push(new FusedConvMaxpoolOp<float,float,float>({ 1, 1 }, { 1, 2, 2, 1 },SAME),
             { "x_2_2", "w_2_2"}, {"out_2_2"});
 
     ctx.eval();
@@ -110,7 +110,7 @@ void test_operators_fusedConvMaxpool23(void) {
     //Outputs
     S_TENSOR out = ctx.add(new RamTensor<float>(ref->getShape()), "out_2_3");
 
-    ctx.push(new FusedConvMaxpoolOp<float,float,float>({ 1, 1 }, { 1, 3, 3, 1 },VALID),
+    ctx.push(new FusedConvMaxpoolOp<float,float,float>({ 1, 1 }, { 1, 3, 3, 1 },SAME),
             { "x_2_3", "w_2_3"}, {"out_2_3"});
 
     ctx.eval();
@@ -132,7 +132,7 @@ void test_operators_fusedConvMaxpool24(void) {
     //Outputs
     S_TENSOR out = ctx.add(new RamTensor<float>(ref->getShape()), "out_2_4");
 
-    ctx.push(new FusedConvMaxpoolOp<float,float,float>({ 1, 1 }, { 1, 4, 4, 1 },VALID),
+    ctx.push(new FusedConvMaxpoolOp<float,float,float>({ 1, 1 }, { 1, 4, 4, 1 },SAME),
             { "x_2_4", "w_2_4"}, {"out_2_4"});
 
     ctx.eval();
@@ -154,7 +154,7 @@ void test_operators_fusedConvMaxpool32(void) {
     //Outputs
     S_TENSOR out = ctx.add(new RamTensor<float>(ref->getShape()), "out_3_2");
 
-    ctx.push(new FusedConvMaxpoolOp<float,float,float>({ 1, 1 }, { 1, 2, 2, 1 },VALID),
+    ctx.push(new FusedConvMaxpoolOp<float,float,float>({ 1, 1 }, { 1, 2, 2, 1 },SAME),
             { "x_3_2", "w_3_2"}, {"out_3_2"});
 
     ctx.eval();
@@ -176,7 +176,7 @@ void test_operators_fusedConvMaxpool33(void) {
     //Outputs
     S_TENSOR out = ctx.add(new RamTensor<float>(ref->getShape()), "out_3_3");
 
-    ctx.push(new FusedConvMaxpoolOp<float,float,float>({ 1, 1 }, { 1, 3, 3, 1 },VALID),
+    ctx.push(new FusedConvMaxpoolOp<float,float,float>({ 1, 1 }, { 1, 3, 3, 1 },SAME),
             { "x_3_3", "w_3_3"}, {"out_3_3"});
 
     ctx.eval();
@@ -198,7 +198,7 @@ void test_operators_fusedConvMaxpool34(void) {
     //Outputs
     S_TENSOR out = ctx.add(new RamTensor<float>(ref->getShape()), "out_3_4");
 
-    ctx.push(new FusedConvMaxpoolOp<float,float,float>({ 1, 1 }, { 1, 4, 4, 1 },VALID),
+    ctx.push(new FusedConvMaxpoolOp<float,float,float>({ 1, 1 }, { 1, 4, 4, 1 },SAME),
             { "x_3_4", "w_3_4"}, {"out_3_4"});
 
     ctx.eval();
