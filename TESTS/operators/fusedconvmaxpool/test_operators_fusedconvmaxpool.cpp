@@ -14,7 +14,7 @@ void test_operators_fusedConvMaxpool12(void) {
 
     //inputs
     ctx.add(t_import.float_import("/fs/constants/fusedConvMaxpool/in/depth1_pool_size2_input.idx"), "x_1_2");
-    ctx.add(t_import.float_import("/fs/constants/fusedConvMaxpool/in/.idx"), "w_1_2");
+    ctx.add(t_import.float_import("/fs/constants/fusedConvMaxpool/in/depth1_pool_size2_weights.idx"), "w_1_2");
 
     //reference outputs
     S_TENSOR ref = ctx.add(t_import.float_import("/fs/constants/fusedConvMaxpool/out/depth1_pool_size2_output.idx"), "ref_1_2");
@@ -36,7 +36,7 @@ void test_operators_fusedConvMaxpool13(void) {
 
     //inputs
     ctx.add(t_import.float_import("/fs/constants/fusedConvMaxpool/in/depth1_pool_size3_input.idx"), "x_1_3");
-    ctx.add(t_import.float_import("/fs/constants/fusedConvMaxpool/in/.idx"), "w_1_3");
+    ctx.add(t_import.float_import("/fs/constants/fusedConvMaxpool/in/depth1_pool_size3_weights.idx"), "w_1_3");
 
     //reference outputs
     S_TENSOR ref = ctx.add(t_import.float_import("/fs/constants/fusedConvMaxpool/out/depth1_pool_size3_output.idx"), "ref_1_3");
@@ -58,7 +58,7 @@ void test_operators_fusedConvMaxpool14(void) {
 
     //inputs
     ctx.add(t_import.float_import("/fs/constants/fusedConvMaxpool/in/depth1_pool_size4_input.idx"), "x_1_4");
-    ctx.add(t_import.float_import("/fs/constants/fusedConvMaxpool/in/.idx"), "w_1_4");
+    ctx.add(t_import.float_import("/fs/constants/fusedConvMaxpool/in/depth1_pool_size4_weights.idx"), "w_1_4");
 
     //reference outputs
     S_TENSOR ref = ctx.add(t_import.float_import("/fs/constants/fusedConvMaxpool/out/depth1_pool_size4_output.idx"), "ref_1_4");
@@ -80,7 +80,7 @@ void test_operators_fusedConvMaxpool22(void) {
 
     //inputs
     ctx.add(t_import.float_import("/fs/constants/fusedConvMaxpool/in/depth2_pool_size2_input.idx"), "x_2_2");
-    ctx.add(t_import.float_import("/fs/constants/fusedConvMaxpool/in/.idx"), "w_2_2");
+    ctx.add(t_import.float_import("/fs/constants/fusedConvMaxpool/in/depth2_pool_size2_weights.idx"), "w_2_2");
 
     //reference outputs
     S_TENSOR ref = ctx.add(t_import.float_import("/fs/constants/fusedConvMaxpool/out/depth2_pool_size2_output.idx"), "ref_2_2");
@@ -102,7 +102,7 @@ void test_operators_fusedConvMaxpool23(void) {
 
     //inputs
     ctx.add(t_import.float_import("/fs/constants/fusedConvMaxpool/in/depth2_pool_size3_input.idx"), "x_2_3");
-    ctx.add(t_import.float_import("/fs/constants/fusedConvMaxpool/in/.idx"), "w_2_3");
+    ctx.add(t_import.float_import("/fs/constants/fusedConvMaxpool/in/depth2_pool_size3_weights.idx"), "w_2_3");
 
     //reference outputs
     S_TENSOR ref = ctx.add(t_import.float_import("/fs/constants/fusedConvMaxpool/out/depth2_pool_size3_output.idx"), "ref_2_3");
@@ -124,7 +124,7 @@ void test_operators_fusedConvMaxpool24(void) {
 
     //inputs
     ctx.add(t_import.float_import("/fs/constants/fusedConvMaxpool/in/depth2_pool_size4_input.idx"), "x_2_4");
-    ctx.add(t_import.float_import("/fs/constants/fusedConvMaxpool/in/.idx"), "w_2_4");
+    ctx.add(t_import.float_import("/fs/constants/fusedConvMaxpool/in/depth2_pool_size4_weights.idx"), "w_2_4");
 
     //reference outputs
     S_TENSOR ref = ctx.add(t_import.float_import("/fs/constants/fusedConvMaxpool/out/depth2_pool_size4_output.idx"), "ref_2_4");
@@ -146,7 +146,7 @@ void test_operators_fusedConvMaxpool32(void) {
 
     //inputs
     ctx.add(t_import.float_import("/fs/constants/fusedConvMaxpool/in/depth3_pool_size2_input.idx"), "x_3_2");
-    ctx.add(t_import.float_import("/fs/constants/fusedConvMaxpool/in/.idx"), "w_3_2");
+    ctx.add(t_import.float_import("/fs/constants/fusedConvMaxpool/in/depth3_pool_size2_weights.idx"), "w_3_2");
 
     //reference outputs
     S_TENSOR ref = ctx.add(t_import.float_import("/fs/constants/fusedConvMaxpool/out/depth3_pool_size2_output.idx"), "ref_3_2");
@@ -168,7 +168,7 @@ void test_operators_fusedConvMaxpool33(void) {
 
     //inputs
     ctx.add(t_import.float_import("/fs/constants/fusedConvMaxpool/in/depth3_pool_size3_input.idx"), "x_3_3");
-    ctx.add(t_import.float_import("/fs/constants/fusedConvMaxpool/in/.idx"), "w_3_3");
+    ctx.add(t_import.float_import("/fs/constants/fusedConvMaxpool/in/depth3_pool_size3_weights.idx"), "w_3_3");
 
     //reference outputs
     S_TENSOR ref = ctx.add(t_import.float_import("/fs/constants/fusedConvMaxpool/out/depth3_pool_size3_output.idx"), "ref_3_3");
@@ -190,7 +190,7 @@ void test_operators_fusedConvMaxpool34(void) {
 
     //inputs
     ctx.add(t_import.float_import("/fs/constants/fusedConvMaxpool/in/depth3_pool_size4_input.idx"), "x_3_4");
-    ctx.add(t_import.float_import("/fs/constants/fusedConvMaxpool/in/.idx"), "w_3_4");
+    ctx.add(t_import.float_import("/fs/constants/fusedConvMaxpool/in/depth3_pool_size4_weights.idx"), "w_3_4");
 
     //reference outputs
     S_TENSOR ref = ctx.add(t_import.float_import("/fs/constants/fusedConvMaxpool/out/depth3_pool_size4_output.idx"), "ref_3_4");
@@ -207,7 +207,7 @@ void test_operators_fusedConvMaxpool34(void) {
     EXPECT_EQ(result, 0);
 
 }
-
+ 
 // First configure the uTensor test runner
 UTENSOR_TEST_CONFIGURE()
 
