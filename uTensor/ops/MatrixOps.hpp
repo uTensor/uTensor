@@ -920,7 +920,7 @@ class FusedConvMaxpoolOp : public Operator {
     _setup(strides, ksize, padding);
   }
   virtual void compute() override {
-    FusedConvMaxPool<T1, T2, TOut>(inputs[0], inputs[1], outputs[0], _strides, _padding, _ksize);
+    FusedConvMaxPool<T1, T2, TOut>(inputs[0], inputs[1], outputs[0], _strides, _ksize, _padding);
   }
   private:
   std::vector<int32_t> _strides;
@@ -956,7 +956,7 @@ class QuantizedFusedConvMaxpoolOp : public Operator {
   virtual void compute() override {
     QuantizedFusedConvMaxPool<T1, T2, TOut>(inputs[0], inputs[1], outputs[0], inputs[2],
             inputs[3], inputs[4], inputs[5], outputs[1], outputs[2],
-            _strides, _padding, _ksize);
+            _strides, _ksize, _padding);
   }
   private:
   std::vector<int32_t> _strides;
