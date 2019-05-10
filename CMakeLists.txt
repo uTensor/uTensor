@@ -34,7 +34,7 @@ else()
 endif()
 
 # Build with code coverage
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fprofile-arcs -ftest-coverage")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fprofile-arcs -ftest-coverage -ggdb")
 
 add_library(utensor STATIC ${SOURCES})
 
