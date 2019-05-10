@@ -15,7 +15,7 @@ uTensor is an extremely light-weight machine learning inference framework built 
 ### How does it work?
 <div><img src=docs/img/uTensorFlow.jpg width=600 align=center/></div>
 
-A model is constructed and trained in Tensorflow. uTensor takes the model and produces a .cpp and .hpp file. These files contains the generated C++11 code needed for inferencing. Working with uTensor on the embedded side is as easy as copy-and-past. The function interface looks like this:
+A model is constructed and trained in Tensorflow. uTensor takes the model and produces a .cpp and .hpp file. These files contains the generated C++11 code needed for inferencing. Working with uTensor on the embedded side is as easy as copy-and-paste. The function interface looks like this:
 
 ```
 #include "models/deep_mlp.hpp"
