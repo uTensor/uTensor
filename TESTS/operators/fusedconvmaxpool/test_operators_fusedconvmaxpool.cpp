@@ -9,6 +9,8 @@ using std::endl;
 TensorIdxImporter t_import;
 Context ctx;
 
+double alpha = 0.0001;
+
 void test_operators_fusedConvMaxpool12(void) {
     ctx.gc();
 
@@ -28,7 +30,7 @@ void test_operators_fusedConvMaxpool12(void) {
     ctx.eval();
 
     double result = meanPercentErr<float>(ref.get(), out.get());
-    EXPECT_EQ(result, 0);
+    EXPECT_EQ(result < alpha, true);
 
 }
 void test_operators_fusedConvMaxpool13(void) {
@@ -50,7 +52,7 @@ void test_operators_fusedConvMaxpool13(void) {
     ctx.eval();
 
     double result = meanPercentErr<float>(ref.get(), out.get());
-    EXPECT_EQ(result, 0);
+    EXPECT_EQ(result < alpha, true);
 
 }
 void test_operators_fusedConvMaxpool14(void) {
@@ -72,7 +74,7 @@ void test_operators_fusedConvMaxpool14(void) {
     ctx.eval();
 
     double result = meanPercentErr<float>(ref.get(), out.get());
-    EXPECT_EQ(result, 0);
+    EXPECT_EQ(result < alpha, true);
 
 }
 void test_operators_fusedConvMaxpool22(void) {
@@ -94,7 +96,7 @@ void test_operators_fusedConvMaxpool22(void) {
     ctx.eval();
 
     double result = meanPercentErr<float>(ref.get(), out.get());
-    EXPECT_EQ(result, 0);
+    EXPECT_EQ(result < alpha, true);
 
 }
 void test_operators_fusedConvMaxpool23(void) {
@@ -116,7 +118,7 @@ void test_operators_fusedConvMaxpool23(void) {
     ctx.eval();
 
     double result = meanPercentErr<float>(ref.get(), out.get());
-    EXPECT_EQ(result, 0);
+    EXPECT_EQ(result < alpha, true);
 
 }
 void test_operators_fusedConvMaxpool24(void) {
@@ -138,7 +140,7 @@ void test_operators_fusedConvMaxpool24(void) {
     ctx.eval();
 
     double result = meanPercentErr<float>(ref.get(), out.get());
-    EXPECT_EQ(result, 0);
+    EXPECT_EQ(result < alpha, true);
 
 }
 void test_operators_fusedConvMaxpool32(void) {
@@ -160,7 +162,7 @@ void test_operators_fusedConvMaxpool32(void) {
     ctx.eval();
 
     double result = meanPercentErr<float>(ref.get(), out.get());
-    EXPECT_EQ(result, 0);
+    EXPECT_EQ(result < alpha, true);
 
 }
 void test_operators_fusedConvMaxpool33(void) {
@@ -182,7 +184,7 @@ void test_operators_fusedConvMaxpool33(void) {
     ctx.eval();
 
     double result = meanPercentErr<float>(ref.get(), out.get());
-    EXPECT_EQ(result, 0);
+    EXPECT_EQ(result < alpha, true);
 
 }
 void test_operators_fusedConvMaxpool34(void) {
@@ -205,7 +207,7 @@ void test_operators_fusedConvMaxpool34(void) {
 
     double result = meanPercentErr<float>(ref.get(), out.get());
     //printf("Mean Percent Error %f", result);
-    EXPECT_EQ(result, 0);
+    EXPECT_EQ(result < alpha, true);
 
 }
  
