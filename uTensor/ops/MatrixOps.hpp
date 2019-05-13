@@ -661,8 +661,8 @@ void FusedConvMaxPool(S_TENSOR input, S_TENSOR filter, S_TENSOR output,
   const int32_t batch = input->getShape()[0];
   const int32_t max_pool_height = ksize[2];
 
-  const int stride_rows = strides_[1];
-  const int stride_cols = strides_[2];
+  const int stride_rows = strides_[0];
+  const int stride_cols = strides_[1];
 
   int32_t out_rows, out_cols;
   if (padding_ == VALID) {
@@ -724,8 +724,8 @@ void QuantizedFusedConvMaxPool(S_TENSOR input, S_TENSOR filter, S_TENSOR output,
   const int32_t batch = input->getShape()[0];
   const int32_t max_pool_height = ksize[2];
 
-  const int stride_rows = strides_[1];
-  const int stride_cols = strides_[2];
+  const int stride_rows = strides_[0];
+  const int stride_cols = strides_[1];
 
   int32_t out_rows, out_cols;
   if (padding_ == VALID) {
