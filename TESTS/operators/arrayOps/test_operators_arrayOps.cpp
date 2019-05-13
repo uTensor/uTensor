@@ -120,6 +120,7 @@ UTENSOR_TEST_CONFIGURE()
 UTENSOR_TEST(operators, quantizeV2, "Quantize V2 test")
 UTENSOR_TEST(operators, dequantize, "Dequantization Test")
 UTENSOR_TEST(operators, reshape, "Reshape Test")
+UTENSOR_TEST(operators, gather, "Gather Test")
 
 
 // Third, run like hell

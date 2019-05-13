@@ -486,7 +486,7 @@ void gather(S_TENSOR input, S_TENSOR indices, S_TENSOR output) {
     const uint32_t* indices_ptr = indices->read<uint32_t>(0,0); //Can probably templatize this 
 
     for(uint32_t i = 0; i < indices->getSize(); i++){
-        if(indices_ptr[i] > input->getSize());
+        if(indices_ptr[i] > input->getSize())
             ERR_EXIT("Gather indices out of input bound");
         out_ptr[i] = input_ptr[indices_ptr[i]];
     }
