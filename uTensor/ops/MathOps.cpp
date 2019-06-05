@@ -64,7 +64,7 @@ void QuantizedAdd<uint8_t, uint8_t, int>(
     ptr_out[off] = x_in_output_range + y_in_output_range;
   }
 }
-
+/*
 template <>
 void QuantizedMul<uint8_t, uint8_t, int>(
   S_TENSOR input_x, S_TENSOR input_y,
@@ -126,3 +126,4 @@ void QuantizedMul<uint8_t, uint8_t, int>(
     ptr_out[off] = x_in_output_range * y_in_output_range;
   }
 }
+*/

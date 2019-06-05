@@ -435,13 +435,14 @@ void QuantizedAdd<uint8_t, uint8_t, int>(
   S_TENSOR min_y, S_TENSOR max_y,
   S_TENSOR output, S_TENSOR out_min, S_TENSOR out_max);
 
+/*
 template <>
 void QuantizedMul<uint8_t, uint8_t, int>(
   S_TENSOR input_x, S_TENSOR input_y,
   S_TENSOR min_x, S_TENSOR max_x,
   S_TENSOR min_y, S_TENSOR max_y,
   S_TENSOR output, S_TENSOR out_min, S_TENSOR out_max);
-
+*/
 template<class T1, class T2, class T3>
 class QuantizedAddOp : public Operator {
   public:
