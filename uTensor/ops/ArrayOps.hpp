@@ -6,6 +6,7 @@
 #include "uTensor/core/uTensorBase.hpp"
 #include <cstring>
 #include <cmath>
+#include <array>
 
 /*
  * Requires proper testing, tested only for some cases
