@@ -402,11 +402,26 @@ void QuantizedMul(S_TENSOR input_x, S_TENSOR input_y,
   const float value_x_max = *(max_x->read<T2>(0, 0));
   const float value_y_min = *(min_y->read<T2>(0, 0));
   const float value_y_max = *(max_y->read<T2>(0, 0));
-  float value_out_min = std::min(value_x_min, value_y_min);
-  float value_out_max = std::max(value_x_max, value_y_max);
+
+  const int32_t offset_x = FloatToQuantizedUnclamped<T1>(
+      0.0f, value_x_min, value_x_max);  // NT: what 0 quantized to; depends on
+                            // Eigen::NumTraits<T>::lowest()
+  const int32_t offset_y = FloatToQuantizedUnclamped<T2>(0.0f, value_y_min, value_y_max);
+  const int32_t shift_out = 0;
+
+  const int32_t highest = static_cast<int32_t>(std::numeric_limits<Toutput>::max());
+  const int32_t lowest = static_cast<int32_t>(std::numeric_limits<Toutput>::min());
+  const int32_t rounding = (shift_out < 1) ? 0 : (1 << (shift_out - 1));
+
+  float value_out_min;
+  float value_out_max;
 
   Toutput* ptr_out_min = out_min->write<Toutput>(0, 0);
   Toutput* ptr_out_max = out_max->write<Toutput>(0, 0);
+
+  QuantizationRangeForMultiplication<T1, T2, Toutput>(value_x_min, value_x_max, value_y_min, value_y_max,
+      &value_out_min, &value_out_max);
+  
   *(ptr_out_min) = static_cast<Toutput>(value_out_min);
   *(ptr_out_max) = static_cast<Toutput>(value_out_max);
 
@@ -414,18 +429,28 @@ void QuantizedMul(S_TENSOR input_x, S_TENSOR input_y,
   const T1* ptr_x = input_x->read<T1>(0, 0);
   const T1* ptr_y = input_y->read<T1>(0, 0);
 
-  if (!output->getSize()) output->resize(input_x->getShape());
+  if (!output->getSize()) 
+    output->resize(input_x->getShape());
+
   Toutput* ptr_out = output->write<Toutput>(0, 0);
-  for (size_t i = 0; i < num_iterations; ++i) {
-    size_t offset = i * smaller_input_element_count;
+  //for (size_t i = 0; i < num_iterations; ++i) {
+    //size_t offset = i * smaller_input_element_count;
+    size_t offset = 0;
     for (size_t c = 0; c < smaller_input_element_count; ++c) {
-      T1 x = *(ptr_x + offset + c);
+      T1 x = *(ptr_x + /*offset + */ c);
       T1 y = *(ptr_y + c);
-      Toutput new_x = RequantizeInNewRange<T1, Toutput>(x, value_x_min, value_x_max, value_out_min, value_out_max);
-      Toutput new_y = RequantizeInNewRange<T1, Toutput>(y, value_y_min, value_y_max, value_out_min, value_out_max);
-      *(ptr_out+offset+c) = new_x * new_y;
+      //Toutput new_x = RequantizeInNewRange<T1, Toutput>(x, value_x_min, value_x_max, value_out_min, value_out_max);
+      //Toutput new_y = RequantizeInNewRange<T1, Toutput>(y, value_y_min, value_y_max, value_out_min, value_out_max);
+      Toutput new_x = static_cast<int32_t>(x) - offset_x;
+      Toutput new_y = static_cast<int32_t>(y) - offset_y;
+      int32_t o = new_x * new_y + rounding;
+      if (o > highest)
+        o = highest;
+      if (0 < lowest)
+        o = lowest;
+      *(ptr_out+offset+c) = static_cast<Toutput>(o);
     }
-  }
+  //}
 }
 
 template <>

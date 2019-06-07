@@ -4,6 +4,7 @@
 #include "uTensor/util/quantization_utils.hpp"
 #include "uTensor/core/tensor.hpp"
 #include "uTensor/core/uTensorBase.hpp"
+#include "uTensor/ops/quantization.hpp"
 #include <cmath>
 #include <cstdlib>
 #include <limits>
@@ -69,40 +70,6 @@ void ReferenceGemmuImpl(bool transpose_a, bool transpose_b, bool transpose_c,
   }
 }
 
-template <class T>
-float FloatForOneQuantizedLevel(
-    float range_min,
-    float
-        range_max)  // NT: information loss if float_for_one_quantized_level < 1
-{
-  const int64_t highest = static_cast<int64_t>(std::numeric_limits<T>::max());
-  const int64_t lowest = static_cast<int64_t>(std::numeric_limits<T>::lowest());
-  const float float_for_one_quantized_level =
-      (range_max - range_min) / (highest - lowest);
-  return float_for_one_quantized_level;
-}
-
-template <class T1, class T2, class T3>
-void QuantizationRangeForMultiplication(float min_a, float max_a, float min_b,
-                                        float max_b, float* min_c,
-                                        float* max_c) {
-  const float a_float_for_one_quant_level =
-      FloatForOneQuantizedLevel<T1>(min_a, max_a);
-  const float b_float_for_one_quant_level =
-      FloatForOneQuantizedLevel<T2>(min_b, max_b);
-
-  const int64_t c_highest =
-      static_cast<int64_t>(std::numeric_limits<T3>::max());
-  const int64_t c_lowest =
-      static_cast<int64_t>(std::numeric_limits<T3>::lowest());
-  const float c_float_for_one_quant_level =
-      a_float_for_one_quant_level * b_float_for_one_quant_level;
-
-  *min_c = c_float_for_one_quant_level * c_lowest;  // NT: this resulting in
-                                                    // taking only the necessary
-                                                    // quantize range
-  *max_c = c_float_for_one_quant_level * c_highest;
-}
 
 template <class T1, class T2, class Toutput>
 void QuantizedMatMul(Tensor* A, Tensor* B, Tensor** C,
