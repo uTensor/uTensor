@@ -2,22 +2,22 @@
 
 #include <stdint.h>
 
-const float inline_ref_1_0 [ 10 ] = {  0.011775053,  0.08381592,  0.7292312,  0.104419865,  0.37275904,  0.033528745,  0.1564582,  0.5619677,  0.11846019,  0.44154587,  };
+const float inline_ref_1_0 [ 10 ] = {  0.24071902,  0.021353945,  0.13502905,  0.09378974,  0.28589284,  0.7051505,  0.15084569,  0.1201361,  0.5260987,  0.39268196,  };
 #include <stdint.h>
 
-const float inline_Const_0 [ 10 ] = {  0.0403968,  0.13075379,  0.9847866,  0.28699195,  0.5964773,  0.66051394,  0.7144502,  0.60733473,  0.99221176,  0.5193309,  };
+const float inline_a_1_0 [ 10 ] = {  0.68818086,  0.104261704,  0.82276946,  0.15866566,  0.3270738,  0.75627464,  0.32085574,  0.3212427,  0.84153306,  0.96734446,  };
 #include <stdint.h>
 
-const int inline_c_1_eightbit_Const__port__0_reshape_dims_0 [ 1 ] = {  -1,  };
+const int inline_c_1_eightbit_a_1__port__0_reshape_dims_0 [ 1 ] = {  -1,  };
 #include <stdint.h>
 
-const int inline_c_1_eightbit_Const__port__0_reduction_dims_0 [ 1 ] = {  0,  };
+const int inline_c_1_eightbit_a_1__port__0_reduction_dims_0 [ 1 ] = {  0,  };
 #include <stdint.h>
 
-const float inline_Const_1_0 [ 10 ] = {  0.2914848,  0.64102095,  0.74049664,  0.3638425,  0.62493414,  0.050761603,  0.21899106,  0.92530143,  0.11939003,  0.8502207,  };
+const float inline_b_1_0 [ 10 ] = {  0.34979033,  0.204811,  0.16411528,  0.5911156,  0.8740927,  0.9324,  0.47013557,  0.373973,  0.625167,  0.4059381,  };
 #include <stdint.h>
 
-const int inline_c_1_eightbit_Const_1__port__0_reshape_dims_0 [ 1 ] = {  -1,  };
+const int inline_c_1_eightbit_b_1__port__0_reshape_dims_0 [ 1 ] = {  -1,  };
 #include <stdint.h>
 
-const int inline_c_1_eightbit_Const_1__port__0_reduction_dims_0 [ 1 ] = {  0,  };
+const int inline_c_1_eightbit_b_1__port__0_reduction_dims_0 [ 1 ] = {  0,  };
