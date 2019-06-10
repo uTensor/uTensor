@@ -7,7 +7,7 @@ void Operator::setInputs(S_TList &_inputs) {
 }
 
 void Operator::setOutputs(S_TList &_outputs) {
-  if(_outputs.size() != n_outputs) ERR_EXIT("Input Tensor list mismatched...");
+  if(_outputs.size() != n_outputs) ERR_EXIT("Output Tensor list mismatched...");
 
   outputs = _outputs;
 
