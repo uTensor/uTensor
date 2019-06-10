@@ -17,7 +17,7 @@ void test_operators_qmul0(void) {
     S_TENSOR ref = ctx.get({"ref_0:0"});
 
     double result = meanPercentErr<float>(ref.get(), res.get());
-    EXPECT_EQ(result, 0);
+    EXPECT_LT(result, 0.1);
 
 }
 
@@ -30,7 +30,7 @@ void test_operators_qmul1(void) {
     S_TENSOR ref = ctx.get({"ref_1:0"});
 
     double result = meanPercentErr<float>(ref.get(), res.get());
-    EXPECT_EQ(result, 0);
+    EXPECT_LT(result, 0.1);
 
 }
 
@@ -43,7 +43,7 @@ void test_operators_qmul2(void) {
     S_TENSOR ref = ctx.get({"ref_2:0"});
 
     double result = meanPercentErr<float>(ref.get(), res.get());
-    EXPECT_EQ(result, 0);
+    EXPECT_LT(result, 0.1);
 
 }
 
@@ -56,7 +56,7 @@ void test_operators_qmul3(void) {
     S_TENSOR ref = ctx.get({"ref_3:0"});
 
     double result = meanPercentErr<float>(ref.get(), res.get());
-    EXPECT_EQ(result, 0);
+    EXPECT_LT(result, 0.1);
 
 }
 
@@ -69,7 +69,7 @@ void test_operators_qmul4(void) {
     S_TENSOR ref = ctx.get({"ref_4:0"});
 
     double result = meanPercentErr<float>(ref.get(), res.get());
-    EXPECT_EQ(result, 0);
+    EXPECT_LT(result, 0.1);
 
 }
 
