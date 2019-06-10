@@ -4,7 +4,7 @@
 #include "uTensor/util/quantization_utils.hpp"
 #include "uTensor/core/tensor.hpp"
 #include "uTensor/core/uTensorBase.hpp"
-#include "uTensor/ops/quantization.hpp"
+//#include "uTensor/ops/quantization.hpp" // Deprecated
 #include <cmath>
 #include <cstdlib>
 #include <limits>
