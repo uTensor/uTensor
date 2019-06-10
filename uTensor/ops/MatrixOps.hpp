@@ -933,7 +933,7 @@ class QuantizedFusedConvMaxpoolOp : public Operator {
     _strides = strides;
     _padding = padding;
     _ksize = ksize;
-    n_inputs = 2;
+    n_inputs = 6;
     n_outputs = 1;
   }
 };
