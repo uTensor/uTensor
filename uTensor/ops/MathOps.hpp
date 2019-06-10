@@ -421,14 +421,22 @@ void QuantizedMul(S_TENSOR input_x, S_TENSOR input_y,
   const T1* ptr_x = input_x->read<T1>(0, 0);
   const T1* ptr_y = input_y->read<T1>(0, 0);
 
-  if (!output->getSize()) 
+  // if (!output->getSize()) 
     output->resize(input_x->getShape());
 
   Toutput* ptr_out = output->write<Toutput>(0, 0);
-  for(int i = 0; i < smaller_input_element_count; i++){
-    Toutput t = (static_cast<int32_t>(ptr_x[i]) - offset_x) *
-              (static_cast<int32_t>(ptr_y[i]) - offset_y);
-    ptr_out[i] = t;
+  if(smaller_input_element_count == 1){
+    for(int i = 0; i < input_x->getSize(); i++){
+      Toutput t = (static_cast<int32_t>(ptr_x[i]) - offset_x) *
+                (static_cast<int32_t>(ptr_y[0]) - offset_y);
+      ptr_out[i] = t;
+    }
+  } else { //Vector multiply
+    for(int i = 0; i < smaller_input_element_count; i++){
+      Toutput t = (static_cast<int32_t>(ptr_x[i]) - offset_x) *
+                (static_cast<int32_t>(ptr_y[i]) - offset_y);
+      ptr_out[i] = t;
+    } //Tensor multiply as well???
   }
 
   QuantizationRangeForMultiplication<T1, T2, Toutput>(value_x_min, value_x_max, value_y_min, value_y_max,
