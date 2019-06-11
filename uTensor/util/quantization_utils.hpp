@@ -4,6 +4,7 @@
 #include "uTensor/core/tensor.hpp"
 #include <math.h>
 #include <limits>
+#include <cstdlib>
 
 // reference: quantization_utils.h:181
 template <class T>
@@ -149,6 +150,41 @@ inline T2 RequantizeInNewRange(T1 input, float min_input, float max_input,
                                float min_new, float max_new) {
   const float input_float = QuantizedToFloat<T1>(input, min_input, max_input);
   return FloatToQuantized<T2>(input_float, min_new, max_new);
+}
+
+template <class T>
+float FloatForOneQuantizedLevel(
+    float range_min,
+    float
+        range_max)  // NT: information loss if float_for_one_quantized_level < 1
+{
+  const int64_t highest = static_cast<int64_t>(std::numeric_limits<T>::max());
+  const int64_t lowest = static_cast<int64_t>(std::numeric_limits<T>::lowest());
+  const float float_for_one_quantized_level =
+      (range_max - range_min) / (highest - lowest);
+  return float_for_one_quantized_level;
+}
+
+template <class T1, class T2, class T3>
+void QuantizationRangeForMultiplication(float min_a, float max_a, float min_b,
+                                        float max_b, float* min_c,
+                                        float* max_c) {
+  const float a_float_for_one_quant_level =
+      FloatForOneQuantizedLevel<T1>(min_a, max_a);
+  const float b_float_for_one_quant_level =
+      FloatForOneQuantizedLevel<T2>(min_b, max_b);
+
+  const int64_t c_highest =
+      static_cast<int64_t>(std::numeric_limits<T3>::max());
+  const int64_t c_lowest =
+      static_cast<int64_t>(std::numeric_limits<T3>::lowest());
+  const float c_float_for_one_quant_level =
+      a_float_for_one_quant_level * b_float_for_one_quant_level;
+
+  *min_c = c_float_for_one_quant_level * c_lowest;  // NT: this resulting in
+                                                    // taking only the necessary
+                                                    // quantize range
+  *max_c = c_float_for_one_quant_level * c_highest;
 }
 
 #endif  // UTENSOR_QUANT_UTILS
