@@ -709,11 +709,16 @@ void QuantizedFusedConvMaxPool(S_TENSOR input, S_TENSOR filter, S_TENSOR output,
   out_rows /= max_pool_height;
   out_cols /= max_pool_width;
 
+  // 1D Case makes this zero
+  int32_t out_rows_s = (out_rows > 0) ? out_rows : 0;
+  int32_t out_cols_s = (out_cols > 0) ? out_cols : 0;
+
+
   //TensorShape out_shape({batch, out_rows, out_cols, out_depth});
   TensorShape c_shape;
   c_shape.push_back(batch);
-  c_shape.push_back(out_rows);
-  c_shape.push_back(out_cols);
+  c_shape.push_back(out_rows_s);
+  c_shape.push_back(out_cols_s);
   c_shape.push_back(out_depth);
   output->resize(c_shape);
 
@@ -933,8 +938,8 @@ class QuantizedFusedConvMaxpoolOp : public Operator {
     _strides = strides;
     _padding = padding;
     _ksize = ksize;
-    n_inputs = 2;
-    n_outputs = 1;
+    n_inputs = 6;
+    n_outputs = 3;
   }
 };
 
