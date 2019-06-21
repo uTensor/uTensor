@@ -483,22 +483,28 @@ void reshape(S_TENSOR input, S_TENSOR shape, S_TENSOR output) {
 template <typename T>
 void gather(S_TENSOR input, S_TENSOR indices, S_TENSOR output) {
     const T* input_ptr = input->read<T>(0,0);
+    if (!output->getSize())
+        output->resize(indices->getShape());
     T* out_ptr = output->write<T>(0,0);
     const uint32_t* indices_ptr = indices->read<uint32_t>(0,0); //Can probably templatize this 
 
     for(uint32_t i = 0; i < indices->getSize(); i++){
         if(indices_ptr[i] > input->getSize())
             ERR_EXIT("Gather indices out of input bound");
-        out_ptr[i] = input_ptr[indices_ptr[i]];
+        T t = input_ptr[indices_ptr[i]];
+        out_ptr[i] = t;
     }
 
 }
 
+/**
+ * Gather V2 expects an additional axis parameter, for now we ignore this
+ */
 template <typename T>
 class GatherOp : public Operator {
   public:
     GatherOp() {
-      n_inputs = 2;
+      n_inputs = 3; // TODO add axis support
       n_outputs = 1;
     }
 
