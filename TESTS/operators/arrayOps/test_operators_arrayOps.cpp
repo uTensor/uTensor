@@ -105,7 +105,7 @@ void test_operators_gather(void) {
     ctx.add(indices, "g_indices");
 
     ctx.push(new GatherOp<float>(),
-            {"g_input", "g_indices"},
+            {"g_input", "g_indices", "g_indices"/*Not used*/},
             {"g_output"});
     ctx.eval();
 
