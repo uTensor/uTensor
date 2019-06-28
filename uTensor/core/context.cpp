@@ -40,6 +40,7 @@ S_TENSOR Context::add(Tensor* t, TName _name, uint8_t init_count) {
   if(init_count != 0) {
     record.count = init_count;
     record.allow_incr = false;
+    record.is_static = false; //Make sure
   }
 
   record.sptr = _sptr;
@@ -162,9 +163,9 @@ uint8_t Context::dcrRef(TName t_name) {
     ERR_EXIT("Tensor not registered");
   }
 
-  Ref_Record record = rTable[t_name];
+  Ref_Record& record = rTable[t_name];
   if(record.count > 0 && !record.is_static) record.count -= 1;
-  rTable[t_name] = record;
+  //rTable[t_name] = record; //Dont need this extra copy
 
   return record.count;
 }
