@@ -483,8 +483,11 @@ void reshape(S_TENSOR input, S_TENSOR shape, S_TENSOR output) {
 template <typename T>
 void gather(S_TENSOR input, S_TENSOR indices, S_TENSOR output) {
     const T* input_ptr = input->read<T>(0,0);
-    if (!output->getSize())
-        output->resize(indices->getShape());
+    if (!output->getSize()){
+        TensorShape mShape = indices->getShape();
+        mShape.push_back(1);
+        output->resize(mShape);
+    }
     T* out_ptr = output->write<T>(0,0);
     const uint32_t* indices_ptr = indices->read<uint32_t>(0,0); //Can probably templatize this 
 
