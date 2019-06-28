@@ -2,36 +2,22 @@
 #define UTENSOR_KWS_MFCC_FUNCTIONS
 #include "uTensor/core/tensor.hpp"
 #include "uTensor/core/uTensorBase.hpp"
-#include "mfcc.h"
-
-
-template<typename T1>
-void kws_mfcc_selector(const T1* vec_in, const uint16_t dim_vec, T1* p_out);
-
-template<>
-void kws_mfcc_selector<q15_t>(const q15_t* vec_in, const uint16_t dim_vec, q15_t* p_out)
-{
-    arm_softmax_q15(vec_in, dim_vec, p_out);
-}
-template<>
-void kws_mfcc_selector<q7_t>(const q7_t* vec_in, const uint16_t dim_vec, q7_t* p_out)
-{
-    arm_softmax_q7(vec_in, dim_vec, p_out);
-}
 
 /**
  * @param [in] data input tensor
  */
-template <class TIn, class TOut>
-void MFCCCompute(S_TENSOR input, S_TENSOR melcoeff, S_TENSOR dct_coef, S_TENSOR out, Tin dummy, Tout d2) {
+template <typename TIn, typename TOut>
+void MfccCmsis<Tin, Tout>(S_TENSOR input_tensor, S_TENSOR mel_fbank_tensor, S_TENSOR window_func_tensor,
+                          S_TENSOR dct_matrix_tensor, S_TENSOR fbank_filter_first_tensor, S_TENSOR fbank_filter_last_tensor,
+                          int frame_len, int num_mfcc_features int num_fbank_bins, S_TENSOR mfcc_out_tensor, Tin dummy1, Tout dummy2) {
     printf("Error not supported in the general case\n");
     exit(-1);
 }
 
 template <>
-void MFCCCompute<float, int7_t>(S_TENSOR input_tensor, S_TENSOR mel_fbank_tensor, S_TENSOR window_func_tensor,
-                                S_TENSOR dct_matrix_tensor, S_TENSOR fbank_filter_first_tensor, S_TENSOR fbank_filter_last_tensor,
-                                S_TENSOR mfcc_out_tensor, int frame_len, int num_fbank_bins) {
+void MfccCmsis<float, int7_t>(S_TENSOR input_tensor, S_TENSOR mel_fbank_tensor, S_TENSOR window_func_tensor,
+                              S_TENSOR dct_matrix_tensor, S_TENSOR fbank_filter_first_tensor, S_TENSOR fbank_filter_last_tensor,
+                              int frame_len, int num_mfcc_features int num_fbank_bins, S_TENSOR mfcc_out_tensor, Tin dummy1, Tout dummy2) {
     //Implementation for MFCC
     int32_t i, j, bin;
     int32_t frame_len_padded;
@@ -100,7 +86,7 @@ void MFCCCompute<float, int7_t>(S_TENSOR input_tensor, S_TENSOR mel_fbank_tensor
             mel_energies[bin] = FLT_MIN;
     }
 
-    //Take log
+    //Take log.
     for (bin = 0; bin < num_fbank_bins; bin++)
         mel_energies[bin] = logf(mel_energies[bin]);
 
@@ -109,17 +95,18 @@ void MFCCCompute<float, int7_t>(S_TENSOR input_tensor, S_TENSOR mel_fbank_tensor
         float sum = 0.0;
         for (j = 0; j < num_fbank_bins; j++) {
             sum += dct_matrix[i*num_fbank_bins+j] * mel_energies[j];
-    }
+        }
 
-    //Input is Qx.mfcc_dec_bits (from quantization step)
-    sum *= (0x1 << mfcc_dec_bits);
-    sum = round(sum); 
-    if(sum >= 127)
-        mfcc_out[i] = 127;
-    else if(sum <= -128)
-        mfcc_out[i] = -128;
-    else
-        mfcc_out[i] = sum;
+        //Input is Qx.mfcc_dec_bits (from quantization step)
+        sum *= (0x1 << mfcc_dec_bits);
+        sum = round(sum); 
+        if(sum >= 127)
+            mfcc_out[i] = 127;
+        else if(sum <= -128)
+            mfcc_out[i] = -128;
+        else
+            mfcc_out[i] = sum;
+    }
 
     //Clean up whatever is allocated
     delete frame_tensor;
@@ -127,16 +114,18 @@ void MFCCCompute<float, int7_t>(S_TENSOR input_tensor, S_TENSOR mel_fbank_tensor
     delete mel_energies_tensor;
 }
 
-template <class T1>
-class SoftmaxCmsisOp : public Operator {
+template <class Tin, class Tout>
+class MfccCmsisOp : public Operator {
   public:
-  SoftmaxCmsisOp() {
-    n_inputs = 1;
+  MfccCmsisOp() {
+    n_inputs = 8;
     n_outputs = 1;
   }
   virtual void compute() override {
-      T1 x;
-      SoftmaxCmsis(inputs[0], outputs[0], x);
+      Tin x;
+      Tout y;
+      MfccCmsis(inputs[0], inputs[1], inputs[2], inputs[3],
+                inputs[4], inputs[5], inputs[6], inputs[7], outputs[0], x, y);
   }
 };
 
