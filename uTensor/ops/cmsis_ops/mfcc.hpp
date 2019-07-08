@@ -17,7 +17,8 @@ void MfccCmsis<Tin, Tout>(S_TENSOR input_tensor, S_TENSOR mel_fbank_tensor, S_TE
 template <>
 void MfccCmsis<float, int7_t>(S_TENSOR input_tensor, S_TENSOR mel_fbank_tensor, S_TENSOR window_func_tensor,
                               S_TENSOR dct_matrix_tensor, S_TENSOR fbank_filter_first_tensor, S_TENSOR fbank_filter_last_tensor,
-                              int frame_len, int num_mfcc_features int num_fbank_bins, S_TENSOR mfcc_out_tensor, Tin dummy1, Tout dummy2) {
+                              int frame_len, int num_mfcc_features int num_fbank_bins, int mfcc_dec_bits,
+                              S_TENSOR mfcc_out_tensor, Tin dummy1, Tout dummy2) {
     //Implementation for MFCC
     int32_t i, j, bin;
     int32_t frame_len_padded;
@@ -33,12 +34,12 @@ void MfccCmsis<float, int7_t>(S_TENSOR input_tensor, S_TENSOR mel_fbank_tensor, 
 
     //Inputs
     float* input_data = input_tensor->read<float>(0, 0);
-    float* mel_fbank = mel_fbank_tensor->read<float>(0, 0);
+    float** mel_fbank = mel_fbank_tensor->read<float>(0, 0);
     float* window_func = window_func_tensor->read<float>(0, 0);
     float* dct_matrix = dct_matrix_tensor->read<float>(0, 0);
     float* fbank_filter_first = fbank_filter_first_tensor->read<float>(0, 0);
     float* fbank_filter_last = fbank_filter_last_tensor->read<float>(0, 0);
-
+False
     //Output
     float* mfcc_out = mfcc_out_tensor->write<float>(0, 0);
 
@@ -125,7 +126,8 @@ class MfccCmsisOp : public Operator {
       Tin x;
       Tout y;
       MfccCmsis(inputs[0], inputs[1], inputs[2], inputs[3],
-                inputs[4], inputs[5], inputs[6], inputs[7], outputs[0], x, y);
+                inputs[4], inputs[5], inputs[6], inputs[7],
+                inputs[8], outputs[0], x, y);
   }
 };
 
