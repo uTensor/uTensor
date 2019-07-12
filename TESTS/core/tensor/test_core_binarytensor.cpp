@@ -28,7 +28,7 @@ void test_core_reshapeBinaryTensor() {
     std::default_random_engine gen;
     TensorShape tmp({3, 2, 3});
     std::string a_s = "input" + to_string(i);
-    S_TENSOR inputTensor = ctx.add(new BinaryTensor<int>(tmp, val), a_s);
+    S_TENSOR inputTensor = ctx.add(new BinaryTensor<int>(tmp, val), a_s.c_str());
     vector<uint8_t> permute = {2, 1, 0};
     TensorShape g = inputTensor->getShape();
     std::shuffle(permute.begin(), permute.end(), gen);
@@ -36,7 +36,7 @@ void test_core_reshapeBinaryTensor() {
     permuteIndexTransform trans(inputTensor->getShape(), permute);
 
     std::string a_o = "output" + to_string(i);
-    S_TENSOR output = ctx.add(new BinaryTensor<int>(trans.getNewShape(), val), a_o);
+    S_TENSOR output = ctx.add(new BinaryTensor<int>(trans.getNewShape(), val), a_o.c_str());
     TensorShape s = output->getShape();
     res = testshape<uint32_t>(g, s, permute);
     if (!res) {

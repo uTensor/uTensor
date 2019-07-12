@@ -10,17 +10,16 @@
 #endif
 
 ///NT: FIXME: count overflow
-static string getTmpName(void) {
+static uint32_t getTmpName(void) {
   static uint32_t count = 0;
-  return std::to_string(count++);
+  return count++;
 }
 
 template <class T>
 class SDTensor : public Tensor {
   public:
     SDTensor( uint32_t cachesize) : Tensor() {
-        string file = tmpprefix + getTmpName();
-        _filename = file;
+        sprintf(_filename, "/fs/tmp/%d", getTmpName());
         mem.createFile(_filename);
         s->cache_size = cachesize;
         cursor = 0;
@@ -34,8 +33,7 @@ class SDTensor : public Tensor {
       }
       s->cache_size = cachesize;
       Tensor::init(v);
-      string file = tmpprefix + getTmpName();
-      _filename = file;
+      sprintf(_filename, "/fs/tmp/%d", getTmpName());
       mem.createFile(_filename);
       cursor = 0;
       dirty = false;
@@ -44,8 +42,7 @@ class SDTensor : public Tensor {
     SDTensor(const TensorShape& v, uint32_t cachesize) : Tensor() {
       s->cache_size = cachesize;
       Tensor::init(v);
-      string file = tmpprefix + getTmpName();
-      _filename = file;
+      sprintf(_filename, "/fs/tmp/%d", getTmpName());
       mem.createFile(_filename);
       cursor = 0;
       dirty = false;
@@ -121,7 +118,7 @@ class SDTensor : public Tensor {
  private:
   SDTensor(const SDTensor&);
   vm mem;
-  std::string _filename;
+  char _filename[32]; //32 characters should be enough
   bool dirty;
   uint32_t cursor;
   SDTensor& operator=(const SDTensor&);

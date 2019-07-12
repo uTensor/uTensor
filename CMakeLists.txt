@@ -34,7 +34,7 @@ else()
 endif()
 
 # Build with code coverage
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fprofile-arcs -ftest-coverage")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fprofile-arcs -ftest-coverage -ggdb")
 
 add_library(utensor STATIC ${SOURCES})
 
@@ -77,6 +77,7 @@ target_include_directories(utensor PUBLIC ${CMAKE_CURRENT_LIST_DIR}/uTensor/core
 target_include_directories(utensor PUBLIC ${CMAKE_CURRENT_LIST_DIR}/uTensor/loaders)
 target_include_directories(utensor PUBLIC ${CMAKE_CURRENT_LIST_DIR}/uTensor/ops)
 target_include_directories(utensor PUBLIC ${CMAKE_CURRENT_LIST_DIR}/uTensor/util)
+
 
 # Todo add install
 set(UTENSOR_INCLUDES ${INCLUDES} PARENT_SCOPE)

@@ -1,7 +1,9 @@
 #ifndef UTENSOR_VM
 #define UTENSOR_VM
 #include <vector>
-#include <iostream>
+#include <cstdio>
+#include <cstdint>
+#include <cstdlib>
 
 using namespace std;
 
@@ -9,12 +11,12 @@ class vm {
   public:
 
     template<typename T>
-    void load_data(string& filename, uint8_t unit_size, uint32_t cachesize, uint32_t arrsize, long int offset, T* data);
+    void load_data(const char* filename, uint8_t unit_size, uint32_t cachesize, uint32_t arrsize, long int offset, T* data);
 
     template<typename T>
-    void flush_data(string& filename, uint8_t unit_size, uint32_t cachesize, uint32_t arrsize, long int offset, T* data);
+    void flush_data(const char* filename, uint8_t unit_size, uint32_t cachesize, uint32_t arrsize, long int offset, T* data);
 
-    FILE* createFile(string& filename);
+    FILE* createFile(const char* filename);
 
     FILE* getFile() { return buffer; }
 
@@ -46,8 +48,8 @@ void vm::flush_impl(U* dst, uint8_t unit_size, uint32_t arrsize) {
 
 
 template<typename T>
-void vm::load_data(string& filename, uint8_t unit_size, uint32_t cachesize, uint32_t arrsize, long int offset, T* data) {
-  buffer = fopen(filename.c_str(), "r");
+void vm::load_data(const char* filename, uint8_t unit_size, uint32_t cachesize, uint32_t arrsize, long int offset, T* data) {
+  buffer = fopen(filename, "r");
   int size = std::min(cachesize, arrsize);
   uint32_t offset_t = (uint32_t)offset;
 
@@ -58,8 +60,8 @@ void vm::load_data(string& filename, uint8_t unit_size, uint32_t cachesize, uint
 }
 
 template<typename T>
-void vm::flush_data(string& filename, uint8_t unit_size, uint32_t cachesize, uint32_t arrsize, long int offset, T* data) {
-  buffer = fopen(filename.c_str(), "w");
+void vm::flush_data(const char* filename, uint8_t unit_size, uint32_t cachesize, uint32_t arrsize, long int offset, T* data) {
+  buffer = fopen(filename, "w");
   int size = std::min(cachesize, arrsize);
   fseek(buffer, offset * unit_size, SEEK_SET);
   flush_impl(data, unit_size, size);

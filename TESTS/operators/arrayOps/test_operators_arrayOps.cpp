@@ -73,6 +73,46 @@ void test_operators_reshape(void) {
     double result = meanPercentErr<float>(out_2.get(), out_ref_2.get());
     EXPECT_EQ(result, 0);
 }
+
+void test_operators_gather(void) {
+    Tensor* input = new RamTensor<float>();
+    Tensor* output = new RamTensor<float>();
+    Tensor* out_ref = new RamTensor<float>();
+    Tensor* indices  = new RamTensor<uint32_t>();
+    TensorShape tmp({2, 2});
+    TensorShape tmp2({3});
+
+    input->init(tmp);
+    output->init(tmp2);
+    indices->init(tmp2);
+    out_ref->init(tmp2);
+
+    input->write<float>(0,0)[0] = 100.0;
+    input->write<float>(0,0)[1] = 11.0;
+    input->write<float>(0,0)[2] = 12.0;
+    input->write<float>(0,0)[3] = 13.0;
+
+    indices->write<uint32_t>(0,0)[0] = 1;
+    indices->write<uint32_t>(0,0)[1] = 2;
+    indices->write<uint32_t>(0,0)[2] = 1;
+
+    out_ref->write<float>(0,0)[0] = 11.0;
+    out_ref->write<float>(0,0)[1] = 12.0;
+    out_ref->write<float>(0,0)[2] = 11.0;
+
+    ctx.add(input, "g_input");
+    ctx.add(output, "g_output");
+    ctx.add(indices, "g_indices");
+
+    ctx.push(new GatherOp<float>(),
+            {"g_input", "g_indices", "g_indices"/*Not used*/},
+            {"g_output"});
+    ctx.eval();
+
+    double result = meanPercentErr<float>(output, out_ref);
+    EXPECT_EQ(result, 0);
+
+}
 // First configure the uTensor test runner
 UTENSOR_TEST_CONFIGURE()
 
@@ -80,6 +120,7 @@ UTENSOR_TEST_CONFIGURE()
 UTENSOR_TEST(operators, quantizeV2, "Quantize V2 test")
 UTENSOR_TEST(operators, dequantize, "Dequantization Test")
 UTENSOR_TEST(operators, reshape, "Reshape Test")
+UTENSOR_TEST(operators, gather, "Gather Test")
 
 
 // Third, run like hell

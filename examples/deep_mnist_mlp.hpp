@@ -21,6 +21,6 @@ void ReluLayer(Context& ctx, TName x, TName x_min, TName x_max,
 void PredLayer(Context &ctx, TName input, TName input_min,
                TName input_max, TName output, TName w, TName w_min, TName w_max, TName bias, TName dim);
 
-int runMLP(string inputIdxFile);
+int runMLP(const char* inputIdxFile);
 
 #endif
