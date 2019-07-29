@@ -1,3 +1,5 @@
+#ifndef UTENSOR_STRING
+#define UTENSOR_STRING
 #include <string.h>
 
 namespace utensor {
@@ -13,7 +15,7 @@ namespace utensor {
                     
                 }
 
-                return v;
+                return (uint32_t) v;
             }
 
         public:
@@ -24,6 +26,7 @@ namespace utensor {
             string(){
                 value = hash("");
             }
+            string(uint32_t val) : value(val), cstr(NULL) {}
             // bool operator < (const string& that){ return this->value < that.value; }
             // bool operator == (const string& that){ return this->value == that.value; }
             bool operator < (const string& that) const { return this->value < that.value; }
@@ -47,3 +50,5 @@ namespace std {
         }
     };
 }
+
+#endif
