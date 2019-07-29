@@ -1,5 +1,5 @@
 #include "uTensor/util/uTensor_util.hpp"
-#ifndef TARGET_MBED
+#if !(defined(TARGET_MBED) || defined(ARDUINO))
 #include <sys/stat.h>
 #include <dirent.h>
 #endif
@@ -45,6 +45,10 @@ uint32_t ntoh32(uint32_t val) {
   return ret;
 }
 
+#ifdef ARDUINO
+void int_env() {
+}
+#else
 void init_env() {
     int status;
     DIR* dir = opendir("/fs/tmp");
@@ -59,6 +63,7 @@ void init_env() {
       }
     }
 }
+#endif
 
 void utensor_exit(void) {
 #ifndef __EMSCRIPTEN__
