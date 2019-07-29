@@ -8,18 +8,20 @@ set( CMAKE_VERBOSE_MAKEFILE on )
 
 # Find includes in corresponding build directories
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
+message(STATUS "PROJECT_DIR: " ${PROJECT_SOURCE_DIR})
 
-include_directories(${PROJECT_SOURCE_DIR}/uTensor/core)
-include_directories(${PROJECT_SOURCE_DIR}/uTensor/loaders)
-include_directories(${PROJECT_SOURCE_DIR}/uTensor/ops)
-include_directories(${PROJECT_SOURCE_DIR}/uTensor/util)
+include_directories(${PROJECT_SOURCE_DIR}/src/uTensor/core)
+include_directories(${PROJECT_SOURCE_DIR}/src/uTensor/loaders)
+include_directories(${PROJECT_SOURCE_DIR}/src/uTensor/ops)
+include_directories(${PROJECT_SOURCE_DIR}/src/uTensor/util)
 
 
-file(GLOB SOURCES uTensor/*/*.cpp)
-file(GLOB INCLUDES uTensor/*/*.hpp)
+file(GLOB SOURCES src/uTensor/*/*.cpp)
+file(GLOB INCLUDES src/uTensor/*/*.hpp)
 
 
 message(STATUS "SOURCES: " ${SOURCES})
+message(STATUS "INCLUDES: " ${INCLUDES})
 
 # target_compile_features(utensor PRIVATE cxx_range_for)
 include(CheckCXXCompilerFlag)
@@ -73,10 +75,10 @@ if(GTEST_FOUND)
 endif()
 
 # Make includes accesible to project cmake builds
-target_include_directories(utensor PUBLIC ${CMAKE_CURRENT_LIST_DIR}/uTensor/core)
-target_include_directories(utensor PUBLIC ${CMAKE_CURRENT_LIST_DIR}/uTensor/loaders)
-target_include_directories(utensor PUBLIC ${CMAKE_CURRENT_LIST_DIR}/uTensor/ops)
-target_include_directories(utensor PUBLIC ${CMAKE_CURRENT_LIST_DIR}/uTensor/util)
+target_include_directories(utensor PUBLIC ${CMAKE_CURRENT_LIST_DIR}/src/uTensor/core)
+target_include_directories(utensor PUBLIC ${CMAKE_CURRENT_LIST_DIR}/src/uTensor/loaders)
+target_include_directories(utensor PUBLIC ${CMAKE_CURRENT_LIST_DIR}/src/uTensor/ops)
+target_include_directories(utensor PUBLIC ${CMAKE_CURRENT_LIST_DIR}/src/uTensor/util)
 
 
 # Todo add install
