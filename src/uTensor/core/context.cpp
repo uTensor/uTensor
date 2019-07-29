@@ -1,4 +1,4 @@
-#include "uTensor/core/context.hpp"
+#include "src/uTensor/core/context.hpp"
 
 S_TENSOR Context::add_static(std::function<void*(void)> func, TName _name) {
   return addCached(func, _name, 1, true);

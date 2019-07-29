@@ -1,7 +1,7 @@
 #ifndef UTENSOR_FULLY_CONNECTED_OPS
 #define UTENSOR_FULLY_CONNECTED_OPS
-#include "uTensor/core/tensor.hpp"
-#include "uTensor/core/uTensorBase.hpp"
+#include "src/uTensor/core/tensor.hpp"
+#include "src/uTensor/core/uTensorBase.hpp"
 #include "arm_math.h"
 #include "arm_nnfunctions.h"
 

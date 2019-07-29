@@ -1,4 +1,4 @@
-#include "uTensor/loaders/tensorIdxImporter.hpp"
+#include "src/uTensor/loaders/tensorIdxImporter.hpp"
 
 uint8_t TensorIdxImporter::getIdxDTypeSize(IDX_DTYPE dtype) {
   switch (dtype) {

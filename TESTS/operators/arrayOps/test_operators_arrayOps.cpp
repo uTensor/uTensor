@@ -1,6 +1,6 @@
 #include "test_helper.h"
-#include "uTensor/loaders/tensorIdxImporter.hpp"
-#include "uTensor/ops/ArrayOps.hpp"
+#include "src/uTensor/loaders/tensorIdxImporter.hpp"
+#include "src/uTensor/ops/ArrayOps.hpp"
 
 #include <iostream>
 using std::cout;
