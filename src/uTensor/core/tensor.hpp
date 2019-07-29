@@ -2,8 +2,8 @@
 #define UTENSOR_TENSOR_H
 
 #include "uTensor/util/uTensor_util.hpp"
+#include "uTensor/util/utensor_string.hpp"
 #include <initializer_list>
-#include "utensor_string.hpp"
 #include <memory>
 #include <vector>
 #include <algorithm>
