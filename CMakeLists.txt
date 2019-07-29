@@ -14,6 +14,7 @@ include_directories(${PROJECT_SOURCE_DIR}/src/uTensor/core)
 include_directories(${PROJECT_SOURCE_DIR}/src/uTensor/loaders)
 include_directories(${PROJECT_SOURCE_DIR}/src/uTensor/ops)
 include_directories(${PROJECT_SOURCE_DIR}/src/uTensor/util)
+include_directories(${PROJECT_SOURCE_DIR}/src/uTensor)
 
 
 file(GLOB SOURCES src/uTensor/*/*.cpp)
