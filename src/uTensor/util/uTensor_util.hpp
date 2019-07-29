@@ -2,6 +2,7 @@
 #define UTENSOR_UTIL
 #include <stdint.h>
 #include <stdio.h>
+
 #include <vector>
 
 // #define MAX(A, B) ((A > B)? A:B)
@@ -98,7 +99,16 @@ void printVector(std::vector<uint32_t> vec);
 #elif defined(_POSIX_VERSION)
     // POSIX
 #else
+#if ARDUINO
+    #include "Arduino.h"
+
+    #undef max
+    #undef min
+    #undef round
+    #undef abs
+#else
     #include "mbed.h"
+#endif
 //#   error "Unknown compiler"
     // little endian to big endian
     //uint32_t htonl(uint32_t& val);
