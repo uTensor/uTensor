@@ -1,8 +1,8 @@
 #ifndef UTENSOR_TENSOR_H
 #define UTENSOR_TENSOR_H
 
-#include "uTensor/util/uTensor_util.hpp"
-#include "uTensor/util/utensor_string.hpp"
+#include "src/uTensor/util/uTensor_util.hpp"
+#include "src/uTensor/util/utensor_string.hpp"
 #include <initializer_list>
 #include <memory>
 #include <vector>
