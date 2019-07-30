@@ -1,9 +1,9 @@
 #ifndef UTENSOR_ARRAY_OPS
 #define UTENSOR_ARRAY_OPS
 
-#include "uTensor/util/uTensor_util.hpp"
-#include "uTensor/util/quantization_utils.hpp"
-#include "uTensor/core/uTensorBase.hpp"
+#include "src/uTensor/util/uTensor_util.hpp"
+#include "src/uTensor/util/quantization_utils.hpp"
+#include "src/uTensor/core/uTensorBase.hpp"
 #include <cstring>
 #include <cmath>
 #include <array>

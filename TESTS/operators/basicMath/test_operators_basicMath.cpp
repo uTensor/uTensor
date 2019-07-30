@@ -1,5 +1,5 @@
 #include "test_helper.h"
-#include "uTensor/loaders/tensorIdxImporter.hpp"
+#include "src/uTensor/loaders/tensorIdxImporter.hpp"
 #include "MathOps.hpp"
 
 #include <iostream>

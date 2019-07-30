@@ -1,7 +1,7 @@
 #ifndef UTENSOR_SDTENSOR_H
 #define UTENSOR_SDTENSOR_H
-#include "uTensor/core/tensor.hpp"
-#include "uTensor/core/vm.hpp"
+#include "src/uTensor/core/tensor.hpp"
+#include "src/uTensor/core/vm.hpp"
 
 #ifdef MBED_CONF_APP_DEBUG_MSG
   #define tmpprefix "/fs/tmp/"
