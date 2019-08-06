@@ -8,5 +8,6 @@ RUN apt-get update && apt-get install -y \
     mercurial \
     vim
 
-RUN pip install mbed-cli
+RUN pip install --upgrade pip
+RUN pip install mbed-cli 'colorama<0.4.0,>=0.3.9' pyserial prettytable jinja2 intelhex junit_xml pyyaml requests mbed_ls mbed_host_tests mbed_greentea beautifulsoup4 fuzzywuzzy pyelftools jsonschema future six manifest_tool mbed_cloud_sdk icetea
 

@@ -38,7 +38,7 @@ jobs:
         #- run: mv uTensor/unity_temp/* uTensor/unity/
       - run: mbed config root .
       - run: mbed deploy
-      - run: mbed compile -m DISCO_F413ZH -t GCC_ARM --profile=uTensor/build_profile/release.json
+      - run: mbed compile -m DISCO_F413ZH -t GCC_ARM --profile=uTensor/extras/build_profile/release.json
         
 workflows:
     version: 2
