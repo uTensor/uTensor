@@ -8,48 +8,9 @@
 #include <algorithm>
 
 
-template <class Tin, class Tout>
-void Softmax(S_TENSOR input, S_TENSOR output)
-{
-    size_t dim = input->getDim(), row_dim_max, col_dim_max, row_stride, col_stride;
-    if (dim > 2 || dim < 1) {
-        ERR_EXIT("Softmax only supports 1D or 2D tensor");
-    }
-    if (dim == 1) {
-        row_dim_max = 1;
-        col_dim_max = input->getShape().at(0);
-        row_stride = 0;
-        col_stride = input->getStride(0);
-    } else {
-        row_dim_max = input->getShape().at(0);
-        col_dim_max = input->getShape().at(1);
-        row_stride = input->getStride(0);
-        col_stride = input->getStride(1);
-    }
 
-    if (output && output->getSize() == 0) {
-        output->resize(input->getShape());
-    }
-    Tout* out_ptr = output->write<Tout>(0,0);
-    const Tin* in_ptr = input->read<Tin>(0, 0);
+void Softmax(S_TENSOR input, S_TENSOR output);
 
-    for (size_t row_dim = 0; row_dim < row_dim_max; ++row_dim){
-        size_t base_offset = row_dim * row_stride;
-        Tout reduce_sum = 0;
-        for (size_t col_dim = 0; col_dim < col_dim_max; ++col_dim) {
-            size_t offset = base_offset + col_dim * col_stride;
-            Tout logit = (Tout) in_ptr[offset];
-            reduce_sum += exp(logit);
-        }
-        for (size_t col_dim = 0; col_dim < col_dim_max; ++col_dim){
-            size_t offset = base_offset + col_dim * col_stride;
-            Tout logit = (Tout) in_ptr[offset];
-            out_ptr[offset] = exp(logit) / reduce_sum;
-        }
-    }
-}
-
-template <class Tin, class Tout>
 class SoftmaxOp : public Operator {
   public:
   SoftmaxOp() {
@@ -57,7 +18,7 @@ class SoftmaxOp : public Operator {
     n_outputs = 1;
   }
   virtual void compute() override {
-    Softmax<Tin, Tout>(inputs[0], outputs[0]);
+    Softmax(inputs[0], outputs[0]);
   }
 };
 
