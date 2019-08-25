@@ -17,7 +17,7 @@ void test_float_SoftmaxOp(void){
         new SoftmaxOp<float, float>(),
         {"logits",},
         {"out",}
-    )
+    );
     ctx.eval();
 
     Tensor* ref_output = t_import.float_import("/fs/constants/Softmax/out/ref_float_softmax.idx");
