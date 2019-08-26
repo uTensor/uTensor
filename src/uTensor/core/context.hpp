@@ -15,14 +15,14 @@ public:
   bool allow_incr;
   bool is_static;
   bool is_cacheable;
-  S_TENSOR sptr;
+  S_TENSOR ptr;
 
   Ref_Record() {
     count = 0;
     is_static = false;
     is_cacheable = true;
     allow_incr = true;
-    sptr.reset();   
+    ptr = NULL;   
   }
 };
 
@@ -52,8 +52,6 @@ protected:
   //uint16_t getRef();
 
 public:
-  S_TENSOR add_static(std::function<void*(void)> func, TName _name);
-  S_TENSOR addCached(std::function<void*(void)> func, TName _name, uint8_t init_count = 0, bool _is_static = false);
   S_TENSOR add(Tensor* t, TName _name, uint8_t init_count = 0);
   S_TENSOR get(TName const &t_name);
   void push_static(std::function<void*(void)> func, TName _name, TNameList &_inputs, TNameList &_outputs, bool is_static = false);

@@ -1,38 +1,11 @@
 #include "src/uTensor/core/context.hpp"
 
-S_TENSOR Context::add_static(std::function<void*(void)> func, TName _name) {
-  return addCached(func, _name, 1, true);
-}
-
-S_TENSOR Context::addCached(std::function<void*(void)> func, TName _name, uint8_t init_count, bool _is_static) {
-  Tensor* t;
-  if(rTable.find(_name) == rTable.end()) {
-    t = (Tensor*) func();
-    add(t, _name);
-  }
-
-  Ref_Record record = rTable[_name];
-  record.is_static = _is_static;
-  record.is_cacheable = true;
-  if(init_count > 0) {
-    record.count = init_count;
-    record.allow_incr = false;
-  }
-  if(record.count < 1 && record.is_static) {
-    record.count = 1;
-  }
-  rTable[_name] = record;
-
-  return record.sptr;
-}
-
 S_TENSOR Context::add(Tensor* t, TName _name, uint8_t init_count) {
   if(t == nullptr) { ERR_EXIT("null pointer tensor"); }
   if(rTable.find(_name) != rTable.end()) {
     ERR_EXIT("tensor with name \"%d\" address already exist in rTable", t->getName().get_value());
   }
 
-  S_TENSOR _sptr(t);
   t->setName(_name);
 
   Ref_Record record;
@@ -42,16 +15,16 @@ S_TENSOR Context::add(Tensor* t, TName _name, uint8_t init_count) {
     record.allow_incr = false;
   }
 
-  record.sptr = _sptr;
+  record.ptr = t;
 
   rTable[_name] = record;
 
-  return _sptr;
+  return t;
 }
 
 S_TENSOR Context::get(TName const &t_name) {
   if(rTable.find(t_name) == rTable.end()) ERR_EXIT("No tensor with name: %d", t_name.get_value());
-  return rTable[t_name].sptr;
+  return rTable[t_name].ptr;
 }
 
 Operator* Context::registerOpTable(std::function<void*(void)> func, TName _name) {
@@ -60,6 +33,7 @@ Operator* Context::registerOpTable(std::function<void*(void)> func, TName _name)
   if(opTable.find(_name) == opTable.end()) {
     op = (Operator*) func();
     op->setName(_name);
+    opTable[_name] = op;
   } else {
     op = opTable[_name];
   }
@@ -95,14 +69,14 @@ void Context::push(Operator* op, TNameList &in_names, TNameList &out_names) {
   for(auto in:in_names) {
     if(rTable.find(in) == rTable.end()) { ERR_EXIT("Tensor \"%d\" not found", in.get_value()); }
     Ref_Record r = rTable[in];
-    _inputs.push_back(r.sptr);
+    _inputs.push_back(r.ptr);
   }
 
   S_TList _outputs;
   for(auto out:out_names) {
     if(rTable.find(out) == rTable.end()) { ERR_EXIT("Tensor \"%d\" not found", out.get_value()); }
     Ref_Record r = rTable[out];
-    _outputs.push_back(r.sptr);
+    _outputs.push_back(r.ptr);
   }
 
   op->setInputs(_inputs);
@@ -145,7 +119,7 @@ void Context::deinitTensors(const S_TList &t_list) {
 
 void Context::delTensor(TName t_name) {
   Ref_Record record = rTable[t_name];
-  record.sptr.reset();
+  delete record.ptr;
   rTable.erase(t_name);
 }
 
@@ -222,6 +196,7 @@ uint32_t Context::gc(void) {
     delTensor(name);
   }
   
+  //FIXME: delete ops referenced by the opTable
   return (uint32_t) nlist.size();
 }
 
