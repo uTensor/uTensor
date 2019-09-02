@@ -194,7 +194,7 @@ void test_operators_argmax2(void) {  // NT: WIP   do not use t_import int 64 her
   *(test_out_ref->write<float>(3, 0)) = 9.0f;
   *(test_out_ref->write<float>(4, 0)) = 2.0f;
 
-  S_TENSOR test_out = ctx.add(new RamTensor<float>(test_out_ref->getShape(), "test_out");
+  S_TENSOR test_out = ctx.add(new RamTensor<float>(test_out_ref->getShape()), "test_out");
   TNameList inputs = {"test_input", "test_dim"};
   TNameList outputs = {"test_out"};
 
