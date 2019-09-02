@@ -29,7 +29,7 @@ void test_operators_fusedConvMaxpool12(void) {
 
     ctx.eval();
 
-    double result = meanPercentErr<float>(ref.get(), out.get());
+    double result = meanPercentErr<float>(ref, out);
     EXPECT_EQ(result < alpha, true);
 
 }
@@ -51,7 +51,7 @@ void test_operators_fusedConvMaxpool13(void) {
 
     ctx.eval();
 
-    double result = meanPercentErr<float>(ref.get(), out.get());
+    double result = meanPercentErr<float>(ref, out);
     EXPECT_EQ(result < alpha, true);
 
 }
@@ -73,7 +73,7 @@ void test_operators_fusedConvMaxpool14(void) {
 
     ctx.eval();
 
-    double result = meanPercentErr<float>(ref.get(), out.get());
+    double result = meanPercentErr<float>(ref, out);
     EXPECT_EQ(result < alpha, true);
 
 }
@@ -95,7 +95,7 @@ void test_operators_fusedConvMaxpool22(void) {
 
     ctx.eval();
 
-    double result = meanPercentErr<float>(ref.get(), out.get());
+    double result = meanPercentErr<float>(ref, out);
     EXPECT_EQ(result < alpha, true);
 
 }
@@ -117,7 +117,7 @@ void test_operators_fusedConvMaxpool23(void) {
 
     ctx.eval();
 
-    double result = meanPercentErr<float>(ref.get(), out.get());
+    double result = meanPercentErr<float>(ref, out);
     EXPECT_EQ(result < alpha, true);
 
 }
@@ -139,7 +139,7 @@ void test_operators_fusedConvMaxpool24(void) {
 
     ctx.eval();
 
-    double result = meanPercentErr<float>(ref.get(), out.get());
+    double result = meanPercentErr<float>(ref, out);
     EXPECT_EQ(result < alpha, true);
 
 }
@@ -161,7 +161,7 @@ void test_operators_fusedConvMaxpool32(void) {
 
     ctx.eval();
 
-    double result = meanPercentErr<float>(ref.get(), out.get());
+    double result = meanPercentErr<float>(ref, out);
     EXPECT_EQ(result < alpha, true);
 
 }
@@ -183,7 +183,7 @@ void test_operators_fusedConvMaxpool33(void) {
 
     ctx.eval();
 
-    double result = meanPercentErr<float>(ref.get(), out.get());
+    double result = meanPercentErr<float>(ref, out);
     EXPECT_EQ(result < alpha, true);
 
 }
@@ -205,7 +205,7 @@ void test_operators_fusedConvMaxpool34(void) {
 
     ctx.eval();
 
-    double result = meanPercentErr<float>(ref.get(), out.get());
+    double result = meanPercentErr<float>(ref, out);
     //printf("Mean Percent Error %f", result);
     EXPECT_EQ(result < alpha, true);
 

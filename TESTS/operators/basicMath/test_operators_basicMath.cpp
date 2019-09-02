@@ -36,8 +36,8 @@ void test_operators_requantizationRange(void) {
 
   //Note: an output tensor will not be auto-deleted by context unless it has been used as an input
   double result =
-      meanPercentErr<float>(ctx.get("ref_min").get(), ctx.get("out_min").get())
-       + meanPercentErr<float>(ctx.get("ref_max").get(), ctx.get("out_max").get());
+      meanPercentErr<float>(ctx.get("ref_min"), ctx.get("out_min"))
+       + meanPercentErr<float>(ctx.get("ref_max"), ctx.get("out_max"));
   // passed(result < 0.0001);
   EXPECT_EQ(result, 0);
 }
@@ -52,9 +52,6 @@ void test_operators_requantize(void) {
   ctx.addCached(hold(t_import.float_import("/fs/constants/rQ/in/rqRange_0.idx")), "r_a_min");
   ctx.addCached(hold(t_import.float_import("/fs/constants/rQ/in/rqRange_1.idx")), "r_a_max");
   // tf.quint8
-
-  //Note:
-  //Instead of using ctx.get() to obtain a shared_ptr, you may also use the shared_ptr returned by ctx.add()
 
   // reference outputs
   S_TENSOR ref_a_q = ctx.addCached(hold(t_import.ubyte_import("/fs/constants/rQ/out/rQ_0.idx")), "ref_a_q");
@@ -76,9 +73,9 @@ void test_operators_requantize(void) {
   ctx.eval();
   
 
-  double result = meanPercentErr<unsigned char>(ref_a_q.get(), a_q.get()) +
-                  meanPercentErr<float>(ref_a_min.get(), a_min_q.get()) +
-                  meanPercentErr<float>(ref_a_max.get(), a_max_q.get());
+  double result = meanPercentErr<unsigned char>(ref_a_q, a_q) +
+                  meanPercentErr<float>(ref_a_min, a_min_q) +
+                  meanPercentErr<float>(ref_a_max, a_max_q);
   // passed(result < 0.0001);
   EXPECT_EQ(result, 0);
 }
@@ -119,10 +116,10 @@ void test_operators_requantize2(void) {
   
 
   double result;
-  if((result = meanPercentErr<unsigned char>(ctx.get("ref_a_q").get(), out_val.get())) != 0) {
+  if((result = meanPercentErr<unsigned char>(ctx.get("ref_a_q"), out_val)) != 0) {
       printf("Requantize a_q failed (%.6f)\r\n", result);
-      unsigned char* ref_ptr = ref_val.get()->write<unsigned char>(0, 0);
-      unsigned char* test_ptr = out_val.get()->write<unsigned char>(0, 0);
+      unsigned char* ref_ptr = ref_val->write<unsigned char>(0, 0);
+      unsigned char* test_ptr = out_val->write<unsigned char>(0, 0);
       for(uint32_t i = 0; i < ref_val->getSize(); i++) {
           if(ref_ptr[i] != test_ptr[i]) {
               printf("%u: %d != %d\r\n", i, ref_ptr[i], test_ptr[i]);
@@ -133,13 +130,13 @@ void test_operators_requantize2(void) {
   }
 
 
-  if((result = meanPercentErr<float>(ref_min.get(), out_min.get())) != 0) printf("Requantize a_min_q failed (%.6f)\r\n", result);
+  if((result = meanPercentErr<float>(ref_min, out_min)) != 0) printf("Requantize a_min_q failed (%.6f)\r\n", result);
 
-  if((result = meanPercentErr<float>(ref_max.get(), out_max.get())) != 0) printf("Requantize a_max_q failed (%.6f)\r\n", result);
+  if((result = meanPercentErr<float>(ref_max, out_max)) != 0) printf("Requantize a_max_q failed (%.6f)\r\n", result);
 
-  result = meanPercentErr<unsigned char>(ref_val.get(), out_val.get()) +
-                  meanPercentErr<float>(ref_min.get(), out_min.get()) +
-                  meanPercentErr<float>(ref_max.get(), out_max.get());
+  result = meanPercentErr<unsigned char>(ref_val, out_val) +
+                  meanPercentErr<float>(ref_min, out_min) +
+                  meanPercentErr<float>(ref_max, out_max);
   // passed(result < 0.0001);
   EXPECT_EQ(result, 0);
 }
@@ -169,9 +166,9 @@ void test_operators_argmax(void) {  // NT: WIP   do not use t_import int 64 here
   ctx.eval();
   
 
-  Tensor* out_float = TensorCast<int, float>(out.get());  ///NT: /WIP  how to handle the name?
+  Tensor* out_float = TensorCast<int, float>(out);  ///NT: /WIP  how to handle the name?
 
-  double result = meanPercentErr<float>(ref_out.get(), out_float);
+  double result = meanPercentErr<float>(ref_out, out_float);
 
   // passed(result < 0.0001);
   EXPECT_EQ(result, 0);
@@ -206,7 +203,7 @@ void test_operators_argmax2(void) {  // NT: WIP   do not use t_import int 64 her
   ctx.eval();
   
 
-  double result = meanPercentErr<float>(test_out_ref.get(), test_out.get());
+  double result = meanPercentErr<float>(test_out_ref, test_out);
   EXPECT_LT(result, 0.0001);
   //EXPECT_EQ(result, 0);
 }
@@ -230,7 +227,7 @@ void test_operators_add(void) {
   ctx.eval();
   
 
-  double result = meanPercentErr<float>(ref_out.get(), out.get());
+  double result = meanPercentErr<float>(ref_out, out);
    EXPECT_LT(result, 0.0001);
 }
 
@@ -257,7 +254,7 @@ void test_operators_min(void) {
   ctx.eval();
   
 
-  double result = meanPercentErr<float>(ref_out.get(), out.get());
+  double result = meanPercentErr<float>(ref_out, out);
   // passed(result < 0.0001);
   EXPECT_EQ(result, 0);
 }
@@ -283,7 +280,7 @@ void test_operators_max(void) {
   ctx.eval();
   
 
-  double result = meanPercentErr<float>(ref_out.get(), out.get());
+  double result = meanPercentErr<float>(ref_out, out);
   // passed(result < 0.0001);
   EXPECT_EQ(result, 0);
 }

@@ -189,7 +189,7 @@ int runMLP(const char* inputIdxFile) {
     "/fs/testData/deep_mlp/runPredLayer/y_pred/outputs/y_pred_0.idx");
   Tensor* ref_pred = TensorCast<float, int>(ref_out);
 
-  double result = utils::meanPercentErr<int>(ref_pred, pred.get());
+  double result = utils::meanPercentErr<int>(ref_pred, pred);
   
   if (result < 0.0001) {
     printf("PASSED %.8f\r\n\r\n", result);

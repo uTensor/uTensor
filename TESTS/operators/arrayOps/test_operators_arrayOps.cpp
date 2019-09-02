@@ -31,7 +31,7 @@ void test_operators_quantizeV2(){
     ctx.eval();
 
 
-    double result = meanPercentErr<unsigned char>(ref_b_q.get(), out_b_q.get()) + meanPercentErr<float>(ref_b_min_q.get(), out_b_min_q.get()) + meanPercentErr<float>(ref_b_max_q.get(), out_b_max_q.get());
+    double result = meanPercentErr<unsigned char>(ref_b_q, out_b_q) + meanPercentErr<float>(ref_b_min_q, out_b_min_q) + meanPercentErr<float>(ref_b_max_q, out_b_max_q);
     EXPECT_EQ(result, 0);
 }
 
@@ -51,7 +51,7 @@ void test_operators_dequantize(void) {
     ctx.push_static(hold(new DequantizeOp()), "DequantizeOp", {"a", "a_min", "a_max"}, {"out"});
     ctx.eval();
 
-    double result = meanPercentErr<float>(out.get(), out_ref.get());
+    double result = meanPercentErr<float>(out, out_ref);
     EXPECT_EQ(result, 0);
 }
 
@@ -70,7 +70,7 @@ void test_operators_reshape(void) {
     ctx.push_static(hold(new ReshapeOp()), "ReshapeOp", {"ref_a", "ref_dim"}, {"out_2"});
     ctx.eval();
 
-    double result = meanPercentErr<float>(out_2.get(), out_ref_2.get());
+    double result = meanPercentErr<float>(out_2, out_ref_2);
     EXPECT_EQ(result, 0);
 }
 
