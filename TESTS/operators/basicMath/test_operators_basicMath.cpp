@@ -219,7 +219,7 @@ void test_operators_add(void) {
   // Implementation goes here
 
   // modify the checks below:
-  S_TENSOR out = ctx.add(new RamTensor<float>(ref_out->getShape(), "out"));
+  S_TENSOR out = ctx.add(new RamTensor<float>(ref_out->getShape()), "out");
   TNameList inputs = {"a", "b"};
   TNameList outputs = {"out"};
   
