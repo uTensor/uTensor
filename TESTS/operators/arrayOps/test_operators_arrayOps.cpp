@@ -27,7 +27,7 @@ void test_operators_quantizeV2(){
     S_TENSOR out_b_max_q = ctx.add(new RamTensor<float>(b_max_q_ref->getShape()), "b_max_q");
 
     //Implementation goes here
-    ctx.push(new QuantizeV2Op()), "QuantizeV2Op", {"b_q_ref", "b_min_q_ref", "b_max_q_ref"}, {"b_q", "b_min_q", "b_max_q"});
+    ctx.push(new QuantizeV2Op(), "QuantizeV2Op", {"b_q_ref", "b_min_q_ref", "b_max_q_ref"}, {"b_q", "b_min_q", "b_max_q"});
     ctx.eval();
 
 
