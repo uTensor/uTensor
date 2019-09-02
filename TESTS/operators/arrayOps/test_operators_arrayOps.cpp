@@ -13,14 +13,14 @@ Context ctx;
 // Default to using GTest like asserts and expects as these give more info that unity
 // We will forward these commands to unity in test_helper.h
 void test_operators_quantizeV2(){
-    S_TENSOR b_q_ref = ctx.add(t_import.float_import ("/fs/constants/qB/in/Cast_1_0.idx")), "b_q_ref");
-    S_TENSOR b_min_q_ref = ctx.add(t_import.float_import("/fs/constants/qB/in/Min_1_0.idx")), "b_min_q_ref");
-    S_TENSOR b_max_q_ref = ctx.add(t_import.float_import("/fs/constants/qB/in/Max_1_0.idx")), "b_max_q_ref");
+    S_TENSOR b_q_ref = ctx.add(t_import.float_import ("/fs/constants/qB/in/Cast_1_0.idx"), "b_q_ref");
+    S_TENSOR b_min_q_ref = ctx.add(t_import.float_import("/fs/constants/qB/in/Min_1_0.idx"), "b_min_q_ref");
+    S_TENSOR b_max_q_ref = ctx.add(t_import.float_import("/fs/constants/qB/in/Max_1_0.idx"), "b_max_q_ref");
 
     //reference outputs
-    S_TENSOR ref_b_q = ctx.add(t_import.ubyte_import("/fs/constants/qB/out/qB_0.idx")), "ref_b_q");
-    S_TENSOR ref_b_min_q = ctx.add(t_import.float_import("/fs/constants/qB/out/qB_1.idx")), "ref_b_min_q");
-    S_TENSOR ref_b_max_q = ctx.add(t_import.float_import("/fs/constants/qB/out/qB_2.idx")), "ref_b_max_q");
+    S_TENSOR ref_b_q = ctx.add(t_import.ubyte_import("/fs/constants/qB/out/qB_0.idx"), "ref_b_q");
+    S_TENSOR ref_b_min_q = ctx.add(t_import.float_import("/fs/constants/qB/out/qB_1.idx"), "ref_b_min_q");
+    S_TENSOR ref_b_max_q = ctx.add(t_import.float_import("/fs/constants/qB/out/qB_2.idx"), "ref_b_max_q");
 
     S_TENSOR out_b_q = ctx.add(new RamTensor<unsigned char>(b_q_ref->getShape())), "b_q");
     S_TENSOR out_b_min_q = ctx.add(new RamTensor<float>(b_min_q_ref->getShape())), "b_min_q");
@@ -38,12 +38,12 @@ void test_operators_quantizeV2(){
 void test_operators_dequantize(void) {
 
     //reference inputs
-    S_TENSOR a = ctx.add(t_import.ubyte_import("/fs/constants/deQ/in/rQ_0.idx")), "a");
-    S_TENSOR a_min = ctx.add(t_import.float_import("/fs/constants/deQ/in/rQ_1.idx")), "a_min");
-    S_TENSOR a_max = ctx.add(t_import.float_import("/fs/constants/deQ/in/rQ_2.idx")), "a_max");
+    S_TENSOR a = ctx.add(t_import.ubyte_import("/fs/constants/deQ/in/rQ_0.idx"), "a");
+    S_TENSOR a_min = ctx.add(t_import.float_import("/fs/constants/deQ/in/rQ_1.idx"), "a_min");
+    S_TENSOR a_max = ctx.add(t_import.float_import("/fs/constants/deQ/in/rQ_2.idx"), "a_max");
 
     //reference outputs
-    S_TENSOR out_ref = ctx.add(t_import.float_import("/fs/constants/deQ/out/deQ_0.idx")), "out_ref");
+    S_TENSOR out_ref = ctx.add(t_import.float_import("/fs/constants/deQ/out/deQ_0.idx"), "out_ref");
 
     //modify the checks below:
     S_TENSOR out = ctx.add(new RamTensor<float>(out_ref->getShape())), "out");
@@ -57,11 +57,11 @@ void test_operators_dequantize(void) {
 
 void test_operators_reshape(void) {
     //reference inputs
-    S_TENSOR ref_a = ctx.add(t_import.float_import("/fs/constants/ref_reshape/in/Const_0.idx")), "ref_a");
-    S_TENSOR ref_dim = ctx.add(t_import.int_import("/fs/constants/ref_reshape/in/Const_1_0.idx")), "ref_dim");
+    S_TENSOR ref_a = ctx.add(t_import.float_import("/fs/constants/ref_reshape/in/Const_0.idx"), "ref_a");
+    S_TENSOR ref_dim = ctx.add(t_import.int_import("/fs/constants/ref_reshape/in/Const_1_0.idx"), "ref_dim");
 
     //reference outputs
-    S_TENSOR out_ref_2 = ctx.add(t_import.float_import("/fs/constants/ref_reshape/out/ref_reshape_0.idx")), "out_ref_2");
+    S_TENSOR out_ref_2 = ctx.add(t_import.float_import("/fs/constants/ref_reshape/out/ref_reshape_0.idx"), "out_ref_2");
 
     //modify the checks below:
     S_TENSOR out_2 = ctx.add(new RamTensor<float>(out_ref_2->getShape())), "out_2");

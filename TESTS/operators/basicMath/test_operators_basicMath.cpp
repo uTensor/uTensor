@@ -15,13 +15,13 @@ void test_operators_requantizationRange(void) {
 
   //Note: raw pointers should be owned ONLY by the context. no copy of the raw pointer should exist elsewhere
   // reference inputs
-  ctx.add(t_import.int_import("/fs/constants/rqRange/in/qMatMul_0.idx")), "a");
-  ctx.add(t_import.float_import("/fs/constants/rqRange/in/qMatMul_1.idx")), "a_min");
-  ctx.add(t_import.float_import("/fs/constants/rqRange/in/qMatMul_2.idx")), "a_max");
+  ctx.add(t_import.int_import("/fs/constants/rqRange/in/qMatMul_0.idx"), "a");
+  ctx.add(t_import.float_import("/fs/constants/rqRange/in/qMatMul_1.idx"), "a_min");
+  ctx.add(t_import.float_import("/fs/constants/rqRange/in/qMatMul_2.idx"), "a_max");
 
   // reference output
-  ctx.add(t_import.float_import("/fs/constants/rqRange/out/rqRange_0.idx")), "ref_min");
-  ctx.add(t_import.float_import("/fs/constants/rqRange/out/rqRange_1.idx")), "ref_max");
+  ctx.add(t_import.float_import("/fs/constants/rqRange/out/rqRange_0.idx"), "ref_min");
+  ctx.add(t_import.float_import("/fs/constants/rqRange/out/rqRange_1.idx"), "ref_max");
 
   // Implementation goes here
 
@@ -46,17 +46,17 @@ void test_operators_requantize(void) {
   ctx.gc();
 
   // reference inputs
-  ctx.add(t_import.int_import("/fs/constants/rQ/in/qMatMul_0.idx")), "a");
-  ctx.add(t_import.float_import("/fs/constants/rQ/in/qMatMul_1.idx")), "a_min");
-  ctx.add(t_import.float_import("/fs/constants/rQ/in/qMatMul_2.idx")), "a_max");
-  ctx.add(t_import.float_import("/fs/constants/rQ/in/rqRange_0.idx")), "r_a_min");
-  ctx.add(t_import.float_import("/fs/constants/rQ/in/rqRange_1.idx")), "r_a_max");
+  ctx.add(t_import.int_import("/fs/constants/rQ/in/qMatMul_0.idx"), "a");
+  ctx.add(t_import.float_import("/fs/constants/rQ/in/qMatMul_1.idx"), "a_min");
+  ctx.add(t_import.float_import("/fs/constants/rQ/in/qMatMul_2.idx"), "a_max");
+  ctx.add(t_import.float_import("/fs/constants/rQ/in/rqRange_0.idx"), "r_a_min");
+  ctx.add(t_import.float_import("/fs/constants/rQ/in/rqRange_1.idx"), "r_a_max");
   // tf.quint8
 
   // reference outputs
-  S_TENSOR ref_a_q = ctx.add(t_import.ubyte_import("/fs/constants/rQ/out/rQ_0.idx")), "ref_a_q");
-  S_TENSOR ref_a_min = ctx.add(t_import.float_import("/fs/constants/rQ/out/rQ_1.idx")), "ref_a_min");
-  S_TENSOR ref_a_max = ctx.add(t_import.float_import("/fs/constants/rQ/out/rQ_2.idx")), "ref_a_max");
+  S_TENSOR ref_a_q = ctx.add(t_import.ubyte_import("/fs/constants/rQ/out/rQ_0.idx"), "ref_a_q");
+  S_TENSOR ref_a_min = ctx.add(t_import.float_import("/fs/constants/rQ/out/rQ_1.idx"), "ref_a_min");
+  S_TENSOR ref_a_max = ctx.add(t_import.float_import("/fs/constants/rQ/out/rQ_2.idx"), "ref_a_max");
 
   // modify the checks below:
   S_TENSOR a_q = ctx.add(new RamTensor<unsigned char>(ref_a_q->getShape())), "a_q");
@@ -84,17 +84,17 @@ void test_operators_requantize2(void) {
   ctx.gc();
 
   // reference inputs
-  ctx.add(t_import.int_import("/fs/constants/import-MatMul_eightbit_requantize/in/import-MatMul_eightbit_quantized_mat_mul_0.idx")), "a");
-  ctx.add(t_import.float_import("/fs/constants/import-MatMul_eightbit_requantize/in/import-MatMul_eightbit_quantized_mat_mul_1.idx")), "a_min");
-  ctx.add(t_import.float_import("/fs/constants/import-MatMul_eightbit_requantize/in/import-MatMul_eightbit_quantized_mat_mul_2.idx")), "a_max");
-  ctx.add(t_import.float_import("/fs/constants/import-MatMul_eightbit_requantize/in/import-MatMul_eightbit_requant_range_0.idx")), "r_a_min");
-  ctx.add(t_import.float_import("/fs/constants/import-MatMul_eightbit_requantize/in/import-MatMul_eightbit_requant_range_1.idx")), "r_a_max");
+  ctx.add(t_import.int_import("/fs/constants/import-MatMul_eightbit_requantize/in/import-MatMul_eightbit_quantized_mat_mul_0.idx"), "a");
+  ctx.add(t_import.float_import("/fs/constants/import-MatMul_eightbit_requantize/in/import-MatMul_eightbit_quantized_mat_mul_1.idx"), "a_min");
+  ctx.add(t_import.float_import("/fs/constants/import-MatMul_eightbit_requantize/in/import-MatMul_eightbit_quantized_mat_mul_2.idx"), "a_max");
+  ctx.add(t_import.float_import("/fs/constants/import-MatMul_eightbit_requantize/in/import-MatMul_eightbit_requant_range_0.idx"), "r_a_min");
+  ctx.add(t_import.float_import("/fs/constants/import-MatMul_eightbit_requantize/in/import-MatMul_eightbit_requant_range_1.idx"), "r_a_max");
   // tf.quint8
 
   // reference outputs
-  ctx.add(t_import.ubyte_import("/fs/constants/import-MatMul_eightbit_requantize/out/import-MatMul_eightbit_requantize_0.idx")), "ref_a_q");
-  ctx.add(t_import.float_import("/fs/constants/import-MatMul_eightbit_requantize/out/import-MatMul_eightbit_requantize_1.idx")), "ref_a_min");
-  ctx.add(t_import.float_import("/fs/constants/import-MatMul_eightbit_requantize/out/import-MatMul_eightbit_requantize_2.idx")), "ref_a_max");
+  ctx.add(t_import.ubyte_import("/fs/constants/import-MatMul_eightbit_requantize/out/import-MatMul_eightbit_requantize_0.idx"), "ref_a_q");
+  ctx.add(t_import.float_import("/fs/constants/import-MatMul_eightbit_requantize/out/import-MatMul_eightbit_requantize_1.idx"), "ref_a_min");
+  ctx.add(t_import.float_import("/fs/constants/import-MatMul_eightbit_requantize/out/import-MatMul_eightbit_requantize_2.idx"), "ref_a_max");
 
 
   // modify the checks below:
@@ -145,13 +145,13 @@ void test_operators_argmax(void) {  // NT: WIP   do not use t_import int 64 here
   ctx.gc();
 
   // reference inputs
-  ctx.add(t_import.float_import("/fs/constants/ArgMax/in/ArgMax-input_0.idx")), "ref_a");
-  ctx.add(t_import.int_import("/fs/constants/ArgMax/in/ArgMax-dimension_0.idx")), "ref_dim");
+  ctx.add(t_import.float_import("/fs/constants/ArgMax/in/ArgMax-input_0.idx"), "ref_a");
+  ctx.add(t_import.int_import("/fs/constants/ArgMax/in/ArgMax-dimension_0.idx"), "ref_dim");
 
   // reference outputs
   /// NT: FIXME: argmax outputs int64 tensor which isn't supported by
   /// int_import.
-  S_TENSOR ref_out = ctx.add(t_import.float_import("/fs/constants/ArgMax/out/ArgMax_0.idx")), "ref_out");
+  S_TENSOR ref_out = ctx.add(t_import.float_import("/fs/constants/ArgMax/out/ArgMax_0.idx"), "ref_out");
 
   // Implementation goes here
 
@@ -210,11 +210,11 @@ void test_operators_argmax2(void) {  // NT: WIP   do not use t_import int 64 her
 
 void test_operators_add(void) {
   // reference inputs
-  ctx.add(t_import.float_import("/fs/constants/ref_add/in/Const_5_0.idx")), "a");
-  ctx.add(t_import.float_import("/fs/constants/ref_add/in/Const_6_0.idx")), "b");
+  ctx.add(t_import.float_import("/fs/constants/ref_add/in/Const_5_0.idx"), "a");
+  ctx.add(t_import.float_import("/fs/constants/ref_add/in/Const_6_0.idx"), "b");
 
   // reference outputs
-  S_TENSOR ref_out = ctx.add(t_import.float_import("/fs/constants/ref_add/out/ref_add_0.idx")), "ref_out");
+  S_TENSOR ref_out = ctx.add(t_import.float_import("/fs/constants/ref_add/out/ref_add_0.idx"), "ref_out");
 
   // Implementation goes here
 
@@ -237,11 +237,11 @@ void test_operators_min(void) {
   ctx.gc();
 
   // reference inputs
-  ctx.add(t_import.float_import("/fs/constants/ref_min/in/Const_2_0.idx")), "a");
-  ctx.add(t_import.int_import("/fs/constants/ref_min/in/Const_3_0.idx")), "dim");
+  ctx.add(t_import.float_import("/fs/constants/ref_min/in/Const_2_0.idx"), "a");
+  ctx.add(t_import.int_import("/fs/constants/ref_min/in/Const_3_0.idx"), "dim");
 
   // reference outputs
-  S_TENSOR ref_out = ctx.add(t_import.float_import("/fs/constants/ref_min/out/ref_min_0.idx")), "ref_out");
+  S_TENSOR ref_out = ctx.add(t_import.float_import("/fs/constants/ref_min/out/ref_min_0.idx"), "ref_out");
 
 
   // modify the checks below:
@@ -263,11 +263,11 @@ void test_operators_max(void) {
   ctx.gc();
 
   // reference inputs
-  ctx.add(t_import.float_import("/fs/constants/ref_max/in/Const_2_0.idx")), "a");
-  ctx.add(t_import.int_import("/fs/constants/ref_max/in/Const_4_0.idx")), "dim");
+  ctx.add(t_import.float_import("/fs/constants/ref_max/in/Const_2_0.idx"), "a");
+  ctx.add(t_import.int_import("/fs/constants/ref_max/in/Const_4_0.idx"), "dim");
 
   // reference outputs
-  S_TENSOR ref_out = ctx.add(t_import.float_import("/fs/constants/ref_max/out/ref_max_0.idx")), "ref_out");
+  S_TENSOR ref_out = ctx.add(t_import.float_import("/fs/constants/ref_max/out/ref_max_0.idx"), "ref_out");
 
   // Implementation goes here
 
