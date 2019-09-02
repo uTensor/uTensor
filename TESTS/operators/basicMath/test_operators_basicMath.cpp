@@ -26,12 +26,12 @@ void test_operators_requantizationRange(void) {
   // Implementation goes here
 
   // modify the checks below:
-  ctx.add(new RamTensor<float>(ctx.get("ref_min")->getShape())), "out_min");
-  ctx.add(new RamTensor<float>(ctx.get("ref_max")->getShape())), "out_max");
+  ctx.add(new RamTensor<float>(ctx.get("ref_min")->getShape()), "out_min");
+  ctx.add(new RamTensor<float>(ctx.get("ref_max")->getShape()), "out_max");
   TNameList inputs = {"a", "a_min", "a_max"};
   TNameList outputs = {"out_min", "out_max"};
 
-  ctx.push(new Requantization_RangeOp()), "Requantization_RangeOp", inputs, outputs);
+  ctx.push(new Requantization_RangeOp(), "Requantization_RangeOp", inputs, outputs);
   ctx.eval();
 
   //Note: an output tensor will not be auto-deleted by context unless it has been used as an input
@@ -59,9 +59,9 @@ void test_operators_requantize(void) {
   S_TENSOR ref_a_max = ctx.add(t_import.float_import("/fs/constants/rQ/out/rQ_2.idx"), "ref_a_max");
 
   // modify the checks below:
-  S_TENSOR a_q = ctx.add(new RamTensor<unsigned char>(ref_a_q->getShape())), "a_q");
-  S_TENSOR a_min_q = ctx.add(new RamTensor<float>(ref_a_min->getShape())), "a_min_q");
-  S_TENSOR a_max_q = ctx.add(new RamTensor<float>(ref_a_max->getShape())), "a_max_q");
+  S_TENSOR a_q = ctx.add(new RamTensor<unsigned char>(ref_a_q->getShape()), "a_q");
+  S_TENSOR a_min_q = ctx.add(new RamTensor<float>(ref_a_min->getShape()), "a_min_q");
+  S_TENSOR a_max_q = ctx.add(new RamTensor<float>(ref_a_max->getShape()), "a_max_q");
 
 
   TNameList inputs = {"a", "a_min", "a_max", "r_a_min", "r_a_max"};
@@ -69,7 +69,7 @@ void test_operators_requantize(void) {
 
   // Implementation goes here
   
-  ctx.push(new RequantizeOp()), "RequantizeOp", inputs, outputs);
+  ctx.push(new RequantizeOp(), "RequantizeOp", inputs, outputs);
   ctx.eval();
   
 
@@ -98,9 +98,9 @@ void test_operators_requantize2(void) {
 
 
   // modify the checks below:
-  ctx.add(new RamTensor<unsigned char>(ctx.get("ref_a_q")->getShape())), "a_q");
-  ctx.add(new RamTensor<float>(ctx.get("ref_a_min")->getShape())), "a_min_q");
-  ctx.add(new RamTensor<float>(ctx.get("ref_a_max")->getShape())), "a_max_q");
+  ctx.add(new RamTensor<unsigned char>(ctx.get("ref_a_q")->getShape()), "a_q");
+  ctx.add(new RamTensor<float>(ctx.get("ref_a_min")->getShape()), "a_min_q");
+  ctx.add(new RamTensor<float>(ctx.get("ref_a_max")->getShape()), "a_max_q");
 
   S_TENSOR ref_val = ctx.get("ref_a_q");
   S_TENSOR ref_min = ctx.get("ref_a_min");
@@ -111,7 +111,7 @@ void test_operators_requantize2(void) {
 
   // Implementation goes here
   
-  ctx.push(new RequantizeOp()), "RequantizeOp", {"a", "a_min", "a_max", "r_a_min", "r_a_max"}, {"a_q", "a_min_q", "a_max_q"});
+  ctx.push(new RequantizeOp(), "RequantizeOp", {"a", "a_min", "a_max", "r_a_min", "r_a_max"}, {"a_q", "a_min_q", "a_max_q"});
   ctx.eval();
   
 
@@ -156,13 +156,13 @@ void test_operators_argmax(void) {  // NT: WIP   do not use t_import int 64 here
   // Implementation goes here
 
   // modify the checks below:
-  S_TENSOR out = ctx.add(new RamTensor<int>(ref_out->getShape())), "out");
+  S_TENSOR out = ctx.add(new RamTensor<int>(ref_out->getShape()), "out");
 
   TNameList inputs = {"ref_a", "ref_dim"};
   TNameList outputs = {"out"};
 
   
-  ctx.push(new ArgMaxOp<float, int>()), "ArgMaxOp", inputs, outputs);
+  ctx.push(new ArgMaxOp<float, int>(), "ArgMaxOp", inputs, outputs);
   ctx.eval();
   
 
@@ -194,7 +194,7 @@ void test_operators_argmax2(void) {  // NT: WIP   do not use t_import int 64 her
   *(test_out_ref->write<float>(3, 0)) = 9.0f;
   *(test_out_ref->write<float>(4, 0)) = 2.0f;
 
-  S_TENSOR test_out = ctx.add(new RamTensor<float>(test_out_ref->getShape()), "test_out");
+  S_TENSOR test_out = ctx.add(new RamTensor<float>(test_out_ref->getShape(), "test_out");
   TNameList inputs = {"test_input", "test_dim"};
   TNameList outputs = {"test_out"};
 
@@ -219,11 +219,11 @@ void test_operators_add(void) {
   // Implementation goes here
 
   // modify the checks below:
-  S_TENSOR out = ctx.add(new RamTensor<float>(ref_out->getShape())), "out");
+  S_TENSOR out = ctx.add(new RamTensor<float>(ref_out->getShape(), "out");
   TNameList inputs = {"a", "b"};
   TNameList outputs = {"out"};
   
-  ctx.push(new AddOp<float, float>()), "AddOp", inputs, outputs);
+  ctx.push(new AddOp<float, float>(), "AddOp", inputs, outputs);
   ctx.eval();
   
 
@@ -245,12 +245,12 @@ void test_operators_min(void) {
 
 
   // modify the checks below:
-  S_TENSOR out = ctx.add(new RamTensor<float>(ref_out->getShape())), "out");
+  S_TENSOR out = ctx.add(new RamTensor<float>(ref_out->getShape()), "out");
   TNameList inputs = {"a", "dim"};
   TNameList outputs = {"out"};
 
   
-  ctx.push(new MinOp()), "MinOp", inputs, outputs);
+  ctx.push(new MinOp(), "MinOp", inputs, outputs);
   ctx.eval();
   
 
@@ -272,11 +272,11 @@ void test_operators_max(void) {
   // Implementation goes here
 
   // modify the checks below:
-  S_TENSOR out = ctx.add(new RamTensor<float>(ref_out->getShape())), "out");
+  S_TENSOR out = ctx.add(new RamTensor<float>(ref_out->getShape()), "out");
   TNameList inputs = {"a", "dim"};
   TNameList outputs = {"out"};
   
-  ctx.push(new MaxOp()), "MaxOp", inputs, outputs);
+  ctx.push(new MaxOp(), "MaxOp", inputs, outputs);
   ctx.eval();
   
 
