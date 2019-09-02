@@ -22,9 +22,9 @@ void test_operators_quantizeV2(){
     S_TENSOR ref_b_min_q = ctx.add(t_import.float_import("/fs/constants/qB/out/qB_1.idx"), "ref_b_min_q");
     S_TENSOR ref_b_max_q = ctx.add(t_import.float_import("/fs/constants/qB/out/qB_2.idx"), "ref_b_max_q");
 
-    S_TENSOR out_b_q = ctx.add(new RamTensor<unsigned char>(b_q_ref->getShape())), "b_q");
-    S_TENSOR out_b_min_q = ctx.add(new RamTensor<float>(b_min_q_ref->getShape())), "b_min_q");
-    S_TENSOR out_b_max_q = ctx.add(new RamTensor<float>(b_max_q_ref->getShape())), "b_max_q");
+    S_TENSOR out_b_q = ctx.add(new RamTensor<unsigned char>(b_q_ref->getShape()), "b_q");
+    S_TENSOR out_b_min_q = ctx.add(new RamTensor<float>(b_min_q_ref->getShape()), "b_min_q");
+    S_TENSOR out_b_max_q = ctx.add(new RamTensor<float>(b_max_q_ref->getShape()), "b_max_q");
 
     //Implementation goes here
     ctx.push(new QuantizeV2Op()), "QuantizeV2Op", {"b_q_ref", "b_min_q_ref", "b_max_q_ref"}, {"b_q", "b_min_q", "b_max_q"});
@@ -46,9 +46,9 @@ void test_operators_dequantize(void) {
     S_TENSOR out_ref = ctx.add(t_import.float_import("/fs/constants/deQ/out/deQ_0.idx"), "out_ref");
 
     //modify the checks below:
-    S_TENSOR out = ctx.add(new RamTensor<float>(out_ref->getShape())), "out");
+    S_TENSOR out = ctx.add(new RamTensor<float>(out_ref->getShape()), "out");
 
-    ctx.push(new DequantizeOp()), "DequantizeOp", {"a", "a_min", "a_max"}, {"out"});
+    ctx.push(new DequantizeOp(), "DequantizeOp", {"a", "a_min", "a_max"}, {"out"});
     ctx.eval();
 
     double result = meanPercentErr<float>(out, out_ref);
@@ -64,10 +64,10 @@ void test_operators_reshape(void) {
     S_TENSOR out_ref_2 = ctx.add(t_import.float_import("/fs/constants/ref_reshape/out/ref_reshape_0.idx"), "out_ref_2");
 
     //modify the checks below:
-    S_TENSOR out_2 = ctx.add(new RamTensor<float>(out_ref_2->getShape())), "out_2");
+    S_TENSOR out_2 = ctx.add(new RamTensor<float>(out_ref_2->getShape()), "out_2");
 
 
-    ctx.push(new ReshapeOp()), "ReshapeOp", {"ref_a", "ref_dim"}, {"out_2"});
+    ctx.push(new ReshapeOp(), "ReshapeOp", {"ref_a", "ref_dim"}, {"out_2"});
     ctx.eval();
 
     double result = meanPercentErr<float>(out_2, out_ref_2);
