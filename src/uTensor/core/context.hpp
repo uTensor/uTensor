@@ -54,7 +54,7 @@ protected:
 public:
   S_TENSOR add(Tensor* t, TName _name, uint8_t init_count = 0);
   S_TENSOR get(TName const &t_name);
-  void push(Operator* op, TName _name, TNameList _inputs, TNameList _outputs); //a place holder api to name an op
+  void push(Operator* op, TName _name, TNameList &_inputs, TNameList &_outputs);  //a place holder api to name an op
   void push(Operator* op, TNameList &_inputs, TNameList &_outputs);
   void push(Operator* op, std::initializer_list<TName> _inputs, std::initializer_list<TName> _outputs);
   uint32_t gc(void);

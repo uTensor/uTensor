@@ -41,11 +41,11 @@ Operator* Context::registerOpTable(std::function<void*(void)> func, TName _name)
   return op;
 }
 
-void Context::push(Operator* op, TName _name, TNameList _inputs, TNameList _outputs) {
+void Context::push(Operator* op, TName _name, TNameList &_inputs, TNameList &_outputs) {
   Context::push(op, _inputs, _outputs);
 }
 
-void Context::push(Operator* op, TNameList _inputs, TNameList _outputs) {
+void Context::push(Operator* op, std::initializer_list<TName> _inputs, std::initializer_list<TName> _outputs) {
   TNameList inputs;
   TNameList outputs;
 
