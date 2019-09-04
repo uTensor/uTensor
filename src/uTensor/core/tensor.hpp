@@ -24,7 +24,7 @@ class TensorIdxImporter;
 typedef utensor::string TName;
 typedef utensor::string OpName;
 typedef std::vector<TName> TNameList;
-typedef std::shared_ptr<Tensor> S_TENSOR;
+typedef Tensor* S_TENSOR;
 typedef std::vector<S_TENSOR> S_TList;
 
 class TensorShape: public std::vector<uint32_t> {
