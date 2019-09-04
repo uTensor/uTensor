@@ -20,7 +20,7 @@ void test_operators_quantizedAdd(){
     Tensor* ref_z = t_import.float_import("/fs/constants/add_graph/ref_z.idx");
 
     // compare the results
-    double err = meanAbsErr<float>(ref_z, output_z.get());
+    double err = meanAbsErr<float>(ref_z, output_z);
 
     cout << "err: " << err << endl;
     EXPECT_LT(err , 0.0003);
