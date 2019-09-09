@@ -87,7 +87,7 @@ uTensor is young and under going rapid development. Many exciting features are o
 - Smaller binary
 - More efficient Run-time
 
-You can also check the [project page](https://github.com/orgs/uTensor/projects) for the latest progress. If you'd like to take part in this project, please have a look at our **[contributor guide](contribution_guide.md)** and feel free to reach out to us.
+You can also check the [project page](https://github.com/orgs/uTensor/projects) for the latest progress. If you'd like to take part in this project, please have a look at our **[contributor guide](docs/contribution_guide.md)** and feel free to reach out to us.
 
 ## Further Reading
 - [Why Edge Computing](https://towardsdatascience.com/why-machine-learning-on-the-edge-92fac32105e6)
