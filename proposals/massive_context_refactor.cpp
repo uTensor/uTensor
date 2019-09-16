@@ -1,7 +1,6 @@
 typedef utensor::string OpName;
 typedef std::unordered_map<TName, Tensor*> TensorNamePtrMap;
-​
-
+ 
 class TensorRecord {
     public:
         unsigned char ref_count = 0;
@@ -132,23 +131,23 @@ class TensorInterface : public TensorBase {
         ttype _type; // Maybe make this const
 };
 
-​class utensor::AllocatorInterface {
-​
+class utensor::AllocatorInterface {
+
     protected:
         virtual void _bind(void* ptr, utensor::Tensor* hndl) = 0;
         virtual void _unbind(void* ptr, utensor::Tensor* hndl) = 0;
         virtual bool _is_bound(void* ptr, utensor::Tensor* hndl) = 0;
         virtual bool _has_handle(utensor::Tensor* hndl) = 0;
-​
+
     public:
         void update_hndl(TensorHandle& h, utensor::Tensor* new_t_ptr) {
             h._ptr = new_t_ptr;
         }
-​
+
         void bind(void* ptr, utensor::Tensor* hndl) { 
             if (!has_hndl(hndl))
                 ERROR("Allocator does not contain reference to handle");
-​
+
             if (is_bound(ptr, hndl)){
                 ERROR("Cannot rebind Handles without unbinding");
                 exit(-1)
@@ -165,21 +164,20 @@ class TensorInterface : public TensorBase {
         bool is_bound(void* ptr, utensor::Tensor* hndl) {
             return _is_bound(ptr, hndl);
         }
-​
+
         virtual bool can_rebalance() = 0;
         virtual size_t available() = 0;
         virtual bool rebalance() = 0; // KEY. This call updates all the TensorHandle data references
         
         void* allocate(size_t sz) = 0;
         void deallocate(void* ptr) = 0
-​
+
 };
-​
+
 template<size_t size>
 class utensor::localArenaAllocator : public AllocatorInterface {
     // stuff
 };
-​
 // Note not actually complete
 template<size_t sz>
 class utensor::ArenaAllocator {
@@ -189,7 +187,7 @@ class utensor::ArenaAllocator {
         static void* allocate(size_t size) { 
             if (size > _allocator.available())
                 return NULL;
-​
+
             void* p = _allocator.allocate(size);
             if (p == NULL)
                 _allocator.rebalance(); 
@@ -198,11 +196,11 @@ class utensor::ArenaAllocator {
         static void  bind(void* ptr, utensor::Tensor* hndl) {
             _allocator.bind(ptr, hndl);
         }
-​
+
 };
-​
+
 using utensor::DefaultTensorMetaDataAllocator = utensor::ArenaAllocator<512>;
-​using utensor::DefaultRamTensorAllocator = utensor::ArenaAllocator<4096>;
+using utensor::DefaultRamTensorAllocator = utensor::ArenaAllocator<4096>;
 
 // TensorHandles also appear on the same heap as the Tensor metadata. This way we can move tensors around and delete them without affecting user code
 //template <typename Allocator=utensor::DefaultTensorMetaDataAllocator>
@@ -210,14 +208,14 @@ class TensorHandle {
     private:
         utensor::Tensor* _ptr;
         TensorHandle(const TensorHandle& that) {} // Cannot copy TensorHandles, must pass by reference
-​
+
     public:  
         utensor::Tensor* operator->(0) { return _ptr; }
         TensorHandle(utensor::Tensor* ptr) : _ptr(ptr) {
             Context::DefaultTensorMetaDataAllocator::bind(this, ptr);
         }
         // Add some bits to make the interface nicer to the user
-​
+
         // Force everything to be on the utensor allocator
         void* operator new(size_t sz) { // Have to delegate this size from tensors somehow + sizeof(TensorHandle)
             void* p = Context::DefaultTensorMetaDataAllocator::allocate(sz); 
@@ -226,7 +224,7 @@ class TensorHandle {
         void operator delete(void* p) {
             Context::DefaultTensorMetaDataAllocator::deallocate(p);
         }
-​
+
         // KEY BIT
         friend class utensor::AllocatorInterface;
 };
@@ -298,6 +296,22 @@ public:
         ctx.push_op_tensors(*this, inputs);
         ctx.push_op_tensors(*this, outputs);
     }
+    // The preferred interface
+    OperatorBase(TensorMapInterface* inputs) : inputs(*inputs) {
+        Context& ctx = Context::get_default_context();
+        ctx.push_op_tensors(*this, inputs);
+    }
+    OperatorBase() {}
+    void set_inputs(TensorMapInterface* inputs) {
+        this->inputs = *inputs; 
+        Context& ctx = Context::get_default_context();
+        ctx.push_op_tensors(*this, inputs);
+    }
+    void set_outputs(TensorMapInterface* outputs) {
+        this->outputs = *outputs; 
+        Context& ctx = Context::get_default_context();
+        ctx.push_op_tensors(*this, outputs);
+    }
     virtual ~OperatorBase() {
         Context& ctx = Context::get_default_context();
         ctx.pop_op_tensors(*this, inputs); // Inputs are no longer needed
@@ -316,7 +330,7 @@ void add_kernel(TensorHandle& a, TensorHandle& b, TensorHandle& c){
 
 class AddOperator {
 public:
-    enum names: uint8_t {a, b, c};
+    static enum names: uint8_t {a, b, c};
     AddOperator(FixedTensorMap<2> inputs, FixedTensorMap<1> outputs) : OperatorBase(inputs, outputs) {}
 
 protected:
@@ -333,10 +347,8 @@ class Context {
 
     public:
         static utensor::DefaultTensorMetaDataAllocator DefaultTensorMetaDataAllocator<512>;
-​        static utensor::DefaultRamTensorAllocator DefaultRamTensorAllocator<4096>;
     public:
         static Context* get_default_context() { static Context ctx; return *ctx;}
-// ​
 //         template<class T, typename... Args>
 //         Tensor* add(TName&& _name, unsigned char&& _ref_count, Args&&... args) {
 //             //pooling can be implemented here
@@ -345,7 +357,6 @@ class Context {
 //             tTable[_name] = TensorRecord(t, _ref_count);
 //             return t;
 //         }
-// ​
 //         Tensor*& operator[](TName name);  //non-existing tensor: returns Tensor*& but set Tensor* to null
         
         // Op names are just used for debugging
@@ -353,6 +364,18 @@ class Context {
         void invoke(operator &op);  //intermediate ops exists on stack
         //void invoke(operator &&op, TensorMap _map, OpName _name);  //intermediate ops mamanged by stack
         void gc({});  //decrease ref count of used tensors and perform deletion
-​
 };
-​
+
+void example_model(RamTensor<int8_t> input){
+    // Context is opaque and will handle the destruction and reference counting
+    Context& ctx = Context::get_default_context();
+
+    TensorHandle& A = new TensorHandle(new RomTensor<int8_t(SREF_A_SHAPE, SREF_A_DATA)):
+    TensorHandle& B = new TensorHandle(new RomTensor<int8_t(SREF_B_SHAPE, SREF_B_DATA)):
+    TensorHandle& C = new TensorHandle(new RamTensor<int8_t>());
+
+    AddOperator add_AB().set_inputs({{AddOperator::a, A}, {AddOperator::b, B}}).set_outputs({{AddOperator::c, C}});
+
+    ctx.invoke(add_AB); 
+    
+}
