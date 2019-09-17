@@ -140,7 +140,7 @@ class utensor::AllocatorInterface {
         virtual bool _has_handle(utensor::Tensor* hndl) = 0;
 
     public:
-        void update_hndl(TensorHandle& h, utensor::Tensor* new_t_ptr) {
+        void update_hndl(Tensor& h, utensor::Tensor* new_t_ptr) {
             h._ptr = new_t_ptr;
         }
 
@@ -167,7 +167,7 @@ class utensor::AllocatorInterface {
 
         virtual bool can_rebalance() = 0;
         virtual size_t available() = 0;
-        virtual bool rebalance() = 0; // KEY. This call updates all the TensorHandle data references
+        virtual bool rebalance() = 0; // KEY. This call updates all the Tensor data references
         
         void* allocate(size_t sz) = 0;
         void deallocate(void* ptr) = 0
@@ -202,22 +202,22 @@ class utensor::ArenaAllocator {
 using utensor::DefaultTensorMetaDataAllocator = utensor::ArenaAllocator<512>;
 using utensor::DefaultRamTensorAllocator = utensor::ArenaAllocator<4096>;
 
-// TensorHandles also appear on the same heap as the Tensor metadata. This way we can move tensors around and delete them without affecting user code
+// Tensors also appear on the same heap as the Tensor metadata. This way we can move tensors around and delete them without affecting user code
 //template <typename Allocator=utensor::DefaultTensorMetaDataAllocator>
-class TensorHandle {
+class Tensor {
     private:
-        utensor::Tensor* _ptr;
-        TensorHandle(const TensorHandle& that) {} // Cannot copy TensorHandles, must pass by reference
+        utensor::TensorInterface* _ptr;
+        Tensor(const Tensor& that) {} // Cannot copy Tensors, must pass by reference
 
     public:  
-        utensor::Tensor* operator->(0) { return _ptr; }
-        TensorHandle(utensor::Tensor* ptr) : _ptr(ptr) {
+        utensor::TensorInterface* operator->(0) { return _ptr; }
+        Tensor(utensor::TensorInterface* ptr) : _ptr(ptr) {
             Context::DefaultTensorMetaDataAllocator::bind(this, ptr);
         }
         // Add some bits to make the interface nicer to the user
 
         // Force everything to be on the utensor allocator
-        void* operator new(size_t sz) { // Have to delegate this size from tensors somehow + sizeof(TensorHandle)
+        void* operator new(size_t sz) { // Have to delegate this size from tensors somehow + sizeof(Tensor)
             void* p = Context::DefaultTensorMetaDataAllocator::allocate(sz); 
             return p;
         }
@@ -233,9 +233,9 @@ class TensorHandle {
 class NamedTensorReference {
     public:
     const utensor::string& name; //Fixed
-    utensor::TensorHandle& tensor;     //Modifiable
+    utensor::Tensor& tensor;     //Modifiable
     
-    NamedTensorReference(const utensor::string& name, utensor::TensorHandle& tensor) : name(name), tensor(tensor) {
+    NamedTensorReference(const utensor::string& name, utensor::Tensor& tensor) : name(name), tensor(tensor) {
         Context& ctx = Context::get_default_context();
         ctx.push(*this);
     }
@@ -246,9 +246,9 @@ class NamedTensorReference {
 class SimpleNamedTensor {
     public:
     const utensor::string& name; //Fixed
-    utensor::TensorHandle& tensor;     //Modifiable
+    utensor::Tensor& tensor;     //Modifiable
     
-    SimpleNamedTensor(const utensor::string& name, utensor::TensorHandle& tensor) : name(name), tensor(tensor) {}
+    SimpleNamedTensor(const utensor::string& name, utensor::Tensor& tensor) : name(name), tensor(tensor) {}
 };
 
 // Tensor maps are fixed size to force input output mismatched errors
@@ -256,7 +256,7 @@ class TensorMapInterface {
 public:
     virtual SimpleNamedTensor& operator[](const utensor::string& name) = 0;
     virtual const SimpleNamedTensor& operator[](const utensor::string& name) const = 0;
-    static SimpleNamedTensor not_found(utensor::string("NotFound"), static_cast<utensor::TensorHandle>(NULL));
+    static SimpleNamedTensor not_found(utensor::string("NotFound"), static_cast<utensor::Tensor>(NULL));
 };
 
 template<size_t size>
@@ -322,7 +322,7 @@ protected:
     virtual void compute() = 0;
 };
 
-void add_kernel(TensorHandle& a, TensorHandle& b, TensorHandle& c){
+void add_kernel(Tensor& a, Tensor& b, Tensor& c){
     // Decide on c shape
     for (int i = 0; i < c.size(); i++)
         c[i] = a[i] + b[i];
@@ -370,9 +370,9 @@ void example_model(RamTensor<int8_t> input){
     // Context is opaque and will handle the destruction and reference counting
     Context& ctx = Context::get_default_context();
 
-    TensorHandle& A = new TensorHandle(new RomTensor<int8_t(SREF_A_SHAPE, SREF_A_DATA)):
-    TensorHandle& B = new TensorHandle(new RomTensor<int8_t(SREF_B_SHAPE, SREF_B_DATA)):
-    TensorHandle& C = new TensorHandle(new RamTensor<int8_t>());
+    Tensor& A = new Tensor(new RomTensor<int8_t(SREF_A_SHAPE, SREF_A_DATA)):
+    Tensor& B = new Tensor(new RomTensor<int8_t(SREF_B_SHAPE, SREF_B_DATA)):
+    Tensor& C = new Tensor(new RamTensor<int8_t>());
 
     AddOperator add_AB().set_inputs({{AddOperator::a, A}, {AddOperator::b, B}}).set_outputs({{AddOperator::c, C}});
 
