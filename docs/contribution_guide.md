@@ -1,6 +1,6 @@
 # Contributing to uTensor
 
-Welcome to uTensor contribution guide. Want to make things better? Talk to us directly on [Slack](http://bit.ly/2LtBmJg) or our [Google Group](mailto://utensor@googlegroups.com)!
+Welcome to uTensor contribution guide. Want to make things better? Talk to us directly on [Slack](https://join.slack.com/t/utensor/shared_invite/enQtNTM4NTg4MjY0MjEwLTk3MzkzOTAzMGQ3NTY3YzMzZDE4ZjdmZjI5MmU0OGY5MmI5ZGJlMTUwZWEwMjU5NzAyZjcyMDUxYTdkMTQ4YzM) or our [Google Group](mailto://utensor@googlegroups.com)!
 
 ## Ways to Contribute
 
