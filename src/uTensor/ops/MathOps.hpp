@@ -34,7 +34,7 @@ void Requantization_Range(S_TENSOR input, S_TENSOR min, S_TENSOR max,
 
   int32_t used_min_quan;
   int32_t used_max_quan;
-  CalculateUsedRange<T1>(input.get(), &used_min_quan, &used_max_quan);
+  CalculateUsedRange<T1>(input, &used_min_quan, &used_max_quan);
 
   TensorShape one_shape = {1};
   if(out_min->getSize() == 0) out_min->resize(one_shape);

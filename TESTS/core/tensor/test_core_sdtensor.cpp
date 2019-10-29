@@ -82,8 +82,8 @@ void test_core_matmulSDtensor() {
          
     ctx.eval();
 
-    double result = meanPercentErr<int>(c.get(), out_c.get()) + meanPercentErr<float>(c_min.get(), out_min.get()) +
-                      meanPercentErr<float>(c_max.get(), out_max.get());
+    double result = meanPercentErr<int>(c, out_c) + meanPercentErr<float>(c_min, out_min) +
+                      meanPercentErr<float>(c_max, out_max);
 
     EXPECT_EQ(result, 0);
 }

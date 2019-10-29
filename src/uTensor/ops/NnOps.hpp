@@ -311,9 +311,9 @@ class QuantizedMaxPoolingOp : public MaxPoolingOp<T> {
     // new range
     float new_in_max = in_max > 0 ? in_max : 0;
     float new_in_min = in_min < 0 ? in_min : 0;
-    RequantizeManyInNewRange<T, T>(this->inputs[0].get(), this->inputs[0]->getSize(),
-                                   in_min, in_max, new_in_min, new_in_max,
-                                   this->inputs[0].get());
+    RequantizeManyInNewRange<T, T>(this->inputs[0], this->inputs[0]->getSize(),
+                                   in_min, in_max, new_in_min, new_in_max, 
+                                   this->inputs[0]);
     // write new range
     S_TENSOR out_min_tensor = this->outputs[1];
     S_TENSOR out_max_tensor = this->outputs[2];
