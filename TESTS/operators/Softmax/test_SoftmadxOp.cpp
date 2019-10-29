@@ -21,7 +21,7 @@ void test_operators_float_SoftmaxOp(void){
     ctx.eval();
 
     Tensor* ref_output = t_import.float_import("/fs/constants/Softmax/out/ref_float_softmax.idx");
-    double err = meanAbsErr<float>(out.get(), ref_output);
+    double err = meanAbsErr<float>(out, ref_output);
     EXPECT_EQ(err < 1e-6, true);
 }
 
