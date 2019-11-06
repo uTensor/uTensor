@@ -1,13 +1,16 @@
 #ifndef __UTENSOR_TYPES_H
 #define __UTENSOR_TYPES_H
 #include <cstdint>
+#include <array>
+
+using std::array;
 
 class TensorShape {
         TensorShape(uint16_t shape);
-        TensorShape(uint16_t shape[1]) ;
-        TensorShape(uint16_t shape[2]) ;
-        TensorShape(uint16_t shape[3]) ;
-        TensorShape(uint16_t shape[4]) ;
+        TensorShape(array<uint16_t, 1> shape) ;
+        TensorShape(array<uint16_t, 2> shape) ;
+        TensorShape(array<uint16_t, 3> shape) ;
+        TensorShape(array<uint16_t, 4> shape) ;
 
         uint16_t operator[] (int i) const ;
         uint16_t& operator[](int i) ;
@@ -16,7 +19,7 @@ class TensorShape {
     private:
         uint16_t _shape[4];
         uint8_t  _num_dims;
-}
+};
 // Do something to remember current type
 enum ttype: uint8_t {
             i8,
@@ -25,7 +28,7 @@ enum ttype: uint8_t {
             u16,
             i32,
             u32,
-            float,
+            flt,
             undefined
 };
 
@@ -35,7 +38,7 @@ class IntegralValue {
     public:
 
         // Explicit
-        IntegralValue(void* p) : p(p) ;
+        IntegralValue(void* p);
         IntegralValue(const uint8_t& u) ;
         IntegralValue(const int8_t& u);
         IntegralValue(const uint16_t& u);

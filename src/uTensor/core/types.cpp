@@ -1,11 +1,37 @@
 #include "types.hpp"
 
 
-TensorShape::TensorShape(uint16_t shape) : _shape({shape, 0, 0, 0}), _num_dims(1) {}
-TensorShape::TensorShape(uint16_t shape[1]) : _shape({shape, 0, 0, 0}), _num_dims(1) {}
-TensorShape::TensorShape(uint16_t shape[2]) : _shape({shape[0],shape[1], 0, 0}), _num_dims(2) {}
-TensorShape::TensorShape(uint16_t shape[3]) : _shape({shape[0], shape[1], shape[2], 0}), _num_dims(3) {}
-TensorShape::TensorShape(uint16_t shape[4]) : _shape(shape), _num_dims(4) {}
+TensorShape::TensorShape(uint16_t shape) :  _num_dims(1) {
+    _shape[0] = shape;
+    _shape[1] = 0;
+    _shape[2] = 0;
+    _shape[3] = 0;
+}
+TensorShape::TensorShape(array<uint16_t, 1> shape) :  _num_dims(1) {
+    _shape[0] = shape[0];
+    _shape[1] = 0;
+    _shape[2] = 0;
+    _shape[3] = 0;
+}
+TensorShape::TensorShape(array<uint16_t, 2> shape) :  _num_dims(2) {
+    _shape[0] = shape[0];
+    _shape[1] = shape[1];
+    _shape[2] = 0;
+    _shape[3] = 0;
+}
+TensorShape::TensorShape(array<uint16_t, 3> shape) :  _num_dims(3) {
+    _shape[0] = shape[0];
+    _shape[1] = shape[1];
+    _shape[2] = shape[2];
+    _shape[3] = 0;
+
+}
+TensorShape::TensorShape(array<uint16_t, 4> shape) :  _num_dims(4) {
+    _shape[0] = shape[0];
+    _shape[1] = shape[1];
+    _shape[2] = shape[2];
+    _shape[3] = shape[3];
+}
 
 uint16_t TensorShape::operator[] (int i) const { return _shape[i]; /* Do additional checks*/}
 uint16_t& TensorShape::operator[](int i) { return _shape[i]; } // Maybe handle update case
@@ -23,6 +49,7 @@ uint16_t TensorShape::get_linear_size() const {
     for(int i = 0; i < _num_dims; i++){
         sum += _shape[i];
     }
+    return sum;
 }
 
 IntegralValue::IntegralValue(void* p) : p(p) {}
