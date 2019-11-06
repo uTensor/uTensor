@@ -16,6 +16,7 @@ class TensorShape {
         uint16_t& operator[](int i) ;
         void update_dims();
         uint16_t get_linear_size() const; 
+        uint8_t num_dims() const;
     private:
         uint16_t _shape[4];
         uint8_t  _num_dims;
