@@ -4,6 +4,9 @@
 namespace uTensor {
 class Tensor;
 
+/**
+ * Allocators are expected to maintain a mapping of Tensor handles to data regions. * This allows the allocator to move around the underlying data without breaking the user interface.
+ */
 class AllocatorInterface {
 
     // Allocators must implement these functions
