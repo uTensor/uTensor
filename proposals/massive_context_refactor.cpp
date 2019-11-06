@@ -90,15 +90,15 @@ public:
     TensorBase(){
         utensor::Context::get_default_context().register(*this);
     }
-    virtual ~TensorBase(){}
+    //virtual ~TensorBase(){}
 
     // Allocate the tensor metadata on a different heap from the data scratch pads
 
-    virtual void* operator new(size_t sz) { 
+    void* operator new(size_t sz) { 
         void* p = utensor::Context::DefaultTensorMetaDataAllocator::allocate(sz); 
         return p;
     }
-    virtual void operator delete(void* p) {
+    void operator delete(void* p) {
         utensor::Context::DefaultTensorMetaDataAllocator::deallocate(p);
     }
 };
