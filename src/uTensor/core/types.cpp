@@ -52,6 +52,7 @@ uint16_t TensorShape::get_linear_size() const {
     return sum;
 }
 
+uint8_t TensorShape::num_dims() const { return _num_dims; }
 IntegralValue::IntegralValue(void* p) : p(p) {}
 IntegralValue::IntegralValue(const uint8_t& u) { *reinterpret_cast<uint8_t*>(p) = u; }
 IntegralValue::IntegralValue(const int8_t& u) { *reinterpret_cast<int8_t*>(p) = u; }
@@ -77,3 +78,5 @@ IntegralValue::operator int32_t&  ( )       { return static_cast<int32_t&> ( *re
 IntegralValue::
 IntegralValue::operator float   ( ) const { return static_cast<float> ( *reinterpret_cast<float*>  ( p)); }
 IntegralValue::operator float&  ( )       { return static_cast<float&> ( *reinterpret_cast<float*>  ( p)); }
+
+
