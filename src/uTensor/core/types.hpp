@@ -6,6 +6,7 @@
 using std::array;
 
 class TensorShape {
+  public:
         TensorShape(uint16_t shape);
         TensorShape(array<uint16_t, 1> shape) ;
         TensorShape(array<uint16_t, 2> shape) ;
@@ -17,6 +18,7 @@ class TensorShape {
         void update_dims();
         uint16_t get_linear_size() const; 
         uint8_t num_dims() const;
+        uint32_t linear_index(uint16_t i, uint16_t j, uint16_t k, uint16_t l) const;
     private:
         uint16_t _shape[4];
         uint8_t  _num_dims;

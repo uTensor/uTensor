@@ -3,8 +3,8 @@
 namespace uTensor {
 Tensor::Tensor(const Tensor& that) {} // Cannot copy Tensors, must pass by reference
 
-TensorInterface* Tensor::operator->(0) { return _ptr; }
-Tensor::Tensor(utensor::TensorInterface* ptr) : _ptr(ptr) {
+TensorInterface* Tensor::operator->() { return _ptr; }
+Tensor::Tensor(TensorInterface* ptr) : _ptr(ptr) {
   Context::DefaultTensorMetaDataAllocator::bind(this, ptr);
 }
 // Add some bits to make the interface nicer to the user
