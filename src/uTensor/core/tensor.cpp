@@ -1,10 +1,10 @@
 #include "tensor.hpp"
 
 namespace uTensor {
-Tensor::Tensor(const Tensor& that) {} // Cannot copy Tensors, must pass by reference
+//Tensor::Tensor(const Tensor& that) {} // Cannot copy Tensors, must pass by reference
 
-TensorInterface* Tensor::operator->() { return _ptr; }
-Tensor::Tensor(TensorInterface* ptr) : _ptr(ptr) {
+TensorInterface* Tensor::operator->() { return reinterpret_cast<TensorInterface*>(_ptr); }
+Tensor::Tensor(TensorInterface* ptr) : Handle((void*)ptr) {
   Context::DefaultTensorMetaDataAllocator::bind(this, ptr);
 }
 // Add some bits to make the interface nicer to the user

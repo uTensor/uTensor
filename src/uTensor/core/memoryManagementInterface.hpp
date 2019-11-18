@@ -2,8 +2,23 @@
 #define __UTENSOR_MEMORY_MANAGEMENT_IFC_H
 #include <cstring>
 namespace uTensor {
-class Tensor;
 
+class AllocatorInterface;
+
+class Handle {
+  private:
+    Handle(const Handle& that);
+    // KEY BIT
+    friend class AllocatorInterface;
+  public:
+    // Force everything to be on the utensor allocator
+    //void* operator new(size_t sz); 
+    //void operator delete(void* p); 
+    Handle() : _ptr(nullptr) {}
+    Handle(void* p): _ptr(p) {}
+  protected:
+    void* _ptr;
+};
 /**
  * Allocators are expected to maintain a mapping of Tensor handles to data regions. * This allows the allocator to move around the underlying data without breaking the user interface.
  */
@@ -11,26 +26,26 @@ class AllocatorInterface {
 
     // Allocators must implement these functions
     protected:
-        virtual void _bind(void* ptr, Tensor* hndl) = 0;
-        virtual void _unbind(void* ptr, Tensor* hndl) = 0;
-        virtual bool _is_bound(void* ptr, Tensor* hndl) = 0;
-        virtual bool _has_handle(Tensor* hndl) = 0;
+        virtual void _bind(void* ptr, Handle* hndl) = 0;
+        virtual void _unbind(void* ptr, Handle* hndl) = 0;
+        virtual bool _is_bound(void* ptr, Handle* hndl) = 0;
+        virtual bool _has_handle(Handle* hndl) = 0;
 
     public:
         /*
          * Public interface for updating a Tensor Handle reference
          */
-        void update_hndl(Tensor& h, Tensor* new_t_ptr);
+        void update_hndl(Handle& h, void* new_ptr);
 
         /**
          * Bind/Unbind data to Tensor Handle
          */
-        void bind(void* ptr, Tensor* hndl);
-        void unbind(void* ptr, Tensor* hndl); 
+        void bind(void* ptr, Handle* hndl);
+        void unbind(void* ptr, Handle* hndl); 
         /**
          * Check if a pointer is associated with a Tensor
          */
-        bool is_bound(void* ptr, Tensor* hndl); 
+        bool is_bound(void* ptr, Handle* hndl); 
 
         /**
          * Returns the amount of space available in the Memory Manager
