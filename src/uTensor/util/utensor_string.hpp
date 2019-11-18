@@ -2,7 +2,7 @@
 #define UTENSOR_STRING
 #include <string.h>
 
-namespace utensor {
+namespace uTensor {
     class string{
         private:
             uint32_t value;
