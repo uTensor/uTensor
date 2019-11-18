@@ -8,7 +8,7 @@ void AllocatorInterface::update_hndl(Tensor& h, Tensor* new_t_ptr) {
 }
 
 void AllocatorInterface::bind(void* ptr, Tensor* hndl) { 
-    if (!has_hndl(hndl))
+    if (!_has_handle(hndl))
         DEBUG("Allocator does not contain reference to handle");
 
     if (is_bound(ptr, hndl)){
@@ -16,7 +16,7 @@ void AllocatorInterface::bind(void* ptr, Tensor* hndl) {
     }
     _bind(ptr, hndl);
 }
-void AllocatorInterface::unbind(void* ptr, Tensor* hdnl) {
+void AllocatorInterface::unbind(void* ptr, Tensor* hndl) {
     if (!is_bound(ptr, hndl)){
         ERR_EXIT("Cannot unbind unbound Handles");
     }

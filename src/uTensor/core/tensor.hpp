@@ -10,13 +10,13 @@ namespace uTensor {
 //template <typename Allocator=utensor::DefaultTensorMetaDataAllocator>
 class Tensor {
     private:
-        utensor::TensorInterface* _ptr;
+        TensorInterface* _ptr;
         // Cannot copy Tensors, must pass by reference
         Tensor(const Tensor& that);
 
     public:  
-        utensor::TensorInterface* operator->(0); 
-        Tensor(utensor::TensorInterface* ptr);
+        TensorInterface* operator->(); 
+        Tensor(TensorInterface* ptr);
         // Add some bits to make the interface nicer to the user
 
         // Force everything to be on the utensor allocator
@@ -24,7 +24,7 @@ class Tensor {
         void operator delete(void* p); 
 
         // KEY BIT
-        friend class utensor::AllocatorInterface;
+        friend class AllocatorInterface;
 };
 
 // Same as Named Tensor but not registered in the context class 
@@ -33,7 +33,7 @@ struct SimpleNamedTensor {
     const uTensor::string& name; //Fixed
     Tensor& tensor;     //Modifiable
     
-    SimpleNamedTensor(const uTensor::string& name, Tensor& tensor) : name(name), tensor(tensor);
+    SimpleNamedTensor(const uTensor::string& name, Tensor& tensor);
 };
 }
 #endif

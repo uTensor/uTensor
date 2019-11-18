@@ -26,7 +26,7 @@ class AllocatorInterface {
          * Bind/Unbind data to Tensor Handle
          */
         void bind(void* ptr, Tensor* hndl);
-        void unbind(void* ptr, Tensor* hdnl); 
+        void unbind(void* ptr, Tensor* hndl); 
         /**
          * Check if a pointer is associated with a Tensor
          */
@@ -47,12 +47,12 @@ class AllocatorInterface {
         /**
          * Allocate sz bytes in the memory manager
          */
-        void* allocate(size_t sz) = 0;
+        virtual void* allocate(size_t sz) = 0;
 
         /**
          * Deallocate all data associated with pointer
          */
-        void deallocate(void* ptr) = 0;
+        virtual void deallocate(void* ptr) = 0;
 
 };
 

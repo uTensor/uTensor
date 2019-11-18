@@ -39,9 +39,9 @@ namespace uTensor {
 }
 
 namespace std {
-    template<> struct hash<utensor::string>
+    template<> struct hash<uTensor::string>
     {
-        typedef utensor::string argument_type;
+        typedef uTensor::string argument_type;
         typedef std::size_t result_type;
 
         result_type operator()(argument_type const& s) const noexcept

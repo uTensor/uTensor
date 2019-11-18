@@ -35,8 +35,8 @@ class TensorInterface : public TensorBase {
         const IntegralValue operator()(uint16_t i, 
                 uint16_t j = 0, 
                 uint16_t k = 0, 
-                uint16_t l = 0);
-        IntegralValue& operator()(uint16_t i, 
+                uint16_t l = 0) const;
+        IntegralValue operator()(uint16_t i, 
                 uint16_t j = 0, 
                 uint16_t k = 0, 
                 uint16_t l = 0);
