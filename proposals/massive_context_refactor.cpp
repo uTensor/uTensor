@@ -30,7 +30,7 @@ class TensorShape {
 
             uint16_t sum = 0;
             for(int i = 0; i < _num_dims; i++){
-                sum += _shape[i];
+                sum *= _shape[i];
             }
         }
     private:

@@ -19,6 +19,7 @@ public:
 
 // The public interface for all TensorMem types. This is the public contract for users of tensors, handling basic data read/write, sizing, construction, shaping, etc.
 class TensorInterface : public TensorBase {
+    // DO not make these read/write calls public or Michael will smite you
     protected:
         virtual void* read(uint32_t linear_index) const = 0; // Handle to the data
         virtual void* write(uint32_t linear_index) = 0;
