@@ -52,7 +52,7 @@ class AllocatorInterface {
         /**
          * Deallocate all data associated with pointer
          */
-        void deallocate(void* ptr) = 0
+        void deallocate(void* ptr) = 0;
 
 };
 
