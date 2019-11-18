@@ -32,5 +32,13 @@ IntegralValue& TensorInterface::operator()(uint16_t i, uint16_t j = 0, uint16_t 
     // Add shape checks here
     return write(_shape.linear_index(i,j,k,l));
 }
+size_t get_readable_block(void* buffer, uint16_t req_read_size,  uint32_t linear_index) const {
+    printf("ERROR, Optimized op attempted to read access non-optimizable tensor\n");
+}
+size_t get_writeable_block(void* buffer,uint16_t req_write_size, uint32_t linear_index){
+    printf("ERROR, Optimized op attempted to write access non-optimizable tensor\n");
 
 }
+
+}
+
