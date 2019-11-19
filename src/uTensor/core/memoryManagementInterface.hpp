@@ -8,16 +8,41 @@ class AllocatorInterface;
 class Handle {
   private:
     Handle(const Handle& that);
+    // Handles cannot be allocated directly
+    void* operator new(size_t sz) { return nullptr; }
+    void operator delete(void* p) { }
     // KEY BIT
     friend class AllocatorInterface;
   public:
-    // Force everything to be on the utensor allocator
-    //void* operator new(size_t sz); 
-    //void operator delete(void* p); 
     Handle() : _ptr(nullptr) {}
     Handle(void* p): _ptr(p) {}
+    void* operator*() { return _ptr; }
   protected:
     void* _ptr;
+};
+
+class RawDataHandle : public Handle {
+  public:
+    RawDataHandle(size_t req_ram_size) {
+      _ptr = Context::DefaultRamDataAllocator::allocate(req_ram_size);
+      Context::DefaultRamDataAllocator::bind(this, _ptr);
+    }
+    ~RawDataHandle() {
+      Context::DefaultRamDataAllocator::deallocate(_ptr);
+    }
+    //void* operator new(size_t sz) { // Have to delegate this size from tensors somehow + sizeof(Tensor)
+    //  void* p = Context::DefaultTensorMetaDataAllocator::allocate(sz); 
+    //  return p;
+    //}
+    //void operator delete(void* p) {
+    //  Context::DefaultTensorMetaDataAllocator::deallocate(p);
+    //}
+  // Ignore this, use the constructor to specify the data space
+  //  void* operator new(size_t sz, size_t req_ram_size){
+  //    void* p = Context::DefaultTensorMetaDataAllocator::allocate(sz); 
+  //    _ptr = Context::DefaultRamDataAllocator::allocator(req_ram_size);
+  //    return p;
+  //  }
 };
 /**
  * Allocators are expected to maintain a mapping of Tensor handles to data regions. * This allows the allocator to move around the underlying data without breaking the user interface.
