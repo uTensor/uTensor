@@ -6,33 +6,34 @@
 #include "utensor_string.hpp"
 
 namespace uTensor {
-// Tensors also appear on the same heap as the Tensor metadata. This way we can move tensors around and delete them without affecting user code
-//template <typename Allocator=utensor::DefaultTensorMetaDataAllocator>
+// Tensors also appear on the same heap as the Tensor metadata. This way we can
+// move tensors around and delete them without affecting user code
+// template <typename Allocator=utensor::DefaultTensorMetaDataAllocator>
 class Tensor : public Handle {
-    //private:
-    //    // Cannot copy Tensors, must pass by reference
-    //    Tensor(const Tensor& that);
+  // private:
+  //    // Cannot copy Tensors, must pass by reference
+  //    Tensor(const Tensor& that);
 
-    public:  
-        TensorInterface* operator->(); 
-        Tensor(TensorInterface* ptr);
-        // Add some bits to make the interface nicer to the user
+ public:
+  TensorInterface* operator->();
+  Tensor(TensorInterface* ptr);
+  // Add some bits to make the interface nicer to the user
 
-        // Force everything to be on the utensor allocator
-        void* operator new(size_t sz); 
-        void operator delete(void* p); 
+  // Force everything to be on the utensor allocator
+  void* operator new(size_t sz);
+  void operator delete(void* p);
 
-        // KEY BIT
-        friend class AllocatorInterface;
+  // KEY BIT
+  friend class AllocatorInterface;
 };
 
-// Same as Named Tensor but not registered in the context class 
+// Same as Named Tensor but not registered in the context class
 struct SimpleNamedTensor {
-    public:
-    const uTensor::string& name; //Fixed
-    Tensor& tensor;     //Modifiable
-    
-    SimpleNamedTensor(const uTensor::string& name, Tensor& tensor);
+ public:
+  const uTensor::string& name;  // Fixed
+  Tensor& tensor;               // Modifiable
+
+  SimpleNamedTensor(const uTensor::string& name, Tensor& tensor);
 };
-}
+}  // namespace uTensor
 #endif

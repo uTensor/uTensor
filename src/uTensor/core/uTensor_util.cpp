@@ -1,7 +1,7 @@
 #include "uTensor_util.hpp"
 #if !(defined(TARGET_MBED) || defined(ARDUINO))
-#include <sys/stat.h>
 #include <dirent.h>
+#include <sys/stat.h>
 #endif
 #include <cstdlib>
 
@@ -25,13 +25,13 @@ void printVector(std::vector<uint32_t> vec) {
 }
 
 uint16_t ntoh16(uint16_t val) {
-   uint16_t ret = 0;
+  uint16_t ret = 0;
 
-   ret |= val >> 8;
-   ret |= val << 8;
+  ret |= val >> 8;
+  ret |= val << 8;
 
-   return ret;
- }
+  return ret;
+}
 
 uint32_t ntoh32(uint32_t val) {
   const uint32_t mask = 0b11111111;
@@ -46,27 +46,25 @@ uint32_t ntoh32(uint32_t val) {
 }
 
 #ifdef ARDUINO
-void int_env() {
-}
+void int_env() {}
 #else
 void init_env() {
-    int status;
-    DIR* dir = opendir("/fs/tmp");
-    if (dir) {
-        closedir(dir);
-        return;
-    } else {
-
-      status = mkdir("/fs/tmp", 0777);
-      if (status == -1) {
-        ERR_EXIT("env setting failed");
-      }
+  int status;
+  DIR* dir = opendir("/fs/tmp");
+  if (dir) {
+    closedir(dir);
+    return;
+  } else {
+    status = mkdir("/fs/tmp", 0777);
+    if (status == -1) {
+      ERR_EXIT("env setting failed");
     }
+  }
 }
 #endif
 
 void utensor_exit(void) {
 #ifndef __EMSCRIPTEN__
-    exit(-1);
+  exit(-1);
 #endif
 }
