@@ -19,6 +19,8 @@ class Handle {
   Handle(void* p);
   // return the data directly (looks pointer like)
   void* operator*();
+  // Allow users to check if handle is not valid
+  bool operator!() const;
 
  protected:
   void* _ptr;
@@ -36,6 +38,8 @@ class AllocatorInterface {
   virtual void _unbind(void* ptr, Handle* hndl) = 0;
   virtual bool _is_bound(void* ptr, Handle* hndl) = 0;
   virtual bool _has_handle(Handle* hndl) = 0;
+  virtual void* _allocate(size_t sz) = 0;
+  virtual void _deallocate(void* ptr) = 0;
 
  public:
   /*
@@ -69,12 +73,12 @@ class AllocatorInterface {
   /**
    * Allocate sz bytes in the memory manager
    */
-  virtual void* allocate(size_t sz) = 0;
+  void* allocate(size_t sz);
 
   /**
    * Deallocate all data associated with pointer
    */
-  virtual void deallocate(void* ptr) = 0;
+  void deallocate(void* ptr);
 };
 
 }  // namespace uTensor

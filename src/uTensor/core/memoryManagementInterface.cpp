@@ -10,6 +10,7 @@ void Handle::operator delete(void* p) {}
 Handle::Handle() : _ptr(nullptr) {}
 Handle::Handle(void* p) : _ptr(p) {}
 void* Handle::operator*() { return _ptr; }
+bool Handle::operator!() const { return _ptr == nullptr; }
 
 void AllocatorInterface::update_hndl(Handle& h, void* new_ptr) {
   h._ptr = new_ptr;
@@ -32,6 +33,17 @@ void AllocatorInterface::unbind(void* ptr, Handle* hndl) {
 }
 bool AllocatorInterface::is_bound(void* ptr, Handle* hndl) {
   return _is_bound(ptr, hndl);
+}
+void* AllocatorInterface::allocate(size_t sz) {
+    if(sz > (1 << 16)){
+        //TODO ERROR invalid allocation size
+        return nullptr;
+    }
+    return _allocate(sz);
+}
+
+void AllocatorInterface::deallocate(void* ptr) {
+    _deallocate(ptr);
 }
 
 };  // namespace uTensor
