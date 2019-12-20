@@ -45,7 +45,7 @@ class AllocatorInterface {
   /*
    * Public interface for updating a Tensor Handle reference
    */
-  void update_hndl(Handle& h, void* new_ptr);
+  void update_hndl(Handle* h, void* new_ptr);
 
   /**
    * Bind/Unbind data to Tensor Handle

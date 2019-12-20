@@ -12,8 +12,8 @@ Handle::Handle(void* p) : _ptr(p) {}
 void* Handle::operator*() { return _ptr; }
 bool Handle::operator!() const { return _ptr == nullptr; }
 
-void AllocatorInterface::update_hndl(Handle& h, void* new_ptr) {
-  h._ptr = new_ptr;
+void AllocatorInterface::update_hndl(Handle* h, void* new_ptr) {
+  h->_ptr = new_ptr;
 }
 
 void AllocatorInterface::bind(void* ptr, Handle* hndl) {

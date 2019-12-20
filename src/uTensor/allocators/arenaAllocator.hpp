@@ -177,7 +177,7 @@ class localCircularArenaAllocator : public AllocatorInterface {
       while(forward_cursor < end()){
         MetaHeader hdr = _read_header((void*) forward_cursor);
         if(hdr.is_bound()){
-          hdr.hndl->_ptr = (void*) forward_cursor;
+          update_hndl(hdr.hndl, (void*) forward_cursor);
         }
         forward_cursor += hdr.get_len() + sizeof(MetaHeader);
       }
@@ -201,16 +201,17 @@ class ArenaCircularAllocator {
         static localCircularArenaAllocator<sz> _allocator;
     public:
         static void* allocate(size_t size) { 
-            if (size > _allocator.available())
-                return NULL;
-
             void* p = _allocator.allocate(size);
-            if (p == NULL)
-                _allocator.rebalance(); 
+            return p;
         }
-        static void  deallocate(void* p) { ... }
-        static void  bind(void* ptr, utensor::Tensor* hndl) {
+        static void  deallocate(void* p) {
+          _allocator.deallocate(p);
+        }
+        static void  bind(void* ptr, Tensor* hndl) {
             _allocator.bind(ptr, hndl);
+        }
+        static void unbind(void* ptr, Tensor* hndl) {
+          _allocator.unbind(ptr, hndl);
         }
 
 };
