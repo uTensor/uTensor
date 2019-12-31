@@ -13,6 +13,7 @@ class Tensor : public Handle {
   // private:
   //    // Cannot copy Tensors, must pass by reference
   //    Tensor(const Tensor& that);
+  //enum Type : uint8_t { TENSOR_IFC_PTR, TENSOR_HANDLE_PTR } type;
 
  public:
   TensorInterface* operator->();
