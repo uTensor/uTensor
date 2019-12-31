@@ -44,6 +44,7 @@ void* AllocatorInterface::allocate(size_t sz) {
 
 void AllocatorInterface::deallocate(void* ptr) {
     _deallocate(ptr);
+    ptr = nullptr;
 }
 
 };  // namespace uTensor
