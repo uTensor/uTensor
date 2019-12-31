@@ -78,14 +78,14 @@ TEST(ArenaAllocator, two_alloc_access) {
 
 TEST(ArenaAllocator, circle_back) {
   localCircularArenaAllocator<256> _allocator;
-  void* ptr1 = _allocator.allocate(200);
+  void* ptr1 = _allocator.allocate(100);
   cout << "Avaliable " << _allocator.available() << endl;
-  void* ptr2 = _allocator.allocate(10);
+  void* ptr2 = _allocator.allocate(100);
   cout << "Avaliable " << _allocator.available() << endl;
-  void* ptr3 = _allocator.allocate(40);
+  void* ptr3 = _allocator.allocate(117);
   cout << "Avaliable " << _allocator.available() << endl;
-  EXPECT_EQ(_allocator.contains(ptr2), true);
+  EXPECT_EQ(_allocator.contains(ptr2), false);
   EXPECT_EQ(_allocator.contains(ptr3), true);
-  EXPECT_EQ(_allocator.contains(ptr1), false);
+  EXPECT_EQ(_allocator.contains(ptr1), true);
 
 }
