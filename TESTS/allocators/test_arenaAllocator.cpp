@@ -1,5 +1,8 @@
 #include "gtest/gtest.h"
 #include "arenaAllocator.hpp"
+#include <iostream>
+using std::cout;
+using std::endl;
 
 using namespace uTensor;
 TEST(ArenaAllocator, constructor) {
@@ -70,5 +73,19 @@ TEST(ArenaAllocator, two_alloc_access) {
   for(int i = 0; i < 40; i++){
     EXPECT_EQ(data2[i], 255-i);
   }
+
+}
+
+TEST(ArenaAllocator, circle_back) {
+  localCircularArenaAllocator<256> _allocator;
+  void* ptr1 = _allocator.allocate(200);
+  cout << "Avaliable " << _allocator.available() << endl;
+  void* ptr2 = _allocator.allocate(10);
+  cout << "Avaliable " << _allocator.available() << endl;
+  void* ptr3 = _allocator.allocate(40);
+  cout << "Avaliable " << _allocator.available() << endl;
+  EXPECT_EQ(_allocator.contains(ptr2), true);
+  EXPECT_EQ(_allocator.contains(ptr3), true);
+  EXPECT_EQ(_allocator.contains(ptr1), false);
 
 }
