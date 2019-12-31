@@ -65,6 +65,23 @@ class localCircularArenaAllocator : public AllocatorInterface {
 
     uint8_t* begin() { return _buffer + sizeof(MetaHeader); }
     uint8_t* end() { return _buffer + size; }
+    void _clear_forward(size_t sz) { 
+        //clear necessary chunks until enough space for current request + appended fragment header
+        uint8_t* forward_cursor = cursor;
+        while((forward_cursor - cursor) < sz){
+          MetaHeader f_hdr = _read_header((void*) forward_cursor);
+          deallocate((void*) forward_cursor);
+        // Decide whether we need to insert a fragment header or not
+          forward_cursor += f_hdr.get_len() + sizeof(MetaHeader);
+          if((forward_cursor - cursor) > (sz + sizeof(MetaHeader))){
+            f_hdr.set_inactive();
+            f_hdr.set_hndl(nullptr);
+            // set it to the free length
+            f_hdr.set_len( forward_cursor - sizeof(MetaHeader) - cursor + sz);
+            _write_header( f_hdr, (void*)(cursor + sz));
+          }
+        }
+    }
   protected:
     virtual void _bind(void* ptr, Handle* hndl){
       MetaHeader hdr = _read_header(ptr);
@@ -110,36 +127,34 @@ class localCircularArenaAllocator : public AllocatorInterface {
         //ERROR
         return nullptr;
       }
-      if(sz > ( (_buffer + size) - cursor)){
+      //if(sz > ( end() - (cursor + sizeof(MetaHeader)))){
+      if(sz > available()){
         //Allocate at beginning
         // Rebalance to make it less likely to overwrite a region
         // Overwriting allocated regions is a valid operation as long as the overwritten regions are invalidated
         rebalance();
+        // If still dont have space, start overwriting from the start
+        if ( sz > available() ) {
+          cursor = begin();
+        }
+
       }
       MetaHeader hdr = _read_header((void*) cursor);
       if(hdr.is_active() || (hdr.get_len() > 0 && hdr.get_len() < sz)){
         //clear necessary chunks until enough space for current request + appended fragment header
-        uint8_t* forward_cursor = cursor;
-        while((forward_cursor - cursor) < sz){
-          MetaHeader f_hdr = _read_header((void*) forward_cursor);
-          deallocate((void*) forward_cursor);
-        // Decide whether we need to insert a fragment header or not
-          forward_cursor += f_hdr.get_len() + sizeof(MetaHeader);
-          if((forward_cursor - cursor) > (sz + sizeof(MetaHeader))){
-            f_hdr.set_inactive();
-            f_hdr.set_hndl(nullptr);
-            // set it to the free length
-            f_hdr.set_len( forward_cursor - sizeof(MetaHeader) - cursor + sz);
-            _write_header( f_hdr, (void*)(cursor + sz));
-          }
-        }
+        _clear_forward(sz);
       }
       hdr.set_active();
       hdr.set_len(sz);
       hdr.set_hndl(nullptr);
       _write_header(hdr, (void*) cursor);
       loc = cursor;
-      cursor += hdr.get_len() + sizeof(MetaHeader);
+      // Cursor can corner case end up past the buffer region
+      if ((cursor + hdr.get_len() + sizeof(MetaHeader)) > end()) {
+        cursor = begin();
+      } else {
+        cursor += hdr.get_len() + sizeof(MetaHeader);
+      }
       return (void*)loc;
     }
     virtual void _deallocate(void* ptr){
@@ -149,6 +164,7 @@ class localCircularArenaAllocator : public AllocatorInterface {
         if(hdr.is_bound()){
           _unbind(ptr, hdr.hndl);
         }
+        hdr.set_hndl(nullptr); //cleanup
         _write_header(hdr, ptr);
       }
     }
@@ -164,13 +180,29 @@ class localCircularArenaAllocator : public AllocatorInterface {
 
     /** This implementation of rebalance shifts all allocated chunks to the end of the buffer and inserts an inactive region at the start.
      * note: cursor gets moved to begin()
+     * note: unbound regions get wiped
      */
     virtual bool rebalance() {
       //TODO WARNING rebalancing Allocator
       // Shift each chunk towards the end of the buffer
       uint16_t empty_chunk_len = (uint16_t)(end() - cursor);
       uint16_t allocated_amount = (uint16_t)(cursor - _buffer);
+      uint8_t* forward_cursor;
+      // First deallocate all unbound regions
+      forward_cursor = begin();
+      while(forward_cursor < end() ) {
+        MetaHeader hdr = _read_header((void*) forward_cursor);
+        if(hdr.is_active() && !hdr.is_bound()){
+          deallocate((void*) forward_cursor);
+        }
+        forward_cursor += hdr.get_len() + sizeof(MetaHeader);
+      }
+
+      //Next shift all the bound regions to the start, forward scan
+
+
       // From the end, move byte by byte until everything is shifted
+      // TODO only move bound regions
       cursor--;
       uint8_t* tail = &_buffer[size-1];
       for(uint16_t i = 0; i < allocated_amount; i++){
@@ -180,7 +212,7 @@ class localCircularArenaAllocator : public AllocatorInterface {
       }
 
       // Next scan forward from the shifted points and update any bound handles
-      uint8_t* forward_cursor = _buffer + empty_chunk_len;
+      forward_cursor = _buffer + empty_chunk_len;
       while(forward_cursor < end()){
         MetaHeader hdr = _read_header((void*) forward_cursor);
         if(hdr.is_bound()){
