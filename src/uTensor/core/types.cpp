@@ -30,6 +30,26 @@ TensorShape::TensorShape(array<uint16_t, 4> shape) : _num_dims(4) {
   _shape[2] = shape[2];
   _shape[3] = shape[3];
 }
+TensorShape::TensorShape(uint16_t shape0, uint16_t shape1) : _num_dims(2) {
+  _shape[0] = shape0;
+  _shape[1] = shape1;
+  _shape[2] = 0;
+  _shape[3] = 0;
+}
+TensorShape::TensorShape(uint16_t shape0, uint16_t shape1, uint16_t shape2) : _num_dims(3) {
+  _shape[0] = shape0;
+  _shape[1] = shape1;
+  _shape[2] = shape2;
+  _shape[3] = 0;
+
+}
+TensorShape::TensorShape(uint16_t shape0, uint16_t shape1, uint16_t shape2, uint16_t shape3) : _num_dims(4){
+  _shape[0] = shape0;
+  _shape[1] = shape1;
+  _shape[2] = shape2;
+  _shape[3] = shape3;
+
+}
 
 uint16_t TensorShape::operator[](int i) const {
   return _shape[i]; /* Do additional checks*/
@@ -57,6 +77,11 @@ uint8_t TensorShape::num_dims() const { return _num_dims; }
 uint32_t TensorShape::linear_index(uint16_t i, uint16_t j, uint16_t k,
                                    uint16_t l) const {
   // TODO
+  uint32_t d1 = _shape[1] > 0 ? 1 : 0;  d1*= _shape[0];
+  uint32_t d2 = _shape[2] > 0 ? 1 : 0;  d2*= d1*_shape[1];
+  uint32_t d3 = _shape[3] > 0 ? 1 : 0;  d3*= d2*_shape[2];
+
+  return i + j*d1 + k*d2 + l*d3;
 }
 IntegralValue::IntegralValue(void* p) : p(p) {}
 IntegralValue::IntegralValue(const uint8_t& u) {
