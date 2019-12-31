@@ -1,12 +1,14 @@
 #ifndef UTENSOR_ARENA_ALLOCATOR_HPP
 #define UTENSOR_ARENA_ALLOCATOR_HPP
 #include "memoryManagementInterface.hpp"
+#include "tensor.hpp"
 #include <forward_list>
+#include <cstdio>
 
 namespace uTensor {
 
 #define BLOCK_INACTIVE (0 << 15)
-#define BLOCK_ACTIVE (1 << 15);
+#define BLOCK_ACTIVE (1 << 15)
 #define BLOCK_ZERO_LENGTH 0
 
 /**
@@ -23,14 +25,15 @@ class localCircularArenaAllocator : public AllocatorInterface {
         MetaHeader() : meta_data(BLOCK_INACTIVE | BLOCK_ZERO_LENGTH), hndl(nullptr) {}
         MetaHeader(uint16_t sz) : meta_data(BLOCK_ACTIVE | sz), hndl(nullptr) {}
         void set_active() { meta_data |= BLOCK_ACTIVE; }
-        void set_inactive() { meta_data &= (BLOCK_ACTIVE | 0x7FFF) ; }
+        void set_inactive() { meta_data &= (BLOCK_INACTIVE | 0x7FFF) ; }
         void set_hndl(Handle* handle) { hndl = handle; }
         void set_len(uint16_t sz) { meta_data &= 0x8000; meta_data |= (0x7FFF & sz); }
         uint16_t get_len() const { return meta_data & 0x7FFF; }
         bool is_active() const { return (meta_data & 0x8000) == BLOCK_ACTIVE; }
         bool is_bound() const { return (hndl != nullptr); }
-        bool has_handle(Handle* target) const { return is_active && (hndl == target); }
-    }
+        bool has_handle(Handle* target) const { return is_active() && (hndl == target); }
+        bool is_used() const { return is_active() && (get_len() > 0); }
+    };
   private:
     uint16_t capacity;
     uint8_t _buffer[size];
@@ -60,8 +63,8 @@ class localCircularArenaAllocator : public AllocatorInterface {
       memcpy(p - sizeof(MetaHeader), &hdr, sizeof(MetaHeader));
     }
 
-    uint8_t* begin() const { return _buffer + sizeof(MetaHeader); }
-    uint8_t* end() const { return _buffer + size; }
+    uint8_t* begin() { return _buffer + sizeof(MetaHeader); }
+    uint8_t* end() { return _buffer + size; }
   protected:
     virtual void _bind(void* ptr, Handle* hndl){
       MetaHeader hdr = _read_header(ptr);
@@ -75,7 +78,7 @@ class localCircularArenaAllocator : public AllocatorInterface {
 
     virtual void _unbind(void* ptr, Handle* hndl){
       //teehee
-      hndl->_ptr = nullptr;
+      update_hndl(hndl, nullptr);
       _bind(ptr, nullptr);
     }
 
@@ -105,6 +108,7 @@ class localCircularArenaAllocator : public AllocatorInterface {
       // If make this capacity then have possibility of filling up
       if(sz > size){
         //ERROR
+        return nullptr;
       }
       if(sz > ( (_buffer + size) - cursor)){
         //Allocate at beginning
@@ -151,6 +155,9 @@ class localCircularArenaAllocator : public AllocatorInterface {
 
   public:
     localCircularArenaAllocator() : capacity(size) {
+      printf("Sizeof Pointer = %d\n" , sizeof(cursor));
+      printf("Sizeof Handle = %d\n" , sizeof(Handle));
+      printf("MetaHeader Size = %d\n", sizeof(MetaHeader));
       memset(_buffer, 0, size);
       cursor = begin();
     }
@@ -187,11 +194,32 @@ class localCircularArenaAllocator : public AllocatorInterface {
       MetaHeader hdr(empty_chunk_len);
       hdr.set_inactive();
       _write_header(hdr, (void*)cursor);
+      return true;
     }
 
     virtual size_t available() { 
       return end() - cursor;
     }
+
+    virtual void clear() {
+      //TODO deallocate and invalidate all references
+      // reset to default state
+      memset(_buffer, 0, size);
+      cursor = begin();
+    }
+    
+    // Check to see if pointer exists in memory space and is valid
+    bool contains(void* p) const  { 
+      if(!((p > _buffer) && (p < (_buffer + size)))) {
+        return false;
+      }
+      MetaHeader hdr = _read_header(p);
+      return hdr.is_used();
+    }
+    
+public:
+    // Testing bits, attribute out later
+    uint32_t internal_header_unit_size() const { return sizeof(MetaHeader); }
 };
 
 // Note not actually complete
