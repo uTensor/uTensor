@@ -3,84 +3,98 @@ cmake_minimum_required(VERSION 3.10)
 project(utensor)
 
 set( CMAKE_VERBOSE_MAKEFILE on )
+set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -O3")
+
+### Require out-of-source builds
+file(TO_CMAKE_PATH "${PROJECT_BINARY_DIR}/CMakeLists.txt" LOC_PATH)
+if(EXISTS "${LOC_PATH}")
+    message(FATAL_ERROR "You cannot build in a source directory (or any directory with a CMakeLists.txt file). Please make a build subdirectory. Feel free to remove CMakeCache.txt and CMakeFiles.")
+endif()
+
+add_subdirectory(src)
+# Testing only available if this is the main app # Emergency override MODERN_CMAKE_BUILD_TESTING provided as well i
+if((CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME OR MODERN_CMAKE_BUILD_TESTING) AND BUILD_TESTING)
+  add_subdirectory(TESTS) 
+endif() 
 
 # set(CMAKE_CXX_FLAGS "-fPIC")
 
 # Find includes in corresponding build directories
-set(CMAKE_INCLUDE_CURRENT_DIR ON)
-message(STATUS "PROJECT_DIR: " ${PROJECT_SOURCE_DIR})
-
-include_directories(${PROJECT_SOURCE_DIR}/src/uTensor/core)
-include_directories(${PROJECT_SOURCE_DIR}/src/uTensor/loaders)
-include_directories(${PROJECT_SOURCE_DIR}/src/uTensor/ops)
-include_directories(${PROJECT_SOURCE_DIR}/src/uTensor/util)
-include_directories(${PROJECT_SOURCE_DIR}/src/uTensor)
-
-
-file(GLOB SOURCES src/uTensor/*/*.cpp)
-file(GLOB INCLUDES src/uTensor/*/*.hpp)
-
-
-message(STATUS "SOURCES: " ${SOURCES})
-message(STATUS "INCLUDES: " ${INCLUDES})
-
-# target_compile_features(utensor PRIVATE cxx_range_for)
-include(CheckCXXCompilerFlag)
-CHECK_CXX_COMPILER_FLAG("-std=c++11" COMPILER_SUPPORTS_CXX11)
-CHECK_CXX_COMPILER_FLAG("-std=c++0x" COMPILER_SUPPORTS_CXX0X)
-if(COMPILER_SUPPORTS_CXX11)
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
-elseif(COMPILER_SUPPORTS_CXX0X)
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++0x")
-else()
-        message(STATUS "The compiler ${CMAKE_CXX_COMPILER} has no C++11 support. Please use a different C++ compiler.")
-endif()
-
-# Build with code coverage
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fprofile-arcs -ftest-coverage -ggdb")
-
-add_library(utensor STATIC ${SOURCES})
-
-# Configure GTest
-enable_testing()
-find_package(GTest)
-if(GTEST_FOUND)
-    find_package(Threads)
-    include_directories(${GTEST_INCLUDE_DIRS})
-    add_subdirectory(unity)
-
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DGTEST_DONT_DEFINE_FOO=1 -DHAVE_GTEST")
-    
-    # Add the helper header
-    include_directories(${PROJECT_SOURCE_DIR}/TESTS)
-
-    file(GLOB TEST_SOURCES TESTS/*/*/test_*.cpp)
-    foreach( testsource ${TEST_SOURCES} )
-        #string( REPLACE ".cpp" "" testnameT ${testsource} )
-        get_filename_component(testname ${testsource} NAME_WE)
-        get_filename_component(testdir ${testsource} DIRECTORY)
-        file(GLOB TEST_MODEL_SOURCES ${testdir}/models/*.cpp)
-
-        add_executable( ${testname} ${testsource} ${TEST_MODEL_SOURCES} )
-        target_link_libraries(${testname} utensor ${CMAKE_THREAD_LIBS_INIT} GTest::GTest GTest::Main unity)
-        #add_test(${testname} ${testname})
-        # Need this line to work for more detailed test resultso
-        # F ME https://blog.kitware.com/dynamic-google-test-discovery-in-cmake-3-10/
-        #GTEST_ADD_TESTS(${testname} "" ${testsource})
-        gtest_discover_tests(${testname})
-    endforeach( testsource ${TEST_SOURCES} )
-
-    #add_executable(uTensorTests ${TEST_SOURCES} tests/gtest_main.cpp)
-    #target_link_libraries(uTensorTests utensor ${CMAKE_THREAD_LIBS_INIT} GTest::GTest GTest::Main unity)
-    #GTEST_ADD_TESTS(uTensorTests "" AUTO)
-endif()
-
-# Make includes accesible to project cmake builds
-target_include_directories(utensor PUBLIC ${CMAKE_CURRENT_LIST_DIR}/src/uTensor/core)
-target_include_directories(utensor PUBLIC ${CMAKE_CURRENT_LIST_DIR}/src/uTensor/loaders)
-target_include_directories(utensor PUBLIC ${CMAKE_CURRENT_LIST_DIR}/src/uTensor/ops)
-target_include_directories(utensor PUBLIC ${CMAKE_CURRENT_LIST_DIR}/src/uTensor/util)
-
-
-# Todo add install
-set(UTENSOR_INCLUDES ${INCLUDES} PARENT_SCOPE)
+#set(CMAKE_INCLUDE_CURRENT_DIR ON)
+#message(STATUS "PROJECT_DIR: " ${PROJECT_SOURCE_DIR})
+#
+#include_directories(${PROJECT_SOURCE_DIR}/src/uTensor/core)
+#include_directories(${PROJECT_SOURCE_DIR}/src/uTensor/loaders)
+#include_directories(${PROJECT_SOURCE_DIR}/src/uTensor/ops)
+#include_directories(${PROJECT_SOURCE_DIR}/src/uTensor/util)
+#include_directories(${PROJECT_SOURCE_DIR}/src/uTensor)
+#
+#
+#file(GLOB SOURCES src/uTensor/*/*.cpp)
+#file(GLOB INCLUDES src/uTensor/*/*.hpp)
+#
+#
+#message(STATUS "SOURCES: " ${SOURCES})
+#message(STATUS "INCLUDES: " ${INCLUDES})
+#
+## target_compile_features(utensor PRIVATE cxx_range_for)
+#include(CheckCXXCompilerFlag)
+#CHECK_CXX_COMPILER_FLAG("-std=c++11" COMPILER_SUPPORTS_CXX11)
+#CHECK_CXX_COMPILER_FLAG("-std=c++0x" COMPILER_SUPPORTS_CXX0X)
+#if(COMPILER_SUPPORTS_CXX11)
+#  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
+#elseif(COMPILER_SUPPORTS_CXX0X)
+#  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++0x")
+#else()
+#        message(STATUS "The compiler ${CMAKE_CXX_COMPILER} has no C++11 support. Please use a different C++ compiler.")
+#endif()
+#
+## Build with code coverage
+#set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fprofile-arcs -ftest-coverage -ggdb")
+#
+#add_library(utensor STATIC ${SOURCES})
+#
+## Configure GTest
+#enable_testing()
+#find_package(GTest)
+#if(GTEST_FOUND)
+#    find_package(Threads)
+#    include_directories(${GTEST_INCLUDE_DIRS})
+#    add_subdirectory(unity)
+#
+#    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DGTEST_DONT_DEFINE_FOO=1 -DHAVE_GTEST")
+#    
+#    # Add the helper header
+#    include_directories(${PROJECT_SOURCE_DIR}/TESTS)
+#
+#    file(GLOB TEST_SOURCES TESTS/*/*/test_*.cpp)
+#    foreach( testsource ${TEST_SOURCES} )
+#        #string( REPLACE ".cpp" "" testnameT ${testsource} )
+#        get_filename_component(testname ${testsource} NAME_WE)
+#        get_filename_component(testdir ${testsource} DIRECTORY)
+#        file(GLOB TEST_MODEL_SOURCES ${testdir}/models/*.cpp)
+#
+#        add_executable( ${testname} ${testsource} ${TEST_MODEL_SOURCES} )
+#        target_link_libraries(${testname} utensor ${CMAKE_THREAD_LIBS_INIT} GTest::GTest GTest::Main unity)
+#        #add_test(${testname} ${testname})
+#        # Need this line to work for more detailed test resultso
+#        # F ME https://blog.kitware.com/dynamic-google-test-discovery-in-cmake-3-10/
+#        #GTEST_ADD_TESTS(${testname} "" ${testsource})
+#        gtest_discover_tests(${testname})
+#    endforeach( testsource ${TEST_SOURCES} )
+#
+#    #add_executable(uTensorTests ${TEST_SOURCES} tests/gtest_main.cpp)
+#    #target_link_libraries(uTensorTests utensor ${CMAKE_THREAD_LIBS_INIT} GTest::GTest GTest::Main unity)
+#    #GTEST_ADD_TESTS(uTensorTests "" AUTO)
+#endif()
+#
+## Make includes accesible to project cmake builds
+#target_include_directories(utensor PUBLIC ${CMAKE_CURRENT_LIST_DIR}/src/uTensor/core)
+#target_include_directories(utensor PUBLIC ${CMAKE_CURRENT_LIST_DIR}/src/uTensor/loaders)
+#target_include_directories(utensor PUBLIC ${CMAKE_CURRENT_LIST_DIR}/src/uTensor/ops)
+#target_include_directories(utensor PUBLIC ${CMAKE_CURRENT_LIST_DIR}/src/uTensor/util)
+#
+#
+## Todo add install
+#set(UTENSOR_INCLUDES ${INCLUDES} PARENT_SCOPE)

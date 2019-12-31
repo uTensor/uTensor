@@ -1,15 +1,18 @@
 #include "tensorBase.hpp"
+#include "context.hpp"
+#include "memoryManagementInterface.hpp"
+
 namespace uTensor {
-TensorBase::TensorBase() { Context::get_default_context().register(*this); }
+TensorBase::TensorBase() { Context::get_default_context()->register_tensor(this); }
 
 // Allocate the tensor metadata on a different heap from the data scratch pads
 void* TensorBase::operator new(size_t sz) {
-  void* p = Context::DefaultTensorMetaDataAllocator::allocate(sz);
+  void* p = Context::get_metadata_allocator()->allocate(sz);
   return p;
 }
 
 void TensorBase::operator delete(void* p) {
-  Context::DefaultTensorMetaDataAllocator::deallocate(p);
+  Context::get_metadata_allocator()->deallocate(p);
 }
 
 ttype TensorInterface::get_type() const { return _type; }
