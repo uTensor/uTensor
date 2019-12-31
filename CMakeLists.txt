@@ -14,9 +14,15 @@ endif()
 
 add_subdirectory(src)
 # Testing only available if this is the main app # Emergency override MODERN_CMAKE_BUILD_TESTING provided as well i
-if((CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME OR MODERN_CMAKE_BUILD_TESTING) AND BUILD_TESTING)
-  add_subdirectory(TESTS) 
-endif() 
+#if((CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME OR MODERN_CMAKE_BUILD_TESTING) AND BUILD_TESTING)
+#  add_subdirectory(TESTS) 
+#endif() 
+option(PACKAGE_TESTS "Build the tests" ON)
+if(PACKAGE_TESTS)
+    enable_testing()
+    include(GoogleTest)
+    add_subdirectory(TESTS)
+endif()
 
 # set(CMAKE_CXX_FLAGS "-fPIC")
 
