@@ -33,4 +33,7 @@ TEST(RAM_Tensor, read_write_u8) {
   Context::set_ram_data_allocator(&ram_allocator);
   RamTensor r({10, 10}, u8);
   r(2,2) = (uint8_t) 5;
+  uint8_t read = r(2,2);
+  EXPECT_EQ(read, 5);
+  cout << "Sizeof IntegralValue " << sizeof(IntegralValue(5)) << endl;
 }
