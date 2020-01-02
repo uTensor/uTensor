@@ -13,6 +13,8 @@ void* Handle::operator*() { return _ptr; }
 bool Handle::operator!() const { return _ptr == nullptr; }
 Handle::operator bool() const { return _ptr != nullptr; }
 
+void* operator*(const Handle& that) { return that._ptr; }
+
 /** Handle Reference Stuff
  */
 HandleReference::HandleReference() : _ref(nullptr) {}

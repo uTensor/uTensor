@@ -16,6 +16,7 @@ class Handle {
   void operator delete(void* p);
   // KEY BIT
   friend class AllocatorInterface;
+  friend void* operator*(const Handle& that);
 
  public:
   Handle();
@@ -29,6 +30,8 @@ class Handle {
  protected:
   void* _ptr;
 };
+
+void* operator*(const Handle& that);
 
 /**
  * Expecting the Handle copies to contain knowledge of their underlying types/copy info is not reasonable.

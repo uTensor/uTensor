@@ -18,9 +18,11 @@ void TensorBase::operator delete(void* p) {
 ttype TensorInterface::get_type() const { return _type; }
 TensorShape& TensorInterface::get_shape() { return _shape; }
 TensorInterface::TensorInterface()
-    : TensorBase(), _shape(0), _type(undefined) {}
+    : TensorBase(), _shape(0), _type(undefined), _type_size(0) {}
 TensorInterface::TensorInterface(TensorShape _shape, ttype _type)
-    : TensorBase(), _shape(_shape), _type(_type) {}
+    : TensorBase(), _shape(_shape), _type(_type) {
+    _type_size = type_size(_type);
+    }
 TensorInterface::~TensorInterface(){};
 
 // Can access Tensors like
