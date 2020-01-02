@@ -1,4 +1,5 @@
 #include "types.hpp"
+#include <cstring>
 
 uint8_t type_size(ttype t) {
   switch (t) {
@@ -110,44 +111,71 @@ uint32_t TensorShape::linear_index(uint16_t i, uint16_t j, uint16_t k,
 
   return i + j * d1 + k * d2 + l * d3;
 }
-IntegralValue::IntegralValue(void* p) : p(p) {}
-IntegralValue::IntegralValue(const uint8_t& u) {
+IntegralValue::IntegralValue(void* p) : p(p), num_bytes(0) {}
+IntegralValue::IntegralValue(const uint8_t& u): num_bytes(sizeof(u)) {
   *reinterpret_cast<uint8_t*>(p) = u;
 }
-IntegralValue::IntegralValue(const int8_t& u) {
+IntegralValue::IntegralValue(const int8_t& u): num_bytes(sizeof(u)) {
   *reinterpret_cast<int8_t*>(p) = u;
 }
-IntegralValue::IntegralValue(const uint16_t& u) {
+IntegralValue::IntegralValue(const uint16_t& u): num_bytes(sizeof(u)) {
   *reinterpret_cast<uint16_t*>(p) = u;
 }
-IntegralValue::IntegralValue(const int16_t& u) {
+IntegralValue::IntegralValue(const int16_t& u): num_bytes(sizeof(u)) {
   *reinterpret_cast<int16_t*>(p) = u;
 }
-IntegralValue::IntegralValue(const uint32_t& u) {
+IntegralValue::IntegralValue(const uint32_t& u): num_bytes(sizeof(u)) {
   *reinterpret_cast<uint32_t*>(p) = u;
 }
-IntegralValue::IntegralValue(const int32_t& u) {
+IntegralValue::IntegralValue(const int32_t& u): num_bytes(sizeof(u)) {
   *reinterpret_cast<int32_t*>(p) = u;
 }
 
-IntegralValue::IntegralValue(uint8_t&& u) {
-  *reinterpret_cast<uint8_t*>(p) = u;
+IntegralValue::IntegralValue(uint8_t&& u): num_bytes(sizeof(u)) {
+  memcpy(tmp, &u, sizeof(uint8_t));
+  p = reinterpret_cast<void*>(tmp);
 }
-IntegralValue::IntegralValue(int8_t&& u) {
-  *reinterpret_cast<int8_t*>(p) = u;
+IntegralValue::IntegralValue(int8_t&& u): num_bytes(sizeof(u)) {
+  memcpy(tmp, &u, sizeof(int8_t));
+  p = reinterpret_cast<void*>(tmp);
 }
-IntegralValue::IntegralValue(uint16_t&& u) {
-  *reinterpret_cast<uint16_t*>(p) = u;
+IntegralValue::IntegralValue(uint16_t&& u): num_bytes(sizeof(u)) {
+  memcpy(tmp, &u, sizeof(uint16_t));
+  p = reinterpret_cast<void*>(tmp);
 }
-IntegralValue::IntegralValue(int16_t&& u) {
-  *reinterpret_cast<int16_t*>(p) = u;
+IntegralValue::IntegralValue(int16_t&& u): num_bytes(sizeof(u)) {
+  memcpy(tmp, &u, sizeof(int16_t));
+  p = reinterpret_cast<void*>(tmp);
 }
-IntegralValue::IntegralValue(uint32_t&& u) {
-  *reinterpret_cast<uint32_t*>(p) = u;
+IntegralValue::IntegralValue(uint32_t&& u): num_bytes(sizeof(u)) {
+  memcpy(tmp, &u, sizeof(uint32_t));
+  p = reinterpret_cast<void*>(tmp);
 }
-IntegralValue::IntegralValue(int32_t&& u) {
-  *reinterpret_cast<int32_t*>(p) = u;
+IntegralValue::IntegralValue(int32_t&& u): num_bytes(sizeof(u)) {
+  memcpy(tmp, &u, sizeof(int32_t));
+  p = reinterpret_cast<void*>(tmp);
 }
+IntegralValue::IntegralValue(const IntegralValue& that) {
+  p = that.p;
+  memcpy(tmp, that.tmp, sizeof(tmp));
+  num_bytes = that.num_bytes;
+  if(that.p == &that.tmp[0])
+    p = &tmp[0];
+}
+IntegralValue& IntegralValue::operator=(const IntegralValue& that) {
+  p = that.p;
+  memcpy(tmp, that.tmp, sizeof(tmp));
+  num_bytes = that.num_bytes;
+  if(that.p == &that.tmp[0])
+    p = &tmp[0];
+  return *this;
+}
+IntegralValue& IntegralValue::operator=(IntegralValue&& that) {
+  memmove(p, that.p, that.num_bytes);
+  num_bytes = that.num_bytes;
+  return *this;
+}
+
 
 IntegralValue::operator uint8_t() const {
   return static_cast<uint8_t>(*reinterpret_cast<uint8_t*>(p));
