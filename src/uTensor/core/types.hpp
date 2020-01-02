@@ -10,7 +10,8 @@ class TensorShape {
   TensorShape(uint16_t shape);
   TensorShape(uint16_t shape1, uint16_t shape2);
   TensorShape(uint16_t shape1, uint16_t shape2, uint16_t shape3);
-  TensorShape(uint16_t shape1, uint16_t shape2, uint16_t shape3, uint16_t shape4);
+  TensorShape(uint16_t shape1, uint16_t shape2, uint16_t shape3,
+              uint16_t shape4);
   TensorShape(array<uint16_t, 1> shape);
   TensorShape(array<uint16_t, 2> shape);
   TensorShape(array<uint16_t, 3> shape);

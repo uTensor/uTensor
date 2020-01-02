@@ -19,22 +19,25 @@ void* operator*(const Handle& that) { return that._ptr; }
  */
 HandleReference::HandleReference() : _ref(nullptr) {}
 HandleReference::HandleReference(Handle* ref) : _ref(ref) {}
-HandleReference::HandleReference(const Handle& ref) : _ref(const_cast<Handle*>(&ref)) {}
-HandleReference::HandleReference(const HandleReference& that) { _ref = that._ref; }
+HandleReference::HandleReference(const Handle& ref)
+    : _ref(const_cast<Handle*>(&ref)) {}
+HandleReference::HandleReference(const HandleReference& that) {
+  _ref = that._ref;
+}
 HandleReference::HandleReference(HandleReference&& that) {
   _ref = that._ref;
   that._ref = nullptr;
 }
-HandleReference& HandleReference::operator=(Handle* ref){
+HandleReference& HandleReference::operator=(Handle* ref) {
   _ref = ref;
   return *this;
 }
-HandleReference& HandleReference::operator=(const HandleReference& that){
+HandleReference& HandleReference::operator=(const HandleReference& that) {
   _ref = that._ref;
   return *this;
 }
-HandleReference& HandleReference::operator=(HandleReference&& that){
-  if(this != &that){
+HandleReference& HandleReference::operator=(HandleReference&& that) {
+  if (this != &that) {
     _ref = that._ref;
     that._ref = nullptr;
   }
@@ -43,8 +46,8 @@ HandleReference& HandleReference::operator=(HandleReference&& that){
 
 // Delegate functions
 // return the data directly (looks pointer like)
-void* HandleReference::operator*() { 
-  if(_ref) {
+void* HandleReference::operator*() {
+  if (_ref) {
     // Hue hue pointer like
     return **_ref;
   }
@@ -52,14 +55,14 @@ void* HandleReference::operator*() {
 }
 // Allow users to check if handle is not valid
 bool HandleReference::operator!() const {
-  if(_ref) {
-    return !((bool) _ref);
+  if (_ref) {
+    return !((bool)_ref);
   }
   return true;
 }
 HandleReference::operator bool() const {
-  if(_ref) {
-    return ((bool) _ref);
+  if (_ref) {
+    return ((bool)_ref);
   }
   return true;
 }
@@ -90,20 +93,20 @@ bool AllocatorInterface::is_bound(void* ptr, Handle* hndl) {
   return _is_bound(ptr, hndl);
 }
 void* AllocatorInterface::allocate(size_t sz) {
-    if(sz > (1 << 16)){
-        //TODO ERROR invalid allocation size
-        return nullptr;
-    }
-    return _allocate(sz);
+  if (sz > (1 << 16)) {
+    // TODO ERROR invalid allocation size
+    return nullptr;
+  }
+  return _allocate(sz);
 }
 
 void AllocatorInterface::deallocate(void* ptr) {
-    _deallocate(ptr);
-    ptr = nullptr;
+  _deallocate(ptr);
+  ptr = nullptr;
 }
 
 bool bind(Handle& hndl, AllocatorInterface& allocator) {
-  if(!hndl){
+  if (!hndl) {
     return false;
   }
   allocator.bind(*hndl, &hndl);
