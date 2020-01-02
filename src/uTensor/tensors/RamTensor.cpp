@@ -23,14 +23,15 @@ RamTensor::RamTensor(TensorShape _shape, ttype _type)
       _ram_region(Context::get_ram_data_allocator()->allocate(
           _shape.get_linear_size() * _type_size)) {
   AllocatorInterface* allocator = Context::get_ram_data_allocator();
-  bind(_ram_region, *allocator);
+  //bind(_ram_region, *allocator);
+  allocator->bind(*_ram_region, &_ram_region);
 }
 
 RamTensor::~RamTensor() {
   Context::get_ram_data_allocator()->deallocate(*_ram_region);
 }
 
-void resize(TensorShape new_shape) {
+void RamTensor::resize(TensorShape new_shape) {
   printf("Warning, RAM Tensor resize not implemented\n");
 }
 
