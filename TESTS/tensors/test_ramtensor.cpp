@@ -63,4 +63,5 @@ TEST(RAM_Tensor, read_write_i8) {
   int8_t read = r(2,2);
   EXPECT_EQ(read, -5);
   cout << "Sizeof IntegralValue " << sizeof(IntegralValue(5)) << endl;
+  cout << "Sizeof RamTensor " << sizeof(r) << endl;
 }
