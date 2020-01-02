@@ -11,6 +11,7 @@ Handle::Handle() : _ptr(nullptr) {}
 Handle::Handle(void* p) : _ptr(p) {}
 void* Handle::operator*() { return _ptr; }
 bool Handle::operator!() const { return _ptr == nullptr; }
+Handle::operator bool() const { return _ptr != nullptr; }
 
 void AllocatorInterface::update_hndl(Handle* h, void* new_ptr) {
   h->_ptr = new_ptr;
@@ -23,6 +24,8 @@ void AllocatorInterface::bind(void* ptr, Handle* hndl) {
   if (is_bound(ptr, hndl)) {
     ERR_EXIT("Cannot rebind Handles without unbinding");
   }
+  // To be safe, make sure handle has a pointer
+  update_hndl(hndl, ptr);
   _bind(ptr, hndl);
 }
 void AllocatorInterface::unbind(void* ptr, Handle* hndl) {
@@ -30,6 +33,7 @@ void AllocatorInterface::unbind(void* ptr, Handle* hndl) {
     ERR_EXIT("Cannot unbind unbound Handles");
   }
   _unbind(ptr, hndl);
+  update_hndl(hndl, nullptr);
 }
 bool AllocatorInterface::is_bound(void* ptr, Handle* hndl) {
   return _is_bound(ptr, hndl);
@@ -47,4 +51,11 @@ void AllocatorInterface::deallocate(void* ptr) {
     ptr = nullptr;
 }
 
+bool bind(Handle& hndl, AllocatorInterface& allocator) {
+  if(!hndl){
+    return false;
+  }
+  allocator.bind(*hndl, &hndl);
+  return true;
+}
 };  // namespace uTensor
