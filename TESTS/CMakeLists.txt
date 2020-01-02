@@ -27,3 +27,4 @@ endmacro()
 
 package_add_test_with_libraries(test_types core/test_types.cpp utensor_core "${PROJECT_DIR}/test-data/")
 package_add_test_with_libraries(test_alloc allocators/test_arenaAllocator utensor "${PROJECT_DIR}/test-data/")
+package_add_test_with_libraries(test_context core/test_context utensor "${PROJECT_DIR}/test-data/")
