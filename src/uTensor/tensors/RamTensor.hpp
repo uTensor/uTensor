@@ -2,9 +2,22 @@
 #define UTENSOR_RAM_TENSOR
 
 #include "memoryManagementInterface.hpp"
+#include "tensorBase.hpp"
 
 namespace uTensor {
 
+class RamTensor : public TensorInterface { 
+  protected:
+    virtual void* read(uint32_t linear_index) const;
+    virtual void* write(uint32_t linear_index);
+  public:
+    RamTensor(TensorShape _shape, ttype _type);
+    virtual ~RamTensor();
+    virtual void resize(TensorShape new_shape) override;
+
+  private:
+    Handle _ram_region;
+};
 //class RawDataHandle : public Handle {
 // public:
 //  RawDataHandle(size_t req_ram_size) {

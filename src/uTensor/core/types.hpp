@@ -29,6 +29,7 @@ class TensorShape {
 };
 // Do something to remember current type
 enum ttype : uint8_t { i8, u8, i16, u16, i32, u32, flt, undefined };
+uint8_t type_size(ttype t);
 
 // Need to figure out way of defering reference until after lefthand assignment
 class IntegralValue {

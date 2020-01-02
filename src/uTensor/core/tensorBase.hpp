@@ -59,9 +59,10 @@ class TensorInterface : public TensorBase {
                                      uint32_t linear_index);
   friend class FastOperator;
 
- private:
+ protected:
   TensorShape _shape;
   ttype _type;  // Maybe make this const
+  uint8_t _type_size;
 };
 
 }  // namespace uTensor

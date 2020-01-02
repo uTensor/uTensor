@@ -1,5 +1,26 @@
 #include "types.hpp"
 
+uint8_t type_size(ttype t) {
+  switch(t) {
+    case i8:
+      return sizeof(int8_t);
+    case u8:
+      return sizeof(uint8_t);
+    case i16:
+      return sizeof(int16_t);
+    case u16:
+      return sizeof(uint16_t);
+    case i32:
+      return sizeof(int32_t);
+    case u32:
+      return sizeof(uint32_t);
+    case flt:
+      return sizeof(float);
+    default:
+      //TODO print error
+      return 0;
+  }
+}
 TensorShape::TensorShape(uint16_t shape) : _num_dims(1) {
   _shape[0] = shape;
   _shape[1] = 0;
