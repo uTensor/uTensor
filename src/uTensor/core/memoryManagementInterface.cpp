@@ -13,6 +13,55 @@ void* Handle::operator*() { return _ptr; }
 bool Handle::operator!() const { return _ptr == nullptr; }
 Handle::operator bool() const { return _ptr != nullptr; }
 
+/** Handle Reference Stuff
+ */
+HandleReference::HandleReference() : _ref(nullptr) {}
+HandleReference::HandleReference(Handle* ref) : _ref(ref) {}
+HandleReference::HandleReference(const Handle& ref) : _ref(const_cast<Handle*>(&ref)) {}
+HandleReference::HandleReference(const HandleReference& that) { _ref = that._ref; }
+HandleReference::HandleReference(HandleReference&& that) {
+  _ref = that._ref;
+  that._ref = nullptr;
+}
+HandleReference& HandleReference::operator=(Handle* ref){
+  _ref = ref;
+  return *this;
+}
+HandleReference& HandleReference::operator=(const HandleReference& that){
+  _ref = that._ref;
+  return *this;
+}
+HandleReference& HandleReference::operator=(HandleReference&& that){
+  if(this != &that){
+    _ref = that._ref;
+    that._ref = nullptr;
+  }
+  return *this;
+}
+
+// Delegate functions
+// return the data directly (looks pointer like)
+void* HandleReference::operator*() { 
+  if(_ref) {
+    // Hue hue pointer like
+    return **_ref;
+  }
+  return nullptr;
+}
+// Allow users to check if handle is not valid
+bool HandleReference::operator!() const {
+  if(_ref) {
+    return !((bool) _ref);
+  }
+  return true;
+}
+HandleReference::operator bool() const {
+  if(_ref) {
+    return ((bool) _ref);
+  }
+  return true;
+}
+
 void AllocatorInterface::update_hndl(Handle* h, void* new_ptr) {
   h->_ptr = new_ptr;
 }

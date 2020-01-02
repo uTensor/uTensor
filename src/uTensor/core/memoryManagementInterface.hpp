@@ -5,6 +5,7 @@ namespace uTensor {
 
 class AllocatorInterface;
 
+//TODO Add support for Moving Handles without copies, Must be careful with binding
 class Handle {
  private:
   // Handles cannot be copied, there exists one unless explicitly deep copied
@@ -29,6 +30,31 @@ class Handle {
   void* _ptr;
 };
 
+/**
+ * Expecting the Handle copies to contain knowledge of their underlying types/copy info is not reasonable.
+ * This class is designed to reference a singleton-like handle for some data
+ */
+class HandleReference {
+  private:
+    Handle* _ref;
+
+  public:
+    HandleReference();
+    HandleReference(Handle* ref);
+    HandleReference(const Handle& ref);
+    HandleReference(const HandleReference& that);
+    HandleReference(HandleReference&& that);
+    HandleReference& operator=(Handle* ref);
+    HandleReference& operator=(const HandleReference& that);
+    HandleReference& operator=(HandleReference&& that);
+
+    // Delegate functions
+    // return the data directly (looks pointer like)
+    void* operator*();
+    // Allow users to check if handle is not valid
+    bool operator!() const;
+    operator bool() const;
+};
 /**
  * Allocators are expected to maintain a mapping of Tensor handles to data
  * regions. * This allows the allocator to move around the underlying data

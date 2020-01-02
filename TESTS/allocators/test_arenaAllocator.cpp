@@ -146,6 +146,73 @@ TEST(ArenaAllocator, circle_back_with_handle) {
   for(int i = 0 ; i < 117; i++){
     EXPECT_EQ(reinterpret_cast<uint8_t*>(ptr3)[i], 0x03);
   }
+}
 
+TEST(Handle, default_construction) {
+  Handle h;
+  EXPECT_EQ(sizeof(Handle), sizeof(void*));
+}
+
+TEST(Handle, construction) {
+  localCircularArenaAllocator<256> _allocator;
+  void* ptr = _allocator.allocate(100);
+  Handle hndl(ptr);
+}
+
+TEST(Handle, read_write) {
+  localCircularArenaAllocator<256> _allocator;
+  void* ptr = _allocator.allocate(100);
+  Handle hndl(ptr);
+  for(int i = 0 ; i < 100; i++){
+    reinterpret_cast<uint8_t*>(*hndl)[i] = 0x01;
+    EXPECT_EQ(reinterpret_cast<uint8_t*>(*hndl)[i], 0x01);
+  }
+}
+
+TEST(HandleReference, default_construction) {
+  Handle h;
+  EXPECT_EQ(sizeof(Handle), sizeof(void*));
+}
+
+TEST(HandleReference, copy) {
+  localCircularArenaAllocator<256> _allocator;
+  void* ptr = _allocator.allocate(100);
+  Handle hndl(ptr);
+  for(int i = 0 ; i < 100; i++){
+    reinterpret_cast<uint8_t*>(*hndl)[i] = 0x01;
+  }
+  HandleReference h2 = hndl;
+  reinterpret_cast<uint8_t*>(*h2)[0] = 0x02;
+  EXPECT_EQ(reinterpret_cast<uint8_t*>(*hndl)[0], 0x02);
+  for(int i = 1 ; i < 100; i++){
+    EXPECT_EQ(reinterpret_cast<uint8_t*>(*hndl)[i], 0x01);
+  }
+  for(int i = 1 ; i < 100; i++){
+    EXPECT_EQ(reinterpret_cast<uint8_t*>(*h2)[i], 0x01);
+  }
+
+}
+
+TEST(HandleReference, copy_copy) {
+  localCircularArenaAllocator<256> _allocator;
+  void* ptr = _allocator.allocate(100);
+  Handle hndl(ptr);
+  for(int i = 0 ; i < 100; i++){
+    reinterpret_cast<uint8_t*>(*hndl)[i] = 0x01;
+  }
+  HandleReference h1 = hndl;
+  HandleReference h2 = h1;
+  reinterpret_cast<uint8_t*>(*h2)[0] = 0x02;
+  EXPECT_EQ(reinterpret_cast<uint8_t*>(*hndl)[0], 0x02);
+  EXPECT_EQ(reinterpret_cast<uint8_t*>(*h1)[0], 0x02);
+  for(int i = 1 ; i < 100; i++){
+    EXPECT_EQ(reinterpret_cast<uint8_t*>(*hndl)[i], 0x01);
+  }
+  for(int i = 1 ; i < 100; i++){
+    EXPECT_EQ(reinterpret_cast<uint8_t*>(*h1)[i], 0x01);
+  }
+  for(int i = 1 ; i < 100; i++){
+    EXPECT_EQ(reinterpret_cast<uint8_t*>(*h2)[i], 0x01);
+  }
 
 }
