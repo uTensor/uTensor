@@ -13,7 +13,7 @@ class Tensor : public Handle {
   // private:
   //    // Cannot copy Tensors, must pass by reference
   //    Tensor(const Tensor& that);
-  //enum Type : uint8_t { TENSOR_IFC_PTR, TENSOR_HANDLE_PTR } type;
+  // enum Type : uint8_t { TENSOR_IFC_PTR, TENSOR_HANDLE_PTR } type;
 
  public:
   TensorInterface* operator->();
@@ -38,10 +38,12 @@ class Tensor : public Handle {
     public:
         Tensor(TensorBase* tb) : type(Type::TENSOR_BASE_PTR), tb(tb) {}
         // Slightly different behavior from regular copy
-        Tensor(const Tensor& tp) : type(Type::TENSOR_HANDLE_PTR), tp(const_cast<Tensor*>(&tp)) {}
-        //Tensor& operator= (const Tensor& tp){ type=Type::TENSOR_HANDLE_PTR; tp = const_cast<Tensor*>(&tp); return *this; }
-        Tensor& operator= (Tensor& tp){ type = Type::TENSOR_HANDLE_PTR; this->tp = &tp; return *this; }
-        Tensor& operator= (TensorBase* tb){ type=Type::TENSOR_BASE_PTR; tb = tb; return *this; }
+        Tensor(const Tensor& tp) : type(Type::TENSOR_HANDLE_PTR),
+tp(const_cast<Tensor*>(&tp)) {}
+        //Tensor& operator= (const Tensor& tp){ type=Type::TENSOR_HANDLE_PTR; tp
+= const_cast<Tensor*>(&tp); return *this; } Tensor& operator= (Tensor& tp){ type
+= Type::TENSOR_HANDLE_PTR; this->tp = &tp; return *this; } Tensor& operator=
+(TensorBase* tb){ type=Type::TENSOR_BASE_PTR; tb = tb; return *this; }
         //Do move semantics as well
         Tensor(Tensor&& that) : type(that.type) {
             if(type == Type::TENSOR_BASE_PTR)

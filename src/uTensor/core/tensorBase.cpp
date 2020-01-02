@@ -3,7 +3,9 @@
 #include "memoryManagementInterface.hpp"
 
 namespace uTensor {
-TensorBase::TensorBase() { Context::get_default_context()->register_tensor(this); }
+TensorBase::TensorBase() {
+  Context::get_default_context()->register_tensor(this);
+}
 
 // Allocate the tensor metadata on a different heap from the data scratch pads
 void* TensorBase::operator new(size_t sz) {
@@ -21,8 +23,8 @@ TensorInterface::TensorInterface()
     : TensorBase(), _shape(0), _type(undefined), _type_size(0) {}
 TensorInterface::TensorInterface(TensorShape _shape, ttype _type)
     : TensorBase(), _shape(_shape), _type(_type) {
-    _type_size = type_size(_type);
-    }
+  _type_size = type_size(_type);
+}
 TensorInterface::~TensorInterface(){};
 
 // Can access Tensors like

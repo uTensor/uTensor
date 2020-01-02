@@ -6,26 +6,28 @@
 
 namespace uTensor {
 
-class RamTensor : public TensorInterface { 
-  protected:
-    virtual void* read(uint32_t linear_index) const;
-    virtual void* write(uint32_t linear_index);
-  public:
-    RamTensor(TensorShape _shape, ttype _type);
-    virtual ~RamTensor();
-    virtual void resize(TensorShape new_shape) override;
+class RamTensor : public TensorInterface {
+ protected:
+  virtual void* read(uint32_t linear_index) const;
+  virtual void* write(uint32_t linear_index);
 
-  private:
-    Handle _ram_region;
+ public:
+  RamTensor(TensorShape _shape, ttype _type);
+  virtual ~RamTensor();
+  virtual void resize(TensorShape new_shape) override;
+
+ private:
+  Handle _ram_region;
 };
-//class RawDataHandle : public Handle {
+// class RawDataHandle : public Handle {
 // public:
 //  RawDataHandle(size_t req_ram_size) {
 //    _ptr = Context::DefaultRamDataAllocator::allocate(req_ram_size);
 //    Context::DefaultRamDataAllocator::bind(this, _ptr);
 //  }
 //  ~RawDataHandle() { Context::DefaultRamDataAllocator::deallocate(_ptr); }
-//  // void* operator new(size_t sz) { // Have to delegate this size from tensors
+//  // void* operator new(size_t sz) { // Have to delegate this size from
+//  tensors
 //  // somehow + sizeof(Tensor)
 //  //  void* p = Context::DefaultTensorMetaDataAllocator::allocate(sz);
 //  //  return p;
@@ -41,5 +43,5 @@ class RamTensor : public TensorInterface {
 //  //  }
 //};
 
-}
+}  // namespace uTensor
 #endif
