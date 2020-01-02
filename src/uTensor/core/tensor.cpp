@@ -9,7 +9,7 @@ TensorInterface* Tensor::operator->() {
   return reinterpret_cast<TensorInterface*>(_ptr);
 }
 Tensor::Tensor(TensorInterface* ptr) : Handle((void*)ptr) {
-  Context::get_metadata_allocator()->bind(ptr, this);
+  //Context::get_metadata_allocator()->bind(ptr, this);
 }
 // Add some bits to make the interface nicer to the user
 

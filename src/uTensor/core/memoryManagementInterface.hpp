@@ -7,6 +7,8 @@ class AllocatorInterface;
 
 class Handle {
  private:
+  // Handles cannot be copied, there exists one unless explicitly deep copied
+  // TODO write Handle deep_copy(const Handle& that);
   Handle(const Handle& that);
   // Handles cannot be allocated directly
   void* operator new(size_t sz);
@@ -21,6 +23,7 @@ class Handle {
   void* operator*();
   // Allow users to check if handle is not valid
   bool operator!() const;
+  operator bool() const;
 
  protected:
   void* _ptr;
@@ -81,5 +84,6 @@ class AllocatorInterface {
   void deallocate(void* ptr);
 };
 
+bool bind(Handle& hndl, AllocatorInterface& allocator);
 }  // namespace uTensor
 #endif

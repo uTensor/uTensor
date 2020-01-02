@@ -13,11 +13,12 @@ namespace uTensor {
 
 /**
  * Size allocated must be less than 2**15
+ * TODO get around the BS alignment bits from the silly pointer variable causing extra empty padding
  */
 template<size_t size>
 class localCircularArenaAllocator : public AllocatorInterface {
   private:
-    class MetaHeader {
+    class alignas(1) MetaHeader {
       public:
         uint16_t meta_data;
         Handle* hndl;
@@ -212,13 +213,14 @@ class localCircularArenaAllocator : public AllocatorInterface {
         forward_cursor += hdr.get_len() + sizeof(MetaHeader);
       }
       cursor = fwrite_cursor;
-      empty_chunk_len = (uint16_t)(end() - cursor);
-      allocated_amount = (uint16_t)(cursor - _buffer);
+      // Account for the extra empty meta data
+      empty_chunk_len = (uint16_t)(end() - (cursor - sizeof(MetaHeader)));
+      allocated_amount = (uint16_t)((cursor - sizeof(MetaHeader)) - _buffer);
 
 
       // From the end, move byte by byte until everything is shifted
       // TODO only move bound regions
-      cursor--;
+      cursor = cursor - sizeof(MetaHeader) - 1;
       uint8_t* tail = &_buffer[size-1];
       for(uint16_t i = 0; i < allocated_amount; i++){
         *tail = *cursor;
@@ -227,7 +229,7 @@ class localCircularArenaAllocator : public AllocatorInterface {
       }
 
       // Next scan forward from the shifted points and update any bound handles
-      forward_cursor = _buffer + empty_chunk_len;
+      forward_cursor = _buffer + empty_chunk_len + sizeof(MetaHeader);
       while(forward_cursor < end()){
         MetaHeader hdr = _read_header((void*) forward_cursor);
         if(hdr.is_bound()){
