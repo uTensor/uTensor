@@ -127,6 +127,8 @@ class localCircularArenaAllocator : public AllocatorInterface {
       if (hdr.has_handle(hndl)) {
         return true;
       }
+      if(hdr.get_len() == 0)
+        break;
       m_cursor += hdr.get_len();
     }
     return false;
