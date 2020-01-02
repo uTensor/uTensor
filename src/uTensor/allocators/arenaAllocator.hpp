@@ -185,9 +185,10 @@ class localCircularArenaAllocator : public AllocatorInterface {
     virtual bool rebalance() {
       //TODO WARNING rebalancing Allocator
       // Shift each chunk towards the end of the buffer
-      uint16_t empty_chunk_len = (uint16_t)(end() - cursor);
-      uint16_t allocated_amount = (uint16_t)(cursor - _buffer);
-      uint8_t* forward_cursor;
+      uint16_t empty_chunk_len;
+      uint16_t allocated_amount;
+      uint8_t* forward_cursor; 
+      uint8_t* fwrite_cursor;
       // First deallocate all unbound regions
       forward_cursor = begin();
       while(forward_cursor < end() ) {
@@ -199,6 +200,20 @@ class localCircularArenaAllocator : public AllocatorInterface {
       }
 
       //Next shift all the bound regions to the start, forward scan
+      //TODO do some sorting here to make smaller blocks at the start
+      forward_cursor = begin();
+      fwrite_cursor = begin();
+      while(forward_cursor < end() ) {
+        MetaHeader hdr = _read_header((void*) forward_cursor);
+        if(hdr.is_active() && hdr.is_bound() && forward_cursor != fwrite_cursor){
+          memcpy(fwrite_cursor - sizeof(MetaHeader), forward_cursor - sizeof(MetaHeader), hdr.get_len() + sizeof(MetaHeader));
+          fwrite_cursor += hdr.get_len() + sizeof(MetaHeader);
+        }
+        forward_cursor += hdr.get_len() + sizeof(MetaHeader);
+      }
+      cursor = fwrite_cursor;
+      empty_chunk_len = (uint16_t)(end() - cursor);
+      allocated_amount = (uint16_t)(cursor - _buffer);
 
 
       // From the end, move byte by byte until everything is shifted
