@@ -88,8 +88,10 @@ void TensorShape::update_dims() {
   }
 }
 uint16_t TensorShape::get_linear_size() const {
-  uint16_t sum = 0;
+  uint16_t sum = 1;
   for (int i = 0; i < _num_dims; i++) {
+    if(_shape[i] == 0)
+      break;
     sum *= _shape[i];
   }
   return sum;
@@ -125,6 +127,25 @@ IntegralValue::IntegralValue(const uint32_t& u) {
   *reinterpret_cast<uint32_t*>(p) = u;
 }
 IntegralValue::IntegralValue(const int32_t& u) {
+  *reinterpret_cast<int32_t*>(p) = u;
+}
+
+IntegralValue::IntegralValue(uint8_t&& u) {
+  *reinterpret_cast<uint8_t*>(p) = u;
+}
+IntegralValue::IntegralValue(int8_t&& u) {
+  *reinterpret_cast<int8_t*>(p) = u;
+}
+IntegralValue::IntegralValue(uint16_t&& u) {
+  *reinterpret_cast<uint16_t*>(p) = u;
+}
+IntegralValue::IntegralValue(int16_t&& u) {
+  *reinterpret_cast<int16_t*>(p) = u;
+}
+IntegralValue::IntegralValue(uint32_t&& u) {
+  *reinterpret_cast<uint32_t*>(p) = u;
+}
+IntegralValue::IntegralValue(int32_t&& u) {
   *reinterpret_cast<int32_t*>(p) = u;
 }
 

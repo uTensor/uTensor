@@ -33,6 +33,7 @@ enum ttype : uint8_t { i8, u8, i16, u16, i32, u32, flt, undefined };
 uint8_t type_size(ttype t);
 
 // Need to figure out way of defering reference until after lefthand assignment
+// Need to figure out way of maintaining reference to rvalue
 class IntegralValue {
   void* p;
 
@@ -46,6 +47,12 @@ class IntegralValue {
   IntegralValue(const uint32_t& u);
   IntegralValue(const int32_t& u);
 
+  IntegralValue(uint8_t&& u);
+  IntegralValue(int8_t&& u);
+  IntegralValue(uint16_t&& u);
+  IntegralValue(int16_t&& u);
+  IntegralValue(uint32_t&& u);
+  IntegralValue(int32_t&& u);
   // IntegralValue& operator=(void* _p) { p = _p; }
 
   operator uint8_t() const;
