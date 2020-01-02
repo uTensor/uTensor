@@ -5,8 +5,8 @@
 
 namespace uTensor {
 class Context {
-  private:
-    Context();
+  //private:
+  //  Context();
 
   public:
     static Context* get_default_context();
