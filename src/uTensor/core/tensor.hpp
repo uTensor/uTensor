@@ -17,6 +17,8 @@ class Tensor : public Handle {
 
  public:
   TensorInterface* operator->();
+  // As long as operating on instantiations of this class and not pointers this function will work
+  TensorInterface* operator*();
   Tensor(TensorInterface* ptr);
   // Add some bits to make the interface nicer to the user
 
@@ -26,6 +28,11 @@ class Tensor : public Handle {
 
   // KEY BIT
   friend class AllocatorInterface;
+};
+
+class TensorReference : public HandleReference {
+  public:
+    TensorInterface* operator*();
 };
 /*
   class Tensor {

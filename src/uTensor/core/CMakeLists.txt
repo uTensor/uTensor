@@ -5,6 +5,7 @@ set(src_utensor_core
     memoryManagementInterface.cpp
     context.cpp
     tensor.cpp
+    operatorBase.cpp
    )
 
 set(hdr_utensor_core
@@ -14,6 +15,9 @@ set(hdr_utensor_core
     memoryManagementInterface.hpp
     context.hpp
     tensor.hpp
+    TensorMap.hpp
+    operatorBase.hpp
+    utensor_string.hpp
    )
     
 add_library(utensor_core ${src_utensor_core} ${hdr_utensor_core})

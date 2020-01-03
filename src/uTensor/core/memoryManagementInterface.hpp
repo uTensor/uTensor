@@ -40,7 +40,7 @@ void* operator*(const Handle& that);
  * singleton-like handle for some data
  */
 class HandleReference {
- private:
+ protected:
   Handle* _ref;
 
  public:

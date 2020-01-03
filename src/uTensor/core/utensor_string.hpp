@@ -1,6 +1,8 @@
 #ifndef UTENSOR_STRING
 #define UTENSOR_STRING
-#include <string.h>
+//#include <string.h>
+#include <cstdint>
+#include <cstring>
 
 namespace uTensor {
 class string {
@@ -37,16 +39,16 @@ class string {
 
 }  // namespace uTensor
 
-namespace std {
-template <>
-struct hash<uTensor::string> {
-  typedef uTensor::string argument_type;
-  typedef std::size_t result_type;
-
-  result_type operator()(argument_type const& s) const noexcept {
-    return s.get_value();
-  }
-};
-}  // namespace std
+//namespace std {
+//template <>
+//struct hash<uTensor::string> {
+//  typedef uTensor::string argument_type;
+//  typedef std::size_t result_type;
+//
+//  result_type operator()(argument_type const& s) const noexcept {
+//    return s.get_value();
+//  }
+//};
+//}  // namespace std
 
 #endif
