@@ -19,7 +19,7 @@ namespace uTensor {
 template <size_t size>
 class localCircularArenaAllocator : public AllocatorInterface {
  private:
-  class alignas(1) MetaHeader {
+  class MetaHeader {
    public:
     uint16_t meta_data;
     Handle* hndl;
