@@ -8,6 +8,9 @@ namespace uTensor {
 TensorInterface* Tensor::operator->() {
   return reinterpret_cast<TensorInterface*>(_ptr);
 }
+TensorInterface* Tensor::operator*() {
+  return reinterpret_cast<TensorInterface*>(_ptr);
+}
 Tensor::Tensor(TensorInterface* ptr) : Handle((void*)ptr) {
   // Context::get_metadata_allocator()->bind(ptr, this);
 }
@@ -21,6 +24,10 @@ void* Tensor::operator new(size_t sz) {  // Have to delegate this size from
 }
 void Tensor::operator delete(void* p) {
   Context::get_metadata_allocator()->deallocate(p);
+}
+
+TensorInterface* TensorReference::operator*(){
+  return reinterpret_cast<TensorInterface*>(_ref->operator*()); 
 }
 
 SimpleNamedTensor::SimpleNamedTensor(const uTensor::string& name,
