@@ -20,6 +20,9 @@ class Tensor : public Handle {
   // As long as operating on instantiations of this class and not pointers this function will work
   TensorInterface* operator*();
   Tensor(TensorInterface* ptr);
+  Tensor& operator=(TensorInterface* ptr);
+  Tensor(Tensor&& that);
+  Tensor& operator=(Tensor&& that);
   // Add some bits to make the interface nicer to the user
 
   // Force everything to be on the utensor allocator
