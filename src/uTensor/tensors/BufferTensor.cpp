@@ -25,15 +25,15 @@ bool BufferTensor::unbind() {
 
 void* BufferTensor::read(uint32_t linear_index) const {
   if (_buffer) {
-    uint8_t* d = reinterpret_cast<uint8_t*>(*_buffer);
-    return reinterpret_cast<void*>(d + linear_index * _type_size);
+    //uint8_t* d = reinterpret_cast<uint8_t*>(_buffer);
+    return reinterpret_cast<void*>(_buffer + linear_index * _type_size);
   }
   return nullptr;
 }
 void* BufferTensor::write(uint32_t linear_index) {
   if (_buffer) {
-    uint8_t* d = reinterpret_cast<uint8_t*>(*_buffer);
-    return reinterpret_cast<void*>(d + linear_index * _type_size);
+    //uint8_t* d = reinterpret_cast<uint8_t*>(*_buffer);
+    return reinterpret_cast<void*>(_buffer + linear_index * _type_size);
   }
   return nullptr;
 }
