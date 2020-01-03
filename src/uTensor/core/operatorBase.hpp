@@ -13,6 +13,7 @@ class OperatorBase {
     //OperatorBase(TensorMapInterface* inputs, TensorMapInterface* outputs);
     // The preferred interface
     OperatorBase();
+    OperatorBase(uTensor::string op_name);
     void set_name(uTensor::string _name);
     virtual ~OperatorBase();
 

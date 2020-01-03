@@ -14,6 +14,7 @@ OperatorBase::OperatorBase(TensorMapInterface* inputs) : _p_inputs(inputs) {
     //ctx.push_op_tensors(*this, inputs);
 }
 OperatorBase::OperatorBase() {}
+OperatorBase::OperatorBase(uTensor::string op_name) : op_name(op_name) {}
 
 void OperatorBase::set_inputs(TensorMapInterface* inputs) {
     this->_p_inputs = inputs; 
