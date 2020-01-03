@@ -29,3 +29,4 @@ package_add_test_with_libraries(test_types core/test_types.cpp utensor_core "${P
 package_add_test_with_libraries(test_alloc allocators/test_arenaAllocator utensor "${PROJECT_DIR}/test-data/")
 package_add_test_with_libraries(test_context core/test_context utensor "${PROJECT_DIR}/test-data/")
 package_add_test_with_libraries(test_ramtensor tensors/test_ramtensor utensor "${PROJECT_DIR}/test-data/")
+package_add_test_with_libraries(test_buffertensor tensors/test_buffertensor utensor "${PROJECT_DIR}/test-data/")
