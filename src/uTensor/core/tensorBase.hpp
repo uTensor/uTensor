@@ -41,6 +41,8 @@ class TensorInterface : public TensorBase {
                                  uint16_t l = 0) const;
   IntegralValue operator()(uint16_t i, uint16_t j = 0, uint16_t k = 0,
                            uint16_t l = 0);
+  const IntegralValue operator()(uint32_t linear_index) const;
+  IntegralValue operator()(uint32_t linear_index);
 
   virtual void resize(TensorShape new_shape) = 0;
 
