@@ -33,6 +33,17 @@ class FixedTensorMap : public TensorMapInterface {
     }
     return TensorMapInterface::not_found;
   }
+  FixedTensorMap(FixedTensorMap<size>&& that){
+      _map = that._map;
+      that._map = nullptr;
+  } 
+  FixedTensorMap& operator=(FixedTensorMap<size>&& that) {
+    if(this != &that){
+      _map = that._map;
+      that._map = nullptr;
+    }
+      return *this;
+  }
 
  private:
   SimpleNamedTensor _map[size];

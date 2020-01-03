@@ -34,56 +34,6 @@ class TensorReference : public HandleReference {
   public:
     TensorInterface* operator*();
 };
-/*
-  class Tensor {
-    enum Type : uint8_t { TENSOR_BASE_PTR, TENSOR_HANDLE_PTR } type;
-    union {
-        TensorBase* tb;
-        Tensor* tp;
-    };
-
-    public:
-        Tensor(TensorBase* tb) : type(Type::TENSOR_BASE_PTR), tb(tb) {}
-        // Slightly different behavior from regular copy
-        Tensor(const Tensor& tp) : type(Type::TENSOR_HANDLE_PTR),
-tp(const_cast<Tensor*>(&tp)) {}
-        //Tensor& operator= (const Tensor& tp){ type=Type::TENSOR_HANDLE_PTR; tp
-= const_cast<Tensor*>(&tp); return *this; } Tensor& operator= (Tensor& tp){ type
-= Type::TENSOR_HANDLE_PTR; this->tp = &tp; return *this; } Tensor& operator=
-(TensorBase* tb){ type=Type::TENSOR_BASE_PTR; tb = tb; return *this; }
-        //Do move semantics as well
-        Tensor(Tensor&& that) : type(that.type) {
-            if(type == Type::TENSOR_BASE_PTR)
-                tb = that.tb;
-            else
-                tp = that.tp;
-        }
-        Tensor& operator=(Tensor&& that) {
-            if(this != &that){
-                this->type = that.type;
-                if(type == Type::TENSOR_BASE_PTR){
-                    tb = that.tb;
-                    that.tb = nullptr;
-                }
-                else{
-                    tp = that.tp;
-                    that.tb = nullptr;
-                }
-
-            }
-            return *this;
-        }
-
-        void read(int i) {
-            cout << "In Tensor read" << endl;
-            if(type == Type::TENSOR_BASE_PTR)
-                tb->read(i);
-            else
-                tp->read(i);
-        }
-
-};
-*/
 
 // Same as Named Tensor but not registered in the context class
 struct SimpleNamedTensor {

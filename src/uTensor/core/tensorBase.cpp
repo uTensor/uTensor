@@ -39,6 +39,14 @@ IntegralValue TensorInterface::operator()(uint16_t i, uint16_t j, uint16_t k,
   // Add shape checks here
   return write(_shape.linear_index(i, j, k, l));
 }
+const IntegralValue TensorInterface::operator()(uint32_t linear_index) const {
+  // Add shape checks here
+  return read(linear_index);
+}
+IntegralValue TensorInterface::operator()(uint32_t linear_index){
+  // Add shape checks here
+  return write(linear_index);
+}
 size_t TensorInterface::get_readable_block(void* buffer, uint16_t req_read_size,
                                            uint32_t linear_index) const {
   printf(
