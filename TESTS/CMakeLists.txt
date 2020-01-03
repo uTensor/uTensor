@@ -31,3 +31,4 @@ package_add_test_with_libraries(test_context core/test_context utensor "${PROJEC
 package_add_test_with_libraries(test_ramtensor tensors/test_ramtensor utensor "${PROJECT_DIR}/test-data/")
 package_add_test_with_libraries(test_buffertensor tensors/test_buffertensor utensor "${PROJECT_DIR}/test-data/")
 package_add_test_with_libraries(test_romtensor tensors/test_romtensor utensor "${PROJECT_DIR}/test-data/")
+package_add_test_with_libraries(test_arith operators/test_arithmetic utensor "${PROJECT_DIR}/test-data/")

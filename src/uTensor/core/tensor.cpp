@@ -14,6 +14,22 @@ TensorInterface* Tensor::operator*() {
 Tensor::Tensor(TensorInterface* ptr) : Handle((void*)ptr) {
   // Context::get_metadata_allocator()->bind(ptr, this);
 }
+Tensor& Tensor::operator=(TensorInterface* ptr) {
+  _ptr = (void*)ptr;
+  return *this;
+}
+
+Tensor::Tensor(Tensor&& that) {
+    _ptr = that._ptr;
+    that._ptr = nullptr;
+}
+Tensor& Tensor::operator=(Tensor&& that) {
+  if (this != &that) {
+    _ptr = that._ptr;
+    that._ptr = nullptr;
+  }
+  return *this;
+}
 // Add some bits to make the interface nicer to the user
 
 // Force everything to be on the utensor allocator
