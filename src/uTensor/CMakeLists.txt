@@ -10,10 +10,12 @@ set(hdr_utensor_alloc
 set(src_utensor_tensors
   tensors/RamTensor.cpp
   tensors/BufferTensor.cpp
+  tensors/RomTensor.cpp
    )
 set(hdr_utensor_tensors
   tensors/RamTensor.hpp
   tensors/BufferTensor.hpp
+  tensors/RomTensor.hpp
    )
 add_library(utensor ${src_utensor_alloc} ${hdr_utensor_alloc} ${src_utensor_tensors} ${hdr_utensor_tensors})
 target_link_libraries(utensor utensor_core)

@@ -30,3 +30,4 @@ package_add_test_with_libraries(test_alloc allocators/test_arenaAllocator utenso
 package_add_test_with_libraries(test_context core/test_context utensor "${PROJECT_DIR}/test-data/")
 package_add_test_with_libraries(test_ramtensor tensors/test_ramtensor utensor "${PROJECT_DIR}/test-data/")
 package_add_test_with_libraries(test_buffertensor tensors/test_buffertensor utensor "${PROJECT_DIR}/test-data/")
+package_add_test_with_libraries(test_romtensor tensors/test_romtensor utensor "${PROJECT_DIR}/test-data/")
