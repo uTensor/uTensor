@@ -20,6 +20,9 @@ template <size_t size>
 class FixedTensorMap : public TensorMapInterface {
  public:
   FixedTensorMap(SimpleNamedTensor map[size]) : _map{map} {}
+  FixedTensorMap() {
+    _map = {not_found};
+  }
   virtual ~FixedTensorMap() {}
   SimpleNamedTensor& operator[](const uTensor::string& name) {
     for (int i = 0; i < size; i++) {

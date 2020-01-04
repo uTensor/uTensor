@@ -49,4 +49,9 @@ TensorInterface* TensorReference::operator*(){
 SimpleNamedTensor::SimpleNamedTensor(const uTensor::string& name,
                                      Tensor& tensor)
     : name(name), tensor(tensor) {}
+//SimpleNamedTensor::SimpleNamedTensor() {}
+
+
+
 }  // namespace uTensor
+

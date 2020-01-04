@@ -25,7 +25,7 @@ public:
 
 protected:
     virtual void compute() {
-        add_kernel<T>(outputs[c], inputs[a], inputs[b]);
+        add_kernel<T>(outputs[c].tensor, inputs[a].tensor, inputs[b].tensor);
     }
 };
 
