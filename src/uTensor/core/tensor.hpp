@@ -41,10 +41,10 @@ class TensorReference : public HandleReference {
 // Same as Named Tensor but not registered in the context class
 struct SimpleNamedTensor {
  public:
-  const uTensor::string& name;  // Fixed
-  Tensor& tensor;               // Modifiable
+  const uTensor::string* name;  // Fixed
+  Tensor* tensor;               // Modifiable
 
-  //SimpleNamedTensor();
+  SimpleNamedTensor();
   SimpleNamedTensor(const uTensor::string& name, Tensor& tensor);
 };
 }  // namespace uTensor
