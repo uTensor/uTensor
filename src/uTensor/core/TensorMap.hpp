@@ -21,18 +21,18 @@ class FixedTensorMap : public TensorMapInterface {
  public:
   FixedTensorMap(SimpleNamedTensor map[size]) : _map{map} {}
   FixedTensorMap() {
-    _map = {not_found};
+    //_map = {not_found};
   }
   virtual ~FixedTensorMap() {}
   SimpleNamedTensor& operator[](const uTensor::string& name) {
     for (int i = 0; i < size; i++) {
-      if (name == _map[i].name) return _map[i];
+      if (name == *(_map[i].name)) return _map[i];
     }
     return TensorMapInterface::not_found;
   }
   const SimpleNamedTensor& operator[](const uTensor::string& name) const {
     for (int i = 0; i < size; i++) {
-      if (name == _map[i].name) return _map[i];
+      if (name == *(_map[i].name)) return _map[i];
     }
     return TensorMapInterface::not_found;
   }
@@ -47,10 +47,18 @@ class FixedTensorMap : public TensorMapInterface {
     }
       return *this;
   }
+  FixedTensorMap(const FixedTensorMap<size>& that) {
+    _map = that._map;
+  }
+  FixedTensorMap& operator=(const FixedTensorMap<size>& that) {
+    //_map = that._map;
+    for(int i = 0; i < size; i++)
+        _map[i] = that._map[i];
+    return *this;
+  }
 
  private:
   SimpleNamedTensor _map[size];
-  FixedTensorMap(const FixedTensorMap& that) {}
 };
 }
 #endif
