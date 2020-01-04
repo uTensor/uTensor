@@ -44,6 +44,7 @@ struct SimpleNamedTensor {
   const uTensor::string& name;  // Fixed
   Tensor& tensor;               // Modifiable
 
+  //SimpleNamedTensor();
   SimpleNamedTensor(const uTensor::string& name, Tensor& tensor);
 };
 }  // namespace uTensor
