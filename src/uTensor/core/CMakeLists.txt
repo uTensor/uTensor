@@ -5,6 +5,7 @@ set(src_utensor_core
     memoryManagementInterface.cpp
     context.cpp
     tensor.cpp
+    TensorMap.cpp
     operatorBase.cpp
    )
 
