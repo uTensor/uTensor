@@ -1,5 +1,8 @@
 #include "TensorMap.hpp"
 namespace uTensor {
-  TensorMapInterface::SimpleNamedTensor not_found(uTensor::string("NotFound"),
-                                     static_cast<Tensor>(NULL));
+const uTensor::string not_found_string("NotFound");
+Tensor not_found_tensor(nullptr);
+
+SimpleNamedTensor TensorMapInterface::not_found(not_found_string,
+                                     not_found_tensor);
 }

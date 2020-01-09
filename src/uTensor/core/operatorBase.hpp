@@ -33,8 +33,8 @@ class OperatorInterface : public OperatorBase {
     FixedTensorMap<num_inputs> inputs;
     FixedTensorMap<num_outputs> outputs;
   public:
-    virtual ~OperatorInterface();
     OperatorInterface() : OperatorBase() {}
+    virtual ~OperatorInterface() {}
 
     // This will throw compile time errors if users provide the wrong number of inputs
     OperatorInterface& set_inputs(FixedTensorMap<num_inputs>&& in) {
