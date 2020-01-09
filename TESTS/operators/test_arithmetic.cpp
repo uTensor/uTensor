@@ -57,5 +57,12 @@ TEST(Arithmetic, AddOp) {
 
   AddOperator<uint8_t> add_AB;
   add_AB.set_inputs(FixedTensorMap<2>({{AddOperator<uint8_t>::a, a}, {AddOperator<uint8_t>::b, b}})).set_outputs({{AddOperator<uint8_t>::c, c}});
+  TensorShape& c_shape = c->get_shape();
+  for(int i = 0; i < c_shape[0]; i++){
+    for(int j = 0; j < c_shape[1]; j++){
+        size_t lin_index = i + j*c_shape[0];
+        EXPECT_EQ((uint8_t)c(i,j), a_buffer[lin_index] + s_b[lin_index]);
+    }
+  }
 
 }
