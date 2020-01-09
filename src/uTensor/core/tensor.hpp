@@ -23,7 +23,14 @@ class Tensor : public Handle {
   Tensor& operator=(TensorInterface* ptr);
   Tensor(Tensor&& that);
   Tensor& operator=(Tensor&& that);
+
   // Add some bits to make the interface nicer to the user
+  const IntegralValue operator()(uint16_t i, uint16_t j = 0, uint16_t k = 0,
+                                 uint16_t l = 0) const;
+  IntegralValue operator()(uint16_t i, uint16_t j = 0, uint16_t k = 0,
+                           uint16_t l = 0);
+  const IntegralValue operator()(uint32_t linear_index) const;
+  IntegralValue operator()(uint32_t linear_index);
 
   // Force everything to be on the utensor allocator
   void* operator new(size_t sz);

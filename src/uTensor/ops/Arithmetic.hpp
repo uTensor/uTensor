@@ -9,12 +9,13 @@ void add_kernel(Tensor& c, const Tensor& a, const Tensor& b){
     // Decide on c shape
     TensorShape c_shape = c->get_shape();
     uint32_t c_size = c_shape.get_linear_size();
-    TensorInterface& C = reinterpret_cast<TensorInterface*>(*c);
-    const TensorInterface& A = reinterpret_cast<TensorInterface*>(*a);
-    const TensorInterface& B = reinterpret_cast<TensorInterface*>(*b);
+    //TensorInterface& C = reinterpret_cast<TensorInterface*>(*c);
+    //const TensorInterface& A = reinterpret_cast<TensorInterface*>(*a);
+    //const TensorInterface& B = reinterpret_cast<TensorInterface*>(*b);
+
 
     for (uint32_t i = 0; i < c_size; i++)
-        C(i) = static_cast<T>(A(i)) + static_cast<T>(B(i));
+       c(i) = static_cast<T>(a(i)) + static_cast<T>(b(i));
 }
 
 template<typename T>
