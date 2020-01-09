@@ -42,6 +42,24 @@ void Tensor::operator delete(void* p) {
   Context::get_metadata_allocator()->deallocate(p);
 }
 
+// Interface
+const IntegralValue Tensor::operator()(uint16_t i, uint16_t j, uint16_t k,
+                               uint16_t l) const {
+  return reinterpret_cast<TensorInterface*>(_ptr)->operator()(i, j, k, l);
+}
+IntegralValue Tensor::operator()(uint16_t i, uint16_t j, uint16_t k,
+                         uint16_t l){
+  return reinterpret_cast<TensorInterface*>(_ptr)->operator()(i, j, k, l);
+}
+const IntegralValue Tensor::operator()(uint32_t linear_index) const {
+  return reinterpret_cast<TensorInterface*>(_ptr)->operator()(linear_index);
+}
+IntegralValue Tensor::operator()(uint32_t linear_index){
+  return reinterpret_cast<TensorInterface*>(_ptr)->operator()(linear_index);
+
+}
+
+
 TensorInterface* TensorReference::operator*(){
   return reinterpret_cast<TensorInterface*>(_ref->operator*()); 
 }
