@@ -38,6 +38,22 @@ TEST(RAM_Tensor, read_write_u8) {
   cout << "Sizeof IntegralValue " << sizeof(IntegralValue(5)) << endl;
 }
 
+TEST(RAM_Tensor, read_write_u8_multi_tensor) {
+  ///setup_context();
+  localCircularArenaAllocator<256> meta_allocator;
+  localCircularArenaAllocator<256> ram_allocator;
+  Context::set_metadata_allocator(&meta_allocator);
+  Context::set_ram_data_allocator(&ram_allocator);
+  RamTensor r1({10, 10}, u8);
+  RamTensor r2({10, 10}, u8);
+  RamTensor r3({10, 10}, u8);
+  r1(2,2) = (uint8_t) 5;
+  r2(2,2) = (uint8_t) 5;
+  r3(2,2) = (uint8_t) r1(2,2) + (uint8_t) r2(2,2);
+  EXPECT_EQ((uint8_t)r3(2,2), 10);
+  cout << "Sizeof IntegralValue " << sizeof(IntegralValue(5)) << endl;
+}
+
 TEST(RAM_Tensor, read_write_u8_2x) {
   ///setup_context();
   localCircularArenaAllocator<256> meta_allocator;
