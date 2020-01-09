@@ -37,13 +37,15 @@ class OperatorInterface : public OperatorBase {
     OperatorInterface() : OperatorBase() {}
 
     // This will throw compile time errors if users provide the wrong number of inputs
-    void set_inputs(FixedTensorMap<num_inputs>&& in) {
+    OperatorInterface& set_inputs(FixedTensorMap<num_inputs>&& in) {
       inputs = in;
       OperatorBase::set_inputs(&inputs);
+      return *this;
     }
-    void set_outputs(FixedTensorMap<num_outputs>&& out) {
+    OperatorInterface& set_outputs(FixedTensorMap<num_outputs>&& out) {
       outputs = out;
       OperatorBase::set_outputs(&outputs);
+      return *this;
     }
 
   protected:

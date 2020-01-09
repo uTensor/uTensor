@@ -3,6 +3,9 @@
 
 #include "utensor_string.hpp"
 #include "tensor.hpp"
+#include <initializer_list>
+
+using std::initializer_list;
 
 namespace uTensor {
 // Tensor maps are fixed size to force input output mismatched errors
@@ -20,6 +23,17 @@ template <size_t size>
 class FixedTensorMap : public TensorMapInterface {
  public:
   FixedTensorMap(SimpleNamedTensor map[size]) : _map{map} {}
+  FixedTensorMap(initializer_list<SimpleNamedTensor> l) {
+    if(size != l.size()){
+        //TODO THROW ERROR
+        printf("Element number mismatch in TensorMap construction\n");
+    }
+    int i = 0;
+    for(auto thing = l.begin(); thing != l.end(); thing++){
+        _map[i] = *thing;
+        i++;
+    }
+  }
   FixedTensorMap() {
     //_map = {not_found};
   }

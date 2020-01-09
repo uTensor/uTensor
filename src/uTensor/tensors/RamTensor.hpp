@@ -8,8 +8,8 @@ namespace uTensor {
 
 class RamTensor : public TensorInterface {
  protected:
-  virtual void* read(uint32_t linear_index) const;
-  virtual void* write(uint32_t linear_index);
+  virtual void* read(uint32_t linear_index) const override;
+  virtual void* write(uint32_t linear_index) override;
 
  public:
   RamTensor(TensorShape _shape, ttype _type);
