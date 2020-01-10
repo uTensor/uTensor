@@ -31,15 +31,16 @@ class TensorInterface : public TensorBase {
  public:
   ttype get_type() const;
   TensorShape& get_shape();
+  const TensorShape& get_shape() const;
   TensorInterface();
   TensorInterface(TensorShape _shape, ttype _type);
   virtual ~TensorInterface();
 
   // Can access Tensors like
   // mTensor(1) = 5, mTensor(2,2) = 5, etc.
-  const IntegralValue operator()(uint16_t i, uint16_t j = 0, uint16_t k = 0,
+  const IntegralValue operator()(uint16_t i, uint16_t j, uint16_t k = 0,
                                  uint16_t l = 0) const;
-  IntegralValue operator()(uint16_t i, uint16_t j = 0, uint16_t k = 0,
+  IntegralValue operator()(uint16_t i, uint16_t j, uint16_t k = 0,
                            uint16_t l = 0);
   const IntegralValue operator()(uint32_t linear_index) const;
   IntegralValue operator()(uint32_t linear_index);
