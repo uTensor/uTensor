@@ -7,8 +7,11 @@
 
 namespace uTensor {
 
-#define BLOCK_INACTIVE (0 << 15)
-#define BLOCK_ACTIVE (1 << 15)
+//#define MSB_SET ~( ~( (T)0 ) >> 1 )
+#define MSB_SET (1 << (sizeof(T)*8 - 1))
+#define BLOCK_INACTIVE ~MSB_SET
+#define BLOCK_LENGTH_MASK ~MSB_SET
+#define BLOCK_ACTIVE MSB_SET
 #define BLOCK_ZERO_LENGTH 0
 
 /**
@@ -16,27 +19,27 @@ namespace uTensor {
  * TODO get around the BS alignment bits from the silly pointer variable causing
  * extra empty padding
  */
-template <size_t size>
+template <size_t size, typename T=uint16_t>
 class localCircularArenaAllocator : public AllocatorInterface {
  private:
   class MetaHeader {
    public:
-    uint16_t meta_data;
+    T meta_data;
     Handle* hndl;
 
    public:
     MetaHeader()
-        : meta_data(BLOCK_INACTIVE | BLOCK_ZERO_LENGTH), hndl(nullptr) {}
-    MetaHeader(uint16_t sz) : meta_data(BLOCK_ACTIVE | sz), hndl(nullptr) {}
+        : meta_data(BLOCK_INACTIVE & BLOCK_ZERO_LENGTH), hndl(nullptr) {}
+    MetaHeader(T sz) : meta_data(BLOCK_ACTIVE | sz), hndl(nullptr) {}
     void set_active() { meta_data |= BLOCK_ACTIVE; }
-    void set_inactive() { meta_data &= (BLOCK_INACTIVE | 0x7FFF); }
+    void set_inactive() { meta_data &= BLOCK_INACTIVE; }
     void set_hndl(Handle* handle) { hndl = handle; }
-    void set_len(uint16_t sz) {
-      meta_data &= 0x8000;
-      meta_data |= (0x7FFF & sz);
+    void set_len(T sz) {
+      meta_data &= MSB_SET; // Clear all size bits
+      meta_data |= (BLOCK_LENGTH_MASK & sz);
     }
-    uint16_t get_len() const { return meta_data & 0x7FFF; }
-    bool is_active() const { return (meta_data & 0x8000) == BLOCK_ACTIVE; }
+    T get_len() const { return meta_data & BLOCK_LENGTH_MASK; }
+    bool is_active() const { return (meta_data & MSB_SET) == BLOCK_ACTIVE; }
     bool is_bound() const { return (hndl != nullptr); }
     bool has_handle(Handle* target) const {
       return is_active() && (hndl == target);
@@ -45,12 +48,12 @@ class localCircularArenaAllocator : public AllocatorInterface {
   };
 
  private:
-  uint16_t capacity;
+  T capacity;
   uint8_t _buffer[size];
   uint8_t* cursor;
 
   // Return the amount of free space at the tail
-  uint16_t tail_capacity(){};
+  T tail_capacity(){};
 
   MetaHeader _read_header(void* ptr) const {
     // First check if ptr in bounds
@@ -200,8 +203,8 @@ class localCircularArenaAllocator : public AllocatorInterface {
   virtual bool rebalance() {
     // TODO WARNING rebalancing Allocator
     // Shift each chunk towards the end of the buffer
-    uint16_t empty_chunk_len;
-    uint16_t allocated_amount;
+    T empty_chunk_len;
+    T allocated_amount;
     uint8_t* forward_cursor;
     uint8_t* fwrite_cursor;
     // First deallocate all unbound regions
@@ -231,14 +234,14 @@ class localCircularArenaAllocator : public AllocatorInterface {
     }
     cursor = fwrite_cursor;
     // Account for the extra empty meta data
-    empty_chunk_len = (uint16_t)(end() - (cursor - sizeof(MetaHeader)));
-    allocated_amount = (uint16_t)((cursor - sizeof(MetaHeader)) - _buffer);
+    empty_chunk_len = (T)(end() - (cursor - sizeof(MetaHeader)));
+    allocated_amount = (T)((cursor - sizeof(MetaHeader)) - _buffer);
 
     // From the end, move byte by byte until everything is shifted
     // TODO only move bound regions
     cursor = cursor - sizeof(MetaHeader) - 1;
     uint8_t* tail = &_buffer[size - 1];
-    for (uint16_t i = 0; i < allocated_amount; i++) {
+    for (T i = 0; i < allocated_amount; i++) {
       *tail = *cursor;
       tail--;
       cursor--;
