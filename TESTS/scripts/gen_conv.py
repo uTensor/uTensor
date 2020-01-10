@@ -2,10 +2,15 @@ import tensorflow as tf
 import jinja2
 
 output_file = "test_convolution.cpp"
+const_file = "constants_convolution.hpp"
+
+const_str = """
+static const float s_in_{{ test_number }}[{{ input_size }}] = { {% for x in ref_in %} {{ x }}{{ "," if not loop.last }} {% endfor %} };
+static const float s_w_{{ test_number }}[{{ w_size }}] = { {% for x in ref_w %} {{ x }}{{ "," if not loop.last }} {% endfor %} };
+static const float s_ref_out_{{ test_number }}[{{ out_size }}] = { {% for x in ref_out %} {{ x }}{{ "," if not loop.last }} {% endfor %} };
+"""
+
 test_str = """
-const float s_in_{{ test_number }}[{{ input_size }}] = { {% for x in ref_in %} {{ x }}{{ "," if not loop.last }} {% endfor %} };
-const float s_w_{{ test_number }}[{{ w_size }}] = { {% for x in ref_w %} {{ x }}{{ "," if not loop.last }} {% endfor %} };
-const float s_ref_out_{{ test_number }}[{{ out_size }}] = { {% for x in ref_out %} {{ x }}{{ "," if not loop.last }} {% endfor %} };
 
 TEST(Convolution, random_inputs_{{test_number}}) {
   localCircularArenaAllocator<1024> meta_allocator;
@@ -40,6 +45,8 @@ container_str = """
 #include "arenaAllocator.hpp"
 #include "context.hpp"
 #include "gtest/gtest.h"
+
+#include "{{ constants_header }}"
 using std::cout;
 using std::endl;
 
@@ -53,12 +60,23 @@ using namespace uTensor;
 
 {% endfor %}
 """
+const_container_str = """
+#ifndef {{ constants_header | replace(".", "_") }} 
+#define {{ constants_header | replace(".", "_") }} 
+{% for constant_snippet in constants %}
+{{ constant_snippet }}
+{% endfor %}
+#endif
+"""
 
 test_Template = jinja2.Template(test_str)
+const_Template = jinja2.Template(const_str)
 container_Template = jinja2.Template(container_str)
+const_container_Template = jinja2.Template(const_container_str)
 
 num_tests = 5
 tests=[]
+constants=[]
 for i in range(num_tests):
     for stride in [1, 2]:
         w =  tf.Variable(tf.random.normal([5, 5, 1, 32]))
@@ -72,10 +90,15 @@ for i in range(num_tests):
         test_number = "%d%s" % (i, stride_str)
 
         test_str_rendered = test_Template.render(test_number=test_number, input_size=in_flat.shape[0], w_size=w_flat.shape[0], out_size=out_flat.shape[0], ref_in=in_flat, ref_w=w_flat, ref_out=out_flat, strides=strides, in_shape=in_1.shape, w_shape=w.shape, out_shape=out_1.shape)
+        const_str_rendered = const_Template.render(test_number=test_number, input_size=in_flat.shape[0], w_size=w_flat.shape[0], out_size=out_flat.shape[0], ref_in=in_flat, ref_w=w_flat, ref_out=out_flat, strides=strides, in_shape=in_1.shape, w_shape=w.shape, out_shape=out_1.shape)
         tests.append(test_str_rendered)
+        constants.append(const_str_rendered)
 
-container_rendered = container_Template.render(tests=tests)
+container_rendered = container_Template.render(tests=tests, constants_header=const_file)
+consts_container_rendered = const_container_Template.render(constants=constants, constants_header=const_file)
 with open(output_file, "w") as fp:
     fp.write(container_rendered)
+with open(const_file, "w") as fp:
+    fp.write(consts_container_rendered)
 
 print("Complete");
