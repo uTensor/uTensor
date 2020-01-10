@@ -93,8 +93,9 @@ bool AllocatorInterface::is_bound(void* ptr, Handle* hndl) {
   return _is_bound(ptr, hndl);
 }
 void* AllocatorInterface::allocate(size_t sz) {
-  if (sz > (1 << 16)) {
+  if (sz > (1 << 31)) {
     // TODO ERROR invalid allocation size
+    printf("[ERROR] Attempted to allocator > 2**32 bytes\n");
     return nullptr;
   }
   return _allocate(sz);
