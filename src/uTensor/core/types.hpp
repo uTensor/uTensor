@@ -48,6 +48,7 @@ class IntegralValue {
   IntegralValue(const int16_t& u);
   IntegralValue(const uint32_t& u);
   IntegralValue(const int32_t& u);
+  IntegralValue(const float& u);
 
   IntegralValue(uint8_t&& u);
   IntegralValue(int8_t&& u);
@@ -55,6 +56,7 @@ class IntegralValue {
   IntegralValue(int16_t&& u);
   IntegralValue(uint32_t&& u);
   IntegralValue(int32_t&& u);
+  IntegralValue(float&& u);
   // IntegralValue& operator=(void* _p) { p = _p; }
   IntegralValue(const IntegralValue& that);
   IntegralValue& operator=(const IntegralValue& that);

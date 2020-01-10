@@ -130,6 +130,9 @@ IntegralValue::IntegralValue(const uint32_t& u): num_bytes(sizeof(u)) {
 IntegralValue::IntegralValue(const int32_t& u): num_bytes(sizeof(u)) {
   *reinterpret_cast<int32_t*>(p) = u;
 }
+IntegralValue::IntegralValue(const float& u): num_bytes(sizeof(u)) {
+  *reinterpret_cast<float*>(p) = u;
+}
 
 IntegralValue::IntegralValue(uint8_t&& u): num_bytes(sizeof(u)) {
   memcpy(tmp, &u, sizeof(uint8_t));
@@ -153,6 +156,10 @@ IntegralValue::IntegralValue(uint32_t&& u): num_bytes(sizeof(u)) {
 }
 IntegralValue::IntegralValue(int32_t&& u): num_bytes(sizeof(u)) {
   memcpy(tmp, &u, sizeof(int32_t));
+  p = reinterpret_cast<void*>(tmp);
+}
+IntegralValue::IntegralValue(float&& u): num_bytes(sizeof(u)) {
+  memcpy(tmp, &u, sizeof(float));
   p = reinterpret_cast<void*>(tmp);
 }
 IntegralValue::IntegralValue(const IntegralValue& that) {
