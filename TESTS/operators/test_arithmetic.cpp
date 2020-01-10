@@ -35,7 +35,8 @@ TEST(Arithmetic, AddOp) {
   // {AddOperator<uint8_t>::b, b}})).set_outputs({{AddOperator<uint8_t>::c, c}});
   add_AB
       .set_inputs({{AddOperator<uint8_t>::a, a}, {AddOperator<uint8_t>::b, b}})
-      .set_outputs({{AddOperator<uint8_t>::c, c}});
+      .set_outputs({{AddOperator<uint8_t>::c, c}})
+      .eval();
 
   // Compare results
   TensorShape& c_shape = c->get_shape();
