@@ -14,6 +14,10 @@ const TensorInterface* Tensor::operator->() const {
 TensorInterface* Tensor::operator*() {
   return reinterpret_cast<TensorInterface*>(_ptr);
 }
+Tensor::~Tensor() {
+  if(_ptr)
+    delete reinterpret_cast<TensorInterface*>(_ptr);
+}
 Tensor::Tensor(TensorInterface* ptr) : Handle((void*)ptr) {
   // Context::get_metadata_allocator()->bind(ptr, this);
 }
