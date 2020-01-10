@@ -42,6 +42,15 @@ class IntegralValue {
  public:
   // Explicit
   IntegralValue(void* p);
+/*
+  IntegralValue(uint8_t u);
+  IntegralValue(int8_t u);
+  IntegralValue(uint16_t u);
+  IntegralValue(int16_t u);
+  IntegralValue(uint32_t u);
+  IntegralValue(int32_t u);
+  IntegralValue(float u);
+*/
   IntegralValue(const uint8_t& u);
   IntegralValue(const int8_t& u);
   IntegralValue(const uint16_t& u);
