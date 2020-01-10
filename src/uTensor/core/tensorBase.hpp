@@ -11,6 +11,7 @@ namespace uTensor {
 class TensorBase {
  public:
   TensorBase();
+  ~TensorBase();
 
   // Allocate the tensor metadata on a different heap from the data scratch pads
   // Note: as long as derived classes dont override new and delete, these will

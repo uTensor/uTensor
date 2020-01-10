@@ -6,6 +6,9 @@ namespace uTensor {
 TensorBase::TensorBase() {
   Context::get_default_context()->register_tensor(this);
 }
+TensorBase::~TensorBase() {
+  //Context::get_metadata_allocator()->deallocate(this);
+}
 
 // Allocate the tensor metadata on a different heap from the data scratch pads
 void* TensorBase::operator new(size_t sz) {
