@@ -8,6 +8,9 @@ namespace uTensor {
 TensorInterface* Tensor::operator->() {
   return reinterpret_cast<TensorInterface*>(_ptr);
 }
+const TensorInterface* Tensor::operator->() const {
+  return reinterpret_cast<const TensorInterface*>(_ptr);
+}
 TensorInterface* Tensor::operator*() {
   return reinterpret_cast<TensorInterface*>(_ptr);
 }
@@ -57,6 +60,10 @@ const IntegralValue Tensor::operator()(uint32_t linear_index) const {
 IntegralValue Tensor::operator()(uint32_t linear_index){
   return reinterpret_cast<TensorInterface*>(_ptr)->operator()(linear_index);
 
+}
+
+TensorShape& Tensor::get_shape(){
+  return reinterpret_cast<TensorInterface*>(_ptr)->get_shape();
 }
 
 

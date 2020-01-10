@@ -19,6 +19,7 @@ void TensorBase::operator delete(void* p) {
 
 ttype TensorInterface::get_type() const { return _type; }
 TensorShape& TensorInterface::get_shape() { return _shape; }
+const TensorShape& TensorInterface::get_shape() const { return _shape; }
 TensorInterface::TensorInterface()
     : TensorBase(), _shape(0), _type(undefined), _type_size(0) {}
 TensorInterface::TensorInterface(TensorShape _shape, ttype _type)

@@ -17,6 +17,7 @@ class Tensor : public Handle {
 
  public:
   TensorInterface* operator->();
+  const TensorInterface* operator->() const;
   // As long as operating on instantiations of this class and not pointers this function will work
   TensorInterface* operator*();
   Tensor(TensorInterface* ptr);
@@ -25,12 +26,14 @@ class Tensor : public Handle {
   Tensor& operator=(Tensor&& that);
 
   // Add some bits to make the interface nicer to the user
-  const IntegralValue operator()(uint16_t i, uint16_t j = 0, uint16_t k = 0,
+  const IntegralValue operator()(uint16_t i, uint16_t j, uint16_t k = 0,
                                  uint16_t l = 0) const;
-  IntegralValue operator()(uint16_t i, uint16_t j = 0, uint16_t k = 0,
+  IntegralValue operator()(uint16_t i, uint16_t j, uint16_t k = 0,
                            uint16_t l = 0);
   const IntegralValue operator()(uint32_t linear_index) const;
   IntegralValue operator()(uint32_t linear_index);
+
+  TensorShape& get_shape();
 
   // Force everything to be on the utensor allocator
   void* operator new(size_t sz);
