@@ -57,7 +57,7 @@ TEST(Rom_Tensor, read_write_u8_2x) {
   const RomTensor r({10, 10}, u8, buffer);
   uint8_t read = r(2,2);
   EXPECT_EQ(read, 22);
-  EXPECT_EQ((uint8_t)r(3,2), 23);
+  EXPECT_EQ((uint8_t)r(3,2), 32);
   delete[]  buffer;
 }
 
@@ -91,7 +91,7 @@ TEST(Rom_Tensor, read_write_u16) {
   uint16_t read = r(2,2);
   EXPECT_EQ(read, 22);
   read = r(3,2);
-  EXPECT_EQ(read, 23);
+  EXPECT_EQ(read, 32);
   cout << "uint16 Sizeof IntegralValue " << sizeof(IntegralValue(5)) << endl;
   delete[] buffer;
 }
@@ -109,7 +109,7 @@ TEST(Rom_Tensor, read_write_i16) {
   int16_t read = r(2,2);
   EXPECT_EQ(read, 22);
   read = r(3,2);
-  EXPECT_EQ(read, 23);
+  EXPECT_EQ(read, 32);
   cout << "uint16 Sizeof IntegralValue " << sizeof(IntegralValue(5)) << endl;
   delete[] buffer;
 }

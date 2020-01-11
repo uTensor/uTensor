@@ -33,4 +33,5 @@ package_add_test_with_libraries(test_ramtensor tensors/test_ramtensor utensor te
 package_add_test_with_libraries(test_buffertensor tensors/test_buffertensor utensor tensors "${PROJECT_DIR}/test-data/")
 package_add_test_with_libraries(test_romtensor tensors/test_romtensor utensor tensors "${PROJECT_DIR}/test-data/")
 package_add_test_with_libraries(test_arith operators/test_arithmetic utensor operators "${PROJECT_DIR}/test-data/")
+package_add_test_with_libraries(test_matrix_ops operators/test_matrix utensor operators "${PROJECT_DIR}/test-data/")
 package_add_test_with_libraries(test_convolution operators/test_convolution utensor operators "${PROJECT_DIR}/test-data/")
