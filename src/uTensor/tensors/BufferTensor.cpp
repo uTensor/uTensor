@@ -1,10 +1,14 @@
 #include "BufferTensor.hpp"
+#include "context.hpp"
 #include <cstdio>
 
 namespace uTensor {
+
 void BufferTensor::resize(TensorShape new_shape) {
-    printf("[ERROR] Cannot reshape a BufferTensor\n");
+    printf("[ERROR] Cannot resize a BufferTensor\n");
+    Context::get_default_context()->throwError(new InvalidResizeError());
 }
+
 BufferTensor::BufferTensor(TensorShape _shape, ttype _type) : TensorInterface(_shape, _type), _buffer(nullptr) {}
 BufferTensor::BufferTensor(TensorShape _shape, ttype _type, void* buffer) : TensorInterface(_shape, _type), _buffer(reinterpret_cast<uint8_t*>(buffer)) {}
 BufferTensor::~BufferTensor(){ _buffer = nullptr; }

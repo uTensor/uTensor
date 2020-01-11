@@ -1,5 +1,6 @@
 #include "RomTensor.hpp"
 #include <cstdio>
+#include "context.hpp"
 namespace uTensor {
 RomTensor::RomTensor(TensorShape _shape, ttype _type, const void* buffer) : 
     BufferTensor(_shape, _type, const_cast<void*>(buffer))
@@ -45,15 +46,17 @@ int floorPerfSqrt(int x)
     return -1;
 }
 
+struct InvalidTensorDimensionsError: public Error {};
+
 DiagonalRomTensor::DiagonalRomTensor(TensorShape _shape, ttype _type, const void* buffer, size_t buffer_len) : RomTensor(_shape, _type, buffer) {
    if(_shape.num_dims() != 2){
     printf("[ERROR] Attempted to create diagonal Tensor with wrong number of dimensions\n");
-    return;
+    Context::get_default_context()->throwError(new InvalidTensorDimensionsError());
    }
    uint16_t smaller_dim = (_shape[0] < _shape[1]) ? _shape[0] : _shape[1];
    if(buffer_len < smaller_dim){
     printf("[ERROR] Diagnoal Tensor size mismatch with buffer\n");
-    return;
+    Context::get_default_context()->throwError(new InvalidTensorDimensionsError());
    }
 }
 
@@ -61,17 +64,17 @@ DiagonalRomTensor::~DiagonalRomTensor() {}
 void* DiagonalRomTensor::read(uint32_t linear_index) const {
     static const uint32_t zero = 0;
     int sqr = floorPerfSqrt(linear_index);
-    if(sqr = linear_index/sqr){
+    if(sqr == linear_index/sqr){
         return RomTensor::read(sqr);
     } else {
         return (void*) &zero;
     }
 }
-// HACK TODO, REMOVE THIS
+// HACK TODO, REMOVE THIS after getting Handles to work with const pointers
 void* DiagonalRomTensor::write(uint32_t linear_index) {
     static uint32_t zero = 0;
     int sqr = floorPerfSqrt(linear_index);
-    if(sqr = linear_index/sqr){
+    if(sqr == linear_index/sqr){
         return RomTensor::read(sqr);
     } else {
         return (void*) &zero;

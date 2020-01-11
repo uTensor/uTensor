@@ -57,6 +57,7 @@ void FutureMaxSizeRamTensor::resize(TensorShape new_shape) {
   }
   if(calc_required_space(new_shape, _type_size) >= max_initial_size){
     printf("[ERROR] Resize of FutureTensor can only shrink\n");
+    Context::get_default_context()->throwError(new InvalidResizeError());
     return;
   }
   _shape = new_shape;
