@@ -2,6 +2,7 @@
 #define UTENSOR_CTX_H
 #include "memoryManagementInterface.hpp"
 #include "tensorBase.hpp"
+#include "errorHandler.hpp"
 
 namespace uTensor {
 class Context {
@@ -15,10 +16,12 @@ class Context {
   static void set_metadata_allocator(AllocatorInterface* al);
   static void set_ram_data_allocator(AllocatorInterface* al);
   void register_tensor(TensorBase* tb);
+  void throwError(Error* err);
 
  private:
   static AllocatorInterface* _metadata_allocator;
   static AllocatorInterface* _ram_data_allocator;
+  ErrorHandler _error_handler;
 };
 }  // namespace uTensor
 #endif  // UTENSOR_CTX_H

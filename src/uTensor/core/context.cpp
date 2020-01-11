@@ -26,4 +26,9 @@ void Context::set_ram_data_allocator(AllocatorInterface* al) {
 }
 void Context::register_tensor(TensorBase* tb) {}
 
+void Context::throwError(Error* err) {
+    _error_handler.uThrow(err);
+}
+
 }  // namespace uTensor
+
