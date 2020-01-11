@@ -14,6 +14,7 @@ class ErrorHandler {
 // Default errors
 struct InvalidReshapeError : public Error {};
 struct InvalidResizeError : public Error {};
+struct InvalidMemAccessError : public Error {};
 
 };
 #endif
