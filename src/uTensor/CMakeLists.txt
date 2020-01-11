@@ -22,6 +22,7 @@ set(src_utensor_ops
 set(hdr_utensor_ops
     ops/Arithmetic.hpp
     ops/Convolution.hpp
+    ops/Matrix.hpp
    )
 add_library(utensor ${src_utensor_alloc} ${hdr_utensor_alloc} ${src_utensor_tensors} ${hdr_utensor_tensors} ${src_utensor_ops} ${hdr_utensor_ops})
 target_link_libraries(utensor utensor_core)

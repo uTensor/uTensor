@@ -99,6 +99,9 @@ uint16_t TensorShape::get_linear_size() const {
 }
 
 uint8_t TensorShape::num_dims() const { return _num_dims; }
+
+// TODO FIX FOR HIGHER DIMENSIONS
+// https://www.tensorflow.org/xla/shapes
 uint32_t TensorShape::linear_index(uint16_t i, uint16_t j, uint16_t k,
                                    uint16_t l) const {
   // TODO
@@ -109,7 +112,10 @@ uint32_t TensorShape::linear_index(uint16_t i, uint16_t j, uint16_t k,
   uint32_t d3 = _shape[3] > 0 ? 1 : 0;
   d3 *= d2 * _shape[2];
 
-  return i + j * d1 + k * d2 + l * d3;
+  //Image order
+  //return i + j * d1 + k * d2 + l * d3;
+  // Matrix order
+  return j + i * d1 + k * d2 + l * d3;
 }
 IntegralValue::IntegralValue(void* p) : p(p), num_bytes(0) {}
 
