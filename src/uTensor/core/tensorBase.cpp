@@ -25,6 +25,10 @@ TensorShape& TensorInterface::get_shape() { return _shape; }
 const TensorShape& TensorInterface::get_shape() const { return _shape; }
 TensorInterface::TensorInterface()
     : TensorBase(), _shape(0), _type(undefined), _type_size(0) {}
+TensorInterface::TensorInterface(ttype _type)
+    : TensorBase(), _shape(0), _type(_type) {
+  _type_size = type_size(_type);
+}
 TensorInterface::TensorInterface(TensorShape _shape, ttype _type)
     : TensorBase(), _shape(_shape), _type(_type) {
   _type_size = type_size(_type);

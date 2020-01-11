@@ -35,6 +35,7 @@ class TensorInterface : public TensorBase {
   const TensorShape& get_shape() const;
   TensorInterface();
   TensorInterface(TensorShape _shape, ttype _type);
+  TensorInterface(ttype _type);
   virtual ~TensorInterface();
 
   // Can access Tensors like
