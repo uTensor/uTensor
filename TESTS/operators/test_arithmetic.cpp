@@ -27,7 +27,7 @@ TEST(Arithmetic, AddOp) {
   // TensorInterface* a = new BufferTensor({5,5}, u8, a_buffer);
   // TensorInterface* b = new RomTensor({5,5}, u8, s_b);
   Tensor a = new BufferTensor({5, 5}, u8, a_buffer);
-  Tensor b = new RomTensor({5, 5}, u8, s_b);
+  Tensor b = new /*const*/ RomTensor({5, 5}, u8, s_b);
   Tensor c = new RamTensor({5, 5}, u8);
 
   AddOperator<uint8_t> add_AB;
