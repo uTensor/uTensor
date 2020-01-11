@@ -113,6 +113,7 @@ uint32_t TensorShape::linear_index(uint16_t i, uint16_t j, uint16_t k,
 }
 IntegralValue::IntegralValue(void* p) : p(p), num_bytes(0) {}
 
+/*
 IntegralValue::IntegralValue(const uint8_t& u): num_bytes(sizeof(u)) {
   *reinterpret_cast<uint8_t*>(p) = u;
 }
@@ -133,6 +134,35 @@ IntegralValue::IntegralValue(const int32_t& u): num_bytes(sizeof(u)) {
 }
 IntegralValue::IntegralValue(const float& u): num_bytes(sizeof(u)) {
   *reinterpret_cast<float*>(p) = u;
+}
+*/
+IntegralValue::IntegralValue(const uint8_t& u): num_bytes(sizeof(u)) {
+  memcpy(tmp, &u, sizeof(uint8_t));
+  p = reinterpret_cast<void*>(tmp);
+}
+IntegralValue::IntegralValue(const int8_t& u): num_bytes(sizeof(u)) {
+  memcpy(tmp, &u, sizeof(int8_t));
+  p = reinterpret_cast<void*>(tmp);
+}
+IntegralValue::IntegralValue(const uint16_t& u): num_bytes(sizeof(u)) {
+  memcpy(tmp, &u, sizeof(uint16_t));
+  p = reinterpret_cast<void*>(tmp);
+}
+IntegralValue::IntegralValue(const int16_t& u): num_bytes(sizeof(u)) {
+  memcpy(tmp, &u, sizeof(int16_t));
+  p = reinterpret_cast<void*>(tmp);
+}
+IntegralValue::IntegralValue(const uint32_t& u): num_bytes(sizeof(u)) {
+  memcpy(tmp, &u, sizeof(uint32_t));
+  p = reinterpret_cast<void*>(tmp);
+}
+IntegralValue::IntegralValue(const int32_t& u): num_bytes(sizeof(u)) {
+  memcpy(tmp, &u, sizeof(int32_t));
+  p = reinterpret_cast<void*>(tmp);
+}
+IntegralValue::IntegralValue(const float& u): num_bytes(sizeof(u)) {
+  memcpy(tmp, &u, sizeof(float));
+  p = reinterpret_cast<void*>(tmp);
 }
 
 /*
