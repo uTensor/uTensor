@@ -16,6 +16,7 @@ void* RomTensor::write(uint32_t linear_index) {
 RomTensor::~RomTensor() { }
 void RomTensor::resize(TensorShape new_shape) {
     printf("[ERROR] Attempted resize of ROM tensor\n");
+    Context::get_default_context()->throwError(new InvalidResizeError());
 }
 
 // Returns floor of square root of x

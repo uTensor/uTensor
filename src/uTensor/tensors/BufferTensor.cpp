@@ -32,6 +32,8 @@ void* BufferTensor::read(uint32_t linear_index) const {
     //uint8_t* d = reinterpret_cast<uint8_t*>(_buffer);
     return reinterpret_cast<void*>(_buffer + linear_index * _type_size);
   }
+
+  Context::get_default_context()->throwError(new InvalidMemAccessError());
   return nullptr;
 }
 void* BufferTensor::write(uint32_t linear_index) {
@@ -39,6 +41,7 @@ void* BufferTensor::write(uint32_t linear_index) {
     //uint8_t* d = reinterpret_cast<uint8_t*>(*_buffer);
     return reinterpret_cast<void*>(_buffer + linear_index * _type_size);
   }
+  Context::get_default_context()->throwError(new InvalidMemAccessError());
   return nullptr;
 }
 }
