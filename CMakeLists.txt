@@ -4,7 +4,9 @@ project(utensor)
 
 set( CMAKE_VERBOSE_MAKEFILE on )
 set(CMAKE_CXX_STANDARD 11)
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -fno-rtti")
+# TODO be smarter about code coverage bits
+# https://github.com/codecov/example-cpp11-cmake
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -fno-rtti -fprofile-arcs -ftest-coverage -ggdb")
 
 ### Require out-of-source builds
 file(TO_CMAKE_PATH "${PROJECT_BINARY_DIR}/CMakeLists.txt" LOC_PATH)
