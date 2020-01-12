@@ -17,15 +17,19 @@ jobs:
         #      - run: mv unity_temp/* unity/
         #      - run: find TESTS -type f -exec sed -e 's/\/fs\//TESTS\//g' -i {} \;
         #      - run: find src/uTensor/core/ -type f -exec sed -e 's/\/fs\//\//g' -i {} \;
-      - run: cmake .
-      - run: make
-      - run: 
-          name: Test
-          command: ctest -VV -o /tmp/test_results/test-results.txt
+      - run:
+          name: "Build and test"
+          command: |
+            mkdir build && cd build
+            cmake ..
+            make
+            ctest -VV -o /tmp/test_results/test-results.txt
       - run:
           name: Generate code coverage
-          command: lcov -c --directory . --output-file main_coverage.info > /tmp/test_results/coverage_summary.txt
-      - run: genhtml main_coverage.info --output-directory /tmp/coverage
+          command: |
+            cd build
+            lcov -c --directory . --output-file main_coverage.info > /tmp/test_results/coverage_summary.txt
+            genhtml main_coverage.info --output-directory /tmp/coverage
       - store_test_results:
           path: /tmp/test_results
       - store_artifacts:
