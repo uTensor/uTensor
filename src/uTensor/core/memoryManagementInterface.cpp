@@ -113,4 +113,14 @@ bool bind(Handle& hndl, AllocatorInterface& allocator) {
   allocator.bind(*hndl, &hndl);
   return true;
 }
+bool unbind(Handle& hndl, AllocatorInterface& allocator) {
+  if (!hndl){
+    return false;
+  }
+  allocator.unbind(*hndl, &hndl);
+  return true;
+}
+bool is_bound(Handle& hndl, AllocatorInterface& allocator) {
+  return allocator.is_bound(*hndl, &hndl);
+}
 };  // namespace uTensor
