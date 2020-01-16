@@ -15,35 +15,43 @@ TensorInterface* Tensor::operator*() {
   return reinterpret_cast<TensorInterface*>(_ptr);
 }
 Tensor::~Tensor() {
-  if(_ptr)
+  if(_ptr){
+    AllocatorInterface* alloc = Context::get_default_context()->get_metadata_allocator();
+    if(alloc->is_bound(_ptr, this)){
+      alloc->unbind(_ptr, this);
+    }
+
     delete reinterpret_cast<TensorInterface*>(_ptr);
+  }
 }
 Tensor::Tensor(TensorInterface* ptr) : Handle((void*)ptr) {
   //Context::get_default_context()->get_metadata_allocator()->bind(_ptr, this);
+  bind(*this, *Context::get_default_context()->get_metadata_allocator());
 }
 Tensor& Tensor::operator=(TensorInterface* ptr) {
   _ptr = (void*)ptr;
+  bind(*this, *Context::get_default_context()->get_metadata_allocator());
   //Context::get_metadata_allocator()->bind(_ptr, this);
   return *this;
 }
 
 Tensor::Tensor(Tensor&& that) {
   _ptr = that._ptr;
-  //AllocatorInterface* alloc = Context::get_metadata_allocator();
-  //if(alloc->is_bound(_ptr, &that)){
-  //  alloc->unbind(_ptr, &that);
-  //  alloc->bind(_ptr, this);
-  //}
+  AllocatorInterface* alloc = Context::get_default_context()->get_metadata_allocator();
+  if(alloc->is_bound(_ptr, &that)){
+    alloc->unbind(_ptr, &that);
+    alloc->bind(_ptr, this);
+  }
   that._ptr = nullptr;
 }
 Tensor& Tensor::operator=(Tensor&& that) {
   if (this != &that) {
     _ptr = that._ptr;
-    //AllocatorInterface* alloc = Context::get_metadata_allocator();
-    //if(alloc->is_bound(_ptr, &that)){
-    //  alloc->unbind(_ptr, &that);
-    //  alloc->bind(_ptr, this);
-    //}
+    AllocatorInterface* alloc = Context::get_default_context()->get_metadata_allocator();
+    if(alloc->is_bound(_ptr, &that)){
+      alloc->unbind(_ptr, &that);
+      alloc->bind(_ptr, this);
+    }
     that._ptr = nullptr;
   }
   return *this;
