@@ -19,31 +19,31 @@ Tensor::~Tensor() {
     delete reinterpret_cast<TensorInterface*>(_ptr);
 }
 Tensor::Tensor(TensorInterface* ptr) : Handle((void*)ptr) {
-  Context::get_metadata_allocator()->bind(_ptr, this);
+  //Context::get_default_context()->get_metadata_allocator()->bind(_ptr, this);
 }
 Tensor& Tensor::operator=(TensorInterface* ptr) {
   _ptr = (void*)ptr;
-  Context::get_metadata_allocator()->bind(_ptr, this);
+  //Context::get_metadata_allocator()->bind(_ptr, this);
   return *this;
 }
 
 Tensor::Tensor(Tensor&& that) {
-  AllocatorInterface* alloc = Context::get_metadata_allocator();
   _ptr = that._ptr;
-  if(alloc->is_bound(_ptr, &that)){
-    alloc->unbind(_ptr, &that);
-    alloc->bind(_ptr, this);
-  }
+  //AllocatorInterface* alloc = Context::get_metadata_allocator();
+  //if(alloc->is_bound(_ptr, &that)){
+  //  alloc->unbind(_ptr, &that);
+  //  alloc->bind(_ptr, this);
+  //}
   that._ptr = nullptr;
 }
 Tensor& Tensor::operator=(Tensor&& that) {
   if (this != &that) {
-    AllocatorInterface* alloc = Context::get_metadata_allocator();
     _ptr = that._ptr;
-    if(alloc->is_bound(_ptr, &that)){
-      alloc->unbind(_ptr, &that);
-      alloc->bind(_ptr, this);
-    }
+    //AllocatorInterface* alloc = Context::get_metadata_allocator();
+    //if(alloc->is_bound(_ptr, &that)){
+    //  alloc->unbind(_ptr, &that);
+    //  alloc->bind(_ptr, this);
+    //}
     that._ptr = nullptr;
   }
   return *this;
@@ -53,11 +53,11 @@ Tensor& Tensor::operator=(Tensor&& that) {
 // Force everything to be on the utensor allocator
 void* Tensor::operator new(size_t sz) {  // Have to delegate this size from
                                          // tensors somehow + sizeof(Tensor)
-  void* p = Context::get_metadata_allocator()->allocate(sz);
+  void* p = Context::get_default_context()->get_metadata_allocator()->allocate(sz);
   return p;
 }
 void Tensor::operator delete(void* p) {
-  Context::get_metadata_allocator()->deallocate(p);
+  Context::get_default_context()->get_metadata_allocator()->deallocate(p);
 }
 
 // Interface

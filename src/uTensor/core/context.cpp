@@ -1,8 +1,10 @@
 #include "context.hpp"
 namespace uTensor {
 
-AllocatorInterface* Context::_metadata_allocator = nullptr;
-AllocatorInterface* Context::_ram_data_allocator = nullptr;
+//AllocatorInterface* Context::_metadata_allocator = nullptr;
+//AllocatorInterface* Context::_ram_data_allocator = nullptr;
+//
+Context::Context() : _metadata_allocator(nullptr), _ram_data_allocator(nullptr) {}
 
 Context* Context::get_default_context() {
   static Context ctx;
