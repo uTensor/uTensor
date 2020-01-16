@@ -13,7 +13,7 @@ ModelBase::ModelBase(TensorMapInterface* inputs) : _p_inputs(inputs) {
     //Context* ctx = Context::get_default_context();
 }
 ModelBase::ModelBase() {}
-ModelBase::ModelBase(uTensor::string op_name) : op_name(op_name) {}
+ModelBase::ModelBase(uTensor::string _name) : _name(_name) {}
 
 void ModelBase::set_inputs(TensorMapInterface* inputs) {
     this->_p_inputs = inputs; 
