@@ -6,7 +6,7 @@ namespace uTensor {
 //
 Context::Context() : _metadata_allocator(nullptr), _ram_data_allocator(nullptr) {}
 
-Context* Context::get_default_context() {
+Context* __attribute__((weak)) Context::get_default_context() {
   static Context ctx;
   return &ctx;
 }
