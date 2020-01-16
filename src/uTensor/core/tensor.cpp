@@ -19,20 +19,31 @@ Tensor::~Tensor() {
     delete reinterpret_cast<TensorInterface*>(_ptr);
 }
 Tensor::Tensor(TensorInterface* ptr) : Handle((void*)ptr) {
-  // Context::get_metadata_allocator()->bind(ptr, this);
+  Context::get_metadata_allocator()->bind(_ptr, this);
 }
 Tensor& Tensor::operator=(TensorInterface* ptr) {
   _ptr = (void*)ptr;
+  Context::get_metadata_allocator()->bind(_ptr, this);
   return *this;
 }
 
 Tensor::Tensor(Tensor&& that) {
-    _ptr = that._ptr;
-    that._ptr = nullptr;
+  AllocatorInterface* alloc = Context::get_metadata_allocator();
+  _ptr = that._ptr;
+  if(alloc->is_bound(_ptr, &that)){
+    alloc->unbind(_ptr, &that);
+    alloc->bind(_ptr, this);
+  }
+  that._ptr = nullptr;
 }
 Tensor& Tensor::operator=(Tensor&& that) {
   if (this != &that) {
+    AllocatorInterface* alloc = Context::get_metadata_allocator();
     _ptr = that._ptr;
+    if(alloc->is_bound(_ptr, &that)){
+      alloc->unbind(_ptr, &that);
+      alloc->bind(_ptr, this);
+    }
     that._ptr = nullptr;
   }
   return *this;
