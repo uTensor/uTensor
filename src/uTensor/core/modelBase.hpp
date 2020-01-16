@@ -13,7 +13,7 @@ class ModelBase {
     //ModelBase(TensorMapInterface* inputs, TensorMapInterface* outputs);
     // The preferred interface
     ModelBase();
-    ModelBase(uTensor::string op_name);
+    ModelBase(uTensor::string _name);
     void set_name(uTensor::string _name);
     virtual ~ModelBase();
 
