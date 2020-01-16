@@ -6,21 +6,21 @@
 
 namespace uTensor {
 class Context {
-  // private:
-  //  Context();
+ private:
+    Context();
 
  public:
   static Context* get_default_context();
-  static AllocatorInterface* get_metadata_allocator();
-  static AllocatorInterface* get_ram_data_allocator();
-  static void set_metadata_allocator(AllocatorInterface* al);
-  static void set_ram_data_allocator(AllocatorInterface* al);
+  AllocatorInterface* get_metadata_allocator();
+  AllocatorInterface* get_ram_data_allocator();
+  void set_metadata_allocator(AllocatorInterface* al);
+  void set_ram_data_allocator(AllocatorInterface* al);
   void register_tensor(TensorBase* tb);
   void throwError(Error* err);
 
  private:
-  static AllocatorInterface* _metadata_allocator;
-  static AllocatorInterface* _ram_data_allocator;
+  AllocatorInterface* _metadata_allocator;
+  AllocatorInterface* _ram_data_allocator;
   ErrorHandler _error_handler;
 };
 }  // namespace uTensor

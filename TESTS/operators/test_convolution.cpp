@@ -25,8 +25,8 @@ using namespace uTensor;
 TEST(Convolution, random_inputs_0_stride_1) {
   localCircularArenaAllocator<1024> meta_allocator;
   localCircularArenaAllocator<25088*2*sizeof(float), uint32_t> ram_allocator;
-  Context::set_metadata_allocator(&meta_allocator);
-  Context::set_ram_data_allocator(&ram_allocator);
+  Context::get_default_context()->set_metadata_allocator(&meta_allocator);
+  Context::get_default_context()->set_ram_data_allocator(&ram_allocator);
 
   Tensor in = new RomTensor({ 1,28,28,1 }, flt, s_in_0_stride_1);
   Tensor w = new RomTensor({ 5,5,1,32 }, flt, s_w_0_stride_1);
@@ -54,8 +54,8 @@ TEST(Convolution, random_inputs_0_stride_1) {
 TEST(Convolution, random_inputs_1_stride_1) {
   localCircularArenaAllocator<1024> meta_allocator;
   localCircularArenaAllocator<25088*2*sizeof(float), uint32_t> ram_allocator;
-  Context::set_metadata_allocator(&meta_allocator);
-  Context::set_ram_data_allocator(&ram_allocator);
+  Context::get_default_context()->set_metadata_allocator(&meta_allocator);
+  Context::get_default_context()->set_ram_data_allocator(&ram_allocator);
 
   Tensor in = new RomTensor({ 1,28,28,1 }, flt, s_in_1_stride_1);
   Tensor w = new RomTensor({ 5,5,1,32 }, flt, s_w_1_stride_1);
@@ -83,8 +83,8 @@ TEST(Convolution, random_inputs_1_stride_1) {
 TEST(Convolution, random_inputs_2_stride_1) {
   localCircularArenaAllocator<1024> meta_allocator;
   localCircularArenaAllocator<25088*2*sizeof(float)> ram_allocator;
-  Context::set_metadata_allocator(&meta_allocator);
-  Context::set_ram_data_allocator(&ram_allocator);
+  Context::get_default_context()->set_metadata_allocator(&meta_allocator);
+  Context::get_default_context()->set_ram_data_allocator(&ram_allocator);
 
   Tensor in = new RomTensor({ 1,28,28,1 }, flt, s_in_2_stride_1);
   Tensor w = new RomTensor({ 5,5,1,32 }, flt, s_w_2_stride_1);
@@ -112,8 +112,8 @@ TEST(Convolution, random_inputs_2_stride_1) {
 TEST(Convolution, random_inputs_3_stride_1) {
   localCircularArenaAllocator<1024> meta_allocator;
   localCircularArenaAllocator<25088*2*sizeof(float)> ram_allocator;
-  Context::set_metadata_allocator(&meta_allocator);
-  Context::set_ram_data_allocator(&ram_allocator);
+  Context::get_default_context()->set_metadata_allocator(&meta_allocator);
+  Context::get_default_context()->set_ram_data_allocator(&ram_allocator);
 
   Tensor in = new RomTensor({ 1,28,28,1 }, flt, s_in_3_stride_1);
   Tensor w = new RomTensor({ 5,5,1,32 }, flt, s_w_3_stride_1);
@@ -141,8 +141,8 @@ TEST(Convolution, random_inputs_3_stride_1) {
 TEST(Convolution, random_inputs_4_stride_1) {
   localCircularArenaAllocator<1024> meta_allocator;
   localCircularArenaAllocator<25088*2*sizeof(float), uint32_t> ram_allocator;
-  Context::set_metadata_allocator(&meta_allocator);
-  Context::set_ram_data_allocator(&ram_allocator);
+  Context::get_default_context()->set_metadata_allocator(&meta_allocator);
+  Context::get_default_context()->set_ram_data_allocator(&ram_allocator);
 
   Tensor in = new RomTensor({ 1,28,28,1 }, flt, s_in_4_stride_1);
   Tensor w = new RomTensor({ 5,5,1,32 }, flt, s_w_4_stride_1);
@@ -169,8 +169,8 @@ TEST(Convolution, random_inputs_4_stride_1) {
 TEST(Convolution, random_inputs_0_stride_2) {
   localCircularArenaAllocator<1024> meta_allocator;
   localCircularArenaAllocator<6272*2*sizeof(float), uint32_t> ram_allocator;
-  Context::set_metadata_allocator(&meta_allocator);
-  Context::set_ram_data_allocator(&ram_allocator);
+  Context::get_default_context()->set_metadata_allocator(&meta_allocator);
+  Context::get_default_context()->set_ram_data_allocator(&ram_allocator);
 
   Tensor in = new RomTensor({ 1,28,28,1 }, flt, s_in_0_stride_2);
   Tensor w = new RomTensor({ 5,5,1,32 }, flt, s_w_0_stride_2);
@@ -195,8 +195,8 @@ TEST(Convolution, random_inputs_0_stride_2) {
 TEST(Convolution, random_inputs_1_stride_2) {
   localCircularArenaAllocator<1024> meta_allocator;
   localCircularArenaAllocator<6272*2*sizeof(float), uint32_t> ram_allocator;
-  Context::set_metadata_allocator(&meta_allocator);
-  Context::set_ram_data_allocator(&ram_allocator);
+  Context::get_default_context()->set_metadata_allocator(&meta_allocator);
+  Context::get_default_context()->set_ram_data_allocator(&ram_allocator);
 
   Tensor in = new RomTensor({ 1,28,28,1 }, flt, s_in_1_stride_2);
   Tensor w = new RomTensor({ 5,5,1,32 }, flt, s_w_1_stride_2);
@@ -220,8 +220,8 @@ TEST(Convolution, random_inputs_1_stride_2) {
 TEST(Convolution, random_inputs_2_stride_2) {
   localCircularArenaAllocator<1024> meta_allocator;
   localCircularArenaAllocator<6272*2*sizeof(float)> ram_allocator;
-  Context::set_metadata_allocator(&meta_allocator);
-  Context::set_ram_data_allocator(&ram_allocator);
+  Context::get_default_context()->set_metadata_allocator(&meta_allocator);
+  Context::get_default_context()->set_ram_data_allocator(&ram_allocator);
 
   Tensor in = new RomTensor({ 1,28,28,1 }, flt, s_in_2_stride_2);
   Tensor w = new RomTensor({ 5,5,1,32 }, flt, s_w_2_stride_2);
@@ -245,8 +245,8 @@ TEST(Convolution, random_inputs_2_stride_2) {
 TEST(Convolution, random_inputs_3_stride_2) {
   localCircularArenaAllocator<1024> meta_allocator;
   localCircularArenaAllocator<6272*2*sizeof(float)> ram_allocator;
-  Context::set_metadata_allocator(&meta_allocator);
-  Context::set_ram_data_allocator(&ram_allocator);
+  Context::get_default_context()->set_metadata_allocator(&meta_allocator);
+  Context::get_default_context()->set_ram_data_allocator(&ram_allocator);
 
   Tensor in = new RomTensor({ 1,28,28,1 }, flt, s_in_3_stride_2);
   Tensor w = new RomTensor({ 5,5,1,32 }, flt, s_w_3_stride_2);
@@ -271,8 +271,8 @@ TEST(Convolution, random_inputs_3_stride_2) {
 TEST(Convolution, random_inputs_4_stride_2) {
   localCircularArenaAllocator<1024> meta_allocator;
   localCircularArenaAllocator<6272*2*sizeof(float), uint32_t> ram_allocator;
-  Context::set_metadata_allocator(&meta_allocator);
-  Context::set_ram_data_allocator(&ram_allocator);
+  Context::get_default_context()->set_metadata_allocator(&meta_allocator);
+  Context::get_default_context()->set_ram_data_allocator(&ram_allocator);
 
   Tensor in = new RomTensor({ 1,28,28,1 }, flt, s_in_4_stride_2);
   Tensor w = new RomTensor({ 5,5,1,32 }, flt, s_w_4_stride_2);
