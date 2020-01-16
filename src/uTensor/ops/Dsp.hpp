@@ -31,6 +31,8 @@ public:
       mel_energies(new RamTensor({NUM_FBANK_BINS}, flt)),
       window_func(new RamTensor({frame_len}, flt)),
       fbank_filter_first(new RamTensor({NUM_FBANK_BINS}, i32)),
+      dct_matrix(new RamTensor({NUM_FBANK_BINS * num_mfcc_features}, flt)),
+      mel_fbank(new RamTensor({NUM_FBANK_BINS, frame_len_padded/2}, flt))
     {
     }
 
