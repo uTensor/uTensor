@@ -20,8 +20,8 @@ const uint8_t s_c_ref[4] = {19, 22, 43, 50};
 TEST(Matrix, MultSquareOp) {
   localCircularArenaAllocator<256> meta_allocator;
   localCircularArenaAllocator<256> ram_allocator;
-  Context::set_metadata_allocator(&meta_allocator);
-  Context::set_ram_data_allocator(&ram_allocator);
+  Context::get_default_context()->set_metadata_allocator(&meta_allocator);
+  Context::get_default_context()->set_ram_data_allocator(&ram_allocator);
 
   Tensor a = new /*const*/ RomTensor({2, 2}, u8, s_a);
   Tensor b = new /*const*/ RomTensor({2, 2}, u8, s_b);

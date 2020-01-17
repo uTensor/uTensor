@@ -28,15 +28,15 @@ RamTensor::RamTensor(ttype _type)
 
 RamTensor::RamTensor(TensorShape _shape, ttype _type)
     : TensorInterface(_shape, _type),
-      _ram_region(Context::get_ram_data_allocator()->allocate(
+      _ram_region(Context::get_default_context()->get_ram_data_allocator()->allocate(
           _shape.get_linear_size() * _type_size)) {
-  AllocatorInterface* allocator = Context::get_ram_data_allocator();
+  AllocatorInterface* allocator = Context::get_default_context()->get_ram_data_allocator();
   //bind(_ram_region, *allocator);
   allocator->bind(*_ram_region, &_ram_region);
 }
 
 RamTensor::~RamTensor() {
-  Context::get_ram_data_allocator()->deallocate(*_ram_region);
+  Context::get_default_context()->get_ram_data_allocator()->deallocate(*_ram_region);
 }
 
 void RamTensor::resize(TensorShape new_shape) {
@@ -57,14 +57,14 @@ void FutureMaxSizeRamTensor::resize(TensorShape new_shape) {
   }
   if(calc_required_space(new_shape, _type_size) >= max_initial_size){
     printf("[ERROR] Resize of FutureTensor can only shrink\n");
-    Context::get_default_context()->throwError(new InvalidResizeError());
+    Context::get_default_context()->get_default_context()->throwError(new InvalidResizeError());
     return;
   }
   _shape = new_shape;
 }
 void FutureMaxSizeRamTensor::build() { 
-  _ram_region = Context::get_ram_data_allocator()->allocate( calc_required_space(_shape, _type_size));
-  AllocatorInterface* allocator = Context::get_ram_data_allocator();
+  _ram_region = Context::get_default_context()->get_ram_data_allocator()->allocate( calc_required_space(_shape, _type_size));
+  AllocatorInterface* allocator = Context::get_default_context()->get_ram_data_allocator();
   //bind(_ram_region, *allocator);
   allocator->bind(*_ram_region, &_ram_region);
 }

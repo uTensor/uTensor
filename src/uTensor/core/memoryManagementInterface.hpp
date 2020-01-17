@@ -116,5 +116,7 @@ class AllocatorInterface {
 };
 
 bool bind(Handle& hndl, AllocatorInterface& allocator);
+bool unbind(Handle& hndl, AllocatorInterface& allocator);
+bool is_bound(Handle& hndl, AllocatorInterface& allocator);
 }  // namespace uTensor
 #endif

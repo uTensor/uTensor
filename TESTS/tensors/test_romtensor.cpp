@@ -12,16 +12,16 @@ using namespace uTensor;
 void setup_context(){
   localCircularArenaAllocator<256> meta_allocator;
   localCircularArenaAllocator<256> ram_allocator;
-  Context::set_metadata_allocator(&meta_allocator);
-  Context::set_ram_data_allocator(&ram_allocator);
+  Context::get_default_context()->set_metadata_allocator(&meta_allocator);
+  Context::get_default_context()->set_ram_data_allocator(&ram_allocator);
 }
 
 TEST(Rom_Tensor, constructor) {
   //setup_context();
   localCircularArenaAllocator<256> meta_allocator;
   localCircularArenaAllocator<256> ram_allocator;
-  Context::set_metadata_allocator(&meta_allocator);
-  Context::set_ram_data_allocator(&ram_allocator);
+  Context::get_default_context()->set_metadata_allocator(&meta_allocator);
+  Context::get_default_context()->set_ram_data_allocator(&ram_allocator);
   uint8_t* buffer = new uint8_t[10*10];
   for(int i = 0; i < 100; i++)
       buffer[i] = i;
@@ -33,8 +33,8 @@ TEST(Rom_Tensor, read_write_u8) {
   ///setup_context();
   localCircularArenaAllocator<256> meta_allocator;
   localCircularArenaAllocator<256> ram_allocator;
-  Context::set_metadata_allocator(&meta_allocator);
-  Context::set_ram_data_allocator(&ram_allocator);
+  Context::get_default_context()->set_metadata_allocator(&meta_allocator);
+  Context::get_default_context()->set_ram_data_allocator(&ram_allocator);
   uint8_t* buffer = new uint8_t[10*10];
   for(int i = 0; i < 100; i++)
       buffer[i] = i;
@@ -49,8 +49,8 @@ TEST(Rom_Tensor, read_write_u8_2x) {
   ///setup_context();
   localCircularArenaAllocator<256> meta_allocator;
   localCircularArenaAllocator<256> ram_allocator;
-  Context::set_metadata_allocator(&meta_allocator);
-  Context::set_ram_data_allocator(&ram_allocator);
+  Context::get_default_context()->set_metadata_allocator(&meta_allocator);
+  Context::get_default_context()->set_ram_data_allocator(&ram_allocator);
   uint8_t* buffer = new uint8_t[10*10];
   for(int i = 0; i < 100; i++)
       buffer[i] = i;
@@ -65,8 +65,8 @@ TEST(Rom_Tensor, read_write_i8) {
   ///setup_context();
   localCircularArenaAllocator<256> meta_allocator;
   localCircularArenaAllocator<256> ram_allocator;
-  Context::set_metadata_allocator(&meta_allocator);
-  Context::set_ram_data_allocator(&ram_allocator);
+  Context::get_default_context()->set_metadata_allocator(&meta_allocator);
+  Context::get_default_context()->set_ram_data_allocator(&ram_allocator);
   int8_t* buffer = new int8_t[10*10];
   for(int i = 0; i < 100; i++)
       buffer[i] = i;
@@ -82,8 +82,8 @@ TEST(Rom_Tensor, read_write_u16) {
   ///setup_context();
   localCircularArenaAllocator<256> meta_allocator;
   localCircularArenaAllocator<256> ram_allocator;
-  Context::set_metadata_allocator(&meta_allocator);
-  Context::set_ram_data_allocator(&ram_allocator);
+  Context::get_default_context()->set_metadata_allocator(&meta_allocator);
+  Context::get_default_context()->set_ram_data_allocator(&ram_allocator);
   uint16_t* buffer = new uint16_t[10*10];
   for(int i = 0; i < 100; i++)
       buffer[i] = i;
@@ -100,8 +100,8 @@ TEST(Rom_Tensor, read_write_i16) {
   ///setup_context();
   localCircularArenaAllocator<256> meta_allocator;
   localCircularArenaAllocator<256> ram_allocator;
-  Context::set_metadata_allocator(&meta_allocator);
-  Context::set_ram_data_allocator(&ram_allocator);
+  Context::get_default_context()->set_metadata_allocator(&meta_allocator);
+  Context::get_default_context()->set_ram_data_allocator(&ram_allocator);
   int16_t* buffer = new int16_t[10*10];
   for(int i = 0; i < 100; i++)
       buffer[i] = i;

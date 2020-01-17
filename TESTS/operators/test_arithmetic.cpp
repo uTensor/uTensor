@@ -19,8 +19,8 @@ const uint8_t s_b[25] = {0,  1,  2,  3,  4,  5,  6,  7,  8,  9,  10, 11, 12,
 TEST(Arithmetic, AddOp) {
   localCircularArenaAllocator<256> meta_allocator;
   localCircularArenaAllocator<256> ram_allocator;
-  Context::set_metadata_allocator(&meta_allocator);
-  Context::set_ram_data_allocator(&ram_allocator);
+  Context::get_default_context()->set_metadata_allocator(&meta_allocator);
+  Context::get_default_context()->set_ram_data_allocator(&ram_allocator);
 
   uint8_t a_buffer[25];
   memset(a_buffer, 1, 25);
