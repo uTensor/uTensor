@@ -1,0 +1,132 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<!-- This manual is for FFTW
+(version 3.3.8, 24 May 2018).
+
+Copyright (C) 2003 Matteo Frigo.
+
+Copyright (C) 2003 Massachusetts Institute of Technology.
+
+Permission is granted to make and distribute verbatim copies of this
+manual provided the copyright notice and this permission notice are
+preserved on all copies.
+
+Permission is granted to copy and distribute modified versions of this
+manual under the conditions for verbatim copying, provided that the
+entire resulting derived work is distributed under the terms of a
+permission notice identical to this one.
+
+Permission is granted to copy and distribute translations of this manual
+into another language, under the above conditions for modified versions,
+except that this permission notice may be stated in a translation
+approved by the Free Software Foundation. -->
+<!-- Created by GNU Texinfo 6.3, http://www.gnu.org/software/texinfo/ -->
+<head>
+<title>FFTW 3.3.8: Other Multi-dimensional Real-data MPI Transforms</title>
+
+<meta name="description" content="FFTW 3.3.8: Other Multi-dimensional Real-data MPI Transforms">
+<meta name="keywords" content="FFTW 3.3.8: Other Multi-dimensional Real-data MPI Transforms">
+<meta name="resource-type" content="document">
+<meta name="distribution" content="global">
+<meta name="Generator" content="makeinfo">
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link href="index.html#Top" rel="start" title="Top">
+<link href="Concept-Index.html#Concept-Index" rel="index" title="Concept Index">
+<link href="index.html#SEC_Contents" rel="contents" title="Table of Contents">
+<link href="Distributed_002dmemory-FFTW-with-MPI.html#Distributed_002dmemory-FFTW-with-MPI" rel="up" title="Distributed-memory FFTW with MPI">
+<link href="FFTW-MPI-Transposes.html#FFTW-MPI-Transposes" rel="next" title="FFTW MPI Transposes">
+<link href="Multi_002ddimensional-MPI-DFTs-of-Real-Data.html#Multi_002ddimensional-MPI-DFTs-of-Real-Data" rel="prev" title="Multi-dimensional MPI DFTs of Real Data">
+<style type="text/css">
+<!--
+a.summary-letter {text-decoration: none}
+blockquote.indentedblock {margin-right: 0em}
+blockquote.smallindentedblock {margin-right: 0em; font-size: smaller}
+blockquote.smallquotation {font-size: smaller}
+div.display {margin-left: 3.2em}
+div.example {margin-left: 3.2em}
+div.lisp {margin-left: 3.2em}
+div.smalldisplay {margin-left: 3.2em}
+div.smallexample {margin-left: 3.2em}
+div.smalllisp {margin-left: 3.2em}
+kbd {font-style: oblique}
+pre.display {font-family: inherit}
+pre.format {font-family: inherit}
+pre.menu-comment {font-family: serif}
+pre.menu-preformatted {font-family: serif}
+pre.smalldisplay {font-family: inherit; font-size: smaller}
+pre.smallexample {font-size: smaller}
+pre.smallformat {font-family: inherit; font-size: smaller}
+pre.smalllisp {font-size: smaller}
+span.nolinebreak {white-space: nowrap}
+span.roman {font-family: initial; font-weight: normal}
+span.sansserif {font-family: sans-serif; font-weight: normal}
+ul.no-bullet {list-style: none}
+-->
+</style>
+
+
+</head>
+
+<body lang="en">
+<a name="Other-Multi_002ddimensional-Real_002ddata-MPI-Transforms"></a>
+<div class="header">
+<p>
+Next: <a href="FFTW-MPI-Transposes.html#FFTW-MPI-Transposes" accesskey="n" rel="next">FFTW MPI Transposes</a>, Previous: <a href="Multi_002ddimensional-MPI-DFTs-of-Real-Data.html#Multi_002ddimensional-MPI-DFTs-of-Real-Data" accesskey="p" rel="prev">Multi-dimensional MPI DFTs of Real Data</a>, Up: <a href="Distributed_002dmemory-FFTW-with-MPI.html#Distributed_002dmemory-FFTW-with-MPI" accesskey="u" rel="up">Distributed-memory FFTW with MPI</a> &nbsp; [<a href="index.html#SEC_Contents" title="Table of contents" rel="contents">Contents</a>][<a href="Concept-Index.html#Concept-Index" title="Index" rel="index">Index</a>]</p>
+</div>
+<hr>
+<a name="Other-multi_002ddimensional-Real_002dData-MPI-Transforms"></a>
+<h3 class="section">6.6 Other multi-dimensional Real-Data MPI Transforms</h3>
+
+<a name="index-r2r-3"></a>
+<p>FFTW&rsquo;s MPI interface also supports multi-dimensional &lsquo;<samp>r2r</samp>&rsquo;
+transforms of all kinds supported by the serial interface
+(e.g. discrete cosine and sine transforms, discrete Hartley
+transforms, etc.).  Only multi-dimensional &lsquo;<samp>r2r</samp>&rsquo; transforms, not
+one-dimensional transforms, are currently parallelized.
+</p>
+<a name="index-fftw_005fr2r_005fkind-1"></a>
+<p>These are used much like the multidimensional complex DFTs discussed
+above, except that the data is real rather than complex, and one needs
+to pass an r2r transform kind (<code>fftw_r2r_kind</code>) for each
+dimension as in the serial FFTW (see <a href="More-DFTs-of-Real-Data.html#More-DFTs-of-Real-Data">More DFTs of Real Data</a>).
+</p>
+<p>For example, one might perform a two-dimensional L&nbsp;&times;&nbsp;M
+ that is
+an REDFT10 (DCT-II) in the first dimension and an RODFT10 (DST-II) in
+the second dimension with code like:
+</p>
+<div class="example">
+<pre class="example">    const ptrdiff_t L = ..., M = ...;
+    fftw_plan plan;
+    double *data;
+    ptrdiff_t alloc_local, local_n0, local_0_start, i, j;
+
+    /* <span class="roman">get local data size and allocate</span> */
+    alloc_local = fftw_mpi_local_size_2d(L, M, MPI_COMM_WORLD,
+                                         &amp;local_n0, &amp;local_0_start);
+    data = fftw_alloc_real(alloc_local);
+
+    /* <span class="roman">create plan for in-place REDFT10 x RODFT10</span> */
+    plan = fftw_mpi_plan_r2r_2d(L, M, data, data, MPI_COMM_WORLD,
+                                FFTW_REDFT10, FFTW_RODFT10, FFTW_MEASURE);
+
+    /* <span class="roman">initialize data to some function</span> my_function(x,y) */
+    for (i = 0; i &lt; local_n0; ++i) for (j = 0; j &lt; M; ++j)
+       data[i*M + j] = my_function(local_0_start + i, j);
+
+    /* <span class="roman">compute transforms, in-place, as many times as desired</span> */
+    fftw_execute(plan);
+
+    fftw_destroy_plan(plan);
+</pre></div>
+
+<a name="index-fftw_005falloc_005freal-3"></a>
+<p>Notice that we use the same &lsquo;<samp>local_size</samp>&rsquo; functions as we did for
+complex data, only now we interpret the sizes in terms of real rather
+than complex values, and correspondingly use <code>fftw_alloc_real</code>.
+</p>
+
+
+
+</body>
+</html>

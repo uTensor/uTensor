@@ -1,0 +1,164 @@
+This is fftw3.info, produced by makeinfo version 6.3 from fftw3.texi.
+
+This manual is for FFTW (version 3.3.8, 24 May 2018).
+
+   Copyright (C) 2003 Matteo Frigo.
+
+   Copyright (C) 2003 Massachusetts Institute of Technology.
+
+     Permission is granted to make and distribute verbatim copies of
+     this manual provided the copyright notice and this permission
+     notice are preserved on all copies.
+
+     Permission is granted to copy and distribute modified versions of
+     this manual under the conditions for verbatim copying, provided
+     that the entire resulting derived work is distributed under the
+     terms of a permission notice identical to this one.
+
+     Permission is granted to copy and distribute translations of this
+     manual into another language, under the above conditions for
+     modified versions, except that this permission notice may be stated
+     in a translation approved by the Free Software Foundation.
+INFO-DIR-SECTION Development
+START-INFO-DIR-ENTRY
+* fftw3: (fftw3).	FFTW User's Manual.
+END-INFO-DIR-ENTRY
+
+
+Indirect:
+fftw3.info-1: 1052
+fftw3.info-2: 337333
+
+Tag Table:
+(Indirect)
+Node: Top1052
+Node: Introduction1850
+Node: Tutorial8149
+Ref: Tutorial-Footnote-19391
+Node: Complex One-Dimensional DFTs9485
+Node: Complex Multi-Dimensional DFTs15219
+Ref: Complex Multi-Dimensional DFTs-Footnote-118645
+Node: One-Dimensional DFTs of Real Data18780
+Node: Multi-Dimensional DFTs of Real Data23220
+Node: More DFTs of Real Data27146
+Node: The Halfcomplex-format DFT30643
+Node: Real even/odd DFTs (cosine/sine transforms)33252
+Ref: Real even/odd DFTs (cosine/sine transforms)-Footnote-138841
+Ref: Real even/odd DFTs (cosine/sine transforms)-Footnote-239030
+Node: The Discrete Hartley Transform39964
+Ref: The Discrete Hartley Transform-Footnote-142146
+Node: Other Important Topics42396
+Node: SIMD alignment and fftw_malloc42689
+Node: Multi-dimensional Array Format44878
+Node: Row-major Format45498
+Node: Column-major Format47194
+Node: Fixed-size Arrays in C48275
+Node: Dynamic Arrays in C49711
+Node: Dynamic Arrays in C-The Wrong Way51345
+Node: Words of Wisdom-Saving Plans53093
+Node: Caveats in Using Wisdom55761
+Node: FFTW Reference57844
+Node: Data Types and Files58332
+Node: Complex numbers58764
+Node: Precision60502
+Node: Memory Allocation62062
+Node: Using Plans63627
+Node: Basic Interface67652
+Ref: Basic Interface-Footnote-168396
+Node: Complex DFTs68460
+Node: Planner Flags72425
+Node: Real-data DFTs77865
+Node: Real-data DFT Array Format82854
+Node: Real-to-Real Transforms85110
+Node: Real-to-Real Transform Kinds89073
+Node: Advanced Interface91538
+Node: Advanced Complex DFTs92278
+Node: Advanced Real-data DFTs96546
+Node: Advanced Real-to-real Transforms98874
+Node: Guru Interface99979
+Node: Interleaved and split arrays100903
+Node: Guru vector and transform sizes101942
+Node: Guru Complex DFTs104639
+Node: Guru Real-data DFTs107475
+Node: Guru Real-to-real Transforms110394
+Node: 64-bit Guru Interface111713
+Node: New-array Execute Functions114028
+Node: Wisdom118524
+Node: Wisdom Export118883
+Node: Wisdom Import120861
+Node: Forgetting Wisdom122888
+Node: Wisdom Utilities123261
+Node: What FFTW Really Computes124623
+Node: The 1d Discrete Fourier Transform (DFT)125448
+Node: The 1d Real-data DFT126806
+Node: 1d Real-even DFTs (DCTs)128470
+Node: 1d Real-odd DFTs (DSTs)131671
+Node: 1d Discrete Hartley Transforms (DHTs)134607
+Node: Multi-dimensional Transforms135283
+Node: Multi-threaded FFTW137887
+Node: Installation and Supported Hardware/Software139353
+Node: Usage of Multi-threaded FFTW141177
+Node: How Many Threads to Use?144477
+Node: Thread safety145499
+Node: Distributed-memory FFTW with MPI148799
+Node: FFTW MPI Installation151374
+Node: Linking and Initializing MPI FFTW153161
+Node: 2d MPI example154384
+Node: MPI Data Distribution158609
+Node: Basic and advanced distribution interfaces161483
+Node: Load balancing165904
+Node: Transposed distributions167589
+Node: One-dimensional distributions171356
+Node: Multi-dimensional MPI DFTs of Real Data173921
+Node: Other Multi-dimensional Real-data MPI Transforms178562
+Node: FFTW MPI Transposes180735
+Node: Basic distributed-transpose interface181575
+Node: Advanced distributed-transpose interface183748
+Node: An improved replacement for MPI_Alltoall185032
+Node: FFTW MPI Wisdom187001
+Ref: FFTW MPI Wisdom-Footnote-1189739
+Node: Avoiding MPI Deadlocks190653
+Node: FFTW MPI Performance Tips191678
+Node: Combining MPI and Threads193143
+Node: FFTW MPI Reference196606
+Node: MPI Files and Data Types197185
+Node: MPI Initialization198181
+Node: Using MPI Plans199280
+Node: MPI Data Distribution Functions201106
+Node: MPI Plan Creation206563
+Node: MPI Wisdom Communication217239
+Node: FFTW MPI Fortran Interface218165
+Ref: FFTW MPI Fortran Interface-Footnote-1224188
+Node: Calling FFTW from Modern Fortran224596
+Node: Overview of Fortran interface225946
+Node: Extended and quadruple precision in Fortran229401
+Node: Reversing array dimensions230782
+Node: FFTW Fortran type reference234313
+Node: Plan execution in Fortran238807
+Node: Allocating aligned memory in Fortran241690
+Node: Accessing the wisdom API from Fortran245052
+Node: Wisdom File Export/Import from Fortran245829
+Node: Wisdom String Export/Import from Fortran247491
+Node: Wisdom Generic Export/Import from Fortran249476
+Node: Defining an FFTW module251706
+Node: Calling FFTW from Legacy Fortran252777
+Node: Fortran-interface routines254334
+Ref: Fortran-interface routines-Footnote-1257989
+Ref: Fortran-interface routines-Footnote-2258192
+Node: FFTW Constants in Fortran258325
+Node: FFTW Execution in Fortran259479
+Node: Fortran Examples262225
+Node: Wisdom of Fortran?265626
+Node: Upgrading from FFTW version 2267305
+Ref: Upgrading from FFTW version 2-Footnote-1276932
+Node: Installation and Customization277115
+Node: Installation on Unix278756
+Node: Installation on non-Unix systems286833
+Node: Cycle Counters289050
+Node: Generating your own code290801
+Node: Acknowledgments292835
+Node: License and Copyright296551
+Node: Concept Index298421
+Node: Library Index337333
+
+End Tag Table
