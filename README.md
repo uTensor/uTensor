@@ -35,6 +35,7 @@ Old key points:
 -- Low cost per Tensor throughout the entire system, since most generated models have 100+ including intermediates, also impacts dynamic footprint
 -- Lightweight class hierarchy
 -- Duh
+
 New additional key ideas:
 - System safety
 -- All tensor metadata and actual data are owned in dedicated regions
@@ -56,7 +57,8 @@ New additional key ideas:
 ---- Only specialized operators have access to raw data blocks, and these ops will be wicked fast
 -- Extensible, configurable, and optimize-outable error handling
 -- GDB debugging IS NOW TRIVIAL
-As mentioned before, these key ideas need to be reflected not only in the code, but in the code structure in such a way that it is Maintainable, Hackable, and User-extensible, all without breaking any of the above ideas. Pretty much everything in the uTensor runtime can be divided into two components: core, and everything else. The core library contains all the deep low level functionality needed for the runtime to make the above guarantees, as well as the interfaces required for concrete implementation. Furthermore, the overhead of this core engine should be negligible relative to the system operation. Everything not in the core library really should just be thought of a reasonable defaults. For example, tensor implementations, default operators, example memory allocators, or even possible logging systems and error handlers. These modules should be the primary area for future optimization, especially before model deployment.
+
+As mentioned before, these key ideas need to be reflected not only in the code, but in the code structure in such a way that it is Maintainable, Hackable, and User-extensible. Pretty much everything in the uTensor runtime can be divided into two components: core, and everything else. The core library contains all the deep low level functionality needed for the runtime to make the above guarantees, as well as the interfaces required for concrete implementation. Furthermore, the overhead of this core engine should be negligible relative to the system operation. Everything not in the core library really should just be thought of a reasonable defaults. For example, tensor implementations, default operators, example memory allocators, or even possible logging systems and error handlers. These modules should be the primary area for future optimization, especially before model deployment.
 
 ## High level API
 
