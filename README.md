@@ -11,7 +11,6 @@ uTensor is an extremely light-weight machine learning inference framework built 
 |------------------------------|---------------|-------------|-------------|
 | uTensor/src/uTensor/core     |   1275(+1275) |       4(+4) |     28(+28) |
 | uTensor/src/uTensor/tensors  |     791(+791) |       0(+0) |       0(+0) |
-|------------------------------|---------------|-------------|-------------|
 
 
 ### How does the uTensor workflow work?
@@ -27,36 +26,36 @@ TODO
 The rearchitecture is fundamentally centered around a few key ideas, and the structure of the code base and build tools naturally followed.
 Old key points:
 - Tensors describe how data is accessed and where from
--- Performance of ops depends on which tensors are used
+  - Performance of ops depends on which tensors are used
 - Operators are Tensor agnostic
--- High performance ops can fetch blocks of data at once
+  - High performance ops can fetch blocks of data at once
 - Strive for low total power in execution
 - Low static and dynamic footprint, be small
--- Low cost per Tensor throughout the entire system, since most generated models have 100+ including intermediates, also impacts dynamic footprint
--- Lightweight class hierarchy
--- Duh
+  - Low cost per Tensor throughout the entire system, since most generated models have 100+ including intermediates, also impacts dynamic footprint
+  - Lightweight class hierarchy
+  - Duh
 
 New additional key ideas:
 - System safety
--- All tensor metadata and actual data are owned in dedicated regions
---- This can either be user provided, or one we create
--- We can guarantee that runtime will use no more than N bytes of RAM at code gen time or at compile time!
--- Generally should not collide with userspace or system space memory, i.e. dont share heaps
--- Generally implications: a safe runtime means we can safely update models remotely
--- As many compile time errors as possible!
---- Mismatched inputs, outputs, or numbers
---- wrong sizes used
---- Impossible memory accesses
---- etc.
+  - All tensor metadata and actual data are owned in dedicated regions
+    - This can either be user provided, or one we create
+  - We can guarantee that runtime will use no more than N bytes of RAM at code gen time or at compile time!
+  - Generally should not collide with userspace or system space memory, i.e. dont share heaps
+  - Generally implications: a safe runtime means we can safely update models remotely
+  - As many compile time errors as possible!
+    - Mismatched inputs, outputs, or numbers
+    - wrong sizes used
+    - Impossible memory accesses
+    - etc.
 - Clear, Concise, and Debuggable
--- Previous iteration of uTensor relied almost too heavily on codegen, making changes to a model for any reason was near impossible
--- A developer should be able to make changes to the model without relying on code gen
--- A developer should be able to look at a model file and immediately understand what the graph looks like, without a massive amound of jumping around
--- Default tensor interface should behave like a higher level language, but exploit the speed of C++
---- Generally: No more pointer bullshit! C is super error prone, fight me
----- Only specialized operators have access to raw data blocks, and these ops will be wicked fast
--- Extensible, configurable, and optimize-outable error handling
--- GDB debugging IS NOW TRIVIAL
+  - Previous iteration of uTensor relied almost too heavily on codegen, making changes to a model for any reason was near impossible
+  - A developer should be able to make changes to the model without relying on code gen
+  - A developer should be able to look at a model file and immediately understand what the graph looks like, without a massive amound of jumping around
+  - Default tensor interface should behave like a higher level language, but exploit the speed of C++
+    - Generally: No more pointer bullshit! C is super error prone, fight me
+      - Only specialized operators have access to raw data blocks, and these ops will be wicked fast
+  - Extensible, configurable, and optimize-outable error handling
+  - GDB debugging IS NOW TRIVIAL
 
 As mentioned before, these key ideas need to be reflected not only in the code, but in the code structure in such a way that it is Maintainable, Hackable, and User-extensible. Pretty much everything in the uTensor runtime can be divided into two components: core, and everything else. The core library contains all the deep low level functionality needed for the runtime to make the above guarantees, as well as the interfaces required for concrete implementation. Furthermore, the overhead of this core engine should be negligible relative to the system operation. Everything not in the core library really should just be thought of a reasonable defaults. For example, tensor implementations, default operators, example memory allocators, or even possible logging systems and error handlers. These modules should be the primary area for future optimization, especially before model deployment.
 
