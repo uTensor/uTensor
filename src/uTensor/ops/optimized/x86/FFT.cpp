@@ -1,5 +1,4 @@
 #include "FFT.hpp"
-#include "fftw3.h"
 
 namespace uTensor {
 void dummy() {
