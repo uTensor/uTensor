@@ -1,9 +1,9 @@
 #ifndef UTENSOR_IDX_IMPORTER
 #define UTENSOR_IDX_IMPORTER
 
-#include "src/uTensor/util/uTensor_util.hpp"
-#include "src/uTensor/core/tensor.hpp"
-#include "src/uTensor/core/sdtensor.hpp"
+#include "uTensor/util/uTensor_util.hpp"
+#include "uTensor/core/tensor.hpp"
+#include "uTensor/core/sdtensor.hpp"
 #include <stdio.h>
 #include <stdlib.h>
 #include <vector>

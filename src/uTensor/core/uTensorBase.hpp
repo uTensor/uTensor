@@ -1,7 +1,7 @@
 #ifndef UTENSOR_BASE_H
 #define UTENSOR_BASE_H
 
-#include "src/uTensor/core/tensor.hpp"
+#include "uTensor/core/tensor.hpp"
 
 //isType() https://stackoverflow.com/questions/9974596/how-to-check-whether-two-pointers-point-to-the-same-object-or-not
 //double dispatch

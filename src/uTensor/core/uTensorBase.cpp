@@ -1,4 +1,4 @@
-#include "src/uTensor/core/uTensorBase.hpp"
+#include "uTensor/core/uTensorBase.hpp"
 
 void Operator::setInputs(S_TList &_inputs) {
   if(_inputs.size() != n_inputs) ERR_EXIT("Input Tensor list mismatched...");

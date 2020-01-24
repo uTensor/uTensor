@@ -1,6 +1,6 @@
 #include "test_helper.h"
 #include "models/add_graph.hpp"
-#include "src/uTensor/loaders/tensorIdxImporter.hpp"
+#include "uTensor/loaders/tensorIdxImporter.hpp"
 
 #include <iostream>
 using std::cout;

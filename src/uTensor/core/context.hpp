@@ -1,7 +1,7 @@
 #ifndef UTENSOR_CTX_H
 #define UTENSOR_CTX_H
 
-#include "src/uTensor/core/uTensorBase.hpp"
+#include "uTensor/core/uTensorBase.hpp"
 #include <memory>
 #include <unordered_map>
 #include <initializer_list>

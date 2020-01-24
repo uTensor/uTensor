@@ -2,10 +2,10 @@
 
 #include "qmul4_weight.hpp"
 #include "qmul4.hpp"
-#include "src/uTensor/core/tensor.hpp"
-#include "src/uTensor/core/context.hpp"
-#include "src/uTensor/ops/ArrayOps.hpp"
-#include "src/uTensor/ops/MathOps.hpp"
+#include "uTensor/core/tensor.hpp"
+#include "uTensor/core/context.hpp"
+#include "uTensor/ops/ArrayOps.hpp"
+#include "uTensor/ops/MathOps.hpp"
 
 
 void get_qmul4_ctx(Context& ctx) {

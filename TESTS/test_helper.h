@@ -1,7 +1,7 @@
 #ifndef __TEST_HELPER_H__
 #define __TEST_HELPER_H__
 #include "unity.h"
-#include "src/uTensor/core/context.hpp"
+#include "uTensor/core/context.hpp"
 
 #ifdef COMPILE_GREENTEA
 // Handle all the boilerplate code
