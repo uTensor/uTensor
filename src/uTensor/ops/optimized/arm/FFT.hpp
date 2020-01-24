@@ -1,7 +1,7 @@
 #ifndef UTENSOR_FFT_HPP
 #define UTENSOR_FFT_HPP
 
-#include "fftw3.h"
+#include "arm_math.h"
 #include "operatorBase.hpp"
 
 namespace uTensor {
