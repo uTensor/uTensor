@@ -45,6 +45,7 @@ void PowerSpectrum::power_spectrum_kernel(Tensor& power, const Tensor& input, in
     float real = tmpc[i*2], im = tmpc[i*2 + 1];
     output[i] = real*real + im*im;
   }
+  Context::get_default_context()->get_ram_data_allocator()->deallocate(tmp);
 }
 
 }
