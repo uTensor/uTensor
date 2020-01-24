@@ -15,6 +15,7 @@ void return_error(int ret_val) {
     printf("  [DONE]\r\n");
   }
 }
+/*
 void printVector(std::vector<uint32_t> vec) {
   printf("vector: \r\n");
   for (uint32_t i : vec) {
@@ -23,6 +24,7 @@ void printVector(std::vector<uint32_t> vec) {
 
   printf("\r\n");
 }
+*/
 
 uint16_t ntoh16(uint16_t val) {
   uint16_t ret = 0;
