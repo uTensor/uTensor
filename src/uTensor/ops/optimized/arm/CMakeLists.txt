@@ -1,6 +1,7 @@
 #TODO Add support for other compilers HERE
 #TODO Add device config bits, for super futre
 add_subdirectory("${PROJECT_SOURCE_DIR}/extern/CMSIS_5/CMSIS/DSP/Source" "extern/cmsis_dsp")
+include("${PROJECT_SOURCE_DIR}/extern/CMSIS_5/CMSIS/DSP/config")
 set(hdr_optimized_ops 
     FFT.hpp
    )
