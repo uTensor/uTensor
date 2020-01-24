@@ -3,7 +3,7 @@
 #include <stdint.h>
 #include <stdio.h>
 
-#include <vector>
+//#include <vector>
 
 // #define MAX(A, B) ((A > B)? A:B)
 
@@ -60,7 +60,7 @@ void utensor_exit(void);
 
 // typedef std::vector<uint32_t> Shape;
 
-void printVector(std::vector<uint32_t> vec);
+//void printVector(std::vector<uint32_t> vec);
 #ifdef TARGET_SIMULATOR
 // noop
 #elif defined(_WIN32)
@@ -107,6 +107,7 @@ void printVector(std::vector<uint32_t> vec);
 #undef abs
 #else
 #include "mbed.h"
+#define MBED_PROJECT
 #endif
 //#   error "Unknown compiler"
 // little endian to big endian
