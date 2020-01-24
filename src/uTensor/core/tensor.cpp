@@ -15,9 +15,10 @@ TensorInterface* Tensor::operator*() {
   return reinterpret_cast<TensorInterface*>(_ptr);
 }
 Tensor::~Tensor() {
-  if(_ptr){
-    AllocatorInterface* alloc = Context::get_default_context()->get_metadata_allocator();
-    if(alloc->is_bound(_ptr, this)){
+  if (_ptr) {
+    AllocatorInterface* alloc =
+        Context::get_default_context()->get_metadata_allocator();
+    if (alloc->is_bound(_ptr, this)) {
       alloc->unbind(_ptr, this);
     }
 
@@ -25,20 +26,21 @@ Tensor::~Tensor() {
   }
 }
 Tensor::Tensor(TensorInterface* ptr) : Handle((void*)ptr) {
-  //Context::get_default_context()->get_metadata_allocator()->bind(_ptr, this);
+  // Context::get_default_context()->get_metadata_allocator()->bind(_ptr, this);
   bind(*this, *Context::get_default_context()->get_metadata_allocator());
 }
 Tensor& Tensor::operator=(TensorInterface* ptr) {
   _ptr = (void*)ptr;
   bind(*this, *Context::get_default_context()->get_metadata_allocator());
-  //Context::get_metadata_allocator()->bind(_ptr, this);
+  // Context::get_metadata_allocator()->bind(_ptr, this);
   return *this;
 }
 
 Tensor::Tensor(Tensor&& that) {
   _ptr = that._ptr;
-  AllocatorInterface* alloc = Context::get_default_context()->get_metadata_allocator();
-  if(alloc->is_bound(_ptr, &that)){
+  AllocatorInterface* alloc =
+      Context::get_default_context()->get_metadata_allocator();
+  if (alloc->is_bound(_ptr, &that)) {
     alloc->unbind(_ptr, &that);
     alloc->bind(_ptr, this);
   }
@@ -47,8 +49,9 @@ Tensor::Tensor(Tensor&& that) {
 Tensor& Tensor::operator=(Tensor&& that) {
   if (this != &that) {
     _ptr = that._ptr;
-    AllocatorInterface* alloc = Context::get_default_context()->get_metadata_allocator();
-    if(alloc->is_bound(_ptr, &that)){
+    AllocatorInterface* alloc =
+        Context::get_default_context()->get_metadata_allocator();
+    if (alloc->is_bound(_ptr, &that)) {
       alloc->unbind(_ptr, &that);
       alloc->bind(_ptr, this);
     }
@@ -61,7 +64,8 @@ Tensor& Tensor::operator=(Tensor&& that) {
 // Force everything to be on the utensor allocator
 void* Tensor::operator new(size_t sz) {  // Have to delegate this size from
                                          // tensors somehow + sizeof(Tensor)
-  void* p = Context::get_default_context()->get_metadata_allocator()->allocate(sz);
+  void* p =
+      Context::get_default_context()->get_metadata_allocator()->allocate(sz);
   return p;
 }
 void Tensor::operator delete(void* p) {
@@ -70,28 +74,26 @@ void Tensor::operator delete(void* p) {
 
 // Interface
 const IntegralValue Tensor::operator()(uint16_t i, uint16_t j, uint16_t k,
-                               uint16_t l) const {
+                                       uint16_t l) const {
   return reinterpret_cast<TensorInterface*>(_ptr)->operator()(i, j, k, l);
 }
 IntegralValue Tensor::operator()(uint16_t i, uint16_t j, uint16_t k,
-                         uint16_t l){
+                                 uint16_t l) {
   return reinterpret_cast<TensorInterface*>(_ptr)->operator()(i, j, k, l);
 }
 const IntegralValue Tensor::operator()(uint32_t linear_index) const {
   return reinterpret_cast<TensorInterface*>(_ptr)->operator()(linear_index);
 }
-IntegralValue Tensor::operator()(uint32_t linear_index){
+IntegralValue Tensor::operator()(uint32_t linear_index) {
   return reinterpret_cast<TensorInterface*>(_ptr)->operator()(linear_index);
-
 }
 
-TensorShape& Tensor::get_shape(){
+TensorShape& Tensor::get_shape() {
   return reinterpret_cast<TensorInterface*>(_ptr)->get_shape();
 }
 
-
-TensorInterface* TensorReference::operator*(){
-  return reinterpret_cast<TensorInterface*>(_ref->operator*()); 
+TensorInterface* TensorReference::operator*() {
+  return reinterpret_cast<TensorInterface*>(_ref->operator*());
 }
 
 SimpleNamedTensor::SimpleNamedTensor(const uTensor::string& name,
@@ -99,7 +101,4 @@ SimpleNamedTensor::SimpleNamedTensor(const uTensor::string& name,
     : name(&name), tensor(&tensor) {}
 SimpleNamedTensor::SimpleNamedTensor() {}
 
-
-
 }  // namespace uTensor
-

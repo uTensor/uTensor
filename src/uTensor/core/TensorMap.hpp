@@ -1,9 +1,9 @@
 #ifndef UTENSOR_TENSOR_MAP
 #define UTENSOR_TENSOR_MAP
 
-#include "utensor_string.hpp"
-#include "tensor.hpp"
 #include <initializer_list>
+#include "tensor.hpp"
+#include "utensor_string.hpp"
 
 using std::initializer_list;
 
@@ -24,14 +24,14 @@ class FixedTensorMap : public TensorMapInterface {
  public:
   FixedTensorMap(SimpleNamedTensor map[size]) : _map{map} {}
   FixedTensorMap(initializer_list<SimpleNamedTensor> l) {
-    if(size != l.size()){
-        //TODO THROW ERROR
-        printf("Element number mismatch in TensorMap construction\n");
+    if (size != l.size()) {
+      // TODO THROW ERROR
+      printf("Element number mismatch in TensorMap construction\n");
     }
     int i = 0;
-    for(auto thing = l.begin(); thing != l.end(); thing++){
-        _map[i] = *thing;
-        i++;
+    for (auto thing = l.begin(); thing != l.end(); thing++) {
+      _map[i] = *thing;
+      i++;
     }
   }
   FixedTensorMap() {
@@ -50,29 +50,26 @@ class FixedTensorMap : public TensorMapInterface {
     }
     return TensorMapInterface::not_found;
   }
-  FixedTensorMap(FixedTensorMap<size>&& that){
-      _map = that._map;
-      that._map = nullptr;
-  } 
+  FixedTensorMap(FixedTensorMap<size>&& that) {
+    _map = that._map;
+    that._map = nullptr;
+  }
   FixedTensorMap& operator=(FixedTensorMap<size>&& that) {
-    if(this != &that){
+    if (this != &that) {
       _map = that._map;
       that._map = nullptr;
     }
-      return *this;
+    return *this;
   }
-  FixedTensorMap(const FixedTensorMap<size>& that) {
-    _map = that._map;
-  }
+  FixedTensorMap(const FixedTensorMap<size>& that) { _map = that._map; }
   FixedTensorMap& operator=(const FixedTensorMap<size>& that) {
     //_map = that._map;
-    for(int i = 0; i < size; i++)
-        _map[i] = that._map[i];
+    for (int i = 0; i < size; i++) _map[i] = that._map[i];
     return *this;
   }
 
  private:
   SimpleNamedTensor _map[size];
 };
-}
+}  // namespace uTensor
 #endif

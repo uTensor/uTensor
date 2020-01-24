@@ -60,7 +60,7 @@ void utensor_exit(void);
 
 // typedef std::vector<uint32_t> Shape;
 
-//void printVector(std::vector<uint32_t> vec);
+// void printVector(std::vector<uint32_t> vec);
 #ifdef TARGET_SIMULATOR
 // noop
 #elif defined(_WIN32)

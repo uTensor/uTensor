@@ -12,7 +12,7 @@ class RamTensor : public TensorInterface {
  protected:
   virtual void* read(uint32_t linear_index) const override;
   virtual void* write(uint32_t linear_index) override;
-  RamTensor(); // May be useful in subclasses
+  RamTensor();  // May be useful in subclasses
   RamTensor(ttype _type);
 
  public:
@@ -28,20 +28,19 @@ class RamTensor : public TensorInterface {
  * Similar to RamTensor, but doesnt need to be allocated until its first resize
  */
 class FutureMaxSizeRamTensor : public RamTensor {
-  public:
-    FutureMaxSizeRamTensor(ttype _type);
-    FutureMaxSizeRamTensor(TensorShape _shape, ttype _type);
-    virtual ~FutureMaxSizeRamTensor();
-    // Resizing to something smaller only
-    // Invalidates data
-    virtual void resize(TensorShape new_shape) override;
+ public:
+  FutureMaxSizeRamTensor(ttype _type);
+  FutureMaxSizeRamTensor(TensorShape _shape, ttype _type);
+  virtual ~FutureMaxSizeRamTensor();
+  // Resizing to something smaller only
+  // Invalidates data
+  virtual void resize(TensorShape new_shape) override;
 
-  private:
-    void build();
+ private:
+  void build();
 
-  private:
-    size_t max_initial_size;
-
+ private:
+  size_t max_initial_size;
 };
 
 // class RawDataHandle : public Handle {

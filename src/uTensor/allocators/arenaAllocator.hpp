@@ -8,7 +8,7 @@
 namespace uTensor {
 
 //#define MSB_SET ~( ~( (T)0 ) >> 1 )
-#define MSB_SET (1 << (sizeof(T)*8 - 1))
+#define MSB_SET (1 << (sizeof(T) * 8 - 1))
 #define BLOCK_INACTIVE ~MSB_SET
 #define BLOCK_LENGTH_MASK ~MSB_SET
 #define BLOCK_ACTIVE MSB_SET
@@ -19,7 +19,7 @@ namespace uTensor {
  * TODO get around the BS alignment bits from the silly pointer variable causing
  * extra empty padding
  */
-template <size_t size, typename T=uint16_t>
+template <size_t size, typename T = uint16_t>
 class localCircularArenaAllocator : public AllocatorInterface {
  private:
   class MetaHeader {
@@ -35,7 +35,7 @@ class localCircularArenaAllocator : public AllocatorInterface {
     void set_inactive() { meta_data &= BLOCK_INACTIVE; }
     void set_hndl(Handle* handle) { hndl = handle; }
     void set_len(T sz) {
-      meta_data &= MSB_SET; // Clear all size bits
+      meta_data &= MSB_SET;  // Clear all size bits
       meta_data |= (BLOCK_LENGTH_MASK & sz);
     }
     T get_len() const { return meta_data & BLOCK_LENGTH_MASK; }
@@ -130,8 +130,7 @@ class localCircularArenaAllocator : public AllocatorInterface {
       if (hdr.has_handle(hndl)) {
         return true;
       }
-      if(hdr.get_len() == 0)
-        break;
+      if (hdr.get_len() == 0) break;
       m_cursor += hdr.get_len();
     }
     return false;

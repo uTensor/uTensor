@@ -59,15 +59,16 @@ class TensorInterface : public TensorBase {
    * req_read_size/write_size
    */
   size_t get_readable_block(void* buffer, uint16_t req_read_size,
-                                    uint32_t linear_index) const;
+                            uint32_t linear_index) const;
   size_t get_writeable_block(void* buffer, uint16_t req_write_size,
-                                     uint32_t linear_index);
+                             uint32_t linear_index);
   friend class FastOperator;
+
  protected:
   virtual size_t _get_readable_block(void* buffer, uint16_t req_read_size,
-                                    uint32_t linear_index) const;
+                                     uint32_t linear_index) const;
   virtual size_t _get_writeable_block(void* buffer, uint16_t req_write_size,
-                                     uint32_t linear_index);
+                                      uint32_t linear_index);
 
  protected:
   TensorShape _shape;

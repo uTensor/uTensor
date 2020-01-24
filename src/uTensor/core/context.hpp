@@ -1,13 +1,13 @@
 #ifndef UTENSOR_CTX_H
 #define UTENSOR_CTX_H
+#include "errorHandler.hpp"
 #include "memoryManagementInterface.hpp"
 #include "tensorBase.hpp"
-#include "errorHandler.hpp"
 
 namespace uTensor {
 class Context {
  private:
-    Context();
+  Context();
 
  public:
   static Context* get_default_context();
