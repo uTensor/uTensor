@@ -36,21 +36,21 @@ uint8_t type_size(ttype t);
 // Need to figure out way of maintaining reference to rvalue
 class IntegralValue {
   void* p;
-  uint8_t tmp[sizeof(uint32_t)]; // For storing written rvals
-  uint8_t num_bytes; //Need this for writing, need to find way around it
+  uint8_t tmp[sizeof(uint32_t)];  // For storing written rvals
+  uint8_t num_bytes;  // Need this for writing, need to find way around it
 
  public:
   // Explicit
   IntegralValue(void* p);
-/*
-  IntegralValue(uint8_t u);
-  IntegralValue(int8_t u);
-  IntegralValue(uint16_t u);
-  IntegralValue(int16_t u);
-  IntegralValue(uint32_t u);
-  IntegralValue(int32_t u);
-  IntegralValue(float u);
-*/
+  /*
+    IntegralValue(uint8_t u);
+    IntegralValue(int8_t u);
+    IntegralValue(uint16_t u);
+    IntegralValue(int16_t u);
+    IntegralValue(uint32_t u);
+    IntegralValue(int32_t u);
+    IntegralValue(float u);
+  */
   IntegralValue(const uint8_t& u);
   IntegralValue(const int8_t& u);
   IntegralValue(const uint16_t& u);
@@ -70,7 +70,6 @@ class IntegralValue {
   IntegralValue(const IntegralValue& that);
   IntegralValue& operator=(const IntegralValue& that);
   IntegralValue& operator=(IntegralValue&& that);
-
 
   operator uint8_t() const;
   operator uint8_t&();

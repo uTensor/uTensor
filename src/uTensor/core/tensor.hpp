@@ -18,7 +18,8 @@ class Tensor : public Handle {
  public:
   TensorInterface* operator->();
   const TensorInterface* operator->() const;
-  // As long as operating on instantiations of this class and not pointers this function will work
+  // As long as operating on instantiations of this class and not pointers this
+  // function will work
   TensorInterface* operator*();
   Tensor(TensorInterface* ptr);
   Tensor& operator=(TensorInterface* ptr);
@@ -45,8 +46,8 @@ class Tensor : public Handle {
 };
 
 class TensorReference : public HandleReference {
-  public:
-    TensorInterface* operator*();
+ public:
+  TensorInterface* operator*();
 };
 
 // Same as Named Tensor but not registered in the context class

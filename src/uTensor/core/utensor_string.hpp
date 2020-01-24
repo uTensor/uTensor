@@ -39,9 +39,9 @@ class string {
 
 }  // namespace uTensor
 
-//namespace std {
-//template <>
-//struct hash<uTensor::string> {
+// namespace std {
+// template <>
+// struct hash<uTensor::string> {
 //  typedef uTensor::string argument_type;
 //  typedef std::size_t result_type;
 //

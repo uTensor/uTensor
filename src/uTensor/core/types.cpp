@@ -91,8 +91,7 @@ void TensorShape::update_dims() {
 uint16_t TensorShape::get_linear_size() const {
   uint16_t sum = 1;
   for (int i = 0; i < _num_dims; i++) {
-    if(_shape[i] == 0)
-      break;
+    if (_shape[i] == 0) break;
     sum *= _shape[i];
   }
   return sum;
@@ -112,8 +111,8 @@ uint32_t TensorShape::linear_index(uint16_t i, uint16_t j, uint16_t k,
   uint32_t d3 = _shape[3] > 0 ? 1 : 0;
   d3 *= d2 * _shape[2];
 
-  //Image order
-  //return i + j * d1 + k * d2 + l * d3;
+  // Image order
+  // return i + j * d1 + k * d2 + l * d3;
   // Matrix order
   return j + i * d1 + k * d2 + l * d3;
 }
@@ -142,31 +141,31 @@ IntegralValue::IntegralValue(const float& u): num_bytes(sizeof(u)) {
   *reinterpret_cast<float*>(p) = u;
 }
 */
-IntegralValue::IntegralValue(const uint8_t& u): num_bytes(sizeof(u)) {
+IntegralValue::IntegralValue(const uint8_t& u) : num_bytes(sizeof(u)) {
   memcpy(tmp, &u, sizeof(uint8_t));
   p = reinterpret_cast<void*>(tmp);
 }
-IntegralValue::IntegralValue(const int8_t& u): num_bytes(sizeof(u)) {
+IntegralValue::IntegralValue(const int8_t& u) : num_bytes(sizeof(u)) {
   memcpy(tmp, &u, sizeof(int8_t));
   p = reinterpret_cast<void*>(tmp);
 }
-IntegralValue::IntegralValue(const uint16_t& u): num_bytes(sizeof(u)) {
+IntegralValue::IntegralValue(const uint16_t& u) : num_bytes(sizeof(u)) {
   memcpy(tmp, &u, sizeof(uint16_t));
   p = reinterpret_cast<void*>(tmp);
 }
-IntegralValue::IntegralValue(const int16_t& u): num_bytes(sizeof(u)) {
+IntegralValue::IntegralValue(const int16_t& u) : num_bytes(sizeof(u)) {
   memcpy(tmp, &u, sizeof(int16_t));
   p = reinterpret_cast<void*>(tmp);
 }
-IntegralValue::IntegralValue(const uint32_t& u): num_bytes(sizeof(u)) {
+IntegralValue::IntegralValue(const uint32_t& u) : num_bytes(sizeof(u)) {
   memcpy(tmp, &u, sizeof(uint32_t));
   p = reinterpret_cast<void*>(tmp);
 }
-IntegralValue::IntegralValue(const int32_t& u): num_bytes(sizeof(u)) {
+IntegralValue::IntegralValue(const int32_t& u) : num_bytes(sizeof(u)) {
   memcpy(tmp, &u, sizeof(int32_t));
   p = reinterpret_cast<void*>(tmp);
 }
-IntegralValue::IntegralValue(const float& u): num_bytes(sizeof(u)) {
+IntegralValue::IntegralValue(const float& u) : num_bytes(sizeof(u)) {
   memcpy(tmp, &u, sizeof(float));
   p = reinterpret_cast<void*>(tmp);
 }
@@ -202,32 +201,31 @@ IntegralValue::IntegralValue( float u): num_bytes(sizeof(u)) {
 }
 */
 
-
-IntegralValue::IntegralValue(uint8_t&& u): num_bytes(sizeof(u)) {
+IntegralValue::IntegralValue(uint8_t&& u) : num_bytes(sizeof(u)) {
   memcpy(tmp, &u, sizeof(uint8_t));
   p = reinterpret_cast<void*>(tmp);
 }
-IntegralValue::IntegralValue(int8_t&& u): num_bytes(sizeof(u)) {
+IntegralValue::IntegralValue(int8_t&& u) : num_bytes(sizeof(u)) {
   memcpy(tmp, &u, sizeof(int8_t));
   p = reinterpret_cast<void*>(tmp);
 }
-IntegralValue::IntegralValue(uint16_t&& u): num_bytes(sizeof(u)) {
+IntegralValue::IntegralValue(uint16_t&& u) : num_bytes(sizeof(u)) {
   memcpy(tmp, &u, sizeof(uint16_t));
   p = reinterpret_cast<void*>(tmp);
 }
-IntegralValue::IntegralValue(int16_t&& u): num_bytes(sizeof(u)) {
+IntegralValue::IntegralValue(int16_t&& u) : num_bytes(sizeof(u)) {
   memcpy(tmp, &u, sizeof(int16_t));
   p = reinterpret_cast<void*>(tmp);
 }
-IntegralValue::IntegralValue(uint32_t&& u): num_bytes(sizeof(u)) {
+IntegralValue::IntegralValue(uint32_t&& u) : num_bytes(sizeof(u)) {
   memcpy(tmp, &u, sizeof(uint32_t));
   p = reinterpret_cast<void*>(tmp);
 }
-IntegralValue::IntegralValue(int32_t&& u): num_bytes(sizeof(u)) {
+IntegralValue::IntegralValue(int32_t&& u) : num_bytes(sizeof(u)) {
   memcpy(tmp, &u, sizeof(int32_t));
   p = reinterpret_cast<void*>(tmp);
 }
-IntegralValue::IntegralValue(float&& u): num_bytes(sizeof(u)) {
+IntegralValue::IntegralValue(float&& u) : num_bytes(sizeof(u)) {
   memcpy(tmp, &u, sizeof(float));
   p = reinterpret_cast<void*>(tmp);
 }
@@ -235,15 +233,13 @@ IntegralValue::IntegralValue(const IntegralValue& that) {
   p = that.p;
   memcpy(tmp, that.tmp, sizeof(tmp));
   num_bytes = that.num_bytes;
-  if(that.p == &that.tmp[0])
-    p = &tmp[0];
+  if (that.p == &that.tmp[0]) p = &tmp[0];
 }
 IntegralValue& IntegralValue::operator=(const IntegralValue& that) {
   p = that.p;
   memcpy(tmp, that.tmp, sizeof(tmp));
   num_bytes = that.num_bytes;
-  if(that.p == &that.tmp[0])
-    p = &tmp[0];
+  if (that.p == &that.tmp[0]) p = &tmp[0];
   return *this;
 }
 IntegralValue& IntegralValue::operator=(IntegralValue&& that) {
@@ -251,7 +247,6 @@ IntegralValue& IntegralValue::operator=(IntegralValue&& that) {
   num_bytes = that.num_bytes;
   return *this;
 }
-
 
 IntegralValue::operator uint8_t() const {
   return static_cast<uint8_t>(*reinterpret_cast<uint8_t*>(p));

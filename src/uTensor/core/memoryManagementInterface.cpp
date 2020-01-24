@@ -114,7 +114,7 @@ bool bind(Handle& hndl, AllocatorInterface& allocator) {
   return true;
 }
 bool unbind(Handle& hndl, AllocatorInterface& allocator) {
-  if (!hndl){
+  if (!hndl) {
     return false;
   }
   allocator.unbind(*hndl, &hndl);

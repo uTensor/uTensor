@@ -1,10 +1,11 @@
 #include "context.hpp"
 namespace uTensor {
 
-//AllocatorInterface* Context::_metadata_allocator = nullptr;
-//AllocatorInterface* Context::_ram_data_allocator = nullptr;
+// AllocatorInterface* Context::_metadata_allocator = nullptr;
+// AllocatorInterface* Context::_ram_data_allocator = nullptr;
 //
-Context::Context() : _metadata_allocator(nullptr), _ram_data_allocator(nullptr) {}
+Context::Context()
+    : _metadata_allocator(nullptr), _ram_data_allocator(nullptr) {}
 
 Context* __attribute__((weak)) Context::get_default_context() {
   static Context ctx;
@@ -28,9 +29,6 @@ void Context::set_ram_data_allocator(AllocatorInterface* al) {
 }
 void Context::register_tensor(TensorBase* tb) {}
 
-void Context::throwError(Error* err) {
-    _error_handler.uThrow(err);
-}
+void Context::throwError(Error* err) { _error_handler.uThrow(err); }
 
 }  // namespace uTensor
-

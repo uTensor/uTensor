@@ -8,9 +8,9 @@ struct Error : public Event {};
 
 // Simplest possible error handler, Users can roll their own
 class ErrorHandler {
-    public:
-        virtual void uThrow(Error* err);
-        virtual void uThrow(Event* evt);
+ public:
+  virtual void uThrow(Error* err);
+  virtual void uThrow(Event* evt);
 };
 
 // Default errors
@@ -23,5 +23,5 @@ struct InvalidTensorError : public Error {};
 struct InvalidTensorInputError : public Error {};
 struct InvalidTensorOutputError : public Error {};
 
-};
+};  // namespace uTensor
 #endif
