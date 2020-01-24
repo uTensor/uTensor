@@ -142,7 +142,7 @@ am__uninstall_files_from_dir = { \
 am__installdirs = "$(DESTDIR)$(libdir)" "$(DESTDIR)$(cmakedir)" \
 	"$(DESTDIR)$(pkgconfigdir)"
 LTLIBRARIES = $(lib_LTLIBRARIES)
-libfftw3_la_DEPENDENCIES = kernel/libkernel.la \
+libfftw3f_la_DEPENDENCIES = kernel/libkernel.la \
 	dft/libdft.la dft/scalar/libdft_scalar.la \
 	dft/scalar/codelets/libdft_scalar_codelets.la rdft/librdft.la \
 	rdft/scalar/librdft_scalar.la \
@@ -154,16 +154,16 @@ libfftw3_la_DEPENDENCIES = kernel/libkernel.la \
 	$(NEON_LIBS) $(KCVI_LIBS) $(AVX512_LIBS) \
 	$(GENERIC_SIMD128_LIBS) $(GENERIC_SIMD256_LIBS) \
 	$(COMBINED_THREADLIBS)
-am_libfftw3_la_OBJECTS =
-libfftw3_la_OBJECTS =  \
-	$(am_libfftw3_la_OBJECTS)
+am_libfftw3f_la_OBJECTS =
+libfftw3f_la_OBJECTS =  \
+	$(am_libfftw3f_la_OBJECTS)
 AM_V_lt = $(am__v_lt_$(V))
 am__v_lt_ = $(am__v_lt_$(AM_DEFAULT_VERBOSITY))
 am__v_lt_0 = --silent
 am__v_lt_1 = 
-libfftw3_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC \
+libfftw3f_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC \
 	$(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=link $(CCLD) \
-	$(AM_CFLAGS) $(CFLAGS) $(libfftw3_la_LDFLAGS) \
+	$(AM_CFLAGS) $(CFLAGS) $(libfftw3f_la_LDFLAGS) \
 	$(LDFLAGS) -o $@
 AM_V_P = $(am__v_P_$(V))
 am__v_P_ = $(am__v_P_$(AM_DEFAULT_VERBOSITY))
@@ -196,8 +196,8 @@ AM_V_CCLD = $(am__v_CCLD_$(V))
 am__v_CCLD_ = $(am__v_CCLD_$(AM_DEFAULT_VERBOSITY))
 am__v_CCLD_0 = @echo "  CCLD    " $@;
 am__v_CCLD_1 = 
-SOURCES = $(libfftw3_la_SOURCES)
-DIST_SOURCES = $(libfftw3_la_SOURCES)
+SOURCES = $(libfftw3f_la_SOURCES)
+DIST_SOURCES = $(libfftw3f_la_SOURCES)
 RECURSIVE_TARGETS = all-recursive check-recursive cscopelist-recursive \
 	ctags-recursive dvi-recursive html-recursive info-recursive \
 	install-data-recursive install-dvi-recursive \
@@ -370,8 +370,8 @@ PACKAGE_URL =
 PACKAGE_VERSION = 3.3.8
 PATH_SEPARATOR = :
 POW_LIB = 
-PRECISION = d
-PREC_SUFFIX = 
+PRECISION = s
+PREC_SUFFIX = f
 PTHREAD_CC = 
 PTHREAD_CFLAGS = 
 PTHREAD_LIBS = 
@@ -442,15 +442,15 @@ top_build_prefix =
 top_builddir = .
 top_srcdir = .
 OPTIONS_AUTOMAKE = gnu
-lib_LTLIBRARIES = libfftw3.la
+lib_LTLIBRARIES = libfftw3f.la
 GENFFT = 
 
-# pkgincludedir = $(includedir)/fftw3
+# pkgincludedir = $(includedir)/fftw3f
 # nodist_pkginclude_HEADERS = config.h
 
 # recompile genfft if maintainer mode is true
 #GENFFT = genfft
-#EXTRA_libfftw3_la_DEPENDENCIES = assert-shared-version-info
+#EXTRA_libfftw3f_la_DEPENDENCIES = assert-shared-version-info
 ACLOCAL_AMFLAGS = -I m4
 CHICKEN_EGG = . threads
 
@@ -514,9 +514,9 @@ SIMD_LIBS = simd-support/libsimd_support.la
 #GENERIC_SIMD256_LIBS = dft/simd/generic-simd256/libdft_generic_simd256_codelets.la      \
 #rdft/simd/generic-simd256/librdft_generic_simd256_codelets.la
 
-##COMBINED_THREADLIBS = threads/libfftw3_threads.la
-libfftw3_la_SOURCES = 
-libfftw3_la_LIBADD = \
+##COMBINED_THREADLIBS = threads/libfftw3f_threads.la
+libfftw3f_la_SOURCES = 
+libfftw3f_la_LIBADD = \
 	kernel/libkernel.la				\
 	dft/libdft.la					\
 	dft/scalar/libdft_scalar.la			\
@@ -534,18 +534,18 @@ libfftw3_la_LIBADD = \
         $(GENERIC_SIMD128_LIBS) $(GENERIC_SIMD256_LIBS) \
 	$(COMBINED_THREADLIBS)
 
-libfftw3_la_LDFLAGS = -no-undefined -version-info	\
+libfftw3f_la_LDFLAGS = -no-undefined -version-info	\
 8:8:5  $(ENVIRONMENT_LIBFFTW3_LDFLAGS)
 
 
 # cannot use -no-undefined since dependent on libquadmath
-#libfftw3_la_LDFLAGS = -version-info 8:8:5 $(ENVIRONMENT_LIBFFTW3_LDFLAGS)
+#libfftw3f_la_LDFLAGS = -version-info 8:8:5 $(ENVIRONMENT_LIBFFTW3_LDFLAGS)
 pkgconfigdir = $(libdir)/pkgconfig
-pkgconfig_DATA = fftw3.pc
+pkgconfig_DATA = fftw3f.pc
 cmakedir = $(libdir)/cmake/fftw3
-cmake_DATA = FFTW3Config.cmake FFTW3ConfigVersion.cmake
+cmake_DATA = FFTW3fConfig.cmake FFTW3fConfigVersion.cmake
 WISDOM_DIR = /etc/fftw
-WISDOM = wisdom
+WISDOM = wisdomf
 WISDOM_TIME = 12 # default to 12-hour limit, i.e. overnight
 WISDOM_FLAGS = --verbose --canonical --time-limit=$(WISDOM_TIME)
 all: config.h
@@ -638,8 +638,8 @@ clean-libLTLIBRARIES:
 	  rm -f $${locs}; \
 	}
 
-libfftw3.la: $(libfftw3_la_OBJECTS) $(libfftw3_la_DEPENDENCIES) $(EXTRA_libfftw3_la_DEPENDENCIES) 
-	$(AM_V_CCLD)$(libfftw3_la_LINK) -rpath $(libdir) $(libfftw3_la_OBJECTS) $(libfftw3_la_LIBADD) $(LIBS)
+libfftw3f.la: $(libfftw3f_la_OBJECTS) $(libfftw3f_la_DEPENDENCIES) $(EXTRA_libfftw3f_la_DEPENDENCIES) 
+	$(AM_V_CCLD)$(libfftw3f_la_LINK) -rpath $(libdir) $(libfftw3f_la_OBJECTS) $(libfftw3f_la_LIBADD) $(LIBS)
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
@@ -1128,22 +1128,22 @@ uninstall-am: uninstall-cmakeDATA uninstall-libLTLIBRARIES \
 .PRECIOUS: Makefile
 
 
-fftw3.pc: fftw.pc
-	cp -f fftw.pc fftw3.pc
+fftw3f.pc: fftw.pc
+	cp -f fftw.pc fftw3f.pc
 
-FFTW3Config.cmake: $(top_srcdir)/FFTW3Config.cmake.in
+FFTW3fConfig.cmake: $(top_srcdir)/FFTW3Config.cmake.in
 	$(SED) \
-		-e 's|[@]PREC_SUFFIX@||g' \
+		-e 's|[@]PREC_SUFFIX@|f|g' \
 		-e 's|[@]CMAKE_INSTALL_FULL_LIBDIR@|$(libdir)|g' \
 		-e 's|[@]CMAKE_INSTALL_FULL_INCLUDEDIR@|$(includedir)|g' \
 		$(top_srcdir)/FFTW3Config.cmake.in > $@
-FFTW3ConfigVersion.cmake: $(top_srcdir)/FFTW3ConfigVersion.cmake.in
+FFTW3fConfigVersion.cmake: $(top_srcdir)/FFTW3ConfigVersion.cmake.in
 	$(SED) \
 		-e 's|[@]FFTW_VERSION@|3.3.8|g' \
 		$(top_srcdir)/FFTW3ConfigVersion.cmake.in > $@
 
 wisdom:
-	tools/fftw-wisdom -o $@ $(WISDOM_FLAGS)
+	tools/fftwf-wisdom -o $@ $(WISDOM_FLAGS)
 
 install-wisdom: wisdom
 	$(mkinstalldirs) $(WISDOM_DIR)

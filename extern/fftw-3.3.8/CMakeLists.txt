@@ -17,7 +17,7 @@ option (ENABLE_OPENMP "Use OpenMP for multithreading" OFF)
 option (ENABLE_THREADS "Use pthread for multithreading" OFF)
 option (WITH_COMBINED_THREADS "Merge thread library" OFF)
 
-option (ENABLE_FLOAT "single-precision" OFF)
+option (ENABLE_FLOAT "single-precision" ON)
 option (ENABLE_LONG_DOUBLE "long-double precision" OFF)
 option (ENABLE_QUAD_PRECISION "quadruple-precision" OFF)
 

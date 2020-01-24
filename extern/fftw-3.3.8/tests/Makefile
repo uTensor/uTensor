@@ -115,7 +115,7 @@ am_bench_OBJECTS = bench-bench.$(OBJEXT) bench-hook.$(OBJEXT) \
 bench_OBJECTS = $(am_bench_OBJECTS)
 am__DEPENDENCIES_1 =
 bench_DEPENDENCIES = $(LIBFFTWTHREADS) \
-	$(top_builddir)/libfftw3.la \
+	$(top_builddir)/libfftw3f.la \
 	$(top_builddir)/libbench2/libbench2.a $(am__DEPENDENCIES_1)
 AM_V_lt = $(am__v_lt_$(V))
 am__v_lt_ = $(am__v_lt_$(AM_DEFAULT_VERBOSITY))
@@ -267,8 +267,8 @@ PACKAGE_URL =
 PACKAGE_VERSION = 3.3.8
 PATH_SEPARATOR = :
 POW_LIB = 
-PRECISION = d
-PREC_SUFFIX = 
+PRECISION = s
+PREC_SUFFIX = f
 PTHREAD_CC = 
 PTHREAD_CFLAGS = 
 PTHREAD_LIBS = 
@@ -342,11 +342,11 @@ AM_CPPFLAGS = -I $(top_srcdir)
 EXTRA_DIST = check.pl README
 #bench_CFLAGS = $(OPENMP_CFLAGS)
 #bench_CFLAGS = $(PTHREAD_CFLAGS)
-#LIBFFTWTHREADS = $(top_builddir)/threads/libfftw3_threads.la
-#LIBFFTWTHREADS = $(top_builddir)/threads/libfftw3_omp.la
+#LIBFFTWTHREADS = $(top_builddir)/threads/libfftw3f_threads.la
+#LIBFFTWTHREADS = $(top_builddir)/threads/libfftw3f_omp.la
 bench_SOURCES = bench.c hook.c fftw-bench.c fftw-bench.h
 bench_LDADD = $(LIBFFTWTHREADS)				\
-$(top_builddir)/libfftw3.la		\
+$(top_builddir)/libfftw3f.la		\
 $(top_builddir)/libbench2/libbench2.a $(THREADLIBS)
 
 all: all-am

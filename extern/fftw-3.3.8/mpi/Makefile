@@ -142,8 +142,8 @@ am__uninstall_files_from_dir = { \
 am__installdirs = "$(DESTDIR)$(libdir)" "$(DESTDIR)$(includedir)" \
 	"$(DESTDIR)$(includedir)"
 LTLIBRARIES = $(lib_LTLIBRARIES)
-libfftw3_mpi_la_DEPENDENCIES =  \
-	../libfftw3.la
+libfftw3f_mpi_la_DEPENDENCIES =  \
+	../libfftw3f.la
 am__objects_1 = any-true.lo api.lo block.lo choose-radix.lo conf.lo \
 	dtensor.lo rearrange.lo wisdom-api.lo f03-wrap.lo
 am__objects_2 = transpose-alltoall.lo transpose-pairwise.lo \
@@ -156,27 +156,27 @@ am__objects_4 = rdft-serial.lo rdft-rank-geq2.lo \
 	rdft-problem.lo rdft-solve.lo
 am__objects_5 = rdft2-serial.lo rdft2-rank-geq2.lo \
 	rdft2-rank-geq2-transposed.lo rdft2-problem.lo rdft2-solve.lo
-am_libfftw3_mpi_la_OBJECTS = $(am__objects_1) \
+am_libfftw3f_mpi_la_OBJECTS = $(am__objects_1) \
 	$(am__objects_2) $(am__objects_3) $(am__objects_4) \
 	$(am__objects_5)
-libfftw3_mpi_la_OBJECTS =  \
-	$(am_libfftw3_mpi_la_OBJECTS)
+libfftw3f_mpi_la_OBJECTS =  \
+	$(am_libfftw3f_mpi_la_OBJECTS)
 AM_V_lt = $(am__v_lt_$(V))
 am__v_lt_ = $(am__v_lt_$(AM_DEFAULT_VERBOSITY))
 am__v_lt_0 = --silent
 am__v_lt_1 = 
-libfftw3_mpi_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC \
+libfftw3f_mpi_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC \
 	$(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=link $(CCLD) \
-	$(AM_CFLAGS) $(CFLAGS) $(libfftw3_mpi_la_LDFLAGS) \
+	$(AM_CFLAGS) $(CFLAGS) $(libfftw3f_mpi_la_LDFLAGS) \
 	$(LDFLAGS) -o $@
-#am_libfftw3_mpi_la_rpath = -rpath $(libdir)
+#am_libfftw3f_mpi_la_rpath = -rpath $(libdir)
 PROGRAMS = $(noinst_PROGRAMS)
 am_mpi_bench_OBJECTS = mpi_bench-mpi-bench.$(OBJEXT) \
 	mpi_bench-fftw-bench.$(OBJEXT) mpi_bench-hook.$(OBJEXT)
 mpi_bench_OBJECTS = $(am_mpi_bench_OBJECTS)
 am__DEPENDENCIES_1 =
-mpi_bench_DEPENDENCIES = libfftw3_mpi.la \
-	$(LIBFFTWTHREADS) $(top_builddir)/libfftw3.la \
+mpi_bench_DEPENDENCIES = libfftw3f_mpi.la \
+	$(LIBFFTWTHREADS) $(top_builddir)/libfftw3f.la \
 	$(top_builddir)/libbench2/libbench2.a $(am__DEPENDENCIES_1) \
 	$(am__DEPENDENCIES_1)
 mpi_bench_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
@@ -216,8 +216,8 @@ AM_V_CCLD = $(am__v_CCLD_$(V))
 am__v_CCLD_ = $(am__v_CCLD_$(AM_DEFAULT_VERBOSITY))
 am__v_CCLD_0 = @echo "  CCLD    " $@;
 am__v_CCLD_1 = 
-SOURCES = $(libfftw3_mpi_la_SOURCES) $(mpi_bench_SOURCES)
-DIST_SOURCES = $(libfftw3_mpi_la_SOURCES) \
+SOURCES = $(libfftw3f_mpi_la_SOURCES) $(mpi_bench_SOURCES)
+DIST_SOURCES = $(libfftw3f_mpi_la_SOURCES) \
 	$(mpi_bench_SOURCES)
 am__can_run_installinfo = \
   case $$AM_UPDATE_INFO_DIR in \
@@ -328,8 +328,8 @@ PACKAGE_URL =
 PACKAGE_VERSION = 3.3.8
 PATH_SEPARATOR = :
 POW_LIB = 
-PRECISION = d
-PREC_SUFFIX = 
+PRECISION = s
+PREC_SUFFIX = f
 PTHREAD_CC = 
 PTHREAD_CFLAGS = 
 PTHREAD_LIBS = 
@@ -404,7 +404,7 @@ top_srcdir = ..
 # "fftw3.h", and we cannot change the latter to "api/fftw3.h" because
 # fftw3-mpi.h is installed in /usr/include.
 AM_CPPFLAGS = -I $(top_srcdir) -I $(top_srcdir)/api
-#lib_LTLIBRARIES = libfftw3_mpi.la
+#lib_LTLIBRARIES = libfftw3f_mpi.la
 #include_HEADERS = fftw3-mpi.h
 #nodist_include_HEADERS = fftw3-mpi.f03 fftw3l-mpi.f03
 EXTRA_DIST = testsched.c f03api.sh f03-wrap.sh genf03-wrap.pl fftw3-mpi.f03.in fftw3l-mpi.f03.in
@@ -415,15 +415,15 @@ DFT_SRC = dft-serial.c dft-rank-geq2.c dft-rank-geq2-transposed.c dft-rank1.c df
 RDFT_SRC = rdft-serial.c rdft-rank-geq2.c rdft-rank-geq2-transposed.c rdft-rank1-bigvec.c rdft-problem.c rdft-solve.c mpi-rdft.h
 RDFT2_SRC = rdft2-serial.c rdft2-rank-geq2.c rdft2-rank-geq2-transposed.c rdft2-problem.c rdft2-solve.c mpi-rdft2.h
 SRC = any-true.c api.c block.c choose-radix.c conf.c dtensor.c fftw3-mpi.h ifftw-mpi.h rearrange.c wisdom-api.c f03-wrap.c
-libfftw3_mpi_la_SOURCES = $(SRC) $(TRANSPOSE_SRC) $(DFT_SRC) $(RDFT_SRC) $(RDFT2_SRC)
-libfftw3_mpi_la_LDFLAGS = -version-info 8:8:5
-libfftw3_mpi_la_LIBADD = ../libfftw3.la 
+libfftw3f_mpi_la_SOURCES = $(SRC) $(TRANSPOSE_SRC) $(DFT_SRC) $(RDFT_SRC) $(RDFT2_SRC)
+libfftw3f_mpi_la_LDFLAGS = -version-info 8:8:5
+libfftw3f_mpi_la_LIBADD = ../libfftw3f.la 
 #mpi_bench_CFLAGS = $(OPENMP_CFLAGS)
 #mpi_bench_CFLAGS = $(PTHREAD_CFLAGS)
-#LIBFFTWTHREADS = $(top_builddir)/threads/libfftw3_threads.la
-#LIBFFTWTHREADS = $(top_builddir)/threads/libfftw3_omp.la
+#LIBFFTWTHREADS = $(top_builddir)/threads/libfftw3f_threads.la
+#LIBFFTWTHREADS = $(top_builddir)/threads/libfftw3f_omp.la
 mpi_bench_SOURCES = mpi-bench.c $(top_srcdir)/tests/fftw-bench.c $(top_srcdir)/tests/hook.c
-mpi_bench_LDADD = libfftw3_mpi.la $(LIBFFTWTHREADS) $(top_builddir)/libfftw3.la $(top_builddir)/libbench2/libbench2.a $(MPILIBS) $(THREADLIBS)
+mpi_bench_LDADD = libfftw3f_mpi.la $(LIBFFTWTHREADS) $(top_builddir)/libfftw3f.la $(top_builddir)/libbench2/libbench2.a $(MPILIBS) $(THREADLIBS)
 CHECK = $(top_srcdir)/tests/check.pl
 NUMCHECK = 10
 CHECKSIZE = 10000
@@ -498,8 +498,8 @@ clean-libLTLIBRARIES:
 	  rm -f $${locs}; \
 	}
 
-libfftw3_mpi.la: $(libfftw3_mpi_la_OBJECTS) $(libfftw3_mpi_la_DEPENDENCIES) $(EXTRA_libfftw3_mpi_la_DEPENDENCIES) 
-	$(AM_V_CCLD)$(libfftw3_mpi_la_LINK) $(am_libfftw3_mpi_la_rpath) $(libfftw3_mpi_la_OBJECTS) $(libfftw3_mpi_la_LIBADD) $(LIBS)
+libfftw3f_mpi.la: $(libfftw3f_mpi_la_OBJECTS) $(libfftw3f_mpi_la_DEPENDENCIES) $(EXTRA_libfftw3f_mpi_la_DEPENDENCIES) 
+	$(AM_V_CCLD)$(libfftw3f_mpi_la_LINK) $(am_libfftw3f_mpi_la_rpath) $(libfftw3f_mpi_la_OBJECTS) $(libfftw3f_mpi_la_LIBADD) $(LIBS)
 
 clean-noinstPROGRAMS:
 	@list='$(noinst_PROGRAMS)'; test -n "$$list" || exit 0; \
