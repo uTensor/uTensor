@@ -51,5 +51,15 @@ class OperatorInterface : public OperatorBase {
   protected:
     virtual void compute() = 0;
 };
+
+
+// Just a tag for Tensor access power
+class FastOperator {
+
+  public:
+
+  size_t get_readable_block(const Tensor& t, void* buffer, uint16_t num_elems, int linear_index);
+  size_t get_writeable_block(Tensor& t, void* buffer, uint16_t num_elems, int linear_index);
+};
 }
 #endif

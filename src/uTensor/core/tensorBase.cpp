@@ -55,18 +55,35 @@ IntegralValue TensorInterface::operator()(uint32_t linear_index){
   // Add shape checks here
   return write(linear_index);
 }
-size_t TensorInterface::get_readable_block(void* buffer, uint16_t req_read_size,
+size_t TensorInterface::_get_readable_block(void* buffer, uint16_t req_read_size,
                                            uint32_t linear_index) const {
+  Context::get_default_context()->throwError(new InvalidOptimizableTensorError());
   printf(
       "ERROR, Optimized op attempted to read access non-optimizable tensor\n");
   return -1;
 }
-size_t TensorInterface::get_writeable_block(void* buffer,
+size_t TensorInterface::_get_writeable_block(void* buffer,
                                             uint16_t req_write_size,
                                             uint32_t linear_index) {
+  Context::get_default_context()->throwError(new InvalidOptimizableTensorError());
   printf(
       "ERROR, Optimized op attempted to write access non-optimizable tensor\n");
   return -1;
+}
+size_t TensorInterface::get_readable_block(void* buffer, uint16_t req_read_size,
+                                           uint32_t linear_index) const {
+  if(req_read_size > _type_size*_shape.get_linear_size()){
+    return -1;
+  }
+  return _get_readable_block(buffer, req_read_size, linear_index);
+}
+size_t TensorInterface::get_writeable_block(void* buffer,
+                                            uint16_t req_write_size,
+                                            uint32_t linear_index) {
+  if(req_write_size > _type_size*_shape.get_linear_size()){
+    return -1;
+  }
+  return _get_writeable_block(buffer, req_write_size, linear_index);
 }
 
 }  // namespace uTensor

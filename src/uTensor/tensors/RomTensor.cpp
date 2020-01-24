@@ -12,6 +12,21 @@ void* RomTensor::write(uint32_t linear_index) {
     //return nullptr;
     return BufferTensor::write(linear_index);
 }
+size_t RomTensor::_get_readable_block(void* buffer, uint16_t req_read_size,
+                                           uint32_t linear_index) const {
+  Context::get_default_context()->throwError(new InvalidOptimizableTensorError());
+  printf(
+      "ERROR, Optimized op attempted to read access non-optimizable tensor\n");
+  return -1;
+}
+size_t RomTensor::_get_writeable_block(void* buffer,
+                                            uint16_t req_write_size,
+                                            uint32_t linear_index) {
+  Context::get_default_context()->throwError(new InvalidOptimizableTensorError());
+  printf(
+      "ERROR, Optimized op attempted to write access non-optimizable tensor\n");
+  return -1;
+}
 
 RomTensor::~RomTensor() { }
 void RomTensor::resize(TensorShape new_shape) {

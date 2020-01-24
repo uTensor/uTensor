@@ -2,7 +2,10 @@
 namespace uTensor {
 
 void ErrorHandler::uThrow(Error* err) {
-    while(true) {}
+  while(true) {}
+}
+void ErrorHandler::uThrow(Event* evt) {
+  // Do nothing
 }
 
 } // namespace uTensor

@@ -37,4 +37,13 @@ OperatorBase::~OperatorBase() {
 void OperatorBase::set_name(uTensor::string _name) {
   op_name = _name;
 }
+
+size_t FastOperator::get_readable_block(const Tensor& t, void* buffer, uint16_t num_elems, int linear_index){
+  return t->get_readable_block(buffer, num_elems, linear_index);
 }
+size_t FastOperator::get_writeable_block(Tensor& t, void* buffer, uint16_t num_elems, int linear_index){
+  return t->get_writeable_block(buffer, num_elems, linear_index);
+}
+
+}
+
