@@ -2,6 +2,6 @@
 
 #ifndef __MODELS_QMUL1_H
 #define __MODELS_QMUL1_H
-#include "src/uTensor/core/context.hpp"
+#include "uTensor/core/context.hpp"
 void get_qmul1_ctx(Context& ctx);
 #endif // __MODELS_QMUL1_H

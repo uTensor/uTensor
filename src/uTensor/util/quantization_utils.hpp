@@ -1,7 +1,7 @@
 #ifndef UTENSOR_QUANT_UTILS
 #define UTENSOR_QUANT_UTILS
 
-#include "src/uTensor/core/tensor.hpp"
+#include "uTensor/core/tensor.hpp"
 #include <math.h>
 #include <limits>
 #include <cstdlib>

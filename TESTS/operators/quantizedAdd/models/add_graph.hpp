@@ -2,6 +2,6 @@
 
 #ifndef __MODELS_ADD_GRAPH_H
 #define __MODELS_ADD_GRAPH_H
-#include "src/uTensor/core/context.hpp"
+#include "uTensor/core/context.hpp"
 void get_add_graph_ctx(Context& ctx);
 #endif // __MODELS_ADD_GRAPH_H

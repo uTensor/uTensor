@@ -1,6 +1,6 @@
 #include "test_helper.h"
-#include "src/uTensor/loaders/tensorIdxImporter.hpp"
-#include "src/uTensor/ops/NnOps.hpp"
+#include "uTensor/loaders/tensorIdxImporter.hpp"
+#include "uTensor/ops/NnOps.hpp"
 
 TensorIdxImporter t_import;
 Context ctx;

@@ -1,4 +1,4 @@
-#include "src/uTensor/core/context.hpp"
+#include "uTensor/core/context.hpp"
 
 S_TENSOR Context::add(Tensor* t, TName _name, uint8_t init_count) {
   if(t == nullptr) { ERR_EXIT("null pointer tensor"); }

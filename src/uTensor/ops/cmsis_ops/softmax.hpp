@@ -1,7 +1,7 @@
 #ifndef UTENSOR_CMSIS_SOFTMAX_FUNCTIONS
 #define UTENSOR_CMSIS_SOFTMAX_FUNCTIONS
-#include "src/uTensor/core/tensor.hpp"
-#include "src/uTensor/core/uTensorBase.hpp"
+#include "uTensor/core/tensor.hpp"
+#include "uTensor/core/uTensorBase.hpp"
 #include "arm_math.h"
 #include "arm_nnfunctions.h"
 

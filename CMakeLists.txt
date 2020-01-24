@@ -10,6 +10,7 @@ set( CMAKE_VERBOSE_MAKEFILE on )
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 message(STATUS "PROJECT_DIR: " ${PROJECT_SOURCE_DIR})
 
+include_directories(${PROJECT_SOURCE_DIR}/src/)
 include_directories(${PROJECT_SOURCE_DIR}/src/uTensor/core)
 include_directories(${PROJECT_SOURCE_DIR}/src/uTensor/loaders)
 include_directories(${PROJECT_SOURCE_DIR}/src/uTensor/ops)

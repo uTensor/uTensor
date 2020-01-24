@@ -1,9 +1,9 @@
 #ifndef UTENSOR_NN_OPS
 #define UTENSOR_NN_OPS
 
-#include "src/uTensor/util/quantization_utils.hpp"
-#include "src/uTensor/core/tensor.hpp"
-#include "src/uTensor/core/uTensorBase.hpp"
+#include "uTensor/util/quantization_utils.hpp"
+#include "uTensor/core/tensor.hpp"
+#include "uTensor/core/uTensorBase.hpp"
 #include <math.h>
 #include <algorithm>
 
