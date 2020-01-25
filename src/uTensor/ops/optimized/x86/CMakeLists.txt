@@ -1,5 +1,4 @@
-set(ENABLE_FLOAT ON)
-set(BUILD_TESTS OFF)
+set(ENABLE_FLOAT ON CACHE BOOL "")
 add_subdirectory("${PROJECT_SOURCE_DIR}/extern/fftw-3.3.8" "extern/fftw-3.3.8")
 set(hdr_optimized_ops 
     FFT.hpp
