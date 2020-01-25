@@ -32,4 +32,7 @@ RUN cd /tmp/cmake/cmake-$version.$build/ && make install
 #RUN ln -s /usr/lib/libgtest.a /usr/local/lib/gtest/libgtest.a
 #RUN ln -s /usr/lib/libgtest_main.a /usr/local/lib/gtest/libgtest_main.a
 
-
+RUN apt-get install -y \
+    python \
+    python-pip
+RUN pip install cpp-coveralls
