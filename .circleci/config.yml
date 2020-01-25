@@ -30,7 +30,7 @@ jobs:
             cd build
             lcov -c --directory TESTS --output-file main_coverage.info > /tmp/test_results/coverage_summary.txt
             genhtml main_coverage.info --output-directory /tmp/coverage
-            coveralls -r TESTS --gcov-options '\-lp'
+            coveralls -b TESTS -r TESTS --gcov-options '\-lp'
       - store_test_results:
           path: /tmp/test_results
       - store_artifacts:
