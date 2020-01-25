@@ -9,6 +9,7 @@ RUN apt-get install -y \
     gcc \
     wget \
     lcov \
+    libfftw3-dev \
     g++ 
 
 # Install latest CMAKE
@@ -24,11 +25,11 @@ RUN cd /tmp/cmake/cmake-$version.$build/ && make
 RUN cd /tmp/cmake/cmake-$version.$build/ && make install
 
 # configure GTEST
-RUN cd /usr/src/gtest && cmake CMakeLists.txt
-RUN cd /usr/src/gtest && make
-RUN cp /usr/src/gtest/*.a /usr/lib
-RUN mkdir /usr/local/lib/gtest
-RUN ln -s /usr/lib/libgtest.a /usr/local/lib/gtest/libgtest.a
-RUN ln -s /usr/lib/libgtest_main.a /usr/local/lib/gtest/libgtest_main.a
+#RUN cd /usr/src/gtest && cmake CMakeLists.txt
+#RUN cd /usr/src/gtest && make
+#RUN cp /usr/src/gtest/*.a /usr/lib
+#RUN mkdir /usr/local/lib/gtest
+#RUN ln -s /usr/lib/libgtest.a /usr/local/lib/gtest/libgtest.a
+#RUN ln -s /usr/lib/libgtest_main.a /usr/local/lib/gtest/libgtest_main.a
 
 
