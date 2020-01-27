@@ -23,7 +23,7 @@ class BufferTensor : public TensorInterface {
   // Does nothing
   virtual void resize(TensorShape new_shape) override;
 
- private:
+ protected:
   uint8_t* _buffer;
 };
 }  // namespace uTensor
