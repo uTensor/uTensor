@@ -22,6 +22,30 @@ void* RamTensor::write(uint32_t linear_index) {
   }
   return nullptr;
 }
+
+size_t RamTensor::_get_readable_block(void* buffer, uint16_t req_read_size,
+                                      uint32_t linear_index) const {
+  if (req_read_size + linear_index > _type_size * _shape.get_linear_size()) {
+    Context::get_default_context()->throwError(
+      new InvalidMemAccessError());
+    return -1;
+  }
+  uint8_t* d = reinterpret_cast<uint8_t*>(*_ram_region);
+  buffer = reinterpret_cast<void*>(d + linear_index * _type_size);
+  return req_read_size;
+}
+size_t RamTensor::_get_writeable_block(void* buffer, uint16_t req_write_size,
+                                      uint32_t linear_index) {
+  if (req_write_size + linear_index > _type_size * _shape.get_linear_size()) {
+    Context::get_default_context()->throwError(
+      new InvalidMemAccessError());
+    return -1;
+  }
+  uint8_t* d = reinterpret_cast<uint8_t*>(*_ram_region);
+  buffer = reinterpret_cast<void*>(d + linear_index * _type_size);
+  return req_write_size;
+}
+
 RamTensor::RamTensor(ttype _type) : TensorInterface(_type) {}
 
 RamTensor::RamTensor(TensorShape _shape, ttype _type)
