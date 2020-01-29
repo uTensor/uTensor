@@ -22,7 +22,11 @@
 #include "kernel/ifftw.h"
 
 #if defined(HAVE_MALLOC_H)
-#  include <malloc.h>
+#include <stdlib.h> // malloc, free
+//#  include <malloc.h>
+#ifndef __clang__
+# include <malloc.h>
+#endif
 #endif
 
 /* ``kernel'' malloc(), with proper memory alignment */
