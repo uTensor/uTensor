@@ -51,7 +51,7 @@ class MyModel : public ModelInterface<my_model_num_inputs, my_model_num_outputs>
     AddOperator<uint8_t> add;
 
     // Memory Allocators
-    localCircularArenaAllocator<256> meta_allocator;
+    localCircularArenaAllocator<512> meta_allocator;
     localCircularArenaAllocator<256> ram_allocator;
 
 };
