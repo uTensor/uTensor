@@ -20,7 +20,7 @@ const uint8_t s_out_ref[4] = {19 + 5 + 1, 22 + 6 + 1, 43 + 7 + 1, 50 + 8 + 1};
 const size_t my_model_num_inputs = 1;
 const size_t my_model_num_outputs = 1;
 
-// This example Model allocates all RAM tensors once, and keeps them allocated for the lifetime of the model
+// This example Model allocates all RAM tensors on each eval and deletes them as needed
 // out = a*b + c + d
 class MyModel : public ModelInterface<my_model_num_inputs, my_model_num_outputs> {
   public:
@@ -40,11 +40,6 @@ class MyModel : public ModelInterface<my_model_num_inputs, my_model_num_outputs>
     Tensor c;
     Tensor d;
 
-    // RAM tensors
-    // Can probably come up with some form of a naming scheme around this
-    Tensor mult_1_out;
-    Tensor add_1_out;
-    
     // Operators
     // Note: only need one instance of each since we can set inputs in the compute call
     MatrixMultOperator<uint8_t> mult;
@@ -65,15 +60,19 @@ MyModel::MyModel()
   c = new RomTensor({2,2}, u8, s_c);
   d = new RomTensor({2,2}, u8, s_d);
 
-  // Ram Tensors are temporary values
-  mult_1_out = new RamTensor({2,2}, u8);
-  add_1_out = new RamTensor({2,2}, u8);
 
 }
+
+// The two rom Tensors will be freed after eval is called
 void MyModel::compute() {
   // First update the default context to this model in case multiple models are being run
   Context::get_default_context()->set_metadata_allocator(&meta_allocator);
   Context::get_default_context()->set_ram_data_allocator(&ram_allocator);
+  
+  // Ram Tensors are temporary values
+  // Can probably come up with some form of a naming scheme around this
+  Tensor mult_1_out = new RamTensor({2,2}, u8);
+  Tensor add_1_out = new RamTensor({2,2}, u8);
 
   // First Multiply
   // mult_1_out = input*b;
@@ -88,6 +87,9 @@ void MyModel::compute() {
       .set_inputs({{AddOperator<uint8_t>::a, mult_1_out}, {AddOperator<uint8_t>::b, c}})
       .set_outputs({{AddOperator<uint8_t>::c, add_1_out}})
       .eval();
+  
+  mult_1_out.free();
+
 
   // Second Add
   // output = add_1_out + d
@@ -95,6 +97,7 @@ void MyModel::compute() {
       .set_inputs({{AddOperator<uint8_t>::a, add_1_out}, {AddOperator<uint8_t>::b, d}})
       .set_outputs({{AddOperator<uint8_t>::c, *outputs[output].tensor}})
       .eval();
+  add_1_out.free();
 }
 
 MyModel myModel;

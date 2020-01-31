@@ -29,6 +29,8 @@ class Tensor : public Handle {
   Tensor& operator=(Tensor&& that);
   ~Tensor();
 
+  void free();
+
   // Add some bits to make the interface nicer to the user
   const IntegralValue operator()(uint16_t i, uint16_t j, uint16_t k = 0,
                                  uint16_t l = 0) const;
