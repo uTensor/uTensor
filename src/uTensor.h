@@ -3,6 +3,7 @@
  */
 // This one selects platform specific stuff. probably should come first
 #include "uTensor/core/uTensor_util.hpp"
+#include "uTensor/core/modelBase.hpp"
 
 /*
  * Allocators

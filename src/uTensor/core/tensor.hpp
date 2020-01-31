@@ -21,6 +21,8 @@ class Tensor : public Handle {
   // As long as operating on instantiations of this class and not pointers this
   // function will work
   TensorInterface* operator*();
+
+  Tensor();
   Tensor(TensorInterface* ptr);
   Tensor& operator=(TensorInterface* ptr);
   Tensor(Tensor&& that);
