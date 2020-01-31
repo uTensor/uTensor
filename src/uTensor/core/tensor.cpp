@@ -25,6 +25,7 @@ Tensor::~Tensor() {
     delete reinterpret_cast<TensorInterface*>(_ptr);
   }
 }
+Tensor::Tensor() : Handle() {}
 Tensor::Tensor(TensorInterface* ptr) : Handle((void*)ptr) {
   // Context::get_default_context()->get_metadata_allocator()->bind(_ptr, this);
   bind(*this, *Context::get_default_context()->get_metadata_allocator());

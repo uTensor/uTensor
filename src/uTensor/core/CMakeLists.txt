@@ -8,6 +8,7 @@ set(src_utensor_core
     TensorMap.cpp
     operatorBase.cpp
     errorHandler.cpp
+    modelBase.cpp
    )
 
 set(hdr_utensor_core
@@ -21,6 +22,7 @@ set(hdr_utensor_core
     operatorBase.hpp
     utensor_string.hpp
     errorHandler.hpp
+    modelBase.hpp
    )
     
 add_library(utensor_core ${src_utensor_core} ${hdr_utensor_core})
