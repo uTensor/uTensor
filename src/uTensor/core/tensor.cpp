@@ -15,6 +15,9 @@ TensorInterface* Tensor::operator*() {
   return reinterpret_cast<TensorInterface*>(_ptr);
 }
 Tensor::~Tensor() {
+  free();
+}
+void Tensor::free() {
   if (_ptr) {
     AllocatorInterface* alloc =
         Context::get_default_context()->get_metadata_allocator();
@@ -24,6 +27,7 @@ Tensor::~Tensor() {
 
     delete reinterpret_cast<TensorInterface*>(_ptr);
   }
+  _ptr = nullptr;
 }
 Tensor::Tensor() : Handle() {}
 Tensor::Tensor(TensorInterface* ptr) : Handle((void*)ptr) {
