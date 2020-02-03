@@ -40,3 +40,4 @@ package_add_test_with_libraries(test_convolution operators/test_convolution uten
 package_add_test_with_libraries(test_top_include library/test_top_include utensor library "${PROJECT_DIR}/test-data/")
 
 package_add_test_with_libraries(test_model1 model/test_model1 utensor model "${PROJECT_DIR}/test-data/")
+package_add_test_with_libraries(test_model2 model/test_model2 utensor model "${PROJECT_DIR}/test-data/")
