@@ -2,6 +2,7 @@
 #define UTENSOR_TENSOR_MAP
 
 #include <initializer_list>
+#include <algorithm>
 #include "tensor.hpp"
 #include "utensor_string.hpp"
 
@@ -14,11 +15,14 @@ class TensorMapInterface {
   virtual SimpleNamedTensor& operator[](const uTensor::string& name) = 0;
   virtual const SimpleNamedTensor& operator[](
       const uTensor::string& name) const = 0;
+  virtual SimpleNamedTensor& operator[](uint8_t i) = 0;
+  virtual const SimpleNamedTensor& operator[](uint8_t i) const = 0;
 
  public:
   static SimpleNamedTensor not_found;
 };
 
+bool compare_named_tensors(const SimpleNamedTensor& a, const SimpleNamedTensor& b);
 template <size_t size>
 class FixedTensorMap : public TensorMapInterface {
  public:
@@ -33,18 +37,25 @@ class FixedTensorMap : public TensorMapInterface {
       _map[i] = *thing;
       i++;
     }
+    std::sort(std::begin(_map), std::end(_map), compare_named_tensors);
   }
   FixedTensorMap() {
     //_map = {not_found};
   }
   virtual ~FixedTensorMap() {}
-  SimpleNamedTensor& operator[](const uTensor::string& name) {
+  SimpleNamedTensor& operator[](uint8_t i) override {
+    return _map[i];
+  }
+  virtual const SimpleNamedTensor& operator[](uint8_t i) const override {
+    return _map[i];
+  }
+  virtual SimpleNamedTensor& operator[](const uTensor::string& name) override {
     for (int i = 0; i < size; i++) {
       if (name == *(_map[i].name)) return _map[i];
     }
     return TensorMapInterface::not_found;
   }
-  const SimpleNamedTensor& operator[](const uTensor::string& name) const {
+  virtual const SimpleNamedTensor& operator[](const uTensor::string& name) const override {
     for (int i = 0; i < size; i++) {
       if (name == *(_map[i].name)) return _map[i];
     }
