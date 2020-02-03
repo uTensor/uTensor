@@ -21,7 +21,8 @@ void convolution_kernel() {}
 template <typename Tin, typename Tout>
 class FixedMfccOperator : public OperatorInterface<1, 1> {
  public:
-  enum names : uint8_t { out, in };
+  enum names_in : uint8_t { in };
+  enum names_out : uint8_t { out };
   FixedMfccOperator(int frame_len, int num_mfcc_features, int mfcc_dec_bits);
 
   ~FixedMfccOperator();
