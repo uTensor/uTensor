@@ -24,7 +24,8 @@ const size_t my_model_num_outputs = 1;
 // out = a*b + c + d
 class MyModel : public ModelInterface<my_model_num_inputs, my_model_num_outputs> {
   public:
-    enum names: uint8_t {input, output};
+    enum names_in: uint8_t {input};
+    enum names_out: uint8_t {output};
     MyModel();
 
     //Inherits public interface

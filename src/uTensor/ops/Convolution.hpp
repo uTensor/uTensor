@@ -100,7 +100,8 @@ void convolution_kernel(Tensor& out, const Tensor& in, const Tensor& filter, con
 template<typename T>
 class ConvOperator : public OperatorInterface<2, 1> {
 public:
-    enum names: uint8_t {out, in, filter};
+    enum names_in: uint8_t {in, filter};
+    enum names_out: uint8_t {out};
     ConvOperator(std::initializer_list<uint16_t> strides, Padding padding) : _padding(padding) {
       int i = 0;
       for(auto s : strides){
