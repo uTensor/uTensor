@@ -1,16 +1,15 @@
 cmake_minimum_required(VERSION 3.10)
 
-project(utensor)
+project(utensor VERSION 1.0.0 LANGUAGES CXX)
 
 set( CMAKE_VERBOSE_MAKEFILE on )
 set(CMAKE_CXX_STANDARD 11)
 # TODO be smarter about code coverage bits
 # https://github.com/codecov/example-cpp11-cmake
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -fno-rtti")
-option(ENABLE_COVERAGE "Enable code coverage" ON)
+option(ENABLE_COVERAGE "Enable code coverage" OFF)
 if(ENABLE_COVERAGE)
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fprofile-arcs -ftest-coverage -ggdb -fPIC")
-
 endif()
 
 ### Require out-of-source builds
