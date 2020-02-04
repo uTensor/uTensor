@@ -7,6 +7,14 @@
 
 // #define MAX(A, B) ((A > B)? A:B)
 
+#define ENABLE_PRINTING 1
+
+#ifdef ENABLE_PRINTING
+#define uTensor_printf(...) printf(__VA_ARGS__)
+#else
+#define uTensor_printf(...) /*DUMMY*/
+#endif
+
 void return_error(int ret_val);
 #if MBED_CONF_APP_DEBUG_MSG
 
