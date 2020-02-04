@@ -20,10 +20,11 @@ endif()
 
 add_subdirectory(src)
 # Testing only available if this is the main app # Emergency override MODERN_CMAKE_BUILD_TESTING provided as well i
+option(PACKAGE_TESTS "Build the tests" OFF)
 #if((CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME OR MODERN_CMAKE_BUILD_TESTING) AND BUILD_TESTING)
-#  add_subdirectory(TESTS) 
+#  #add_subdirectory(TESTS) 
+#  set(PACKAGE_TESTS ON)
 #endif() 
-option(PACKAGE_TESTS "Build the tests" ON)
 if(PACKAGE_TESTS)
     enable_testing()
     include(GoogleTest)
