@@ -25,7 +25,6 @@ set(hdr_utensor_core
     modelBase.hpp
    )
     
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -fno-rtti")
 add_library(utensor_core ${src_utensor_core} )
 target_include_directories(utensor_core PUBLIC .)
 target_compile_features(utensor_core PUBLIC cxx_std_11)
