@@ -188,9 +188,6 @@ class localCircularArenaAllocator : public AllocatorInterface {
 
  public:
   localCircularArenaAllocator() : capacity(size) {
-    printf("Sizeof Pointer = %d\n", sizeof(cursor));
-    printf("Sizeof Handle = %d\n", sizeof(Handle));
-    printf("MetaHeader Size = %d\n", sizeof(MetaHeader));
     memset(_buffer, 0, size);
     cursor = begin();
   }
