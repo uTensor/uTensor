@@ -32,8 +32,12 @@ add_definitions( -DX86_PROJECT=1 )
 endif()
 #add_subdirectory(ops/optimized)
 
-add_library(utensor ${src_utensor_alloc} ${hdr_utensor_alloc} ${src_utensor_tensors} ${hdr_utensor_tensors} ${src_utensor_ops} ${hdr_utensor_ops} contexts/default_context.cpp)
+add_library(utensor  ${src_utensor_alloc} ${src_utensor_tensors} ${src_utensor_ops} contexts/default_context.cpp)
 #target_link_libraries(utensor utensor_core optimized_ops)
-target_link_libraries(utensor utensor_core )
-target_include_directories(utensor PUBLIC allocators core tensors ops)
+target_link_libraries(utensor PUBLIC utensor_core )
+target_include_directories(utensor PUBLIC allocators tensors ops)
+#target_include_directories(utensor PUBLIC 
+#  $<BUILD_INTERFACE: allocators tensors ops>
+#  $<INSTALL_INTERFACE: ${CMAKE_CURRENT_SOURCE_DIR}/allocators ${CMAKE_CURRENT_SOURCE_DIR}/tensors ${CMAKE_CURRENT_SOURCE_DIR}/ops>
+#  )
 target_compile_features(utensor PUBLIC cxx_std_11)
