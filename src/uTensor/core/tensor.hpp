@@ -49,6 +49,9 @@ class Tensor : public Handle {
   friend class AllocatorInterface;
 };
 
+// Convenience
+void print(const Tensor& t);
+
 class TensorReference : public HandleReference {
  public:
   TensorInterface* operator*();
