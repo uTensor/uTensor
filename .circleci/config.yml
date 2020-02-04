@@ -21,7 +21,7 @@ jobs:
           name: "Build and test"
           command: |
             mkdir build && cd build
-            cmake ..
+            cmake -DENABLE_COVERAGE=ON ..
             make -j
             ctest -VV -o /tmp/test_results/test-results.txt
       - run:
