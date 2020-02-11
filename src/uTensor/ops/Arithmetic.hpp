@@ -15,7 +15,7 @@ void add_kernel(Tensor& c, const Tensor& a, const Tensor& b){
 
 
     for (uint32_t i = 0; i < c_size; i++)
-       c(i) = static_cast<T>(a(i)) + static_cast<T>(b(i));
+       c(i) = static_cast<T>(static_cast<T>(a(i)) + static_cast<T>(b(i)));
 }
 
 template<typename T>
