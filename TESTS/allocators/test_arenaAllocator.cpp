@@ -16,7 +16,7 @@ TEST(ArenaAllocator, single_alloc) {
 
   localCircularArenaAllocator<256> _allocator;
   void* ptr = _allocator.allocate(40);
-  EXPECT_GE(_allocator.available(), 240 - 40 - 16);
+  EXPECT_LT(_allocator.available(), 240 - 40);
   EXPECT_EQ(_allocator.contains(ptr), true);
 
 }
