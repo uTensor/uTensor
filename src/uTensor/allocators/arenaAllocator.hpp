@@ -3,6 +3,7 @@
 #include <cstdio>
 #include <forward_list>
 #include <vector>
+#include <algorithm> // for sort function
 #include <memory>
 #include "memoryManagementInterface.hpp"
 #include "tensor.hpp"
@@ -163,7 +164,8 @@ class localCircularArenaAllocator : public AllocatorInterface {
        size_t space_change = hdr.get_len();
        aligned_loc = std::align(alignof(uint8_t*), sz, aligned_loc, space_change);
        hdr.set_active();
-       hdr.set_len(sz + hdr.get_len() - space_change);
+       //hdr.set_len(sz + hdr.get_len() - space_change);
+       hdr.set_len(sz);
        hdr.set_hndl(nullptr);
        hdr.set_d((uint8_t*)aligned_loc);
        loc = (uint8_t*)aligned_loc;
@@ -184,18 +186,20 @@ class localCircularArenaAllocator : public AllocatorInterface {
     size_t space_change = available();
     aligned_loc = std::align(alignof(uint8_t*), sz, aligned_loc, space_change);
     hdr.set_active();
-    hdr.set_len(sz + available() - space_change);
+    //hdr.set_len(sz + available() - space_change);
+    hdr.set_len(sz);
     hdr.set_hndl(nullptr);
     hdr.set_d((uint8_t*)aligned_loc);
     _headers.push_back(hdr);
     loc = (uint8_t*)aligned_loc;
-    cursor += hdr.get_len();
+    cursor += hdr.get_len() + available() - space_change;
 
     // Update capacity
     capacity -= hdr.get_len();
 
     return (void*)loc;
   }
+
   virtual void _deallocate(void* ptr) {
     if (ptr) {
       MetaHeader& hdr = _read_header(ptr);
@@ -205,6 +209,7 @@ class localCircularArenaAllocator : public AllocatorInterface {
       }
       hdr.set_hndl(nullptr);  // cleanup
       capacity += hdr.get_len();
+      // Do not update the size of the header
     }
   }
 
@@ -230,7 +235,59 @@ class localCircularArenaAllocator : public AllocatorInterface {
   //TODO ABOVE
   //TODO ABOVE
   virtual bool rebalance() {
+    // Clear all unbound entries
     for(auto hdr_i = _headers.rbegin(); hdr_i != _headers.rend(); hdr_i++){
+      if(!hdr_i->is_bound()){
+        hdr_i->set_inactive();  
+      }
+    }
+    // Sort by activity (shifts unbound entries to the end)
+    std::sort(_headers.begin(), _headers.end(), [](const MetaHeader& a, const MetaHeader& b) {
+      return a.is_active() > b.is_active();
+    });
+
+    int pop_count = 0;
+    for(auto hdr_i = _headers.rbegin(); hdr_i != _headers.rend(); hdr_i++){
+      if(hdr_i->is_active()) {
+        break;
+      }
+        capacity += hdr_i->get_len();
+        pop_count++;
+    }
+    // Remove all unbound
+    // Makes the allocator have a cold start
+    for(int i = 0; i < pop_count; i++){
+      _headers.pop_back();
+    }
+
+    
+    // Headers now only has the bound regions
+    // Sort by region
+    std::sort(_headers.begin(), _headers.end(), [](const MetaHeader& a, const MetaHeader& b) {
+      return a._d < b._d;
+    });
+
+    uint8_t tmp;
+    cursor = begin();
+    void* aligned_loc;
+    size_t space_change;
+
+    for(auto hdr_i = _headers.begin(); hdr_i != _headers.end(); hdr_i++){
+      aligned_loc = (void*) cursor;
+      size_t space_change = available();
+      aligned_loc = std::align(alignof(uint8_t*), hdr_i->get_len(), aligned_loc, space_change);
+
+      // Shift the data
+      for(int i = 0; i < hdr_i->get_len(); i++){
+        tmp = hdr_i->_d[i];
+        reinterpret_cast<uint8_t*>(aligned_loc)[i] = tmp;
+      }
+
+      // Update header
+      //hdr_i->set_len(sz + available() - space_change);
+      hdr_i->set_d((uint8_t*)aligned_loc);
+      update_hndl(hdr_i->hndl, hdr_i->_d);
+      cursor += hdr_i->get_len() + available() - space_change;
     }
 
   }
