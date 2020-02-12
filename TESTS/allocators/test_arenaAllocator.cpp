@@ -16,7 +16,7 @@ TEST(ArenaAllocator, single_alloc) {
 
   localCircularArenaAllocator<256> _allocator;
   void* ptr = _allocator.allocate(40);
-  EXPECT_LT(_allocator.available(), 240 - 40);
+  EXPECT_EQ(_allocator.available(), 256 - 40);
   EXPECT_EQ(_allocator.contains(ptr), true);
 
 }
@@ -113,7 +113,7 @@ TEST(ArenaAllocator, circle_back) {
  */
 TEST(ArenaAllocator, circle_back_with_handle) {
   localCircularArenaAllocator<256> _allocator;
-  void* ptr1 = _allocator.allocate(100);
+  void* ptr1 = _allocator.allocate(96);
   for(int i = 0 ; i < 100; i++){
     reinterpret_cast<uint8_t*>(ptr1)[i] = 0x01;
   }
@@ -131,6 +131,7 @@ TEST(ArenaAllocator, circle_back_with_handle) {
     reinterpret_cast<uint8_t*>(ptr3)[i] = 0x03;
   }
   cout << "Avaliable " << _allocator.available() << endl;
+  // We moved ptr2 in the allocator rebalance, it should be gone
   EXPECT_EQ(_allocator.contains(ptr2), false);
   EXPECT_EQ(_allocator.contains(*hndl2), true);
   EXPECT_EQ(_allocator.contains(ptr3), true);
