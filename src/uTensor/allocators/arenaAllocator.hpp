@@ -2,6 +2,7 @@
 #define UTENSOR_ARENA_ALLOCATOR_HPP
 #include <cstdio>
 #include <forward_list>
+#include <memory>
 #include "memoryManagementInterface.hpp"
 #include "tensor.hpp"
 
@@ -161,11 +162,15 @@ class localCircularArenaAllocator : public AllocatorInterface {
       // appended fragment header
       _clear_forward(sz);
     }
+    // Handle alignment
+    void* aligned_loc = (void*) cursor;
+    size_t space_change = available();
+    aligned_loc = std::align(alignof(uint8_t*), sz, aligned_loc, space_change);
     hdr.set_active();
-    hdr.set_len(sz);
+    hdr.set_len(sz + available() - space_change);
     hdr.set_hndl(nullptr);
-    _write_header(hdr, (void*)cursor);
-    loc = cursor;
+    _write_header(hdr, (void*)aligned_loc);
+    loc = (uint8_t*)aligned_loc;
     // Cursor can corner case end up past the buffer region
     if ((cursor + hdr.get_len() + sizeof(MetaHeader)) > end()) {
       cursor = begin();
@@ -196,6 +201,17 @@ class localCircularArenaAllocator : public AllocatorInterface {
    * the buffer and inserts an inactive region at the start. note: cursor gets
    * moved to begin() note: unbound regions get wiped
    */
+  //TODO Check to make sure updated locations are still aligned
+  //TODO ABOVE
+  //TODO ABOVE
+  //TODO ABOVE
+  //TODO ABOVE
+  //TODO ABOVE
+  //TODO ABOVE
+  //TODO ABOVE
+  //TODO ABOVE
+  //TODO ABOVE
+  //TODO ABOVE
   virtual bool rebalance() {
     // TODO WARNING rebalancing Allocator
     // Shift each chunk towards the end of the buffer
