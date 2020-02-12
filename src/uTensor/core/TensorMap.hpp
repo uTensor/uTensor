@@ -15,8 +15,10 @@ class TensorMapInterface {
   virtual SimpleNamedTensor& operator[](const uTensor::string& name) = 0;
   virtual const SimpleNamedTensor& operator[](
       const uTensor::string& name) const = 0;
+  /*
   virtual SimpleNamedTensor& operator[](uint8_t i) = 0;
   virtual const SimpleNamedTensor& operator[](uint8_t i) const = 0;
+  */
 
  public:
   static SimpleNamedTensor not_found;
@@ -43,12 +45,14 @@ class FixedTensorMap : public TensorMapInterface {
     //_map = {not_found};
   }
   virtual ~FixedTensorMap() {}
+  /*
   SimpleNamedTensor& operator[](uint8_t i) override {
     return _map[i];
   }
   virtual const SimpleNamedTensor& operator[](uint8_t i) const override {
     return _map[i];
   }
+  */
   virtual SimpleNamedTensor& operator[](const uTensor::string& name) override {
     for (int i = 0; i < size; i++) {
       if (name == *(_map[i].name)) return _map[i];
