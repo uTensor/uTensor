@@ -1,6 +1,7 @@
 #include "tensorBase.hpp"
 #include "context.hpp"
 #include "memoryManagementInterface.hpp"
+#include "uTensor_util.hpp"
 
 namespace uTensor {
 TensorBase::TensorBase() {
@@ -61,7 +62,7 @@ size_t TensorInterface::_get_readable_block(void* buffer,
                                             uint32_t linear_index) const {
   Context::get_default_context()->throwError(
       new InvalidOptimizableTensorError());
-  printf(
+  uTensor_printf(
       "ERROR, Optimized op attempted to read access non-optimizable tensor\n");
   return -1;
 }
@@ -70,7 +71,7 @@ size_t TensorInterface::_get_writeable_block(void* buffer,
                                              uint32_t linear_index) {
   Context::get_default_context()->throwError(
       new InvalidOptimizableTensorError());
-  printf(
+  uTensor_printf(
       "ERROR, Optimized op attempted to write access non-optimizable tensor\n");
   return -1;
 }
