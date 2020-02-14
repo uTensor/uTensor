@@ -74,6 +74,7 @@ class localCircularArenaAllocator : public AllocatorInterface {
   }
   // This is just for reference
   MetaHeader& _read_header(void* ptr) {
+    static MetaHeader not_found;
     // First check if ptr in bounds
     if (ptr < _buffer || ptr > (_buffer + size)) {
       // ERROR
@@ -83,6 +84,7 @@ class localCircularArenaAllocator : public AllocatorInterface {
         return *hdr_i;
     }
     // ERROR
+    return not_found;
   }
 
   uint8_t* begin() {
@@ -289,7 +291,7 @@ class localCircularArenaAllocator : public AllocatorInterface {
       update_hndl(hdr_i->hndl, hdr_i->_d);
       cursor += hdr_i->get_len() + available() - space_change;
     }
-
+    return true;
   }
 
   virtual size_t available() { return capacity; }
