@@ -5,6 +5,7 @@
 #include <algorithm>
 #include "tensor.hpp"
 #include "utensor_string.hpp"
+#include "uTensor_util.hpp"
 
 using std::initializer_list;
 
@@ -32,7 +33,7 @@ class FixedTensorMap : public TensorMapInterface {
   FixedTensorMap(initializer_list<SimpleNamedTensor> l) {
     if (size != l.size()) {
       // TODO THROW ERROR
-      printf("Element number mismatch in TensorMap construction\n");
+      uTensor_printf("Element number mismatch in TensorMap construction\n");
     }
     int i = 0;
     for (auto thing = l.begin(); thing != l.end(); thing++) {
