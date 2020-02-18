@@ -313,6 +313,7 @@ class localCircularArenaAllocator : public AllocatorInterface {
       if(hdr_i->_d == p)
         return hdr_i->is_used();
     }
+    return false;
     //MetaHeader hdr = _read_header(p);
     //return hdr.is_used();
   }
