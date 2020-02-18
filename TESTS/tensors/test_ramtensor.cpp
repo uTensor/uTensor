@@ -40,8 +40,8 @@ TEST(RAM_Tensor, read_write_u8) {
 
 TEST(RAM_Tensor, read_write_u8_multi_tensor) {
   ///setup_context();
-  localCircularArenaAllocator<256> meta_allocator;
-  localCircularArenaAllocator<256> ram_allocator;
+  localCircularArenaAllocator<512> meta_allocator;
+  localCircularArenaAllocator<512> ram_allocator;
   Context::get_default_context()->set_metadata_allocator(&meta_allocator);
   Context::get_default_context()->set_ram_data_allocator(&ram_allocator);
   RamTensor r1({10, 10}, u8);

@@ -9,11 +9,8 @@ namespace uTensor {
 // Tensors also appear on the same heap as the Tensor metadata. This way we can
 // move tensors around and delete them without affecting user code
 // template <typename Allocator=utensor::DefaultTensorMetaDataAllocator>
-class Tensor : public Handle {
-  // private:
-  //    // Cannot copy Tensors, must pass by reference
-  //    Tensor(const Tensor& that);
-  // enum Type : uint8_t { TENSOR_IFC_PTR, TENSOR_HANDLE_PTR } type;
+//
+class alignas(alignof(uint8_t*)) Tensor : public Handle {
 
  public:
   TensorInterface* operator->();

@@ -1,5 +1,6 @@
 #include "RamTensor.hpp"
 #include "context.hpp"
+#include "uTensor_util.hpp"
 
 namespace uTensor {
 
@@ -65,7 +66,7 @@ RamTensor::~RamTensor() {
 }
 
 void RamTensor::resize(TensorShape new_shape) {
-  printf("Warning, RAM Tensor resize not implemented\n");
+  uTensor_printf("Warning, RAM Tensor resize not implemented\n");
 }
 
 FutureMaxSizeRamTensor::FutureMaxSizeRamTensor(ttype _type)
@@ -82,7 +83,7 @@ void FutureMaxSizeRamTensor::resize(TensorShape new_shape) {
     return;
   }
   if (calc_required_space(new_shape, _type_size) >= max_initial_size) {
-    printf("[ERROR] Resize of FutureTensor can only shrink\n");
+    uTensor_printf("[ERROR] Resize of FutureTensor can only shrink\n");
     Context::get_default_context()->get_default_context()->throwError(
         new InvalidResizeError());
     return;
