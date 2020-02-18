@@ -76,6 +76,28 @@ TEST(ArenaAllocator, two_alloc_access) {
 
 }
 
+// Less of a test, more of a code coverage forcing hand
+TEST(ArenaAllocator, alloc_reuse) {
+
+  localCircularArenaAllocator<256> _allocator;
+  void* ptr1 = _allocator.allocate(40);
+  uint8_t* data1 = reinterpret_cast<uint8_t*>(ptr1);
+  for(int i = 0; i < 40; i++){
+    data1[i] = i;
+  }
+  _allocator.deallocate(ptr1);
+
+  void* ptr2 = _allocator.allocate(40);
+  uint8_t* data2 = reinterpret_cast<uint8_t*>(ptr2);
+  for(int i = 0; i < 40; i++){
+    data2[i] = 255-i;
+  }
+  for(int i = 0; i < 40; i++){
+    EXPECT_EQ(data2[i], 255-i);
+  }
+
+}
+
 /**
  * Unbound pointers are not guaranteed to be valid if we overflow for whatever reason
  */

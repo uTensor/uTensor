@@ -158,8 +158,9 @@ class localCircularArenaAllocator : public AllocatorInterface {
     }
 
     // First check to see if we have space in a previously allocated area
+    // TODO: if this region is smaller split it and add another header to the table
     for(auto hdr_i = _headers.begin(); hdr_i != _headers.end(); hdr_i++){
-     if(!hdr_i->is_active() && hdr_i->get_len() > sz){
+     if(!hdr_i->is_active() && hdr_i->get_len() >= sz){
        MetaHeader& hdr = *hdr_i;
        // Handle alignment
        void* aligned_loc = (void*) hdr._d;
