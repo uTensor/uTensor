@@ -24,7 +24,7 @@ class string {
     value = hash(that);
     cstr = that;
   }
-  string() { value = hash(""); }
+  string() { value = 0; }
   string(uint32_t val) : value(val), cstr(NULL) {}
   // bool operator < (const string& that){ return this->value < that.value; }
   // bool operator == (const string& that){ return this->value == that.value; }

@@ -82,7 +82,7 @@ TEST(Convolution, random_inputs_1_stride_1) {
 
 TEST(Convolution, random_inputs_2_stride_1) {
   localCircularArenaAllocator<1024> meta_allocator;
-  localCircularArenaAllocator<25088*2*sizeof(float)> ram_allocator;
+  localCircularArenaAllocator<25088*2*sizeof(float), uint32_t> ram_allocator;
   Context::get_default_context()->set_metadata_allocator(&meta_allocator);
   Context::get_default_context()->set_ram_data_allocator(&ram_allocator);
 
@@ -111,7 +111,7 @@ TEST(Convolution, random_inputs_2_stride_1) {
 
 TEST(Convolution, random_inputs_3_stride_1) {
   localCircularArenaAllocator<1024> meta_allocator;
-  localCircularArenaAllocator<25088*2*sizeof(float)> ram_allocator;
+  localCircularArenaAllocator<25088*2*sizeof(float), uint32_t> ram_allocator;
   Context::get_default_context()->set_metadata_allocator(&meta_allocator);
   Context::get_default_context()->set_ram_data_allocator(&ram_allocator);
 

@@ -5,6 +5,7 @@
 #include <algorithm>
 #include "tensor.hpp"
 #include "utensor_string.hpp"
+#include "uTensor_util.hpp"
 
 using std::initializer_list;
 
@@ -15,8 +16,10 @@ class TensorMapInterface {
   virtual SimpleNamedTensor& operator[](const uTensor::string& name) = 0;
   virtual const SimpleNamedTensor& operator[](
       const uTensor::string& name) const = 0;
+  /*
   virtual SimpleNamedTensor& operator[](uint8_t i) = 0;
   virtual const SimpleNamedTensor& operator[](uint8_t i) const = 0;
+  */
 
  public:
   static SimpleNamedTensor not_found;
@@ -30,7 +33,7 @@ class FixedTensorMap : public TensorMapInterface {
   FixedTensorMap(initializer_list<SimpleNamedTensor> l) {
     if (size != l.size()) {
       // TODO THROW ERROR
-      printf("Element number mismatch in TensorMap construction\n");
+      uTensor_printf("Element number mismatch in TensorMap construction\n");
     }
     int i = 0;
     for (auto thing = l.begin(); thing != l.end(); thing++) {
@@ -43,12 +46,14 @@ class FixedTensorMap : public TensorMapInterface {
     //_map = {not_found};
   }
   virtual ~FixedTensorMap() {}
+  /*
   SimpleNamedTensor& operator[](uint8_t i) override {
     return _map[i];
   }
   virtual const SimpleNamedTensor& operator[](uint8_t i) const override {
     return _map[i];
   }
+  */
   virtual SimpleNamedTensor& operator[](const uTensor::string& name) override {
     for (int i = 0; i < size; i++) {
       if (name == *(_map[i].name)) return _map[i];
