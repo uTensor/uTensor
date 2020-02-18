@@ -102,6 +102,20 @@ TensorInterface* TensorReference::operator*() {
   return reinterpret_cast<TensorInterface*>(_ref->operator*());
 }
 
+// Add a couple of bits for GDB debugging since GDB doesnt support operator()
+IntegralValue Tensor::gdb_read(uint16_t i)  {
+  return reinterpret_cast<TensorInterface*>(_ptr)->operator()(i);
+}
+IntegralValue Tensor::gdb_read(uint16_t i, uint16_t j)  {
+  return reinterpret_cast<TensorInterface*>(_ptr)->operator()(i, j);
+}
+IntegralValue Tensor::gdb_read(uint16_t i, uint16_t j, uint16_t k)  {
+  return reinterpret_cast<TensorInterface*>(_ptr)->operator()(i, j, k);
+}
+IntegralValue Tensor::gdb_read(uint16_t i, uint16_t j, uint16_t k, uint16_t l)  {
+  return reinterpret_cast<TensorInterface*>(_ptr)->operator()(i, j, k, l);
+}
+
 void print(const Tensor& t) {
   const TensorShape& t_shape = t->get_shape();
   if(t_shape.num_dims() > 2){

@@ -47,6 +47,12 @@ class Tensor : public Handle {
 
   // KEY BIT
   friend class AllocatorInterface;
+
+  // Add a couple of bits for GDB debugging since GDB doesnt support operator()
+  IntegralValue gdb_read(uint16_t i) ;
+  IntegralValue gdb_read(uint16_t i, uint16_t j) ;
+  IntegralValue gdb_read(uint16_t i, uint16_t j, uint16_t k) ;
+  IntegralValue gdb_read(uint16_t i, uint16_t j, uint16_t k, uint16_t l) ;
 };
 
 // Convenience
