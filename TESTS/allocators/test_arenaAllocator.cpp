@@ -2,6 +2,8 @@
 #include "arenaAllocator.hpp"
 #include "SimpleErrorHandler.hpp"
 #include <iostream>
+#include <algorithm>
+
 using std::cout;
 using std::endl;
 
@@ -14,7 +16,7 @@ TEST(ArenaAllocator, constructor) {
   int d = 1;
 
   EXPECT_GE(_allocator.available(), 240); // F u 64Bit machine self alignment
-  //EXPECT_EQ(*errH.begin(), localCircularArenaAllocatorConstructed());
+  EXPECT_EQ(*errH.begin(), localCircularArenaAllocatorConstructed());
 
 }
 
@@ -108,7 +110,10 @@ TEST(ArenaAllocator, alloc_reuse) {
  * Unbound pointers are not guaranteed to be valid if we overflow for whatever reason
  */
 TEST(ArenaAllocator, circle_back) {
+  SimpleErrorHandler errH(50);
+  Context::get_default_context()->set_ErrorHandler(&errH);
   localCircularArenaAllocator<256> _allocator;
+
   void* ptr1 = _allocator.allocate(100);
   for(int i = 0 ; i < 100; i++){
     reinterpret_cast<uint8_t*>(ptr1)[i] = 0x01;
@@ -134,6 +139,9 @@ TEST(ArenaAllocator, circle_back) {
   for(int i = 0 ; i < 117; i++){
     EXPECT_EQ(reinterpret_cast<uint8_t*>(ptr3)[i], 0x03);
   }
+
+  // Check to make sure a rebalance has occurred
+  bool has_rebalanced = std::find(errH.begin(), errH.end(), localCircularArenaAllocatorRebalancing()) != errH.end();
 }
 
 /**
