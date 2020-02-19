@@ -3,6 +3,7 @@ add_subdirectory(core)
 option(X86_PROJECT "Build for x86" ON)
 
 set(src_utensor_alloc
+    allocators/arenaAllocator.cpp
    )
 
 set(hdr_utensor_alloc
@@ -20,6 +21,7 @@ set(hdr_utensor_tensors
   tensors/RomTensor.hpp
    )
 set(src_utensor_ops
+    ops/Matrix.cpp
    )
 set(hdr_utensor_ops
     ops/Arithmetic.hpp

@@ -6,7 +6,7 @@
 
 namespace uTensor {
 
-struct MemoryAllocatorUnsetError : public Error {};
+DECLARE_ERROR(MemoryAllocatorUnsetError);
 
 class Context {
  private:

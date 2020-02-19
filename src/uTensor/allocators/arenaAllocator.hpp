@@ -21,10 +21,10 @@ namespace uTensor {
 /** EVENT LIST
  */
 
-struct MetaHeaderNotFound : public Event {};
-struct localCircularArenaAllocatorRebalancing : public Event {};
-struct localCircularArenaAllocatorConstructed : public Event {};
-struct InvalidBoundRegionState : public Error {};
+DECLARE_EVENT(MetaHeaderNotFound);
+DECLARE_EVENT(localCircularArenaAllocatorRebalancing);
+DECLARE_EVENT(localCircularArenaAllocatorConstructed);
+DECLARE_ERROR(InvalidBoundRegionState);
 
 /**
  * Size allocated must be less than 2**15
