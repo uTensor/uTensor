@@ -21,6 +21,8 @@ TEST(ArenaAllocator, constructor) {
 }
 
 TEST(ArenaAllocator, single_alloc) {
+  SimpleErrorHandler errH(50);
+  Context::get_default_context()->set_ErrorHandler(&errH);
 
   localCircularArenaAllocator<256> _allocator;
   void* ptr = _allocator.allocate(40);
@@ -30,6 +32,9 @@ TEST(ArenaAllocator, single_alloc) {
 }
 
 TEST(ArenaAllocator, oversized_alloc) {
+  SimpleErrorHandler errH(50);
+  errH.set_onError([](Error* err) { EXPECT_EQ(*err, OutOfMemError()); } );
+  Context::get_default_context()->set_ErrorHandler(&errH);
 
   localCircularArenaAllocator<256> _allocator;
   void* ptr = _allocator.allocate(400);
@@ -38,6 +43,8 @@ TEST(ArenaAllocator, oversized_alloc) {
 }
 
 TEST(ArenaAllocator, deallocate) {
+  SimpleErrorHandler errH(50);
+  Context::get_default_context()->set_ErrorHandler(&errH);
 
   localCircularArenaAllocator<256> _allocator;
   void* ptr = nullptr;
@@ -50,6 +57,8 @@ TEST(ArenaAllocator, deallocate) {
 }
 
 TEST(ArenaAllocator, single_alloc_access) {
+  SimpleErrorHandler errH(50);
+  Context::get_default_context()->set_ErrorHandler(&errH);
 
   localCircularArenaAllocator<256> _allocator;
   void* ptr = _allocator.allocate(40);
@@ -62,6 +71,8 @@ TEST(ArenaAllocator, single_alloc_access) {
 }
 
 TEST(ArenaAllocator, two_alloc_access) {
+  SimpleErrorHandler errH(50);
+  Context::get_default_context()->set_ErrorHandler(&errH);
 
   localCircularArenaAllocator<256> _allocator;
   void* ptr1 = _allocator.allocate(40);
@@ -86,6 +97,8 @@ TEST(ArenaAllocator, two_alloc_access) {
 
 // Less of a test, more of a code coverage forcing hand
 TEST(ArenaAllocator, alloc_reuse) {
+  SimpleErrorHandler errH(50);
+  Context::get_default_context()->set_ErrorHandler(&errH);
 
   localCircularArenaAllocator<256> _allocator;
   void* ptr1 = _allocator.allocate(40);
@@ -192,17 +205,23 @@ TEST(ArenaAllocator, circle_back_with_handle) {
 }
 
 TEST(Handle, default_construction) {
+  SimpleErrorHandler errH(50);
+  Context::get_default_context()->set_ErrorHandler(&errH);
   Handle h;
   EXPECT_EQ(sizeof(Handle), sizeof(void*));
 }
 
 TEST(Handle, construction) {
+  SimpleErrorHandler errH(50);
+  Context::get_default_context()->set_ErrorHandler(&errH);
   localCircularArenaAllocator<256> _allocator;
   void* ptr = _allocator.allocate(100);
   Handle hndl(ptr);
 }
 
 TEST(Handle, read_write) {
+  SimpleErrorHandler errH(50);
+  Context::get_default_context()->set_ErrorHandler(&errH);
   localCircularArenaAllocator<256> _allocator;
   void* ptr = _allocator.allocate(100);
   Handle hndl(ptr);
@@ -213,11 +232,15 @@ TEST(Handle, read_write) {
 }
 
 TEST(HandleReference, default_construction) {
+  SimpleErrorHandler errH(50);
+  Context::get_default_context()->set_ErrorHandler(&errH);
   Handle h;
   EXPECT_EQ(sizeof(Handle), sizeof(void*));
 }
 
 TEST(HandleReference, copy) {
+  SimpleErrorHandler errH(50);
+  Context::get_default_context()->set_ErrorHandler(&errH);
   localCircularArenaAllocator<256> _allocator;
   void* ptr = _allocator.allocate(100);
   Handle hndl(ptr);
@@ -237,6 +260,8 @@ TEST(HandleReference, copy) {
 }
 
 TEST(HandleReference, copy_copy) {
+  SimpleErrorHandler errH(50);
+  Context::get_default_context()->set_ErrorHandler(&errH);
   localCircularArenaAllocator<256> _allocator;
   void* ptr = _allocator.allocate(100);
   Handle hndl(ptr);

@@ -154,6 +154,7 @@ class localCircularArenaAllocator : public AllocatorInterface {
     // If make this capacity then have possibility of filling up
     if (sz > size) {
       // ERROR
+      Context::get_default_context()->throwError(new OutOfMemError);
       return nullptr;
     }
     // if(sz > ( end() - (cursor + sizeof(MetaHeader)))){
@@ -165,6 +166,7 @@ class localCircularArenaAllocator : public AllocatorInterface {
       rebalance();
       // If still dont have space, error out
       if (sz > available()) {
+        Context::get_default_context()->throwError(new OutOfMemError);
         return nullptr;
       }
     }

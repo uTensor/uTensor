@@ -19,7 +19,7 @@ void SimpleErrorHandler::notify(const Event& evt)  {
   _eventQ.push_back(evt);
 }
 
-void SimpleErrorHandler::set_onError(std::function<void(Error*)> onError) {
+void SimpleErrorHandler::set_onError(onErrorF_t onError) {
   _onError = onError;
 }
 std::deque<Event>::iterator SimpleErrorHandler::begin(){
