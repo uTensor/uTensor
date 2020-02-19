@@ -2,6 +2,10 @@
 #include <cstdio>
 #include "context.hpp"
 namespace uTensor {
+
+//EVENTS
+
+
 RomTensor::RomTensor(TensorShape _shape, ttype _type, const void* buffer)
     : BufferTensor(_shape, _type, const_cast<void*>(buffer)) {}
 
@@ -58,7 +62,6 @@ int floorPerfSqrt(int x) {
   return -1;
 }
 
-struct InvalidTensorDimensionsError : public Error {};
 
 DiagonalRomTensor::DiagonalRomTensor(TensorShape _shape, ttype _type,
                                      const void* buffer, size_t buffer_len)

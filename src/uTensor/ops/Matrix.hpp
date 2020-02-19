@@ -5,7 +5,7 @@
 
 namespace uTensor {
 
-struct InvalidMatrixMultIndicesError : public Error {};
+DECLARE_ERROR(InvalidMatrixMultIndicesError);
 
 // Assume c is already allocated to the correct size
 // Naive implementation 

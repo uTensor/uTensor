@@ -3,7 +3,10 @@ namespace uTensor {
 
 // AllocatorInterface* Context::_metadata_allocator = nullptr;
 // AllocatorInterface* Context::_ram_data_allocator = nullptr;
-//
+
+// EVENT LIST
+DEFINE_ERROR(MemoryAllocatorUnsetError);
+
 Context::Context()
     : _metadata_allocator(nullptr), _ram_data_allocator(nullptr), _error_handler(nullptr) {}
 
