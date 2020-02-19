@@ -142,12 +142,15 @@ TEST(ArenaAllocator, circle_back) {
 
   // Check to make sure a rebalance has occurred
   bool has_rebalanced = std::find(errH.begin(), errH.end(), localCircularArenaAllocatorRebalancing()) != errH.end();
+  EXPECT_EQ(has_rebalanced, true);
 }
 
 /**
  * Regions bound to a handle can be moved around inside the memory management system without worry
  */
 TEST(ArenaAllocator, circle_back_with_handle) {
+  SimpleErrorHandler errH(50);
+  Context::get_default_context()->set_ErrorHandler(&errH);
   localCircularArenaAllocator<256> _allocator;
   void* ptr1 = _allocator.allocate(96);
   for(int i = 0 ; i < 100; i++){
@@ -183,6 +186,9 @@ TEST(ArenaAllocator, circle_back_with_handle) {
   for(int i = 0 ; i < 117; i++){
     EXPECT_EQ(reinterpret_cast<uint8_t*>(ptr3)[i], 0x03);
   }
+  // Check to make sure a rebalance has occurred
+  bool has_rebalanced = std::find(errH.begin(), errH.end(), localCircularArenaAllocatorRebalancing()) != errH.end();
+  EXPECT_EQ(has_rebalanced, true);
 }
 
 TEST(Handle, default_construction) {
