@@ -1,5 +1,6 @@
 #include "gtest/gtest.h"
 #include "arenaAllocator.hpp"
+#include "SimpleErrorHandler.hpp"
 #include <iostream>
 using std::cout;
 using std::endl;
@@ -7,8 +8,12 @@ using std::endl;
 using namespace uTensor;
 TEST(ArenaAllocator, constructor) {
 
+  SimpleErrorHandler errH(50);
+  Context::get_default_context()->set_ErrorHandler(&errH);
   localCircularArenaAllocator<256> _allocator;
+
   EXPECT_GE(_allocator.available(), 240); // F u 64Bit machine self alignment
+  //EXPECT_EQ(*errH.begin(), localCircularArenaAllocatorConstructed());
 
 }
 
