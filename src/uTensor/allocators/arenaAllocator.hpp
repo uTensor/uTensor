@@ -23,6 +23,7 @@ namespace uTensor {
 
 struct MetaHeaderNotFound : public Event {};
 struct localCircularArenaAllocatorRebalancing : public Event {};
+struct localCircularArenaAllocatorConstructed : public Event {};
 struct InvalidBoundRegionState : public Error {};
 
 /**
@@ -229,6 +230,7 @@ class localCircularArenaAllocator : public AllocatorInterface {
 
  public:
   localCircularArenaAllocator() : capacity(size) {
+    Context::get_default_context()->notifyEvent(localCircularArenaAllocatorConstructed());
     memset(_buffer, 0, size);
     cursor = begin();
   }
