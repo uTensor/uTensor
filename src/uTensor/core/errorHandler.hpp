@@ -1,6 +1,10 @@
 #ifndef UTENSOR_ERROR_H
 #define UTENSOR_ERROR_H
 
+/** Error Handling and Event primatives
+ * Rather than relying on RTTI for complete compile (fairly expensive for tiny devices) we opt to hash the event names at compile time, and store them at runtime. The ROM/RAM overheads on these are fixed integral widths and configurable via the event_handle_type. 
+ */
+
 #include <cstdint> 
 
 namespace uTensor {
