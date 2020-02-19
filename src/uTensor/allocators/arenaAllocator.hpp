@@ -7,6 +7,7 @@
 #include <memory>
 #include "memoryManagementInterface.hpp"
 #include "tensor.hpp"
+#include "context.hpp"
 
 namespace uTensor {
 
@@ -16,6 +17,13 @@ namespace uTensor {
 #define BLOCK_LENGTH_MASK ~MSB_SET
 #define BLOCK_ACTIVE MSB_SET
 #define BLOCK_ZERO_LENGTH 0
+
+/** EVENT LIST
+ */
+
+struct MetaHeaderNotFound : public Event {};
+struct localCircularArenaAllocatorRebalancing : public Event {};
+struct InvalidBoundRegionState : public Error {};
 
 /**
  * Size allocated must be less than 2**15
@@ -78,12 +86,14 @@ class localCircularArenaAllocator : public AllocatorInterface {
     // First check if ptr in bounds
     if (ptr < _buffer || ptr > (_buffer + size)) {
       // ERROR
+      Context::get_default_context()->throwError(new OutOfMemBoundsError);
     }
     for(auto hdr_i = _headers.begin(); hdr_i != _headers.end(); hdr_i++){
       if(hdr_i->_d == ptr)
         return *hdr_i;
     }
     // ERROR
+    Context::get_default_context()->notifyEvent(MetaHeaderNotFound());
     return not_found;
   }
 
@@ -110,6 +120,7 @@ class localCircularArenaAllocator : public AllocatorInterface {
     // Check if region is active
     if (!hdr.is_active()) {
       // ERROR
+      Context::get_default_context()->throwError(new InvalidBoundRegionState);
     }
     hdr.set_hndl(hndl);
   }
@@ -238,6 +249,7 @@ class localCircularArenaAllocator : public AllocatorInterface {
   //TODO ABOVE
   //TODO ABOVE
   virtual bool rebalance() {
+    Context::get_default_context()->notifyEvent(localCircularArenaAllocatorRebalancing());
     // Clear all unbound entries
     for(auto hdr_i = _headers.rbegin(); hdr_i != _headers.rend(); hdr_i++){
       if(!hdr_i->is_bound()){

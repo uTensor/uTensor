@@ -5,7 +5,7 @@ void ErrorHandler::uThrow(Error* err) {
   while (true) {
   }
 }
-void ErrorHandler::uThrow(Event* evt) {
+void ErrorHandler::notify(const Event& evt) {
   // Do nothing
 }
 
