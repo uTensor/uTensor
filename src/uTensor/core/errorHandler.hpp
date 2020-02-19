@@ -49,6 +49,7 @@ class ErrorHandler {
 #define DECLARE_ERROR(EVT) struct EVT : public Error { static constexpr uint16_t uid = u32toEventType(hash_32_fnv1a_const(STRINGIFY(EVT))); EVT(); }
 #define DEFINE_ERROR(EVT) EVT::EVT() : Error{uid} {}
 
+bool operator == (const Event& a, const Event& b);
 
 // Default errors
 DECLARE_ERROR(InvalidReshapeError);
