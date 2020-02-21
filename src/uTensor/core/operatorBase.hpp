@@ -1,7 +1,13 @@
 #ifndef UTENSOR_OPERATOR_BASE_H
 #define UTENSOR_OPERATOR_BASE_H
 #include "TensorMap.hpp"
+#include "context.hpp"
 namespace uTensor {
+
+//EVENTS AND ERRORS
+DECLARE_ERROR(OperatorIOSizeMismatchError);
+
+
 // Operators do not go on the heap
 class OperatorBase {
  protected:
