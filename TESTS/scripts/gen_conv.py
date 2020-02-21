@@ -16,7 +16,7 @@ test_str = """
 
 TEST(Convolution, random_inputs_{{ test_name }}) {
   localCircularArenaAllocator<1024> meta_allocator;
-  localCircularArenaAllocator<{{ out_size }}*2*sizeof(float)> ram_allocator;
+  localCircularArenaAllocator<{{ out_size }}*2*sizeof(float), uint32_t> ram_allocator;
   Context::get_default_context()->set_metadata_allocator(&meta_allocator);
   Context::get_default_context()->set_ram_data_allocator(&ram_allocator);
 
