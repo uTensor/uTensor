@@ -25,14 +25,15 @@ void convolution_kernel(Tensor& out, const Tensor& in, const Tensor& filter, con
   const int16_t stride_cols = strides[2];
 
   // Compute for now, but should assume codegen does this
-  int16_t out_rows, out_cols;
+  int16_t out_rows = out->get_shape()[1];
+  int16_t out_cols = out->get_shape()[2];
   if (padding == VALID) {
-    out_rows = (input_rows - filter_rows) / stride_rows + 1;
-    out_cols = (input_cols - filter_cols) / stride_cols + 1;
+    //out_rows = (input_rows - filter_rows) / stride_rows + 1;
+    //out_cols = (input_cols - filter_cols) / stride_cols + 1;
   } else {
     // SAME
-    out_rows = input_rows;
-    out_cols = input_cols;
+    //out_rows = input_rows;
+    //out_cols = input_cols;
   }
     // When we're converting the 32 bit accumulator to a lower bit depth, we
     int filter_left_offset;

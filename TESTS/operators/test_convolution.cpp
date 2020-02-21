@@ -16,7 +16,7 @@ using std::endl;
 
 using namespace uTensor;
 
-//#define DO_STRIDE_TESTS 1
+#define DO_STRIDE_TESTS 1
 /*********************************************
  * Generated Test number 
  *********************************************/
