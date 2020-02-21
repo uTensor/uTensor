@@ -75,22 +75,27 @@ void convolution_kernel(Tensor& out, const Tensor& in, const Tensor& filter, con
                       (in_y < input_rows)) {
                       size_t input_index = batch * input_rows * input_cols * input_depth +
                           in_y * input_cols * input_depth + in_x * input_depth + in_channel;
-                      input_value = in((uint32_t)input_index);
+                      //input_value = in((uint32_t)input_index);
+                      input_value = in(batch, in_y, in_x, in_channel);
                   } else {
                     input_value = 0;
                   }
                   size_t filter_index = filter_y * filter_cols * input_depth * filter_count +
                       filter_x * input_depth * filter_count +
                       in_channel * filter_count + out_channel;
-                  const T filter_value = filter(filter_index);
+                  //const T filter_value = filter(filter_index);
+                  const T filter_value = filter(filter_y, filter_x, in_channel, out_channel);
                   output_val += (input_value * filter_value);
                 }
               }
             }
 
+            /*
             out((batch * out_rows * out_cols * filter_count) +
                         (out_y * out_cols * filter_count) +
                         (out_x * filter_count) + out_channel) = output_val;
+            */
+            out(batch, out_y, out_x, out_channel) = output_val;
           }
         }
       }
