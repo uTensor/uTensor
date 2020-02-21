@@ -22,6 +22,6 @@ TEST(Shapes, test_3d) {
   EXPECT_EQ(s1[0], 10);
   EXPECT_EQ(s1[1], 10);
   EXPECT_EQ(s1[2], 10);
-  EXPECT_EQ(s1.linear_index(1,1,0,0), 11);
+  EXPECT_EQ(s1.linear_index(1,1,0,0), 110);
   EXPECT_EQ(s1.linear_index(1,1,1,0), 111);
 }
