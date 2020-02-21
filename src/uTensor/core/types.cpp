@@ -103,6 +103,7 @@ uint8_t TensorShape::num_dims() const { return _num_dims; }
 // https://www.tensorflow.org/xla/shapes
 uint32_t TensorShape::linear_index(uint16_t i, uint16_t j, uint16_t k,
                                    uint16_t l) const {
+  /*
   // TODO
   uint32_t d1 = _shape[1] > 0 ? 1 : 0;
   d1 *= _shape[0];
@@ -115,6 +116,12 @@ uint32_t TensorShape::linear_index(uint16_t i, uint16_t j, uint16_t k,
   // return i + j * d1 + k * d2 + l * d3;
   // Matrix order
   return j + i * d1 + k * d2 + l * d3;
+  */
+  uint32_t num_channels = _shape[3] > 0 ? _shape[3] : 1;
+  uint32_t num_cols     = _shape[2] > 0 ? _shape[2] : 1;
+  uint32_t num_rows     = _shape[1] > 0 ? _shape[1] : 1;
+  // Simple factorization can reduce the number of mults here, but for clarity
+  return i*num_rows*num_cols*num_channels + j*num_cols*num_channels + k*num_channels + l;
 }
 IntegralValue::IntegralValue(void* p) : p(p), num_bytes(0) {}
 
