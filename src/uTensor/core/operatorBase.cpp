@@ -3,6 +3,9 @@
 
 namespace uTensor {
 
+//EVENTS AND ERRORS
+DEFINE_ERROR(OperatorIOSizeMismatchError);
+
 // OperatorBase::OperatorBase(TensorMapInterface* inputs, TensorMapInterface*
 // outputs) : inputs(inputs), outputs(outputs) {
 //    Context* ctx = Context::get_default_context();
