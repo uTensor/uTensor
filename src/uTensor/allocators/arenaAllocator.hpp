@@ -26,6 +26,9 @@ DECLARE_EVENT(localCircularArenaAllocatorRebalancing);
 DECLARE_EVENT(localCircularArenaAllocatorConstructed);
 DECLARE_ERROR(InvalidBoundRegionState);
 
+
+template<typename T>
+constexpr size_t meta_addressable_space() { return 1 << (sizeof(T)*8 - 1); } 
 /**
  * Size allocated must be less than 2**15
  * TODO get around the BS alignment bits from the silly pointer variable causing
@@ -34,6 +37,9 @@ DECLARE_ERROR(InvalidBoundRegionState);
 template <size_t size, typename T = uint16_t>
 class localCircularArenaAllocator : public AllocatorInterface {
  private:
+   // Compile time check to make sure that the user is using a T large enough to address size
+    static_assert(size < meta_addressable_space<T>(), "[ERROR](localCircularArenaAllocator) T not large enoughn to address size in Arena. Attempted to create Arena with (size, T) mismatch, try increasing T to uint32_t");
+
   class MetaHeader {
    public:
     T meta_data;
