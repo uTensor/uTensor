@@ -130,20 +130,24 @@ class ConvOperator : public OperatorInterface<2, 1> {
 
 template <typename T>
 void depthwise_seperable_convolution_kernel(Tensor& out, const Tensor& in,
-                                            const Tensor& filter,
+                                            const Tensor& dw_filter,
+                                            const Tensor& pw_filter,
                                             const Padding padding,
                                             const uint16_t (&strides)[4]) {
   const TensorShape& in_shape = in->get_shape();
-  const TensorShape& f_shape = filter->get_shape();
+  const TensorShape& df_shape = dw_filter->get_shape();
+  const TensorShape& pf_shape = pw_filter->get_shape();
 
   const int16_t input_depth = in_shape[3];
   const int16_t input_rows = in_shape[1];
   const int16_t input_cols = in_shape[2];
   const int16_t input_batches = in_shape[0];
-  const int16_t out_depth = f_shape[3];
-  const int16_t filter_rows = f_shape[0];
-  const int16_t filter_cols = f_shape[1];
-  const int16_t filter_count = f_shape[3];
+  const int16_t out_depth = pf_shape[3];
+  const int16_t dw_filter_rows = df_shape[0];
+  const int16_t dw_filter_cols = df_shape[1];
+  const int16_t dw_filter_in_channels = df_shape[2];
+  const int16_t dw_filter_channel_mult = df_shape[3];
+  const int16_t pw_filter_in_channels = pf_shape[2];
 
   const int16_t stride_rows = strides[1];
   const int16_t stride_cols = strides[2];
@@ -164,14 +168,14 @@ void depthwise_seperable_convolution_kernel(Tensor& out, const Tensor& in,
   int filter_top_offset;
   if (padding == VALID) {
     filter_left_offset =
-        ((out_cols - 1) * stride_cols + filter_cols - input_cols + 1) / 2;
+        ((out_cols - 1) * stride_cols + dw_filter_cols - input_cols + 1) / 2;
     filter_top_offset =
-        ((out_rows - 1) * stride_rows + filter_rows - input_rows + 1) / 2;
+        ((out_rows - 1) * stride_rows + dw_filter_rows - input_rows + 1) / 2;
   } else {
     filter_left_offset =
-        ((out_cols - 1) * stride_cols + filter_cols - input_cols) / 2;
+        ((out_cols - 1) * stride_cols + dw_filter_cols - input_cols) / 2;
     filter_top_offset =
-        ((out_rows - 1) * stride_rows + filter_rows - input_rows) / 2;
+        ((out_rows - 1) * stride_rows + dw_filter_rows - input_rows) / 2;
   }
 
   // If we've got multiple images in our input, work through each of them.
@@ -180,38 +184,43 @@ void depthwise_seperable_convolution_kernel(Tensor& out, const Tensor& in,
     // different positions in the input.
     for (int out_y = 0; out_y < out_rows; ++out_y) {
       for (int out_x = 0; out_x < out_cols; ++out_x) {
-        // Each filter kernel produces one output channel.
-        for (int out_channel = 0; out_channel < filter_count; ++out_channel) {
+        // Fuse the Depthwise filtering with the pointwise filtering by iterating over the channels first
+        for (int out_channel = 0; out_channel < out_depth; ++out_channel) {
           const int in_x_origin = (out_x * stride_cols) - filter_left_offset;
           const int in_y_origin = (out_y * stride_rows) - filter_top_offset;
           T output_val = 0;
-          for (int filter_y = 0; filter_y < filter_rows; ++filter_y) {
-            for (int filter_x = 0; filter_x < filter_cols; ++filter_x) {
+
+          for (int filter_y = 0; filter_y < dw_filter_rows; ++filter_y) {
+            for (int filter_x = 0; filter_x < dw_filter_cols; ++filter_x) {
               for (int in_channel = 0; in_channel < input_depth; ++in_channel) {
-                const int in_x = in_x_origin + filter_x;
-                const int in_y = in_y_origin + filter_y;
-                T input_value;
-                if ((in_x >= 0) && (in_x < input_cols) && (in_y >= 0) &&
-                    (in_y < input_rows)) {
-                  // Commenting out since these indices might be useful later
-                  /*
-                    size_t input_index = batch * input_rows * input_cols *
-                    input_depth + in_y * input_cols * input_depth + in_x *
-                    input_depth + in_channel; input_value =
-                    in((uint32_t)input_index);
-                   */
-                  input_value = in(batch, in_y, in_x, in_channel);
-                } else {
-                  input_value = 0;
+                for (int r = 0; r < dw_filter_channel_mult; ++r) {
+                  const int in_x = in_x_origin + filter_x;
+                  const int in_y = in_y_origin + filter_y;
+                  T input_value;
+                  if ((in_x >= 0) && (in_x < input_cols) && (in_y >= 0) &&
+                      (in_y < input_rows)) {
+                    // Commenting out since these indices might be useful later
+                    /*
+                      size_t input_index = batch * input_rows * input_cols *
+                      input_depth + in_y * input_cols * input_depth + in_x *
+                      input_depth + in_channel; input_value =
+                      in((uint32_t)input_index);
+                     */
+                    input_value = in(batch, in_y, in_x, in_channel);
+                  } else {
+                    input_value = 0;
+                  }
+                  // size_t filter_index = filter_y * filter_cols * input_depth *
+                  // filter_count +
+                  //    filter_x * input_depth * filter_count +
+                  //    in_channel * filter_count + out_channel;
+                  // const T filter_value = filter(filter_index);
+                  const T dw_filter_value =
+                      dw_filter(filter_y, filter_x, in_channel, r);
+                  const T pw_filter_value =
+                      pw_filter(0, 0, in_channel*dw_filter_channel_mult + r, out_channel);
+                  output_val += (input_value * dw_filter_value * pw_filter_value);
                 }
-                // size_t filter_index = filter_y * filter_cols * input_depth *
-                // filter_count +
-                //    filter_x * input_depth * filter_count +
-                //    in_channel * filter_count + out_channel;
-                // const T filter_value = filter(filter_index);
-                const T filter_value =
-                    filter(filter_y, filter_x, in_channel, out_channel);
-                output_val += (input_value * filter_value);
               }
             }
           }
@@ -251,8 +260,16 @@ class DepthwiseSeparableConvOperator : public OperatorInterface<3, 1> {
     TensorShape& pf_shape = *inputs[pointwise_filter].tensor->get_shape();
     TensorShape& out_shape = *outputs[out].tensor->get_shape();
 
+    if (in_shape[3] != df_shape[2]){
+      Context::get_default_context()->throwError(new InvalidTensorDimensionsError); 
+    }
+    if (pf_shape[0] != 1 || pf_shape[1] != 1) {
+      Context::get_default_context()->throwError(new InvalidTensorDimensionsError); 
+    }
     convolution_kernel<T>(*outputs[out].tensor, *inputs[in].tensor,
-                          *inputs[depthwise_filter].tensor, _padding, _stride);
+                          *inputs[depthwise_filter].tensor, 
+                          *inputs[pointwise_filter].tensor, 
+                          _padding, _stride);
   }
 
  private:
