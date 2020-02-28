@@ -129,7 +129,7 @@ class ConvOperator : public OperatorInterface<2, 1> {
 };
 
 template <typename T>
-void depthwise_seperable_convolution_kernel(Tensor& out, const Tensor& in,
+void depthwise_separable_convolution_kernel(Tensor& out, const Tensor& in,
                                             const Tensor& dw_filter,
                                             const Tensor& pw_filter,
                                             const Padding padding,
@@ -255,10 +255,10 @@ class DepthwiseSeparableConvOperator : public OperatorInterface<3, 1> {
 
  protected:
   virtual void compute() {
-    TensorShape& in_shape = *inputs[in].tensor->get_shape();
-    TensorShape& df_shape = *inputs[depthwise_filter].tensor->get_shape();
-    TensorShape& pf_shape = *inputs[pointwise_filter].tensor->get_shape();
-    TensorShape& out_shape = *outputs[out].tensor->get_shape();
+    TensorShape& in_shape  = (*inputs[in].tensor)->get_shape();
+    TensorShape& df_shape  = (*inputs[depthwise_filter].tensor)->get_shape();
+    TensorShape& pf_shape  = (*inputs[pointwise_filter].tensor)->get_shape();
+    TensorShape& out_shape = (*outputs[out].tensor)->get_shape();
 
     if (in_shape[3] != df_shape[2]){
       Context::get_default_context()->throwError(new InvalidTensorDimensionsError); 
@@ -266,7 +266,7 @@ class DepthwiseSeparableConvOperator : public OperatorInterface<3, 1> {
     if (pf_shape[0] != 1 || pf_shape[1] != 1) {
       Context::get_default_context()->throwError(new InvalidTensorDimensionsError); 
     }
-    convolution_kernel<T>(*outputs[out].tensor, *inputs[in].tensor,
+    depthwise_separable_convolution_kernel<T>(*outputs[out].tensor, *inputs[in].tensor,
                           *inputs[depthwise_filter].tensor, 
                           *inputs[pointwise_filter].tensor, 
                           _padding, _stride);
