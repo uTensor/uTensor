@@ -5,3 +5,6 @@
 [submodule "extern/CMSIS_5"]
 	path = extern/CMSIS_5
 	url = https://github.com/mbartling/CMSIS_5.git
+[submodule "extern/fftw-3.3.8"]
+	path = extern/fftw-3.3.8
+	url = https://github.com/mbartling/fftw-3.3.8.git
