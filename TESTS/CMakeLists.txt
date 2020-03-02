@@ -39,6 +39,7 @@ package_add_test_with_libraries(test_matrix_ops operators/test_matrix utensor op
 package_add_test_with_libraries(test_convolution operators/test_convolution utensor operators "${PROJECT_DIR}/test-data/")
 package_add_test_with_libraries(test_dws_convolution operators/test_dws_convolution utensor operators "${PROJECT_DIR}/test-data/")
 package_add_test_with_libraries(test_relu operators/test_relu utensor operators "${PROJECT_DIR}/test-data/")
+package_add_test_with_libraries(test_maxpool operators/test_maxpool utensor operators "${PROJECT_DIR}/test-data/")
 
 package_add_test_with_libraries(test_top_include library/test_top_include utensor library "${PROJECT_DIR}/test-data/")
 

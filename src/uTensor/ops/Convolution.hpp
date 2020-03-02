@@ -541,15 +541,17 @@ class GenericPoolOp : public OperatorInterface<1, 1> {
   enum names_out : uint8_t { out };
 
   // TODO Add dialations
-  GenericPoolOp(uint16_t k_size[2], std::initializer_list<uint16_t> strides,
+  GenericPoolOp(std::initializer_list<uint16_t> k_size, std::initializer_list<uint16_t> strides,
                                  Padding padding) 
       : _padding(padding) {
     int i = 0;
     for (auto s : strides) {
       _stride[i++] = s;
     }
-    _k_size[0] = k_size[0];
-    _k_size[1] = k_size[1];
+    i = 0;
+    for (auto k : k_size) {
+      _k_size[i++] = k;
+    }
   }
 
  protected:
