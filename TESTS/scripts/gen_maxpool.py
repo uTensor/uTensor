@@ -81,7 +81,7 @@ for i in range(num_tests):
     for kh in [1, 3, 5]:
         for kw in [1, 3, 5]:
             for stride in [1, 2]:
-                in_1 = tf.Variable(tf.random.normal([1, 28, 28, 1]))
+                in_1 = tf.Variable(tf.random.normal([1, 28, 28, 3]))
                 ksize = [kh, kw]
                 strides = [1, stride, stride, 1]
                 out_1 = tf.nn.max_pool2d(in_1, ksize, strides=strides, padding=PADDING)

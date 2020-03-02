@@ -33,12 +33,12 @@ class ConvFilter {
 template <typename T>
 class MaxFilter {
   T tmp;
-  int16_t w;
   int16_t h;
+  int16_t w;
   int16_t c;
 
   public: 
-    MaxFilter(int16_t w, int16_t h, int16_t c) : w(w), h(h), c(c) {}
+    MaxFilter(int16_t h, int16_t w, int16_t c) : h(h), w(w), c(c) {}
     inline void reset() { tmp = std::numeric_limits<T>::lowest(); }
     inline void PartialCompute(const T& input_value, int i, int j, int k, int l) {
       tmp = std::max(tmp, input_value);
@@ -198,10 +198,14 @@ void generic_pool_convolution_kernel(Tensor& out, const Tensor& in, Filter filte
   int filter_left_offset;
   int filter_top_offset;
   if (padding == VALID) {
-    filter_left_offset =
-        ((out_cols - 1) * stride_cols + filter_cols - input_cols + 1) / 2;
-    filter_top_offset =
-        ((out_rows - 1) * stride_rows + filter_rows - input_rows + 1) / 2;
+    //filter_left_offset =
+    //    ((out_cols - 1) * stride_cols + filter_cols - input_cols + 1) / 2;
+    //filter_top_offset =
+    //    ((out_rows - 1) * stride_rows + filter_rows - input_rows + 1) / 2;
+    filter_left_offset = 
+      (((input_cols - filter_cols)/stride_cols)*stride_cols + filter_cols - input_cols + 1)/2;
+    filter_top_offset = 
+      (((input_rows - filter_rows)/stride_rows)*stride_rows + filter_rows - input_rows + 1)/2;
   } else {
     filter_left_offset =
         ((out_cols - 1) * stride_cols + filter_cols - input_cols) / 2;
