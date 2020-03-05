@@ -15,15 +15,15 @@ jobs:
       - run: 
           name: Test
           command: ctest -VV -o /tmp/test_results/test-results.txt
-      - run:
-          name: Generate code coverage
-          command: lcov -c --directory . --output-file main_coverage.info > /tmp/test_results/coverage_summary.txt
-      - run: genhtml main_coverage.info --output-directory /tmp/coverage
-      - store_test_results:
-          path: /tmp/test_results
-      - store_artifacts:
-          path: /tmp/coverage
-          prefix: coverage
+#      - run:
+#          name: Generate code coverage
+#          command: lcov -c --directory . --output-file main_coverage.info > /tmp/test_results/coverage_summary.txt
+#      - run: genhtml main_coverage.info --output-directory /tmp/coverage
+#      - store_test_results:
+#          path: /tmp/test_results
+#      - store_artifacts:
+#          path: /tmp/coverage
+#          prefix: coverage
         
   mbedCI:
     docker:
@@ -38,7 +38,7 @@ jobs:
         #- run: mv uTensor/unity_temp/* uTensor/unity/
       - run: mbed config root .
       - run: mbed deploy
-      - run: mbed compile -m DISCO_F413ZH -t GCC_ARM --profile=uTensor/extras/build_profile/release.json
+      - run: mbed compile -m DISCO_F413ZH -t GCC_ARM
         
 workflows:
     version: 2
