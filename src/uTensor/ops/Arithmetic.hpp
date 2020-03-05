@@ -1,6 +1,8 @@
 #ifndef UTENSOR_ARITHMETIC_OPS_H
 #define UTENSOR_ARITHMETIC_OPS_H
 #include "operatorBase.hpp"
+#include <algorithm>
+#include <limits>
 
 namespace uTensor {
 
@@ -30,6 +32,51 @@ protected:
         add_kernel<T>(*outputs[c].tensor, *inputs[a].tensor, *inputs[b].tensor);
     }
 };
+
+
+template<typename T>
+class MinOperator : public OperatorInterface<1, 1> {
+public:
+    enum names_in: uint8_t {a};
+    enum names_out: uint8_t {out};
+    //AddOperator(FixedTensorMap<2> inputs, FixedTensorMap<1> outputs) : OperatorBase(inputs, outputs) {}
+
+protected:
+    virtual void compute() {
+      T tmp = std::numeric_limits<T>::max();
+      const Tensor& a_t = *inputs[a].tensor;
+      Tensor& out_t = *outputs[out].tensor;
+      const TensorShape& a_shape = a_t->get_shape();
+      const uint32_t a_size = a_shape.get_linear_size();
+      for(uint32_t i = 0; i < a_size; i++){
+        tmp = std::min(tmp, static_cast<T>(a_t(i)));
+      }
+      out_t(0) = tmp;
+    }
+};
+
+template<typename T>
+class MaxOperator : public OperatorInterface<1, 1> {
+public:
+    enum names_in: uint8_t {a};
+    enum names_out: uint8_t {out};
+    //AddOperator(FixedTensorMap<2> inputs, FixedTensorMap<1> outputs) : OperatorBase(inputs, outputs) {}
+
+protected:
+    virtual void compute() {
+      T tmp = std::numeric_limits<T>::lowest();
+      const Tensor& a_t = *inputs[a].tensor;
+      Tensor& out_t = *outputs[out].tensor;
+      const TensorShape& a_shape = a_t->get_shape();
+      const uint32_t a_size = a_shape.get_linear_size();
+      for(uint32_t i = 0; i < a_size; i++){
+        tmp = std::max(tmp, static_cast<T>(a_t(i)));
+      }
+      out_t(0) = tmp;
+    }
+};
+
+
 
 }
 #endif
