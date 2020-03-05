@@ -44,7 +44,7 @@ The project is work-in-progress. Here are the operators, of their __quantized__ 
 - Add
 - ArgMax
 - Dropout
-- MatMal
+- MatMul
 - Max
 - Min
 - Placeholder
