@@ -1,7 +1,8 @@
 #ifndef UTENSOR_ACTIVATIONS_OPS_H
 #define UTENSOR_ACTIVATIONS_OPS_H
-#include "operatorBase.hpp"
 #include <type_traits>
+#include "operatorBase.hpp"
+#include "ActivationFncs_kernels.hpp"
 
 namespace uTensor {
 class InPlaceActivationFnc : public OperatorInterface<1,0> {
@@ -19,15 +20,7 @@ class InPlaceReLU : public InPlaceActivationFnc {
 
   protected:
     virtual void compute() {
-      Tensor& t = *inputs[x].tensor;
-      uint32_t t_size = t->get_shape().get_linear_size();
-      T tmp;
-      for (uint32_t i = 0; i < t_size; i++){
-        tmp = t(i);
-        if(tmp < 0){
-          t(i) = static_cast<T>(0);
-        }
-      }
+      inplace_relu_k<T>(*inputs[x].tensor);
     }
 };
 
@@ -48,13 +41,7 @@ class ReLUOp : public OperatorInterface<1,1> {
       uint32_t out_size = outT->get_shape().get_linear_size();
       if(in_size != out_size)
         Context::get_default_context()->throwError(new OperatorIOSizeMismatchError);
-      T tmp;
-      for (uint32_t i = 0; i < in_size; i++){
-        tmp = inT(i);
-        if(tmp < 0){
-          outT(i) = static_cast<T>(0);
-        }
-      }
+      relu_k<T>(outT, inT);
     }
 };
 
