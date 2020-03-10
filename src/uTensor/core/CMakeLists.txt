@@ -9,6 +9,7 @@ set(src_utensor_core
     operatorBase.cpp
     errorHandler.cpp
     modelBase.cpp
+    quantizationPrimitives.cpp
    )
 
 set(hdr_utensor_core
@@ -23,6 +24,7 @@ set(hdr_utensor_core
     utensor_string.hpp
     errorHandler.hpp
     modelBase.hpp
+    quantizationPrimitives.hpp
    )
     
 add_library(utensor_core ${src_utensor_core} )
