@@ -72,19 +72,19 @@ const QuantizationParams& TensorInterface::get_quantization_params() const {
 size_t TensorInterface::_get_readable_block(void* buffer,
                                             uint16_t req_read_size,
                                             uint32_t linear_index) const {
-  Context::get_default_context()->throwError(
-      new InvalidOptimizableTensorError());
   uTensor_printf(
       "ERROR, Optimized op attempted to read access non-optimizable tensor\n");
+  Context::get_default_context()->throwError(
+      new InvalidOptimizableTensorError());
   return -1;
 }
 size_t TensorInterface::_get_writeable_block(void* buffer,
                                              uint16_t req_write_size,
                                              uint32_t linear_index) {
-  Context::get_default_context()->throwError(
-      new InvalidOptimizableTensorError());
   uTensor_printf(
       "ERROR, Optimized op attempted to write access non-optimizable tensor\n");
+  Context::get_default_context()->throwError(
+      new InvalidOptimizableTensorError());
   return -1;
 }
 size_t TensorInterface::get_readable_block(void* buffer, uint16_t req_read_size,
