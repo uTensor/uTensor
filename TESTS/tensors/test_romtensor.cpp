@@ -29,6 +29,18 @@ TEST(Rom_Tensor, constructor) {
   delete[] buffer;
 }
 
+TEST(Rom_Tensor, fixed_constructor) {
+  //setup_context();
+  localCircularArenaAllocator<256> meta_allocator;
+  localCircularArenaAllocator<256> ram_allocator;
+  Context::get_default_context()->set_metadata_allocator(&meta_allocator);
+  Context::get_default_context()->set_ram_data_allocator(&ram_allocator);
+  uint8_t buffer[10*10];
+  for(int i = 0; i < 100; i++)
+      buffer[i] = i;
+  const RomTensor r({10, 10}, buffer);
+}
+
 TEST(Rom_Tensor, read_write_u8) {
   ///setup_context();
   localCircularArenaAllocator<256> meta_allocator;

@@ -1,6 +1,7 @@
 #ifndef UTENSOR_ROM_TENSOR_H
 #define UTENSOR_ROM_TENSOR_H
 #include "BufferTensor.hpp"
+#include "context.hpp"
 
 namespace uTensor {
 
@@ -11,6 +12,15 @@ class RomTensor : public BufferTensor {
 
  public:
   RomTensor(TensorShape _shape, ttype _type, const void* buffer);
+
+  // Doing constructors this way lets us check for bounds
+  template<typename T, size_t buffer_size>
+  RomTensor(TensorShape _shape, const T(& buffer)[buffer_size]) : BufferTensor(_shape, ttype_from<T>::type, const_cast<void*>(reinterpret_cast<const void*>(buffer))) {
+    if(_shape.get_linear_size() != buffer_size){
+      Context::get_default_context()->throwError(new InvalidTensorDimensionsError);
+    }
+  }
+
   virtual ~RomTensor();
   virtual void resize(TensorShape new_shape) override;
 
