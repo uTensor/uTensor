@@ -22,7 +22,7 @@ class QuantizationParams {
   protected:
     const int32_t* _zp;
     const int32_t* _scale;
-    const int _num_channels;
+    int _num_channels;
 };
 
 using NotQuantized = QuantizationParams;

@@ -1,6 +1,7 @@
 #ifndef UTENSOR_TENSOR_BASE_H
 #define UTENSOR_TENSOR_BASE_H
 #include "types.hpp"
+#include "quantizationPrimitives.hpp"
 
 namespace uTensor {
 
@@ -48,6 +49,10 @@ class TensorInterface : public TensorBase {
   IntegralValue operator()(uint32_t linear_index);
 
   virtual void resize(TensorShape new_shape) = 0;
+  TensorInterface& set_quantization_params(const QuantizationParams& params) {
+    _qnt_params = params;
+    return *this;
+  }
 
  private:
   /** Optimized op interface
@@ -74,6 +79,7 @@ class TensorInterface : public TensorBase {
   TensorShape _shape;
   ttype _type;  // Maybe make this const
   uint8_t _type_size;
+  QuantizationParams _qnt_params;
 };
 
 }  // namespace uTensor
