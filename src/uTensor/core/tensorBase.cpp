@@ -1,4 +1,5 @@
 #include "tensorBase.hpp"
+
 #include "context.hpp"
 #include "memoryManagementInterface.hpp"
 #include "uTensor_util.hpp"
@@ -58,7 +59,8 @@ IntegralValue TensorInterface::operator()(uint32_t linear_index) {
   return write(linear_index);
 }
 
-TensorInterface& TensorInterface::set_quantization_params(const QuantizationParams& params) {
+TensorInterface& TensorInterface::set_quantization_params(
+    const QuantizationParams& params) {
   _qnt_params = params;
   return *this;
 }
@@ -100,6 +102,5 @@ size_t TensorInterface::get_writeable_block(void* buffer,
   }
   return _get_writeable_block(buffer, req_write_size, linear_index);
 }
-  
 
 }  // namespace uTensor

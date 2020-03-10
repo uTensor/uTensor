@@ -1,4 +1,5 @@
 #include "RamTensor.hpp"
+
 #include "context.hpp"
 #include "uTensor_util.hpp"
 
@@ -27,8 +28,7 @@ void* RamTensor::write(uint32_t linear_index) {
 size_t RamTensor::_get_readable_block(void* buffer, uint16_t req_read_size,
                                       uint32_t linear_index) const {
   if (req_read_size + linear_index > _type_size * _shape.get_linear_size()) {
-    Context::get_default_context()->throwError(
-      new InvalidMemAccessError());
+    Context::get_default_context()->throwError(new InvalidMemAccessError());
     return -1;
   }
   uint8_t* d = reinterpret_cast<uint8_t*>(*_ram_region);
@@ -36,10 +36,9 @@ size_t RamTensor::_get_readable_block(void* buffer, uint16_t req_read_size,
   return req_read_size;
 }
 size_t RamTensor::_get_writeable_block(void* buffer, uint16_t req_write_size,
-                                      uint32_t linear_index) {
+                                       uint32_t linear_index) {
   if (req_write_size + linear_index > _type_size * _shape.get_linear_size()) {
-    Context::get_default_context()->throwError(
-      new InvalidMemAccessError());
+    Context::get_default_context()->throwError(new InvalidMemAccessError());
     return -1;
   }
   uint8_t* d = reinterpret_cast<uint8_t*>(*_ram_region);

@@ -14,10 +14,13 @@ class RomTensor : public BufferTensor {
   RomTensor(TensorShape _shape, ttype _type, const void* buffer);
 
   // Doing constructors this way lets us check for bounds
-  template<typename T, size_t buffer_size>
-  RomTensor(TensorShape _shape, const T(& buffer)[buffer_size]) : BufferTensor(_shape, ttype_from<T>::type, const_cast<void*>(reinterpret_cast<const void*>(buffer))) {
-    if(_shape.get_linear_size() != buffer_size){
-      Context::get_default_context()->throwError(new InvalidTensorDimensionsError);
+  template <typename T, size_t buffer_size>
+  RomTensor(TensorShape _shape, const T (&buffer)[buffer_size])
+      : BufferTensor(_shape, ttype_from<T>::type,
+                     const_cast<void*>(reinterpret_cast<const void*>(buffer))) {
+    if (_shape.get_linear_size() != buffer_size) {
+      Context::get_default_context()->throwError(
+          new InvalidTensorDimensionsError);
     }
   }
 

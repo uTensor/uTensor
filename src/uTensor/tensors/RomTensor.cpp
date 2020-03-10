@@ -1,10 +1,11 @@
 #include "RomTensor.hpp"
+
 #include <cstdio>
+
 #include "context.hpp"
 namespace uTensor {
 
-//EVENTS
-
+// EVENTS
 
 RomTensor::RomTensor(TensorShape _shape, ttype _type, const void* buffer)
     : BufferTensor(_shape, _type, const_cast<void*>(buffer)) {}
@@ -18,11 +19,10 @@ void* RomTensor::write(uint32_t linear_index) {
 size_t RomTensor::_get_readable_block(void* buffer, uint16_t req_read_size,
                                       uint32_t linear_index) const {
   if (req_read_size + linear_index > _type_size * _shape.get_linear_size()) {
-    Context::get_default_context()->throwError(
-      new InvalidMemAccessError());
+    Context::get_default_context()->throwError(new InvalidMemAccessError());
     return -1;
   }
-  buffer = reinterpret_cast<void*>(_buffer + linear_index*_type_size);
+  buffer = reinterpret_cast<void*>(_buffer + linear_index * _type_size);
   return req_read_size;
 }
 size_t RomTensor::_get_writeable_block(void* buffer, uint16_t req_write_size,
@@ -61,7 +61,6 @@ int floorPerfSqrt(int x) {
   // Did not find perfect square
   return -1;
 }
-
 
 DiagonalRomTensor::DiagonalRomTensor(TensorShape _shape, ttype _type,
                                      const void* buffer, size_t buffer_len)

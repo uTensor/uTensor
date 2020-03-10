@@ -1,9 +1,10 @@
 #include "operatorBase.hpp"
+
 #include "context.hpp"
 
 namespace uTensor {
 
-//EVENTS AND ERRORS
+// EVENTS AND ERRORS
 DEFINE_ERROR(OperatorIOSizeMismatchError);
 
 // OperatorBase::OperatorBase(TensorMapInterface* inputs, TensorMapInterface*

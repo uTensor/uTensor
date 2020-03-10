@@ -41,8 +41,7 @@ class FixedMfccOperator : public OperatorInterface<1, 1> {
   }
 
  protected:
-  virtual void compute() {
-  }
+  virtual void compute() {}
 
  private:
   int frame_len;

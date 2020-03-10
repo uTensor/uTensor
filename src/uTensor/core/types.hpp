@@ -32,14 +32,36 @@ class TensorShape {
 enum ttype : uint8_t { i8, u8, i16, u16, i32, u32, flt, undefined };
 uint8_t type_size(ttype t);
 
-template<typename T> struct ttype_from ;//{ static constexpr ttype type = undefined; };
-template<> struct ttype_from<int8_t>   { static constexpr ttype type = i8; };
-template<> struct ttype_from<uint8_t>  { static constexpr ttype type = u8; };
-template<> struct ttype_from<int16_t>  { static constexpr ttype type = i16; };
-template<> struct ttype_from<uint16_t> { static constexpr ttype type = u16; };
-template<> struct ttype_from<int32_t>  { static constexpr ttype type = i32; };
-template<> struct ttype_from<uint32_t> { static constexpr ttype type = u32; };
-template<> struct ttype_from<float>    { static constexpr ttype type = flt; };
+template <typename T>
+struct ttype_from;  //{ static constexpr ttype type = undefined; };
+template <>
+struct ttype_from<int8_t> {
+  static constexpr ttype type = i8;
+};
+template <>
+struct ttype_from<uint8_t> {
+  static constexpr ttype type = u8;
+};
+template <>
+struct ttype_from<int16_t> {
+  static constexpr ttype type = i16;
+};
+template <>
+struct ttype_from<uint16_t> {
+  static constexpr ttype type = u16;
+};
+template <>
+struct ttype_from<int32_t> {
+  static constexpr ttype type = i32;
+};
+template <>
+struct ttype_from<uint32_t> {
+  static constexpr ttype type = u32;
+};
+template <>
+struct ttype_from<float> {
+  static constexpr ttype type = flt;
+};
 
 // Need to figure out way of defering reference until after lefthand assignment
 // Need to figure out way of maintaining reference to rvalue

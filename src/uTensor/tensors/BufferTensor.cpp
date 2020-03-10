@@ -1,5 +1,7 @@
 #include "BufferTensor.hpp"
+
 #include <cstdio>
+
 #include "context.hpp"
 
 namespace uTensor {

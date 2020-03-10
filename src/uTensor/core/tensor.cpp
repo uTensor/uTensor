@@ -1,4 +1,5 @@
 #include "tensor.hpp"
+
 #include "context.hpp"
 #include "uTensor_util.hpp"
 
@@ -15,9 +16,7 @@ const TensorInterface* Tensor::operator->() const {
 TensorInterface* Tensor::operator*() {
   return reinterpret_cast<TensorInterface*>(_ptr);
 }
-Tensor::~Tensor() {
-  free();
-}
+Tensor::~Tensor() { free(); }
 void Tensor::free() {
   if (_ptr) {
     AllocatorInterface* alloc =
@@ -103,22 +102,22 @@ TensorInterface* TensorReference::operator*() {
 }
 
 // Add a couple of bits for GDB debugging since GDB doesnt support operator()
-IntegralValue Tensor::gdb_read(uint16_t i)  {
+IntegralValue Tensor::gdb_read(uint16_t i) {
   return reinterpret_cast<TensorInterface*>(_ptr)->operator()(i);
 }
-IntegralValue Tensor::gdb_read(uint16_t i, uint16_t j)  {
+IntegralValue Tensor::gdb_read(uint16_t i, uint16_t j) {
   return reinterpret_cast<TensorInterface*>(_ptr)->operator()(i, j);
 }
-IntegralValue Tensor::gdb_read(uint16_t i, uint16_t j, uint16_t k)  {
+IntegralValue Tensor::gdb_read(uint16_t i, uint16_t j, uint16_t k) {
   return reinterpret_cast<TensorInterface*>(_ptr)->operator()(i, j, k);
 }
-IntegralValue Tensor::gdb_read(uint16_t i, uint16_t j, uint16_t k, uint16_t l)  {
+IntegralValue Tensor::gdb_read(uint16_t i, uint16_t j, uint16_t k, uint16_t l) {
   return reinterpret_cast<TensorInterface*>(_ptr)->operator()(i, j, k, l);
 }
 
 void print(const Tensor& t) {
   const TensorShape& t_shape = t->get_shape();
-  if(t_shape.num_dims() > 2){
+  if (t_shape.num_dims() > 2) {
     uTensor_printf("printing > 2D tensors not supported\n");
     return;
   }
@@ -126,38 +125,37 @@ void print(const Tensor& t) {
   for (int j = 0; j < t_shape[1]; j++) {
     uTensor_printf("[ ");
     for (int i = 0; i < t_shape[0]; i++) {
-      switch(t->get_type()) {
+      switch (t->get_type()) {
         case u8:
-          uTensor_printf("%hhu", static_cast<uint8_t>(t(j,i)));
+          uTensor_printf("%hhu", static_cast<uint8_t>(t(j, i)));
           break;
         case i8:
-          uTensor_printf("%hhd", static_cast<int8_t>(t(j,i)));
+          uTensor_printf("%hhd", static_cast<int8_t>(t(j, i)));
           break;
         case u16:
-          uTensor_printf("%hu", static_cast<uint16_t>(t(j,i)));
+          uTensor_printf("%hu", static_cast<uint16_t>(t(j, i)));
           break;
         case i16:
-          uTensor_printf("%hd", static_cast<int16_t>(t(j,i)));
+          uTensor_printf("%hd", static_cast<int16_t>(t(j, i)));
           break;
         case u32:
-          uTensor_printf("%u", static_cast<uint32_t>(t(j,i)));
+          uTensor_printf("%u", static_cast<uint32_t>(t(j, i)));
           break;
         case i32:
-          uTensor_printf("%d", static_cast<int32_t>(t(j,i)));
+          uTensor_printf("%d", static_cast<int32_t>(t(j, i)));
           break;
         case flt:
-          uTensor_printf("%f", static_cast<float>(t(j,i)));
+          uTensor_printf("%f", static_cast<float>(t(j, i)));
           break;
       }
-      if( i != (t_shape[0]-1) )
+      if (i != (t_shape[0] - 1))
         uTensor_printf(", ");
       else
         uTensor_printf(" ");
-      
     }
     uTensor_printf("]\n");
   }
-    uTensor_printf("]\n");
+  uTensor_printf("]\n");
 }
 
 SimpleNamedTensor::SimpleNamedTensor(const uTensor::string& name,

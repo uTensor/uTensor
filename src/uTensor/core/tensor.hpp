@@ -11,7 +11,6 @@ namespace uTensor {
 // template <typename Allocator=utensor::DefaultTensorMetaDataAllocator>
 //
 class alignas(alignof(uint8_t*)) Tensor : public Handle {
-
  public:
   TensorInterface* operator->();
   const TensorInterface* operator->() const;
@@ -46,10 +45,10 @@ class alignas(alignof(uint8_t*)) Tensor : public Handle {
   friend class AllocatorInterface;
 
   // Add a couple of bits for GDB debugging since GDB doesnt support operator()
-  IntegralValue gdb_read(uint16_t i) ;
-  IntegralValue gdb_read(uint16_t i, uint16_t j) ;
-  IntegralValue gdb_read(uint16_t i, uint16_t j, uint16_t k) ;
-  IntegralValue gdb_read(uint16_t i, uint16_t j, uint16_t k, uint16_t l) ;
+  IntegralValue gdb_read(uint16_t i);
+  IntegralValue gdb_read(uint16_t i, uint16_t j);
+  IntegralValue gdb_read(uint16_t i, uint16_t j, uint16_t k);
+  IntegralValue gdb_read(uint16_t i, uint16_t j, uint16_t k, uint16_t l);
 };
 
 // Convenience

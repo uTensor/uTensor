@@ -6,4 +6,4 @@ DEFINE_EVENT(localCircularArenaAllocatorRebalancing);
 DEFINE_EVENT(localCircularArenaAllocatorConstructed);
 DEFINE_ERROR(InvalidBoundRegionState);
 
-}
+}  // namespace uTensor

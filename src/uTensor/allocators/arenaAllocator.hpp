@@ -1,13 +1,14 @@
 #ifndef UTENSOR_ARENA_ALLOCATOR_HPP
 #define UTENSOR_ARENA_ALLOCATOR_HPP
+#include <algorithm>  // for sort function
 #include <cstdio>
 #include <forward_list>
-#include <vector>
-#include <algorithm> // for sort function
 #include <memory>
+#include <vector>
+
+#include "context.hpp"
 #include "memoryManagementInterface.hpp"
 #include "tensor.hpp"
-#include "context.hpp"
 
 namespace uTensor {
 
@@ -26,9 +27,10 @@ DECLARE_EVENT(localCircularArenaAllocatorRebalancing);
 DECLARE_EVENT(localCircularArenaAllocatorConstructed);
 DECLARE_ERROR(InvalidBoundRegionState);
 
-
-template<typename T>
-constexpr size_t meta_addressable_space() { return 1 << (sizeof(T)*8 - 1); } 
+template <typename T>
+constexpr size_t meta_addressable_space() {
+  return 1 << (sizeof(T) * 8 - 1);
+}
 /**
  * Size allocated must be less than 2**15
  * TODO get around the BS alignment bits from the silly pointer variable causing
@@ -37,8 +39,12 @@ constexpr size_t meta_addressable_space() { return 1 << (sizeof(T)*8 - 1); }
 template <size_t size, typename T = uint16_t>
 class localCircularArenaAllocator : public AllocatorInterface {
  private:
-   // Compile time check to make sure that the user is using a T large enough to address size
-    static_assert(size < meta_addressable_space<T>(), "[ERROR](localCircularArenaAllocator) T not large enoughn to address size in Arena. Attempted to create Arena with (size, T) mismatch, try increasing T to uint32_t");
+  // Compile time check to make sure that the user is using a T large enough to
+  // address size
+  static_assert(size < meta_addressable_space<T>(),
+                "[ERROR](localCircularArenaAllocator) T not large enoughn to "
+                "address size in Arena. Attempted to create Arena with (size, "
+                "T) mismatch, try increasing T to uint32_t");
 
   class MetaHeader {
    public:
@@ -48,9 +54,13 @@ class localCircularArenaAllocator : public AllocatorInterface {
 
    public:
     MetaHeader()
-        : meta_data(BLOCK_INACTIVE & BLOCK_ZERO_LENGTH), hndl(nullptr), _d(nullptr) {}
-    MetaHeader(T sz) : meta_data(BLOCK_ACTIVE | sz), hndl(nullptr), _d(nullptr) {}
-    MetaHeader(T sz, uint8_t* d) : meta_data(BLOCK_ACTIVE | sz), hndl(nullptr), _d(d) {}
+        : meta_data(BLOCK_INACTIVE & BLOCK_ZERO_LENGTH),
+          hndl(nullptr),
+          _d(nullptr) {}
+    MetaHeader(T sz)
+        : meta_data(BLOCK_ACTIVE | sz), hndl(nullptr), _d(nullptr) {}
+    MetaHeader(T sz, uint8_t* d)
+        : meta_data(BLOCK_ACTIVE | sz), hndl(nullptr), _d(d) {}
     void set_active() { meta_data |= BLOCK_ACTIVE; }
     void set_inactive() { meta_data &= BLOCK_INACTIVE; }
     void set_hndl(Handle* handle) { hndl = handle; }
@@ -68,12 +78,12 @@ class localCircularArenaAllocator : public AllocatorInterface {
     bool is_used() const { return is_active() && (get_len() > 0); }
   };
 
-
  private:
   T capacity;
   uint8_t _buffer[size];
   uint8_t* cursor;
-  std::vector<MetaHeader> _headers;;
+  std::vector<MetaHeader> _headers;
+  ;
 
  private:
   // Return the amount of free space at the tail
@@ -81,9 +91,8 @@ class localCircularArenaAllocator : public AllocatorInterface {
 
   size_t find_header_associated_w_ptr(void* ptr) const {
     size_t i = 0;
-    for(auto hdr_i = _headers.begin(); hdr_i != _headers.end(); hdr_i++){
-      if(hdr_i->_d == ptr)
-        return i;
+    for (auto hdr_i = _headers.begin(); hdr_i != _headers.end(); hdr_i++) {
+      if (hdr_i->_d == ptr) return i;
     }
     return i;
   }
@@ -95,22 +104,17 @@ class localCircularArenaAllocator : public AllocatorInterface {
       // ERROR
       Context::get_default_context()->throwError(new OutOfMemBoundsError);
     }
-    for(auto hdr_i = _headers.begin(); hdr_i != _headers.end(); hdr_i++){
-      if(hdr_i->_d == ptr)
-        return *hdr_i;
+    for (auto hdr_i = _headers.begin(); hdr_i != _headers.end(); hdr_i++) {
+      if (hdr_i->_d == ptr) return *hdr_i;
     }
     // ERROR
     Context::get_default_context()->notifyEvent(MetaHeaderNotFound());
     return not_found;
   }
 
-  uint8_t* begin() {
-    return _buffer;
-  }
+  uint8_t* begin() { return _buffer; }
 
-  uint8_t* end() {
-    return _buffer + size;
-  }
+  uint8_t* end() { return _buffer + size; }
   /*
   void _write_header(const MetaHeader& hdr, void* ptr) {
     // First check if ptr in bounds
@@ -144,13 +148,13 @@ class localCircularArenaAllocator : public AllocatorInterface {
     if (!hdr.is_active()) {
       // ERROR
     }
-    return hdr.is_bound() && (hdr.hndl == hndl);;
+    return hdr.is_bound() && (hdr.hndl == hndl);
+    ;
   }
 
   virtual bool _has_handle(Handle* hndl) {
-    for(auto hdr_i = _headers.begin(); hdr_i != _headers.end(); hdr_i++){
-      if(hdr_i->has_handle(hndl))
-        return true;
+    for (auto hdr_i = _headers.begin(); hdr_i != _headers.end(); hdr_i++) {
+      if (hdr_i->has_handle(hndl)) return true;
     }
     return false;
   }
@@ -178,38 +182,38 @@ class localCircularArenaAllocator : public AllocatorInterface {
     }
 
     // First check to see if we have space in a previously allocated area
-    // TODO: if this region is smaller split it and add another header to the table
-    for(auto hdr_i = _headers.begin(); hdr_i != _headers.end(); hdr_i++){
-     if(!hdr_i->is_active() && hdr_i->get_len() >= sz){
-       MetaHeader& hdr = *hdr_i;
-       // Handle alignment
-       void* aligned_loc = (void*) hdr._d;
-       size_t space_change = hdr.get_len();
-       aligned_loc = std::align(alignof(uint8_t*), sz, aligned_loc, space_change);
-       hdr.set_active();
-       //hdr.set_len(sz + hdr.get_len() - space_change);
-       hdr.set_len(sz);
-       hdr.set_hndl(nullptr);
-       hdr.set_d((uint8_t*)aligned_loc);
-       loc = (uint8_t*)aligned_loc;
+    // TODO: if this region is smaller split it and add another header to the
+    // table
+    for (auto hdr_i = _headers.begin(); hdr_i != _headers.end(); hdr_i++) {
+      if (!hdr_i->is_active() && hdr_i->get_len() >= sz) {
+        MetaHeader& hdr = *hdr_i;
+        // Handle alignment
+        void* aligned_loc = (void*)hdr._d;
+        size_t space_change = hdr.get_len();
+        aligned_loc =
+            std::align(alignof(uint8_t*), sz, aligned_loc, space_change);
+        hdr.set_active();
+        // hdr.set_len(sz + hdr.get_len() - space_change);
+        hdr.set_len(sz);
+        hdr.set_hndl(nullptr);
+        hdr.set_d((uint8_t*)aligned_loc);
+        loc = (uint8_t*)aligned_loc;
 
-       // Update capacity
-       capacity -= hdr.get_len();
+        // Update capacity
+        capacity -= hdr.get_len();
 
-       return (void*)loc;
-      
-     }
+        return (void*)loc;
+      }
     }
-    
-    
+
     // Otherwise allocate at the end
     MetaHeader hdr;
     // Handle alignment
-    void* aligned_loc = (void*) cursor;
+    void* aligned_loc = (void*)cursor;
     size_t space_change = available();
     aligned_loc = std::align(alignof(uint8_t*), sz, aligned_loc, space_change);
     hdr.set_active();
-    //hdr.set_len(sz + available() - space_change);
+    // hdr.set_len(sz + available() - space_change);
     hdr.set_len(sz);
     hdr.set_hndl(nullptr);
     hdr.set_d((uint8_t*)aligned_loc);
@@ -238,7 +242,8 @@ class localCircularArenaAllocator : public AllocatorInterface {
 
  public:
   localCircularArenaAllocator() : capacity(size) {
-    Context::get_default_context()->notifyEvent(localCircularArenaAllocatorConstructed());
+    Context::get_default_context()->notifyEvent(
+        localCircularArenaAllocatorConstructed());
     memset(_buffer, 0, size);
     cursor = begin();
   }
@@ -247,69 +252,71 @@ class localCircularArenaAllocator : public AllocatorInterface {
    * the buffer and inserts an inactive region at the start. note: cursor gets
    * moved to begin() note: unbound regions get wiped
    */
-  //TODO Check to make sure updated locations are still aligned
-  //TODO ABOVE
-  //TODO ABOVE
-  //TODO ABOVE
-  //TODO ABOVE
-  //TODO ABOVE
-  //TODO ABOVE
-  //TODO ABOVE
-  //TODO ABOVE
-  //TODO ABOVE
-  //TODO ABOVE
+  // TODO Check to make sure updated locations are still aligned
+  // TODO ABOVE
+  // TODO ABOVE
+  // TODO ABOVE
+  // TODO ABOVE
+  // TODO ABOVE
+  // TODO ABOVE
+  // TODO ABOVE
+  // TODO ABOVE
+  // TODO ABOVE
+  // TODO ABOVE
   virtual bool rebalance() {
-    Context::get_default_context()->notifyEvent(localCircularArenaAllocatorRebalancing());
+    Context::get_default_context()->notifyEvent(
+        localCircularArenaAllocatorRebalancing());
     // Clear all unbound entries
-    for(auto hdr_i = _headers.rbegin(); hdr_i != _headers.rend(); hdr_i++){
-      if(!hdr_i->is_bound()){
-        hdr_i->set_inactive();  
+    for (auto hdr_i = _headers.rbegin(); hdr_i != _headers.rend(); hdr_i++) {
+      if (!hdr_i->is_bound()) {
+        hdr_i->set_inactive();
       }
     }
     // Sort by activity (shifts unbound entries to the end)
-    std::sort(_headers.begin(), _headers.end(), [](const MetaHeader& a, const MetaHeader& b) {
-      return a.is_active() > b.is_active();
-    });
+    std::sort(_headers.begin(), _headers.end(),
+              [](const MetaHeader& a, const MetaHeader& b) {
+                return a.is_active() > b.is_active();
+              });
 
     int pop_count = 0;
-    for(auto hdr_i = _headers.rbegin(); hdr_i != _headers.rend(); hdr_i++){
-      if(hdr_i->is_active()) {
+    for (auto hdr_i = _headers.rbegin(); hdr_i != _headers.rend(); hdr_i++) {
+      if (hdr_i->is_active()) {
         break;
       }
-        capacity += hdr_i->get_len();
-        pop_count++;
+      capacity += hdr_i->get_len();
+      pop_count++;
     }
     // Remove all unbound
     // Makes the allocator have a cold start
-    for(int i = 0; i < pop_count; i++){
+    for (int i = 0; i < pop_count; i++) {
       _headers.pop_back();
     }
 
-    
     // Headers now only has the bound regions
     // Sort by region
-    std::sort(_headers.begin(), _headers.end(), [](const MetaHeader& a, const MetaHeader& b) {
-      return a._d < b._d;
-    });
+    std::sort(
+        _headers.begin(), _headers.end(),
+        [](const MetaHeader& a, const MetaHeader& b) { return a._d < b._d; });
 
     uint8_t tmp;
     cursor = begin();
     void* aligned_loc;
     size_t space_change;
 
-    for(auto hdr_i = _headers.begin(); hdr_i != _headers.end(); hdr_i++){
-      aligned_loc = (void*) cursor;
+    for (auto hdr_i = _headers.begin(); hdr_i != _headers.end(); hdr_i++) {
+      aligned_loc = (void*)cursor;
       size_t space_change = available();
-      aligned_loc = std::align(alignof(uint8_t*), hdr_i->get_len(), aligned_loc, space_change);
+      aligned_loc = std::align(alignof(uint8_t*), hdr_i->get_len(), aligned_loc,
+                               space_change);
 
       // Shift the data
-      for(int i = 0; i < hdr_i->get_len(); i++){
+      for (int i = 0; i < hdr_i->get_len(); i++) {
         tmp = hdr_i->_d[i];
         reinterpret_cast<uint8_t*>(aligned_loc)[i] = tmp;
       }
 
       // Update header
-      //hdr_i->set_len(sz + available() - space_change);
+      // hdr_i->set_len(sz + available() - space_change);
       hdr_i->set_d((uint8_t*)aligned_loc);
       update_hndl(hdr_i->hndl, hdr_i->_d);
       cursor += hdr_i->get_len() + available() - space_change;
@@ -332,13 +339,12 @@ class localCircularArenaAllocator : public AllocatorInterface {
     if (!((p > _buffer) && (p < (_buffer + size)))) {
       return false;
     }
-    for(auto hdr_i = _headers.begin(); hdr_i != _headers.end(); hdr_i++){
-      if(hdr_i->_d == p)
-        return hdr_i->is_used();
+    for (auto hdr_i = _headers.begin(); hdr_i != _headers.end(); hdr_i++) {
+      if (hdr_i->_d == p) return hdr_i->is_used();
     }
     return false;
-    //MetaHeader hdr = _read_header(p);
-    //return hdr.is_used();
+    // MetaHeader hdr = _read_header(p);
+    // return hdr.is_used();
   }
 
  public:

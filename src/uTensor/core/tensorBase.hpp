@@ -1,7 +1,7 @@
 #ifndef UTENSOR_TENSOR_BASE_H
 #define UTENSOR_TENSOR_BASE_H
-#include "types.hpp"
 #include "quantizationPrimitives.hpp"
+#include "types.hpp"
 
 namespace uTensor {
 

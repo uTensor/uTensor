@@ -21,6 +21,8 @@ void ErrorHandler::notify(const Event& evt) {
   // Do nothing
 }
 
-bool operator == (const Event& a, const Event& b) { return a.event_id == b.event_id; }
+bool operator==(const Event& a, const Event& b) {
+  return a.event_id == b.event_id;
+}
 
 }  // namespace uTensor

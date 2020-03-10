@@ -1,11 +1,12 @@
 #ifndef UTENSOR_TENSOR_MAP
 #define UTENSOR_TENSOR_MAP
 
-#include <initializer_list>
 #include <algorithm>
+#include <initializer_list>
+
 #include "tensor.hpp"
-#include "utensor_string.hpp"
 #include "uTensor_util.hpp"
+#include "utensor_string.hpp"
 
 using std::initializer_list;
 
@@ -25,7 +26,8 @@ class TensorMapInterface {
   static SimpleNamedTensor not_found;
 };
 
-bool compare_named_tensors(const SimpleNamedTensor& a, const SimpleNamedTensor& b);
+bool compare_named_tensors(const SimpleNamedTensor& a,
+                           const SimpleNamedTensor& b);
 template <size_t size>
 class FixedTensorMap : public TensorMapInterface {
  public:
@@ -60,7 +62,8 @@ class FixedTensorMap : public TensorMapInterface {
     }
     return TensorMapInterface::not_found;
   }
-  virtual const SimpleNamedTensor& operator[](const uTensor::string& name) const override {
+  virtual const SimpleNamedTensor& operator[](
+      const uTensor::string& name) const override {
     for (int i = 0; i < size; i++) {
       if (name == *(_map[i].name)) return _map[i];
     }

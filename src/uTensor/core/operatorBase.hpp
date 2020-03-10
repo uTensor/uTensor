@@ -4,9 +4,8 @@
 #include "context.hpp"
 namespace uTensor {
 
-//EVENTS AND ERRORS
+// EVENTS AND ERRORS
 DECLARE_ERROR(OperatorIOSizeMismatchError);
-
 
 // Operators do not go on the heap
 class OperatorBase {
