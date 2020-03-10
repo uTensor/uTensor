@@ -2,6 +2,7 @@
 #define UTENSOR_BUFFER_TENSOR_H
 
 #include "tensorBase.hpp"
+#include "context.hpp"
 
 namespace uTensor {
 class BufferTensor : public TensorInterface {
@@ -12,6 +13,14 @@ class BufferTensor : public TensorInterface {
  public:
   BufferTensor(TensorShape _shape, ttype _type);
   BufferTensor(TensorShape _shape, ttype _type, void* buffer);
+  
+  // Doing constructors this way lets us check for bounds
+  template<typename T, size_t buffer_size>
+  BufferTensor(TensorShape _shape, T(& buffer)[buffer_size]) : BufferTensor(_shape, ttype_from<T>::type, reinterpret_cast<void*>(buffer)) {
+    if(_shape.get_linear_size() != buffer_size){
+      Context::get_default_context()->throwError(new InvalidTensorDimensionsError);
+    }
+  }
 
   bool is_bound_to_buffer() const;
   // Check if is bound to this pointer

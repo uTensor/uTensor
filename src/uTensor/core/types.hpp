@@ -32,7 +32,7 @@ class TensorShape {
 enum ttype : uint8_t { i8, u8, i16, u16, i32, u32, flt, undefined };
 uint8_t type_size(ttype t);
 
-template<typename T> struct ttype_from { static constexpr ttype type = undefined; };
+template<typename T> struct ttype_from ;//{ static constexpr ttype type = undefined; };
 template<> struct ttype_from<int8_t>   { static constexpr ttype type = i8; };
 template<> struct ttype_from<uint8_t>  { static constexpr ttype type = u8; };
 template<> struct ttype_from<int16_t>  { static constexpr ttype type = i16; };

@@ -27,6 +27,16 @@ TEST(Buffer_Tensor, constructor) {
   delete[] buffer;
 }
 
+TEST(Buffer_Tensor, safe_constructor) {
+  //setup_context();
+  localCircularArenaAllocator<256> meta_allocator;
+  localCircularArenaAllocator<256> ram_allocator;
+  Context::get_default_context()->set_metadata_allocator(&meta_allocator);
+  Context::get_default_context()->set_ram_data_allocator(&ram_allocator);
+  uint8_t buffer[10*10];
+  BufferTensor r({10, 10}, buffer);
+}
+
 TEST(Buffer_Tensor, read_write_u8) {
   ///setup_context();
   localCircularArenaAllocator<256> meta_allocator;
