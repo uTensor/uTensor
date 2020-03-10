@@ -49,10 +49,8 @@ class TensorInterface : public TensorBase {
   IntegralValue operator()(uint32_t linear_index);
 
   virtual void resize(TensorShape new_shape) = 0;
-  TensorInterface& set_quantization_params(const QuantizationParams& params) {
-    _qnt_params = params;
-    return *this;
-  }
+  TensorInterface& set_quantization_params(const QuantizationParams& params);
+  const QuantizationParams& get_quantization_params() const;
 
  private:
   /** Optimized op interface

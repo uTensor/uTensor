@@ -57,6 +57,16 @@ IntegralValue TensorInterface::operator()(uint32_t linear_index) {
   // Add shape checks here
   return write(linear_index);
 }
+
+TensorInterface& TensorInterface::set_quantization_params(const QuantizationParams& params) {
+  _qnt_params = params;
+  return *this;
+}
+
+const QuantizationParams& TensorInterface::get_quantization_params() const {
+  return _qnt_params;
+}
+
 size_t TensorInterface::_get_readable_block(void* buffer,
                                             uint16_t req_read_size,
                                             uint32_t linear_index) const {
@@ -90,5 +100,6 @@ size_t TensorInterface::get_writeable_block(void* buffer,
   }
   return _get_writeable_block(buffer, req_write_size, linear_index);
 }
+  
 
 }  // namespace uTensor
