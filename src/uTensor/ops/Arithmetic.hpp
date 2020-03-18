@@ -4,7 +4,6 @@
 #include <limits>
 
 #include "Arithmetic_kernels.hpp"
-#include "functional_kernels.hpp"
 #include "operatorBase.hpp"
 
 namespace uTensor {
@@ -23,29 +22,6 @@ class AddOperator : public OperatorInterface<2, 1> {
   }
 };
 
-template <typename T>
-class MinOperator : public OperatorInterface<1, 1> {
- public:
-  enum names_in : uint8_t { in };
-  enum names_out : uint8_t { out };
-
- protected:
-  virtual void compute() {
-    min_kernel<T>(*outputs[out].tensor, *inputs[in].tensor);
-  }
-};
-
-template <typename T>
-class MaxOperator : public OperatorInterface<1, 1> {
- public:
-  enum names_in : uint8_t { in };
-  enum names_out : uint8_t { out };
-
- protected:
-  virtual void compute() {
-    max_kernel<T>(*outputs[out].tensor, *inputs[in].tensor);
-  }
-};
 
 }  // namespace uTensor
 #endif

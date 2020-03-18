@@ -15,6 +15,7 @@
  * Operators
  */
 #include "uTensor/ops/Arithmetic.hpp"
+#include "uTensor/ops/Functional.hpp"
 #include "uTensor/ops/Convolution.hpp"
 #include "uTensor/ops/Matrix.hpp"
 
