@@ -29,5 +29,36 @@ void relu_k(Tensor& out, const Tensor& in) {
   }
 }
 
+template <typename T>
+void inplace_relu6_k(Tensor& t) {
+  T tmp;
+  uint32_t t_size = t->get_shape().get_linear_size();
+  for (uint32_t i = 0; i < t_size; i++) {
+    tmp = t(i);
+    if (tmp < 0) {
+      t(i) = static_cast<T>(0);
+    }
+    if (tmp > 6) {
+      t(i) = static_cast<T>(6);
+    }
+  }
+}
+
+template <typename T>
+void relu6_k(Tensor& out, const Tensor& in) {
+  T tmp;
+  uint32_t in_size = in->get_shape().get_linear_size();
+  for (uint32_t i = 0; i < in_size; i++) {
+    tmp = in(i);
+    if (tmp < 0) {
+      tmp = static_cast<T>(0);
+    }
+    if (tmp > 6) {
+      tmp = static_cast<T>(6);
+    }
+    out(i) = tmp;
+  }
+}
+
 }  // namespace uTensor
 #endif
