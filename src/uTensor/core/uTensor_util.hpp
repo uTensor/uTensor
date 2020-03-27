@@ -101,6 +101,8 @@ void utensor_exit(void);
 #include <sys/types.h>
 #elif defined(_POSIX_VERSION)
 // POSIX
+#elif ARM_PROJECT
+//ARM Project
 #else
 #if ARDUINO
 #include "Arduino.h"
@@ -110,7 +112,7 @@ void utensor_exit(void);
 #undef round
 #undef abs
 #else
-#include "mbed.h"
+//#include "mbed.h"
 #define MBED_PROJECT
 #endif
 //#   error "Unknown compiler"

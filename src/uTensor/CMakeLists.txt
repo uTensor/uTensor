@@ -1,6 +1,7 @@
 add_subdirectory(core)
 
-option(X86_PROJECT "Build for x86" ON)
+option(X86_PROJECT "Build for x86" OFF)
+option(ARM_PROJECT "Build for Arm" OFF)
 
 set(src_utensor_alloc
     allocators/arenaAllocator.cpp
@@ -38,9 +39,11 @@ set(hdr_utensor_errhndl
    )
 if(X86_PROJECT)
 add_definitions( -DX86_PROJECT=1 )
+elseif(ARM_PROJECT)
+add_definitions( -DARM_PROJECT=1 )
 #list(APPEND src_utensor_ops )
 endif()
-#add_subdirectory(ops/optimized)
+add_subdirectory(ops/optimized)
 
 add_library(utensor  ${src_utensor_alloc} ${src_utensor_tensors} ${src_utensor_ops} ${src_utensor_errhndl} contexts/default_context.cpp)
 #target_link_libraries(utensor utensor_core optimized_ops)
