@@ -5,7 +5,7 @@ Note: If you are looking for stable releases, checkout master.
 ## Introduction
 
 ### What is it?
-uTensor is an extremely light-weight machine learning inference framework built on Mbed and Tensorflow. It consists of a runtime library and an offline tool that handles most of the model translation work. This repo holds the core runtime and some example implementations of operators, memory managers/schedulers, and more, and the size of the core runtime is only ~1.3KB!
+uTensor is an extremely light-weight machine learning inference framework built on Tensorflow and optimized for Arm targets. It consists of a runtime library and an offline tool that handles most of the model translation work. This repo holds the core runtime and some example implementations of operators, memory managers/schedulers, and more, and the size of the core runtime is only ~2KB!
 
 | Module                       |         .text |       .data |        .bss |
 |------------------------------|---------------|-------------|-------------|
@@ -71,8 +71,8 @@ const uint8_t s_c_ref[4] = {19, 22, 43, 50};
 // This function  name doesnt matter, it should just be called before instantiating a model
 void uTensor_init() {
   // Tell the uTensor context which allocators to use
-  localCircularArenaAllocator<256> meta_allocator;
-  localCircularArenaAllocator<256> ram_allocator;
+  localCircularArenaAllocator<256> meta_allocator; // All tensor metadata gets stored here automatically, even when new is called
+  localCircularArenaAllocator<256> ram_allocator;  // All temporary storage gets allocated here
   Context::get_default_context()->set_metadata_allocator(&meta_allocator);
   Context::get_default_context()->set_ram_data_allocator(&ram_allocator);
 
