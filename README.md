@@ -128,6 +128,11 @@ make test
 
 ## Building and running on Arm systems
 TODO
+https://stackoverflow.com/questions/46916611/cross-compiling-googletest-for-arm64
+```
+mkdir build && cd build
+cmake -DARM_PROJECT=1 -DCMAKE_BUILD_TYPE=Debug -DCMAKE_TOOLCHAIN_FILE=../extern/CMSIS_5/CMSIS/DSP/gcc.cmake  ..
+```
 
 
 ## Further Reading

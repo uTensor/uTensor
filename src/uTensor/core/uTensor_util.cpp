@@ -1,7 +1,7 @@
 #include "uTensor_util.hpp"
 #if !(defined(TARGET_MBED) || defined(ARDUINO))
-#include <dirent.h>
-#include <sys/stat.h>
+//#include <dirent.h>
+//#include <sys/stat.h>
 #endif
 #include <cstdlib>
 
@@ -51,17 +51,17 @@ uint32_t ntoh32(uint32_t val) {
 void int_env() {}
 #else
 void init_env() {
-  int status;
-  DIR* dir = opendir("/fs/tmp");
-  if (dir) {
-    closedir(dir);
-    return;
-  } else {
-    status = mkdir("/fs/tmp", 0777);
-    if (status == -1) {
-      ERR_EXIT("env setting failed");
-    }
-  }
+//  int status;
+//  DIR* dir = opendir("/fs/tmp");
+//  if (dir) {
+//    closedir(dir);
+//    return;
+//  } else {
+//    status = mkdir("/fs/tmp", 0777);
+//    if (status == -1) {
+//      ERR_EXIT("env setting failed");
+//    }
+//  }
 }
 #endif
 
