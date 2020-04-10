@@ -8,6 +8,7 @@ import numpy as np
 
 TFLM_Tensor = namedtuple('TFLM_Tensor', ['tensor', 'quantization'])
 
+test_name = "3_fully_connected"
 output_file = "test_quantized_fully_connected.cpp"
 const_file = "constants_quantized_fully_connected.hpp"
 
@@ -51,13 +52,32 @@ def dtype_to_ctype(x):
         print("unexpected DTYPE", x)
         return None
 
+def dtype_to_utype(x):
+    if x == "int8":
+        return "i8"
+    elif x == "uint8":
+        return "u8"
+    elif x == "int16":
+        return "i16"
+    elif x == "uint16":
+        return "u16"
+    elif x == "int32":
+        return "i32"
+    elif x == "uint32":
+        return "u32"
+    elif x == "float":
+        return "flt"
+    else:
+        print("unexpected DTYPE", x)
+        return None
+
 const_str = """
 {% for tensor in reference_tensors %} 
 static const {{ tensor.type }} {{ tensor.r_name }}[{{ tensor.flat_num_elems }}] = { 
 {% for x in tensor.data  %} {{ x }}{{ "," if not loop.last }}{{ "\n" if loop.index0 != 0 and loop.index0 % 10 == 0 }} {% endfor %} 
 };
-static const int32_t {{ tensor.r_name }}_q_zp [1] = { {{ tensor.zp }} };
-static const float {{ tensor.r_name }}_q_scale [1] = { {{ tensor.scale }} };
+static const int32_t {{ tensor.r_zp_name }} [1] = { {{ tensor.zp }} };
+static const float {{ tensor.r_scale_name }} [1] = { {{ tensor.scale }} };
 
 {% endfor %}
 """
@@ -66,22 +86,27 @@ test_str = """
 
 TEST(Quantized, reference_{{ test_name }}) {
   localCircularArenaAllocator<1024> meta_allocator;
-  localCircularArenaAllocator<{{ out_size }}*2*sizeof(float), uint32_t> ram_allocator;
+  localCircularArenaAllocator<{{ out_tensor.flat_num_elems }}*2*sizeof({{ out_tensor.utype }}), uint32_t> ram_allocator;
   Context::get_default_context()->set_metadata_allocator(&meta_allocator);
   Context::get_default_context()->set_ram_data_allocator(&ram_allocator);
 
-  Tensor in = new RomTensor({ {% for x in in_shape %}{{ x }}{{ "," if not loop.last }}{% endfor %} }, flt, s_in_{{ test_name }});
-  Tensor w = new RomTensor({ {% for x in w_shape %}{{ x }}{{ "," if not loop.last }}{% endfor %} }, flt, s_w_{{ test_name }});
-  Tensor out = new RamTensor({ {% for x in out_shape %}{{ x }}{{ "," if not loop.last }}{% endfor %} }, flt);
+  {% for tensor in reference_tensors %}
+  Tensor {{ tensor.name }} =  new RomTensor({ {% for x in tensor.shape %}{{ x }}{{ ", " if not loop.last }}{% endfor %} }, {{ tensor.utype }}, {{ tensor.r_name }})
+                        .set_quantization_params(PerTensorQuantizationParams({{ tensor.r_zp_name }}, {{ tensor.r_scale_name }}));
 
+  {% endfor %}
+  Tensor out = new RamTensor({ {% for x in out_tensor.shape %}{{ x }}{{ ", " if not loop.last }}{% endfor %} }, {{ out_tensor.utype }})
+                .set_quantization_params(PerTensorQuantizationParams({{ out_tensor.r_zp_name }}, {{ out_tensor.r_scale_name }} ));
+
+  /*
   ConvOperator<float> conv_Aw({ {% for x in strides %}{{ x }}{{ "," if not loop.last }}{% endfor %}}, {{ PADDING }});
   conv_Aw
        .set_inputs({ {ConvOperator<float>::in, in}, {ConvOperator<float>::filter, w} })
        .set_outputs({ {ConvOperator<float>::out, out} })
        .eval();
-
+  */
   for(int i = 0; i < {{ out_size }}; i++) {
-    EXPECT_NEAR((float) out(i), s_ref_out_{{ test_name }}[i], 0.0001);
+    //EXPECT_NEAR((float) out(i), {{ out_tensor.r_name }}[i], 0.0001);
   }
 }
 """
@@ -119,6 +144,7 @@ if __name__ == "__main__":
     tests=[]
     constants=[]
     reference_tensors = []
+    out_tensor = {}
     
     ref_test_data = import_test_data()
     name_map = get_name_map()
@@ -132,18 +158,30 @@ if __name__ == "__main__":
             tensor["name"] = name_map[key][t]
             tensor["r_name"] = "s_ref_%s" % tensor["name"]
             tensor["type"] = dtype_to_ctype(test_data.dtype)
+            tensor["utype"] = dtype_to_utype(test_data.dtype)
             tensor["shape"]  = test_data.shape
             tensor["data"] = test_data.flatten()
             tensor["flat_num_elems"] = len(tensor["data"])
             tensor["zp"] = q_zp
             tensor["scale"] = q_scale
-            
+            tensor["r_zp_name"] = tensor["r_name"] + "_zp"
+            tensor["r_scale_name"] = tensor["r_name"] + "_scale"
+            tensor["io"] = key
+
+            # hack for now
+            if key == "outputs":
+                out_tensor = tensor
             reference_tensors.append(tensor)
+
     #print(reference_tensors)
     const_str_rendered = const_Template.render(reference_tensors=reference_tensors)
     const_container_rendered = const_container_Template.render(constant_snippet=const_str_rendered, constants_header=const_file)
+    test_str_rendered = test_Template.render(test_name=test_name, reference_tensors=reference_tensors, out_tensor=out_tensor)
+    container_rendered = container_Template.render(test=test_str_rendered, constants_header=const_file)
     with open(const_file, "w") as fp:
         fp.write(const_container_rendered)
+    with open(output_file, "w") as fp:
+        fp.write(container_rendered)
 
 
 #for i in range(num_tests):
