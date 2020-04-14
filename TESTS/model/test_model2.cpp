@@ -78,7 +78,7 @@ void MyModel::compute() {
   // First Multiply
   // mult_1_out = input*b;
   mult
-      .set_inputs({{MatrixMultOperator<uint8_t>::a, *inputs[input].tensor}, {MatrixMultOperator<uint8_t>::b, b}})
+      .set_inputs({{MatrixMultOperator<uint8_t>::a, inputs[input].tensor()}, {MatrixMultOperator<uint8_t>::b, b}})
       .set_outputs({{MatrixMultOperator<uint8_t>::c, mult_1_out}})
       .eval();
   
@@ -96,7 +96,7 @@ void MyModel::compute() {
   // output = add_1_out + d
   add
       .set_inputs({{AddOperator<uint8_t>::a, add_1_out}, {AddOperator<uint8_t>::b, d}})
-      .set_outputs({{AddOperator<uint8_t>::c, *outputs[output].tensor}})
+      .set_outputs({{AddOperator<uint8_t>::c, outputs[output].tensor()}})
       .eval();
   add_1_out.free();
 }

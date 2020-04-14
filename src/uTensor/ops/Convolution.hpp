@@ -107,9 +107,9 @@ class ConvOperator : public OperatorInterface<2, 1> {
 
  protected:
   virtual void compute() {
-    ConvFilter<T> conv(*inputs[filter].tensor);
+    ConvFilter<T> conv(inputs[filter].tensor());
     generic_convolution_kernel<T, ConvFilter<T>>(
-        *outputs[out].tensor, *inputs[in].tensor, conv, _padding, _stride);
+        outputs[out].tensor(), inputs[in].tensor(), conv, _padding, _stride);
   }
 
  private:
@@ -135,10 +135,10 @@ class DepthwiseSeparableConvOperator : public OperatorInterface<3, 1> {
 
  protected:
   virtual void compute() {
-    TensorShape& in_shape = (*inputs[in].tensor)->get_shape();
-    TensorShape& df_shape = (*inputs[depthwise_filter].tensor)->get_shape();
-    TensorShape& pf_shape = (*inputs[pointwise_filter].tensor)->get_shape();
-    TensorShape& out_shape = (*outputs[out].tensor)->get_shape();
+    TensorShape& in_shape = inputs[in].tensor()->get_shape();
+    TensorShape& df_shape = inputs[depthwise_filter].tensor()->get_shape();
+    TensorShape& pf_shape = inputs[pointwise_filter].tensor()->get_shape();
+    TensorShape& out_shape = outputs[out].tensor()->get_shape();
 
     if (in_shape[3] != df_shape[2]) {
       Context::get_default_context()->throwError(
@@ -149,8 +149,8 @@ class DepthwiseSeparableConvOperator : public OperatorInterface<3, 1> {
           new InvalidTensorDimensionsError);
     }
     depthwise_separable_convolution_kernel<T>(
-        *outputs[out].tensor, *inputs[in].tensor,
-        *inputs[depthwise_filter].tensor, *inputs[pointwise_filter].tensor,
+        outputs[out].tensor(), inputs[in].tensor(),
+        inputs[depthwise_filter].tensor(), inputs[pointwise_filter].tensor(),
         _padding, _stride);
   }
 
@@ -181,10 +181,10 @@ class GenericPoolOp : public OperatorInterface<1, 1> {
 
  protected:
   virtual void compute() {
-    TensorShape& in_shape = (*inputs[in].tensor)->get_shape();
+    TensorShape& in_shape = inputs[in].tensor()->get_shape();
     Filter filter(_k_size[0], _k_size[1], in_shape[3]);
     generic_pool_convolution_kernel<T, Filter>(
-        *outputs[out].tensor, *inputs[in].tensor, filter, _padding, _stride);
+        outputs[out].tensor(), inputs[in].tensor(), filter, _padding, _stride);
   }
 
  private:
