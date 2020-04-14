@@ -18,7 +18,7 @@ class AddOperator : public OperatorInterface<2, 1> {
 
  protected:
   virtual void compute() {
-    add_kernel<T>(*outputs[c].tensor, *inputs[a].tensor, *inputs[b].tensor);
+    add_kernel<T>(outputs[c].tensor(), inputs[a].tensor(), inputs[b].tensor());
   }
 };
 

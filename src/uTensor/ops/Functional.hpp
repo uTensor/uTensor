@@ -25,7 +25,7 @@ class MinOperator : public OperatorInterface<1, 1> {
 
  protected:
   virtual void compute() {
-    min_kernel<T>(*outputs[out].tensor, *inputs[in].tensor);
+    min_kernel<T>(outputs[out].tensor(), inputs[in].tensor());
   }
 };
 
@@ -37,7 +37,7 @@ class MaxOperator : public OperatorInterface<1, 1> {
 
  protected:
   virtual void compute() {
-    max_kernel<T>(*outputs[out].tensor, *inputs[in].tensor);
+    max_kernel<T>(outputs[out].tensor(), inputs[in].tensor());
   }
 };
 
@@ -49,7 +49,7 @@ class SqueezeOperator : public InPlaceFnc {
    SqueezeOperator(std::initializer_list<uint8_t> axis) : _axis(axis) {}
 
  protected:
-  virtual void compute() { squeeze_kernel<T>(*inputs[x].tensor, _axis); }
+  virtual void compute() { squeeze_kernel<T>(inputs[x].tensor(), _axis); }
  private:
   std::vector<uint8_t> _axis;
 };

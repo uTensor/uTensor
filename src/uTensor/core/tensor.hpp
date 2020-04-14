@@ -63,10 +63,11 @@ class TensorReference : public HandleReference {
 struct SimpleNamedTensor {
  public:
   const uTensor::string* name;  // Fixed
-  Tensor* tensor;               // Modifiable
+  Tensor* _tensor;               // Modifiable
 
   SimpleNamedTensor();
   SimpleNamedTensor(const uTensor::string& name, Tensor& tensor);
+  Tensor& tensor();
 };
 }  // namespace uTensor
 #endif

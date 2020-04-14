@@ -47,8 +47,8 @@ class MatrixMultOperator : public OperatorInterface<2, 1> {
 
  protected:
   virtual void compute() {
-    matrix_mult_kernel<T>(*outputs[c].tensor, *inputs[a].tensor,
-                          *inputs[b].tensor);
+    matrix_mult_kernel<T>(outputs[c].tensor(), inputs[a].tensor(),
+                          inputs[b].tensor());
   }
 };
 
