@@ -89,6 +89,19 @@ void TensorShape::update_dims() {
       _num_dims = i + 1;
   }
 }
+bool TensorShape::operator==(const TensorShape& other) {
+  if (_num_dims != other.num_dims()) {
+    return false;
+  }
+  bool all_eq = true;
+  for (int i = 0; i < _num_dims; ++i){
+    all_eq = all_eq && (_shape[i] == other[i]);
+  }
+  return all_eq;
+}
+bool TensorShape::operator!=(const TensorShape& other){
+  return !(*this == other);
+}
 uint16_t TensorShape::get_linear_size() const {
   uint16_t sum = 1;
   for (int i = 0; i < _num_dims; i++) {

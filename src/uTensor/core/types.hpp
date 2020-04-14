@@ -19,6 +19,8 @@ class TensorShape {
 
   uint16_t operator[](int i) const;
   uint16_t& operator[](int i);
+  bool operator == (const TensorShape& other);
+  bool operator != (const TensorShape& other);
   void update_dims();
   uint16_t get_linear_size() const;
   uint8_t num_dims() const;
