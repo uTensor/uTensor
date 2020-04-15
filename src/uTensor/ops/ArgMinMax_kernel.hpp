@@ -1,0 +1,57 @@
+#ifndef UTENSOR_ARG_MIN_MAX_KERNEL_H
+#define UTENSOR_ARG_MIN_MAX_KERNEL_H
+
+#include "context.hpp"
+#include "types.hpp"
+#include "tensor.hpp"
+#include "uTensor_util.hpp"
+
+namespace uTensor {
+enum ArgMinMaxCompareFlag {
+  Max = 1,
+  Min = -1,
+};
+
+template <typename Tin, typename Tout>
+void arg_min_max_kernel(Tensor &output, Tensor &input, const Tensor &axis, ArgMinMaxCompareFlag cmp = Max) {
+  if (axis->get_type() != u32) {
+    // TODO: type convertion to u32?
+    uTensor_printf("only support u32 typed axis tensor\n");
+    Context::get_default_context()->throwError(new InvalidTensorError);
+    return;
+  }
+  if (axis.get_shape().num_dims() != 1) {
+    uTensor_printf("axis should be scalar\n");
+    Context::get_default_context()->throwError(new InvalidTensorError);
+    return;
+  }
+  TensorShape input_shape = input->get_shape();
+  uint16_t axis_size = input_shape[axis_dim];
+  int num_dims = input_shape.num_dims();
+  const uint32_t axis_dim = axis(0)() > 0 ? axis(0)() : axis(0)() + num_dims;
+  uint32_t outer_size = 1;
+  for (int i = 0; i < axis_dim; ++i) {
+    outer_size *= input_shape[i];
+  }
+  uint32_t inner_size = 1;
+  for (int i = axis_dim + 1; i < num_dimx; ++i) {
+    inner_size *= input_shape[i];
+  }
+  for (uint32_t outer = 0; outer < outer_size; ++outer) {
+    for (uint32_t inner = 0; inner < inner_size; ++inner) {
+      Tin min_max_value = input_a(outer * axis_size * inner_size + inner);
+      Tout min_max_index = 0;
+      for (uint32_t i = 1; i < axis_size; ++i) {
+        const Tin curr_value = input((outer * axis_size + i) * inner_size + inner);
+        if (cmp * curr_value >= cmp * min_max_value) {
+          min_max_value = curr_value;
+          min_max_index = static_cast<Tout>(i);
+        }
+      }
+      output(outer * inner_size + inner) = min_max_index;
+    }
+  }
+}
+} // namespace uTensor
+
+#endif // UTENSOR_ARG_MIN_MAX_KERNEL_H

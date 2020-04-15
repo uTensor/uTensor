@@ -138,6 +138,14 @@ uint32_t TensorShape::linear_index(uint16_t i, uint16_t j, uint16_t k,
   return i * num_rows * num_cols * num_channels + j * num_cols * num_channels +
          k * num_channels + l;
 }
+uint32_t TensorShape::num_elems() const {
+  uint32_t num = 1;
+  for (size_t dim_idx = 0; dim_idx < _num_dims; ++dim_idx) {
+    num *= _shape[dim_idx];
+  }
+  return num;
+}
+
 IntegralValue::IntegralValue(void* p) : p(p), num_bytes(0) {}
 
 /*

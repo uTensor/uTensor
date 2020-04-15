@@ -33,6 +33,7 @@ class TensorInterface : public TensorBase {
  public:
   ttype get_type() const;
   TensorShape& get_shape();
+  uint32_t num_elems() const;
   const TensorShape& get_shape() const;
   TensorInterface();
   TensorInterface(TensorShape _shape, ttype _type);
