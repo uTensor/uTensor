@@ -15,8 +15,8 @@ class QuantizationParams {
   QuantizationParams& operator=(QuantizationParams&&) = default;
 
   virtual ~QuantizationParams();
-  virtual int32_t get_zeroP_for_channel(int i);
-  virtual float get_scale_for_channel(int i);
+  virtual int32_t const get_zeroP_for_channel(int i) const;
+  virtual float const get_scale_for_channel(int i) const;
   inline const int num_channels() const { return _num_channels; };
 
  protected:
@@ -38,8 +38,8 @@ inline bool is_per_channel_quantization(const QuantizationParams& params) {
 class PerTensorQuantizationParams : public QuantizationParams {
  public:
   PerTensorQuantizationParams(const int32_t& zp, const float& scale);
-  virtual int32_t get_zeroP_for_channel(int i) override;
-  virtual float get_scale_for_channel(int i) override;
+  virtual int32_t const get_zeroP_for_channel(int i) const override;
+  virtual float const get_scale_for_channel(int i) const override;
   // virtual inline const int num_channels() { return _num_channels; };
 };
 
@@ -54,8 +54,8 @@ class PerChannelQuantizationParams : public QuantizationParams {
                                const int32_t (&scale)[num_channels])
       : QuantizationParams(zp, scale, num_channels) {}
 
-  virtual int32_t get_zeroP_for_channel(int i) override;
-  virtual float get_scale_for_channel(int i) override;
+  virtual int32_t const get_zeroP_for_channel(int i) const override;
+  virtual float const get_scale_for_channel(int i) const override;
 };
 
 }  // namespace uTensor
