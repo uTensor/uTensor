@@ -12,7 +12,7 @@ enum ArgMinMaxCompareFlag {
   Min = -1,
 };
 
-template <typename Tin, typename Tout>
+template <typename Tin>
 void arg_min_max_kernel(Tensor &output, Tensor &input, Tensor &axis, ArgMinMaxCompareFlag cmp = Max) {
   if (axis->get_type() != u32) {
     // TODO: type convertion to u32?
@@ -22,6 +22,11 @@ void arg_min_max_kernel(Tensor &output, Tensor &input, Tensor &axis, ArgMinMaxCo
   }
   if (axis.get_shape().num_dims() != 1) {
     uTensor_printf("axis should be scalar\n");
+    Context::get_default_context()->throwError(new InvalidTensorError);
+    return;
+  }
+  if (output->get_type() != u32) {
+    uTensor_printf("output type must be u32\n");
     Context::get_default_context()->throwError(new InvalidTensorError);
     return;
   }
@@ -42,12 +47,12 @@ void arg_min_max_kernel(Tensor &output, Tensor &input, Tensor &axis, ArgMinMaxCo
   for (uint32_t outer = 0; outer < outer_size; ++outer) {
     for (uint32_t inner = 0; inner < inner_size; ++inner) {
       Tin min_max_value = input(outer * axis_size * inner_size + inner);
-      Tout min_max_index = 0;
+      uint32_t min_max_index = 0;
       for (uint32_t i = 1; i < axis_size; ++i) {
         const Tin curr_value = input((outer * axis_size + i) * inner_size + inner);
         if (cmp * curr_value >= cmp * min_max_value) {
           min_max_value = curr_value;
-          min_max_index = static_cast<Tout>(i);
+          min_max_index = i;
         }
       }
       output(outer * inner_size + inner) = min_max_index;

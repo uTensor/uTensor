@@ -18,7 +18,7 @@ using namespace uTensor;
  
 TEST({{test_suit_name}}, {{test_name}}) {
   localCircularArenaAllocator<1024> meta_allocator;
-  localCircularArenaAllocator<{{ output_size }}*sizeof(float), uint32_t> ram_allocator;
+  localCircularArenaAllocator<{{ output_size }}*2*sizeof(float), uint32_t> ram_allocator;
   Context::get_default_context()->set_metadata_allocator(&meta_allocator);
   Context::get_default_context()->set_ram_data_allocator(&ram_allocator);
   {%for declare in declare_tensor_strs%}
@@ -34,8 +34,14 @@ TEST({{test_suit_name}}, {{test_name}}) {
     .set_outputs({ {{outputs_str}} })
     .eval();
   {%for output_name, ref_output_name in zip(output_names, ref_output_names)%}
+  {%if tol %}
   for (int i = 0; i < {{output_size}}; ++i) {
-    EXPECT_NEAR((float) {{output_name}}(i), {{ref_output_name}}[i], {{tol}});
+    EXPECT_NEAR(({{output_type_str}}) {{output_name}}(i), {{ref_output_name}}[i], {{tol}});
   }
+  {%else%}
+  for (int i = 0; i < {{output_size}}; ++i) {
+    EXPECT_EQ(({{output_type_str}}) {{output_name}}(i), {{ref_output_name}}[i]);
+  }
+  {%endif%}
   {%endfor%}
 }

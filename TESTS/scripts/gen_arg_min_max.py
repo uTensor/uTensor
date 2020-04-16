@@ -14,7 +14,7 @@ def main(cpp_fname, const_fname, is_argmin):
     output_size = 10
     declare_tensor_strs = []
     op_cls = is_argmin and "ArgMinOperator" or "ArgMaxOperator"
-    op_type_signature = "float, float"
+    op_type_signature = "float"
     op_name = "op"
     op_construct_params = []
     inputs_str = ""
@@ -24,13 +24,13 @@ def main(cpp_fname, const_fname, is_argmin):
     # generate testing data
     tensor_input = tf.random.uniform((10, 5), maxval=5, dtype=tf.float32)
     np_input = tensor_input.numpy()
-    tf_op = [tf.argmin, tf.argmax][is_argmin]
+    tf_op = [tf.argmax, tf.argmin][is_argmin]
     tensor_output = tf_op(tensor_input, axis=1)
     np_output = tensor_output.numpy()
 
-    constants_map["random_input_arr"] = np_input.flatten().tolist()
-    constants_map["const_axis"] = [1]
-    constants_map["ref_output_arr"] = np_output.flatten().tolist()
+    constants_map["random_input_arr"] = (np_input.flatten().tolist(), "float")
+    constants_map["const_axis"] = ([1], "uint32_t")
+    constants_map["ref_output_arr"] = (np_output.flatten().tolist(), "uint32_t")
     declare_tensor_strs.extend(
         [
             env.get_template("declare_rom_tensor.cpp").render(
@@ -48,7 +48,7 @@ def main(cpp_fname, const_fname, is_argmin):
             env.get_template("declare_ram_tensor.cpp").render(
                 tensor_name="output_tensor",
                 shape=np_output.shape,
-                tensor_type_str="float",
+                tensor_type_str="uint32_t",
             ),
         ]
     )
@@ -76,7 +76,7 @@ def main(cpp_fname, const_fname, is_argmin):
                 outputs_str=outputs_str,
                 output_names=output_names,
                 ref_output_names=ref_output_names,
-                tol=0.0001,
+                output_type_str="uint32_t",
             )
         )
         header_fid.write(

@@ -5,7 +5,7 @@
 
 namespace uTensor {
 
-template <typename Tin, typename Tout>
+template <typename Tin>
 class ArgMaxOperator : public OperatorInterface<2, 1>
 {
 public:
@@ -13,7 +13,7 @@ public:
   enum names_out : uint8_t { output };
 protected:
   virtual void compute() {
-    arg_min_max_kernel<Tin, Tout>(
+    arg_min_max_kernel<Tin>(
       outputs[output].tensor(),
       inputs[input].tensor(),
       inputs[axis].tensor(),
@@ -22,7 +22,7 @@ protected:
   }
 };
 
-template <typename Tin, typename Tout>
+template <typename Tin>
 class ArgMinOperator : public OperatorInterface<2, 1>
 {
 public:
@@ -30,7 +30,7 @@ public:
   enum names_out : uint8_t { output };
 protected:
   virtual void compute() {
-    arg_min_max_kernel<Tin, Tout>(
+    arg_min_max_kernel<Tin>(
       outputs[output].tensor(),
       inputs[input].tensor(),
       inputs[axis].tensor(),

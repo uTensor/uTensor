@@ -48,3 +48,6 @@ dev
 .vscode
 
 build
+*.dSYM
+main.cpp
+a.out
