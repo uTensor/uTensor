@@ -22,6 +22,11 @@ public:
       Context::get_default_context()->throwError(new InvalidReshapeError);
       return;
     }
+    if (input_tensor->get_type() != output_tensor->get_type()){
+      uTensor_printf("inconsistent input and output data type for reshape\n");
+      Context::get_default_context()->throwError(new InvalidTensorDataTypeError);
+      return;
+    }
     input_tensor->get_shape() = output_tensor->get_shape();
   }
 };

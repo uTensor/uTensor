@@ -13,7 +13,7 @@ enum ArgMinMaxCompareFlag {
 };
 
 template <typename Tin, typename Tout>
-void arg_min_max_kernel(Tensor &output, Tensor &input, const Tensor &axis, ArgMinMaxCompareFlag cmp = Max) {
+void arg_min_max_kernel(Tensor &output, Tensor &input, Tensor &axis, ArgMinMaxCompareFlag cmp = Max) {
   if (axis->get_type() != u32) {
     // TODO: type convertion to u32?
     uTensor_printf("only support u32 typed axis tensor\n");
@@ -25,21 +25,23 @@ void arg_min_max_kernel(Tensor &output, Tensor &input, const Tensor &axis, ArgMi
     Context::get_default_context()->throwError(new InvalidTensorError);
     return;
   }
+  uint32_t axis_dim = axis(0);
   TensorShape input_shape = input->get_shape();
-  uint16_t axis_size = input_shape[axis_dim];
   int num_dims = input_shape.num_dims();
-  const uint32_t axis_dim = axis(0)() > 0 ? axis(0)() : axis(0)() + num_dims;
+  if (axis_dim < 0) axis_dim += num_dims;
+
+  uint16_t axis_size = input_shape[axis_dim];
   uint32_t outer_size = 1;
   for (int i = 0; i < axis_dim; ++i) {
     outer_size *= input_shape[i];
   }
   uint32_t inner_size = 1;
-  for (int i = axis_dim + 1; i < num_dimx; ++i) {
+  for (int i = axis_dim + 1; i < num_dims; ++i) {
     inner_size *= input_shape[i];
   }
   for (uint32_t outer = 0; outer < outer_size; ++outer) {
     for (uint32_t inner = 0; inner < inner_size; ++inner) {
-      Tin min_max_value = input_a(outer * axis_size * inner_size + inner);
+      Tin min_max_value = input(outer * axis_size * inner_size + inner);
       Tout min_max_index = 0;
       for (uint32_t i = 1; i < axis_size; ++i) {
         const Tin curr_value = input((outer * axis_size + i) * inner_size + inner);

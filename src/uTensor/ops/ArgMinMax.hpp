@@ -18,7 +18,7 @@ protected:
       inputs[input].tensor(),
       inputs[axis].tensor(),
       Max
-    )
+    );
   }
 };
 
@@ -35,7 +35,7 @@ protected:
       inputs[input].tensor(),
       inputs[axis].tensor(),
       Min
-    )
+    );
   }
 };
 

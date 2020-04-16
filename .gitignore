@@ -38,6 +38,7 @@ sd-driver
 
 #Project generated test files
 TESTS/scripts/testData
+TESTS/scripts/.venv
 
 #Vim stuff
 *.swp
