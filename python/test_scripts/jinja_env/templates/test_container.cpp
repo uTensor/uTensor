@@ -44,4 +44,9 @@ TEST({{test_suit_name}}, {{test_name}}) {
   }
   {%endif%}
   {%endfor%}
+  {%if other_tests_str%}
+  {%for test_template_str in other_tests_str%}
+  {{test_template_str}}
+  {%endfor%}
+  {%endif%}
 }

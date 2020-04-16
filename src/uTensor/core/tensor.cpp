@@ -97,6 +97,10 @@ TensorShape& Tensor::get_shape() {
   return reinterpret_cast<TensorInterface*>(_ptr)->get_shape();
 }
 
+const TensorShape& Tensor::get_shape() const {
+  return reinterpret_cast<TensorInterface*>(_ptr)->get_shape();
+}
+
 TensorInterface* TensorReference::operator*() {
   return reinterpret_cast<TensorInterface*>(_ref->operator*());
 }

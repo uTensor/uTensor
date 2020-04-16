@@ -1,19 +1,22 @@
-import tensorflow as tf
 import argparse
-from jinja_env import env
+from functools import reduce
+
 import numpy as np
+import tensorflow as tf
+
+from jinja_env import env
 
 
-def main(cpp_fname, const_fname, is_argmin):
+def main(cpp_fname, const_fname):
     # template render variables
-    utensor_headers = set(["ArgMinMax.hpp", "RamTensor.hpp", "RomTensor.hpp"])
+    utensor_headers = set(["Reshape.hpp", "RamTensor.hpp", "RomTensor.hpp"])
     test_headers = set([const_fname])
     constants_map = {}
-    test_suit_name = is_argmin and "ArgMin" or "ArgMax"
-    test_name = is_argmin and "random_argmin_test" or "random_argmax_test"
+    test_suit_name = "Reshape"
+    test_name = "reshape_test"
     output_size = 10
     declare_tensor_strs = []
-    op_cls = is_argmin and "ArgMinOperator" or "ArgMaxOperator"
+    op_cls = "ReshapeOperator"
     op_type_signature = "float"
     op_name = "op"
     op_construct_params = []
@@ -21,16 +24,17 @@ def main(cpp_fname, const_fname, is_argmin):
     outputs_str = ""
     output_names = []
     ref_output_names = []
+    other_tests_str = []
+
     # generate testing data
-    tensor_input = tf.random.uniform((10, 5), maxval=5, dtype=tf.float32)
+    tensor_input = tf.random.uniform((3, 5), maxval=5, dtype=tf.float32)
     np_input = tensor_input.numpy()
-    tf_op = [tf.argmax, tf.argmin][is_argmin]
-    tensor_output = tf_op(tensor_input, axis=1)
+    new_shape = [5, 3, 1]
+    tensor_output = tf.reshape(tensor_input, new_shape)
     np_output = tensor_output.numpy()
 
     constants_map["random_input_arr"] = (np_input.flatten().tolist(), "float")
-    constants_map["const_axis"] = ([1], "uint32_t")
-    constants_map["ref_output_arr"] = (np_output.flatten().tolist(), "uint32_t")
+    constants_map["ref_output_arr"] = (np_output.flatten().tolist(), "float")
     declare_tensor_strs.extend(
         [
             env.get_template("declare_rom_tensor.cpp").render(
@@ -39,24 +43,23 @@ def main(cpp_fname, const_fname, is_argmin):
                 tensor_type_str="float",
                 const_var_name="random_input_arr",
             ),
-            env.get_template("declare_rom_tensor.cpp").render(
-                tensor_name="axis_tensor",
-                shape=[1],
-                tensor_type_str="uint32_t",
-                const_var_name="const_axis",
-            ),
             env.get_template("declare_ram_tensor.cpp").render(
                 tensor_name="output_tensor",
                 shape=np_output.shape,
-                tensor_type_str="uint32_t",
+                tensor_type_str="float",
             ),
         ]
     )
-    inputs_str += f"{{ {op_cls}<{op_type_signature}>::input, input_tensor }}, "
-    inputs_str += f"{{ {op_cls}<{op_type_signature}>::axis, axis_tensor }}"
+    inputs_str += f"{{ {op_cls}<{op_type_signature}>::input, input_tensor }}"
     outputs_str += f"{{ {op_cls}<{op_type_signature}>::output, output_tensor }}"
     output_names.append("output_tensor")
     ref_output_names.append("ref_output_arr")
+    other_tests_str.append(
+        f"TensorShape target_shape({ ', '.join(map(str, new_shape)) });\n"
+        "  TensorShape output_shape = output_tensor->get_shape();\n"
+        "  EXPECT_TRUE(target_shape == output_shape);\n"
+    )
+
     # render templates
     test_template = env.get_template("test_container.cpp")
     const_template = env.get_template("test_const.hpp")
@@ -67,7 +70,7 @@ def main(cpp_fname, const_fname, is_argmin):
                 test_name=test_name,
                 utensor_headers=utensor_headers,
                 test_headers=test_headers,
-                output_size=np_output.flatten().shape[0],
+                output_size=np_output.size,
                 declare_tensor_strs=declare_tensor_strs,
                 op_cls=op_cls,
                 op_type_signature=op_type_signature,
@@ -76,7 +79,9 @@ def main(cpp_fname, const_fname, is_argmin):
                 outputs_str=outputs_str,
                 output_names=output_names,
                 ref_output_names=ref_output_names,
-                output_type_str="uint32_t",
+                output_type_str="float",
+                tol=0.0001,
+                other_tests_str=other_tests_str,
             )
         )
         header_fid.write(
@@ -91,16 +96,13 @@ if __name__ == "__main__":
         "--cpp-fname",
         help="the output cpp file name (default: %(default)s)",
         metavar="TEST.cpp",
-        default="test_arg_min_max.cpp",
+        default="test_reshape.cpp",
     )
     parser.add_argument(
         "--const-fname",
         help="the header file containing constants for test (default: %(default)s)",
         metavar="CONST.hpp",
-        default="const_arg_min_max.hpp",
-    )
-    parser.add_argument(
-        "--argmin", dest="is_argmin", action="store_true", help="generate ArgMin test"
+        default="constants_reshape.hpp",
     )
     args = parser.parse_args()
     main(**vars(args))

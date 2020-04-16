@@ -6,6 +6,7 @@ verify_ssl = true
 [dev-packages]
 black = "*"
 flake8 = "*"
+isort = "*"
 
 [packages]
 tensorflow = "==2.1.0"

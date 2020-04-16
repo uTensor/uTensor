@@ -13,7 +13,7 @@ enum ArgMinMaxCompareFlag {
 };
 
 template <typename Tin>
-void arg_min_max_kernel(Tensor &output, Tensor &input, Tensor &axis, ArgMinMaxCompareFlag cmp = Max) {
+void arg_min_max_kernel(Tensor& output, const Tensor& input, const Tensor& axis, ArgMinMaxCompareFlag cmp = Max) {
   if (axis->get_type() != u32) {
     // TODO: type convertion to u32?
     uTensor_printf("only support u32 typed axis tensor\n");
