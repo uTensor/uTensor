@@ -160,7 +160,8 @@ void print(const Tensor& t) {
 
 SimpleNamedTensor::SimpleNamedTensor(const uTensor::string& name,
                                      Tensor& tensor)
-    : name(&name), tensor(&tensor) {}
-SimpleNamedTensor::SimpleNamedTensor() : name(nullptr), tensor(nullptr) {}
+    : name(&name), _tensor(&tensor) {}
+SimpleNamedTensor::SimpleNamedTensor() : name(nullptr), _tensor(nullptr) {}
+Tensor& SimpleNamedTensor::tensor() { return *_tensor; }
 
 }  // namespace uTensor
