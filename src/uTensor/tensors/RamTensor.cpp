@@ -65,7 +65,6 @@ RamTensor::~RamTensor() {
 }
 
 void RamTensor::resize(TensorShape new_shape) {
-  // uTensor_printf("Warning, RAM Tensor resize not implemented\n");
   AllocatorInterface* allocator = Context::get_default_context()->get_ram_data_allocator();
   void* ptr = allocator->allocate(new_shape.get_linear_size()*_type_size);
   if (!ptr) {

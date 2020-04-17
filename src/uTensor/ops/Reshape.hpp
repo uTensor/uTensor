@@ -46,8 +46,8 @@ public:
 private:
   TensorShape _shape;
   bool _check_input_shape(){
-    Tensor& input_tensor = inputs[input].tensor();
-    TensorShape shape = input_tensor->get_shape();
+    const Tensor& input_tensor = inputs[input].tensor();
+    const TensorShape& shape = input_tensor->get_shape();
     uint8_t num_dims = shape.num_dims();
     for (int i = 0; i < num_dims; ++i){
       if (shape[i] < 0) {
