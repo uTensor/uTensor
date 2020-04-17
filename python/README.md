@@ -1,4 +1,6 @@
 ## Folder Descriptions
+This folder contains a bunch of convenience scripts for maintaining the uTensor runtime codebase. Python is *NOT* included in the runtime builds.
+
 - `test_scripts` are scripts wich generate testing files for `uTensor`
 
 ## Environment Setup
