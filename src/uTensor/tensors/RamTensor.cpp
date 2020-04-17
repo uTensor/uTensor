@@ -65,7 +65,19 @@ RamTensor::~RamTensor() {
 }
 
 void RamTensor::resize(TensorShape new_shape) {
-  uTensor_printf("Warning, RAM Tensor resize not implemented\n");
+  // uTensor_printf("Warning, RAM Tensor resize not implemented\n");
+  AllocatorInterface* allocator = Context::get_default_context()->get_ram_data_allocator();
+  void* ptr = allocator->allocate(new_shape.get_linear_size()*_type_size);
+  if (!ptr) {
+    uTensor_printf("OOM when resizing\n");
+    Context::get_default_context()->throwError(new OutOfMemError);
+    return;
+  }
+  if (is_bound(_ram_region, *allocator)) {
+    allocator->unbind(*_ram_region, &_ram_region);
+  }
+  _shape = new_shape;
+  allocator->bind(ptr, &_ram_region);
 }
 
 FutureMaxSizeRamTensor::FutureMaxSizeRamTensor(ttype _type)

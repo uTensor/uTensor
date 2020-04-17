@@ -7,17 +7,22 @@
 #include "uTensor_util.hpp"
 #include "operatorBase.hpp"
 
+using std::array;
+
 namespace uTensor {
 
 template <typename Tin>
 class ReshapeOperator : public OperatorInterface<1, 1> {
 /* reshape input as the shape of output*/
 public:
+  ReshapeOperator(const TensorShape&& shape) : _shape(shape) {}
+  ReshapeOperator(const TensorShape& shape) : _shape(shape) {}
   enum names_in : uint8_t { input };
   enum names_out : uint8_t { output };
   virtual void compute(){
     const Tensor& input_tensor = inputs[input].tensor();
     Tensor& output_tensor = outputs[output].tensor();
+    output_tensor->resize(_shape);
     if (input_tensor->num_elems() != output_tensor->num_elems()){
       uTensor_printf("inconsistent input and output shape for reshape\n");
       Context::get_default_context()->throwError(new InvalidReshapeError);
@@ -39,6 +44,7 @@ public:
     }
   }
 private:
+  TensorShape _shape;
   bool _check_input_shape(){
     Tensor& input_tensor = inputs[input].tensor();
     TensorShape shape = input_tensor->get_shape();

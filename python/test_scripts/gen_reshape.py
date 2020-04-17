@@ -30,6 +30,7 @@ def main(cpp_fname, const_fname):
     tensor_input = tf.random.uniform((3, 5), maxval=5, dtype=tf.float32)
     np_input = tensor_input.numpy()
     new_shape = [5, 3, 1]
+    op_construct_params.append("{{ {} }}".format(",".join(map(str, new_shape))))
     tensor_output = tf.reshape(tensor_input, new_shape)
     np_output = tensor_output.numpy()
 
@@ -44,9 +45,7 @@ def main(cpp_fname, const_fname):
                 const_var_name="random_input_arr",
             ),
             env.get_template("declare_ram_tensor.cpp").render(
-                tensor_name="output_tensor",
-                shape=np_output.shape,
-                tensor_type_str="float",
+                tensor_name="output_tensor", tensor_type_str="float",
             ),
         ]
     )
@@ -55,7 +54,7 @@ def main(cpp_fname, const_fname):
     output_names.append("output_tensor")
     ref_output_names.append("ref_output_arr")
     other_tests_str.append(
-        f"TensorShape target_shape({ ', '.join(map(str, new_shape)) });\n"
+        f"TensorShape target_shape({ ','.join(map(str, new_shape)) });\n"
         "  TensorShape output_shape = output_tensor->get_shape();\n"
         "  EXPECT_TRUE(target_shape == output_shape);\n"
     )
@@ -74,6 +73,7 @@ def main(cpp_fname, const_fname):
                 declare_tensor_strs=declare_tensor_strs,
                 op_cls=op_cls,
                 op_type_signature=op_type_signature,
+                op_construct_params=op_construct_params,
                 op_name=op_name,
                 inputs_str=inputs_str,
                 outputs_str=outputs_str,
