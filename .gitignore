@@ -37,7 +37,7 @@ mbed-os
 sd-driver
 
 #Project generated test files
-TESTS/scripts/testData
+python/test_scripts/testData
 python/.venv
 
 #Vim stuff
