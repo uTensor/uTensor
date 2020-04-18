@@ -9,8 +9,6 @@ using std::endl;
 using namespace uTensor;
 
 SimpleErrorHandler mErrHandler(10);
-DECLARE_ERROR(MemMoveEror);
-DEFINE_ERROR(MemMoveEror);
 
 void setup_context(){
   localCircularArenaAllocator<256> meta_allocator;
@@ -158,16 +156,19 @@ TEST(RAM_Tensor, resize_bigger_than_back) {
 TEST(RAM_Tensor, oom) {
   localCircularArenaAllocator<256> meta_allocator;
   localCircularArenaAllocator<20*sizeof(float)> ram_allocator;
-  Context::get_default_context()->set_metadata_allocator(&meta_allocator);
-  Context::get_default_context()->set_ram_data_allocator(&ram_allocator);
-  RamTensor a({5, 2}, flt);
   bool is_oom = false;
   mErrHandler.set_onError([&is_oom](Error* err){
     if(*err == OutOfMemError()) {
       is_oom = true; 
     }
   });
+  Context::get_default_context()->set_metadata_allocator(&meta_allocator);
+  Context::get_default_context()->set_ram_data_allocator(&ram_allocator);
+  Context::get_default_context()->set_ErrorHandler(&mErrHandler);
+
+  RamTensor a({5, 2}, flt);
   RamTensor b({5, 5}, flt);
+  EXPECT_TRUE(is_oom);
 }
 
 TEST(RAM_Tensor, move_to_fit) {
