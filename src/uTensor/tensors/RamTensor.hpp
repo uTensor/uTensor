@@ -19,6 +19,7 @@ class RamTensor : public TensorInterface {
   RamTensor(TensorShape _shape, ttype _type);
   virtual ~RamTensor();
   virtual void resize(TensorShape new_shape) override;
+  // USE AT YOUR OWN RISK, this function is meant for testing purposes and should not be called elsewhere. It is likely to be removed or migrated to a test helper framework
   const void* get_address() { return *_ram_region; }
 
  protected:
