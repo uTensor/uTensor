@@ -153,7 +153,7 @@ TEST(RAM_Tensor, resize_bigger_then_back) {
   EXPECT_EQ(r.num_elems(), 9);
 }
 
-TEST(RAM_Tensor, oom) {
+TEST(RAM_Tensor, out_of_memory) {
   localCircularArenaAllocator<256> meta_allocator;
   localCircularArenaAllocator<20*sizeof(float)> ram_allocator;
   bool is_oom = false;
