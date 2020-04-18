@@ -86,6 +86,7 @@ DECLARE_ERROR(InvalidTensorError);
 DECLARE_ERROR(InvalidTensorInputError);
 DECLARE_ERROR(InvalidTensorOutputError);
 DECLARE_ERROR(InvalidTensorDimensionsError);
+DECLARE_ERROR(InvalidTensorDataTypeError);
 
 };  // namespace uTensor
 #endif

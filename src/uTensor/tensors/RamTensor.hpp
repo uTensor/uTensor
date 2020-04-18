@@ -13,12 +13,14 @@ class RamTensor : public TensorInterface {
   virtual void* read(uint32_t linear_index) const override;
   virtual void* write(uint32_t linear_index) override;
   RamTensor();  // May be useful in subclasses
-  RamTensor(ttype _type);
 
  public:
+  RamTensor(ttype _type);
   RamTensor(TensorShape _shape, ttype _type);
   virtual ~RamTensor();
   virtual void resize(TensorShape new_shape) override;
+  // USE AT YOUR OWN RISK, this function is meant for testing purposes and should not be called elsewhere. It is likely to be removed or migrated to a test helper framework
+  const void* get_address() { return *_ram_region; }
 
  protected:
   virtual size_t _get_readable_block(void* buffer, uint16_t req_read_size,

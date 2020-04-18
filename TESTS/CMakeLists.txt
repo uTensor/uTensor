@@ -42,6 +42,9 @@ package_add_test_with_libraries(test_relu operators/test_relu utensor operators 
 package_add_test_with_libraries(test_maxpool operators/test_maxpool utensor operators "${PROJECT_DIR}/test-data/")
 package_add_test_with_libraries(test_avgpool operators/test_avgpool utensor operators "${PROJECT_DIR}/test-data/")
 package_add_test_with_libraries(test_squeeze operators/test_squeeze utensor operators "${PROJECT_DIR}/test-data/")
+package_add_test_with_libraries(test_argmax operators/test_argmax utensor operators "${PROJECT_DIR}/test-data/")
+package_add_test_with_libraries(test_argmin operators/test_argmin utensor operators "${PROJECT_DIR}/test-data/")
+package_add_test_with_libraries(test_reshape operators/test_reshape utensor operators "${PROJECT_DIR}/test-data/")
 
 package_add_test_with_libraries(test_top_include library/test_top_include utensor library "${PROJECT_DIR}/test-data/")
 

@@ -37,7 +37,8 @@ mbed-os
 sd-driver
 
 #Project generated test files
-TESTS/scripts/testData
+python/test_scripts/testData
+python/.venv
 
 #Vim stuff
 *.swp
@@ -47,3 +48,6 @@ dev
 .vscode
 
 build
+*.dSYM
+main.cpp
+a.out

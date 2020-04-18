@@ -97,6 +97,10 @@ TensorShape& Tensor::get_shape() {
   return reinterpret_cast<TensorInterface*>(_ptr)->get_shape();
 }
 
+const TensorShape& Tensor::get_shape() const {
+  return reinterpret_cast<TensorInterface*>(_ptr)->get_shape();
+}
+
 TensorInterface* TensorReference::operator*() {
   return reinterpret_cast<TensorInterface*>(_ref->operator*());
 }
@@ -147,6 +151,9 @@ void print(const Tensor& t) {
         case flt:
           uTensor_printf("%f", static_cast<float>(t(j, i)));
           break;
+        default:
+          uTensor_printf("Unknown data type");
+          return;
       }
       if (i != (t_shape[0] - 1))
         uTensor_printf(", ");

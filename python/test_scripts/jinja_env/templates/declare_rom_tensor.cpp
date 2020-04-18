@@ -1,0 +1,1 @@
+Tensor {{tensor_name}} = new RomTensor({ {%for s in shape%}{{ s }}{{"," if not loop.last}}{%endfor%} }, {{TENSOR_TYPE_MAP[tensor_type_str]}}, {{const_var_name}});
