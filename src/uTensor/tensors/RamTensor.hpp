@@ -19,6 +19,7 @@ class RamTensor : public TensorInterface {
   RamTensor(TensorShape _shape, ttype _type);
   virtual ~RamTensor();
   virtual void resize(TensorShape new_shape) override;
+  const void* get_address() { return *_ram_region; }
 
  protected:
   virtual size_t _get_readable_block(void* buffer, uint16_t req_read_size,
