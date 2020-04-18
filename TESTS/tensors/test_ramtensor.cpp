@@ -142,7 +142,7 @@ TEST(RAM_Tensor, resize_bigger) {
   EXPECT_EQ(r.num_elems(), 25);
 }
 
-TEST(RAM_Tensor, resize_bigger_than_back) {
+TEST(RAM_Tensor, resize_bigger_then_back) {
   localCircularArenaAllocator<256> meta_allocator;
   localCircularArenaAllocator<256> ram_allocator;
   Context::get_default_context()->set_metadata_allocator(&meta_allocator);
