@@ -29,6 +29,8 @@ set(hdr_utensor_ops
     ops/Convolution.hpp
     ops/Matrix.hpp
     ops/ActivationFncs.hpp
+    ops/ArgMinMax.hpp
+    ops/Reshape.hpp
    )
 set(src_utensor_errhndl
   errorHandlers/SimpleErrorHandler.cpp

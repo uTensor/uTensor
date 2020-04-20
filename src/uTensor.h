@@ -26,3 +26,8 @@
 #include "uTensor/tensors/BufferTensor.hpp"
 #include "uTensor/tensors/RamTensor.hpp"
 #include "uTensor/tensors/RomTensor.hpp"
+
+/*
+ * Error Handlers
+ */
+#include "uTensor/errorHandlers/SimpleErrorHandler.hpp"

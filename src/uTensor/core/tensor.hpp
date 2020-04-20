@@ -36,6 +36,7 @@ class alignas(alignof(uint8_t*)) Tensor : public Handle {
   IntegralValue operator()(uint32_t linear_index);
 
   TensorShape& get_shape();
+  const TensorShape& get_shape() const;
 
   // Force everything to be on the utensor allocator
   void* operator new(size_t sz);
