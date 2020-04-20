@@ -2,6 +2,7 @@
 #define UTENSOR_QUANTIZE_OPS_H
 #include <algorithm>
 #include <limits>
+#include <cmath>
 
 #include "operatorBase.hpp"
 
@@ -35,6 +36,36 @@ class DequantizeOperator : public OperatorInterface<1, 1> {
  protected:
   virtual void compute() {
     dequantize_kernel<oT, iT>(outputs[b].tensor(), inputs[a].tensor());
+  }
+};
+
+template<typename Tout, typename Tin>
+void affine_quantize_kernel(Tensor& output, const Tensor& input, const QuantizationParams& quant_params) {
+  // op: https://github.com/tensorflow/tensorflow/blob/fb4ec5cbde3973050e7350f0aca7f07ab7757bac/tensorflow/lite/micro/kernels/quantize.cc
+  // kernel: https://github.com/tensorflow/tensorflow/blob/fb4ec5cbde3973050e7350f0aca7f07ab7757bac/tensorflow/lite/kernels/internal/reference/quantize.h
+  const int32_t zp = quant_params.get_zeroP_for_channel(0);
+  const float scale = quant_params.get_scale_for_channel(0);
+  output->resize(input->get_shape());
+  const int32_t minVal = std::numeric_limits<Tout>::min();
+  const int32_t maxVal = std::numeric_limits<Tout>::max();
+  for (uint32_t i = 0; i < input->num_elems(); i++){
+    const Tin inVal = input(i);
+    const float inVal_f = static_cast<float>(inVal);
+    int32_t unclamped = static_cast<int32_t>(std::round(inVal_f / scale)) + zp;
+    int32_t clamped = std::min(std::max(unclamped, minVal), maxVal);
+    output(i) = static_cast<Tout>(clamped);
+  }
+}
+
+template<typename Tout, typename Tin>
+class QuantizeOperator : public OperatorInterface<1, 1> {
+  public:
+  enum names_in : uint8_t { input };
+  enum names_out : uint8_t { output };
+  
+  protected:
+  void compute(){
+    affine_quantize_kernel<Tout, Tin>(outputs[output].tensor(), inputs[input].tensor());
   }
 };
 
