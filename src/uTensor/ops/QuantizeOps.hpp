@@ -65,7 +65,12 @@ class QuantizeOperator : public OperatorInterface<1, 1> {
   
   protected:
   void compute(){
-    affine_quantize_kernel<Tout, Tin>(outputs[output].tensor(), inputs[input].tensor());
+    const Tensor input_tensor = inputs[input].tensor();
+    affine_quantize_kernel<Tout, Tin>(
+      outputs[output].tensor(),
+      input_tensor,
+      input_tensor->get_quantization_params()
+    );
   }
 };
 
