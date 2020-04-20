@@ -39,6 +39,11 @@ set(src_utensor_errhndl
 set(hdr_utensor_errhndl
   errorHandlers/SimpleErrorHandler.hpp
    )
+set(src_utensor_legacy_ops
+    ops/legacy/LegacyMath.cpp
+    ops/legacy/legacyQuantizationUtils.cpp
+    )
+
 if(X86_PROJECT)
 add_definitions( -DX86_PROJECT=1 )
 elseif(ARM_PROJECT)
@@ -47,10 +52,10 @@ add_definitions( -DARM_PROJECT=1 )
 endif()
 add_subdirectory(ops/optimized)
 
-add_library(utensor  ${src_utensor_alloc} ${src_utensor_tensors} ${src_utensor_ops} ${src_utensor_errhndl} contexts/default_context.cpp)
+add_library(utensor  ${src_utensor_alloc} ${src_utensor_tensors} ${src_utensor_ops} ${src_utensor_errhndl} contexts/default_context.cpp ${src_utensor_legacy_ops})
 #target_link_libraries(utensor utensor_core optimized_ops)
 target_link_libraries(utensor PUBLIC utensor_core )
-target_include_directories(utensor PUBLIC allocators tensors ops errorHandlers)
+target_include_directories(utensor PUBLIC allocators tensors ops ops/legacy errorHandlers)
 #target_include_directories(utensor PUBLIC 
 #  $<BUILD_INTERFACE: allocators tensors ops>
 #  $<INSTALL_INTERFACE: ${CMAKE_CURRENT_SOURCE_DIR}/allocators ${CMAKE_CURRENT_SOURCE_DIR}/tensors ${CMAKE_CURRENT_SOURCE_DIR}/ops>
