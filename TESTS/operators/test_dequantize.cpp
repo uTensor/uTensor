@@ -22,7 +22,6 @@ int offset = -14;
 float scale = 0.11707353591918945f;
 
 TEST(Quantization, DequantizeOp) {
-//    ASSERT_EQ(0,1);
   localCircularArenaAllocator<256> meta_allocator;
   localCircularArenaAllocator<256> ram_allocator;
   Context::get_default_context()->set_metadata_allocator(&meta_allocator);
@@ -34,8 +33,7 @@ TEST(Quantization, DequantizeOp) {
   Tensor b = new /*const*/ BufferTensor({10}, flt, s_b);
 
   TFLM::DequantizeOperator<float, int8_t> deq_A;
-  // add_AB.set_inputs(FixedTensorMap<2>({{MatrixMultOperator<uint8_t>::a, a},
-  // {MatrixMultOperator<uint8_t>::b, b}})).set_outputs({{MatrixMultOperator<uint8_t>::c, c}});
+  
   deq_A
       .set_inputs({{TFLM::DequantizeOperator<float,uint8_t>::a, a}})
       .set_outputs({{TFLM::DequantizeOperator<float,uint8_t>::b, b}})
