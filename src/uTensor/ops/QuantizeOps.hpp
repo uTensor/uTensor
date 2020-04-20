@@ -43,9 +43,16 @@ template<typename Tout, typename Tin>
 void affine_quantize_kernel(Tensor& output, const Tensor& input, const QuantizationParams& quant_params) {
   // op: https://github.com/tensorflow/tensorflow/blob/fb4ec5cbde3973050e7350f0aca7f07ab7757bac/tensorflow/lite/micro/kernels/quantize.cc
   // kernel: https://github.com/tensorflow/tensorflow/blob/fb4ec5cbde3973050e7350f0aca7f07ab7757bac/tensorflow/lite/kernels/internal/reference/quantize.h
+  if (output->num_elems() == 0) {
+    output->resize(input->get_shape());
+  }
+  if (input->num_elems() != output->num_elems()) {
+    uTensor_printf("number of elements of output tensor mismatch with the input for quantization\n");
+    Context::get_default_context()->throwError(new InvalidTensorOutputError);
+    return;
+  }
   const int32_t zp = quant_params.get_zeroP_for_channel(0);
   const float scale = quant_params.get_scale_for_channel(0);
-  output->resize(input->get_shape());
   const int32_t minVal = std::numeric_limits<Tout>::min();
   const int32_t maxVal = std::numeric_limits<Tout>::max();
   for (uint32_t i = 0; i < input->num_elems(); i++){
