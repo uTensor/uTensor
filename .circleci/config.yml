@@ -24,7 +24,8 @@ jobs:
             cmake -DPACKAGE_TESTS=ON -DENABLE_COVERAGE=ON ..
             make -j
             ctest -VV -o /tmp/test_results/test-results.txt -T Test
-            cp Testing/*/Test.xml /tmp/test_results/.
+            mkdir /tmp/test_results/uTensor
+            mv Testing/*/Test.xml /tmp/test_results/uTensor/results.xml
 
       - run:
           name: Generate code coverage
