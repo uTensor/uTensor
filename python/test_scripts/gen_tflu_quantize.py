@@ -30,7 +30,7 @@ def main(
     output_size = outputs_data.tensor.size
     declare_tensor_strs = []
     op_cls = "::TFLM::QuantizeOperator"
-    op_type_signature = "float, int8_t"
+    op_type_signature = "int8_t, float"
     op_name = "op"
     op_construct_params = []
     inputs_str = ""

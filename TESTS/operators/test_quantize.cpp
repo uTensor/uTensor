@@ -3,9 +3,9 @@
 
 #include "arenaAllocator.hpp"
 #include "context.hpp"
-#include "RomTensor.hpp"
 #include "RamTensor.hpp"
 #include "QuantizeOps.hpp"
+#include "RomTensor.hpp"
 
 #include "gtest/gtest.h"
 
@@ -23,12 +23,13 @@ TEST(Quantized, reference_0_quantize) {
   Tensor output_tensor = new RamTensor({ 1,28,28,1 }, i8);
   output_tensor->set_quantization_params(PerTensorQuantizationParams(-128, 0.003921568859368563));
 
-  ::TFLM::QuantizeOperator<float, int8_t> op;
+  ::TFLM::QuantizeOperator<int8_t, float> op;
   op
-    .set_inputs({ { ::TFLM::QuantizeOperator<float, int8_t>::input, input_tensor } })
-    .set_outputs({ { ::TFLM::QuantizeOperator<float, int8_t>::output, output_tensor } })
+    .set_inputs({ { ::TFLM::QuantizeOperator<int8_t, float>::input, input_tensor } })
+    .set_outputs({ { ::TFLM::QuantizeOperator<int8_t, float>::output, output_tensor } })
     .eval();
   for (int i = 0; i < 784; ++i) {
-    EXPECT_EQ((int8_t) output_tensor(i), ref_output_arr[i]);
+    int8_t value = static_cast<int8_t>(output_tensor(i));
+    EXPECT_EQ(value, ref_output_arr[i]);
   }
 }
