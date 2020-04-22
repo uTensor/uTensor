@@ -39,6 +39,10 @@ TEST(Quantized, reference_1_dws_conv) {
   Tensor out = new RamTensor({ 1, 26, 26, 32 }, i8);
                 out->set_quantization_params(PerTensorQuantizationParams(s_ref_output_ref_zp[0], s_ref_output_ref_scale[0] ));
 
+/*
+options:
+{'Padding': 1, 'StrideW': 1, 'StrideH': 1, 'DepthMultiplier': 32, 'FusedActivationFunction': '1 (RELU)', 'DilationWFactor': 1, 'DilationHFactor': 1}
+*/
   TFLM::DepthwiseSeparableConvOperator<float> dw_conv_Aw;
   dw_conv_Aw
        .set_inputs({ {DepthwiseSeparableConvOperator<float>::in, A}, {DepthwiseSeparableConvOperator<float>::depthwise_filter, filter}, {DepthwiseSeparableConvOperator<float>::pointwise_filter, bias} })

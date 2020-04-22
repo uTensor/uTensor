@@ -1,6 +1,7 @@
 #ifndef UTENSOR_CONVOLUTION_OPS_H
 #define UTENSOR_CONVOLUTION_OPS_H
 #include <algorithm>
+#include <cmath>
 #include <limits>
 
 #include "Convolution_kernels.hpp"
@@ -201,6 +202,43 @@ using AvgPoolOp = GenericPoolOp<T, AvgFilter<T>>;
 
 namespace TFLM {
 
+typedef enum {
+  kTfLitePaddingUnknown = 0,
+  kTfLitePaddingSame,
+  kTfLitePaddingValid,
+} TfLitePadding;
+
+typedef enum {
+  kTfLiteActNone = 0,
+  kTfLiteActRelu,
+  kTfLiteActRelu1,2  // min(max(-1, x), 1)
+  kTfLiteActRelu6,  // min(max(0, x), 6)
+  kTfLiteActTanh,
+  kTfLiteActSignBit,
+  kTfLiteActSigmoid,
+} TfLiteFusedActivation;
+
+struct TfLiteDepthwiseConvParams {
+  // Parameters for DepthwiseConv version 1 or above.
+  TfLitePadding padding;
+  int stride_width;
+  int stride_height;
+  // `depth_multiplier` is redundant. It's used by CPU kernels in
+  // TensorFlow 2.0 or below, but ignored in versions above.
+  //
+  // The information can be deduced from the shape of input and the shape of
+  // weights. Since the TFLiteConverter toolchain doesn't support partially
+  // specified shapes, relying on `depth_multiplier` stops us from supporting
+  // graphs with dynamic shape tensors.
+  //
+  // Note: Some of the delegates (e.g. NNAPI, GPU) are still relying on this
+  // field.
+  int depth_multiplier;
+  TfLiteFusedActivation activation;
+  // Parameters for DepthwiseConv version 2 or above.
+  int dilation_width_factor;
+  int dilation_height_factor;
+} ;
 
 enum PaddingType : uint8_t { kNone, kSame, kValid };
 
@@ -239,20 +277,70 @@ struct DepthwiseParams {
   const int32_t* output_shift_per_channel;
 };
 
+struct TfLitePaddingValues {
+  int width;
+  int height;
+  int width_offset;
+  int height_offset;
+};
+
+// It's not guaranteed that padding is symmetric. It's important to keep
+// offset for algorithms need all paddings.
+inline int ComputePaddingWithOffset(int stride, int dilation_rate, int in_size,
+                                    int filter_size, int out_size,
+                                    int* offset) {
+  int effective_filter_size = (filter_size - 1) * dilation_rate + 1;
+  int total_padding =
+      ((out_size - 1) * stride + effective_filter_size - in_size);
+  total_padding = total_padding > 0 ? total_padding : 0;
+  *offset = total_padding % 2;
+  return total_padding / 2;
+}
+
+// Matching GetWindowedOutputSize in TensorFlow.
+inline int ComputeOutSize(TfLitePadding padding, int image_size,
+                          int filter_size, int stride, int dilation_rate = 1) {
+  int effective_filter_size = (filter_size - 1) * dilation_rate + 1;
+  switch (padding) {
+    case kTfLitePaddingSame:
+      return (image_size + stride - 1) / stride;
+    case kTfLitePaddingValid:
+      return (image_size + stride - effective_filter_size) / stride;
+    default:
+      return 0;
+  }
+}
+
+inline TfLitePaddingValues ComputePaddingHeightWidth(
+    int stride_height, int stride_width, int dilation_rate_height,
+    int dilation_rate_width, int in_height, int in_width, int filter_height,
+    int filter_width, TfLitePadding padding, int* out_height, int* out_width) {
+  *out_width = ComputeOutSize(padding, in_width, filter_width, stride_width,
+                              dilation_rate_width);
+  *out_height = ComputeOutSize(padding, in_height, filter_height, stride_height,
+                               dilation_rate_height);
+
+  TfLitePaddingValues padding_values;
+  int offset = 0;
+  padding_values.height =
+      ComputePaddingWithOffset(stride_height, dilation_rate_height, in_height,
+                               filter_height, *out_height, &offset);
+  padding_values.height_offset = offset;
+  padding_values.width =
+      ComputePaddingWithOffset(stride_width, dilation_rate_width, in_width,
+                               filter_width, *out_width, &offset);
+  padding_values.width_offset = offset;
+  return padding_values;
+}
+
 uint16_t MatchingDim(TensorShape s0, uint8_t i0, TensorShape s1, uint8_t i1) {
   assert(s0[i0] == s1[i1]);
   return s0[i0];
 }
 
-template <typename T>
-void DCHECK_LE(T v0, T v1) {
-  assert(v0 <= v1);
-}
-
-template <typename T>
-void DCHECK_EQ(T v0, T v1) {
-  assert(v0 == v1);
-}
+#define DCHECK_LE(a,b) assert(a <= b)
+#define DCHECK_EQ(a,b) assert(a == b)
+#define DCHECK(a) assert(a)
 
 inline void DepthwiseConvPerChannel(
 const DepthwiseParams& params, const int32_t* output_multiplier, const int32_t* output_shift,
@@ -362,12 +450,241 @@ Tensor& input, Tensor& filter, Tensor& bias, Tensor& output
     }
   }
 }
+
+typedef struct TfLiteAffineQuantization {
+  TfLiteFloatArray* scale;
+  TfLiteIntArray* zero_point;
+  int32_t quantized_dimension;
+} TfLiteAffineQuantization;
+
+
+constexpr uint64_t kSignMask = 0x8000000000000000LL;
+constexpr uint64_t kExponentMask = 0x7ff0000000000000LL;
+constexpr int32_t kExponentShift = 52;
+constexpr int32_t kExponentBias = 1023;
+constexpr uint32_t kExponentIsBadNum = 0x7ff;
+constexpr uint64_t kFractionMask = 0x000fffffffc00000LL;
+constexpr uint32_t kFractionShift = 22;
+constexpr uint32_t kFractionRoundingMask = 0x003fffff;
+constexpr uint32_t kFractionRoundingThreshold = 0x00200000;
+
+int64_t IntegerFrExp(double input, int* shift) {
+  // Make sure our assumptions about the double layout hold.
+  DCHECK_EQ(8, sizeof(double));
+
+  // We want to access the bits of the input double value directly, which is
+  // tricky to do safely, so use a union to handle the casting.
+  union {
+    double double_value;
+    uint64_t double_as_uint;
+  } cast_union;
+  cast_union.double_value = input;
+  const uint64_t u = cast_union.double_as_uint;
+
+  // If the bitfield is all zeros apart from the sign bit, this is a normalized
+  // zero value, so return standard values for this special case.
+  if ((u & ~kSignMask) == 0) {
+    *shift = 0;
+    return 0;
+  }
+
+  // Deal with NaNs and Infs, which are always indicated with a fixed pattern in
+  // the exponent, and distinguished by whether the fractions are zero or
+  // non-zero.
+  const uint32_t exponent_part = ((u & kExponentMask) >> kExponentShift);
+  if (exponent_part == kExponentIsBadNum) {
+    *shift = std::numeric_limits<int>::max();
+    if (u & kFractionMask) {
+      // NaN, so just return zero (with the exponent set to INT_MAX).
+      return 0;
+    } else {
+      // Infinity, so return +/- INT_MAX.
+      if (u & kSignMask) {
+        return std::numeric_limits<int64_t>::min();
+      } else {
+        return std::numeric_limits<int64_t>::max();
+      }
+    }
+  }
+
+constexpr int kDepthwiseConvQuantizedDimension = 3;
+void QuantizeMultiplier(double double_multiplier, int32_t* quantized_multiplier,
+                        int* shift) {
+  if (double_multiplier == 0.) {
+    *quantized_multiplier = 0;
+    *shift = 0;
+    return;
+  }
+#ifdef TFLITE_EMULATE_FLOAT
+  // If we're trying to avoid the use of floating-point instructions (for
+  // example on microcontrollers) then use an alternative implementation
+  // that only requires integer and bitwise operations. To enable this, you
+  // need to set the define during the build process for your platform.
+  int64_t q_fixed = IntegerFrExp(double_multiplier, shift);
+#else   // TFLITE_EMULATE_FLOAT
+  const double q = std::frexp(double_multiplier, shift);
+  auto q_fixed = static_cast<int64_t>(std::round(q * (1ll << 31)));
+#endif  // TFLITE_EMULATE_FLOAT
+  DCHECK(q_fixed <= (1ll << 31));
+  if (q_fixed == (1ll << 31)) {
+    q_fixed /= 2;
+    ++*shift;
+  }
+  DCHECK_LE(q_fixed, std::numeric_limits<int32_t>::max());
+  // A shift amount smaller than -31 would cause all bits to be shifted out
+  // and thus all results would be zero. We implement that instead with
+  // q_fixed==0, so as to avoid hitting issues with right-shift
+  // operations with shift amounts greater than 31. Note that this happens
+  // roughly when abs(double_multiplier) < 2^-31 and the present handling means
+  // that we're effectively flushing tiny double_multiplier's to zero.
+  // We could conceivably handle values in the range (roughly) [32, 63]
+  // as 'denormals' i.e. (shift==0, q_fixed < 2^30). In that point of view
+  // the present handling is just doing 'flush denormals to zero'. We could
+  // reconsider and actually generate nonzero denormals if a need arises.
+  if (*shift < -31) {
+    *shift = 0;
+    q_fixed = 0;
+  }
+  *quantized_multiplier = static_cast<int32_t>(q_fixed);
+}
+
+typedef enum {
+  kTfLiteActNone = 0,
+  kTfLiteActRelu,
+  kTfLiteActRelu1,  // min(max(-1, x), 1)
+  kTfLiteActRelu6,  // min(max(0, x), 6)
+  kTfLiteActTanh,
+  kTfLiteActSignBit,
+  kTfLiteActSigmoid,
+} TfLiteFusedActivation;
+
+void CalculateActivationRangeQuantizedImpl(TfLiteFusedActivation activation,
+                                           int32_t qmin, int32_t qmax,
+                                           Tensor& output,
+                                           int32_t* act_min, int32_t* act_max) {
+  //const auto scale = output->params.scale;
+  const auto scale = output->get_quantization_params().get_scale_for_channel(0);
+  //const auto zero_point = output->params.zero_point;
+  const auto zero_point = output->get_quantization_params().get_zeroP_for_channel(0);
+
+  auto quantize = [scale, zero_point](float f) {
+    return zero_point + static_cast<int32_t>(TfLiteRound(f / scale));
+  };
+
+  if (activation == kTfLiteActRelu) {
+    *act_min = std::max(qmin, quantize(0.0));
+    *act_max = qmax;
+  } else if (activation == kTfLiteActRelu6) {
+    *act_min = std::max(qmin, quantize(0.0));
+    *act_max = std::min(qmax, quantize(6.0));
+  } else if (activation == kTfLiteActRelu1) {
+    *act_min = std::max(qmin, quantize(-1.0));
+    *act_max = std::min(qmax, quantize(1.0));
+  } else {
+    *act_min = qmin;
+    *act_max = qmax;
+  }
+}
+
+void CalculateActivationRangeQuantized(
+                                      TfLiteFusedActivation activation,
+                                      Tensor& output,
+                                      int32_t* act_min,
+                                      int32_t* act_max) {
+  int32_t qmin = 0;
+  int32_t qmax = 0;
+  // if (output->type == kTfLiteUInt8) {
+  //   qmin = std::numeric_limits<uint8_t>::min();
+  //   qmax = std::numeric_limits<uint8_t>::max();
+  // } else if (output->type == kTfLiteInt8) {
+    qmin = std::numeric_limits<int8_t>::min();
+    qmax = std::numeric_limits<int8_t>::max();
+  // } else if (output->type == kTfLiteInt16) {
+  //   qmin = std::numeric_limits<int16_t>::min();
+  //   qmax = std::numeric_limits<int16_t>::max();
+  // } else {
+  //   assert();
+  // }
+
+  CalculateActivationRangeQuantizedImpl(activation, qmin, qmax, output, act_min,
+                                        act_max);
+}
+
 template <typename T>
 class DepthwiseSeparableConvOperator : public OperatorInterface<3, 1> {
  public:
   enum names_in : uint8_t { in, filter, bias };
   enum names_out : uint8_t { out };
 
+  DepthwiseSeparableConvOperator& set_params(TfLiteDepthwiseConvParams&& _params) {
+    param = _params;
+  }
+
+  void calculateOpData() {
+    param.padding = ComputePaddingHeightWidth(
+      params.stride_height, params.stride_width, 1, 1, height, width,
+      filter_height, filter_width, params.padding, &unused_output_height,
+      &unused_output_width);
+
+    int num_channels = inputs[filter].tensor()->get_shape()[kDepthwiseConvQuantizedDimension];
+    QuantizationParams affine_quantization = inputs[filter].tensor()->get_quantization_params();
+    const bool is_per_channel = affine_quantization->num_channels() > 1;
+
+    if (is_per_channel) {
+    //  Currently only Int8 is supported for per channel quantization.
+    // TF_LITE_ENSURE_EQ(context, input->type, kTfLiteInt8);
+    // TF_LITE_ENSURE_EQ(context, filter->type, kTfLiteInt8);
+    TF_LITE_ENSURE_EQ(affine_quantization->num_channels(), num_channels);
+    TF_LITE_ENSURE_EQ(num_channels,
+        filter->get_shape()[affine_quantization.num_channels()]);  //FIXME: affine_quantization.num_channels()-1?
+    }
+
+    // Populate multiplier and shift using affine quantization.
+    //FIXME: where does params.scale comes from? vs. quantization.params
+    //const float input_scale = input->params.scale;
+    const float input_scale = inputs[in].tensor()->get_quantization_params().get_scale_for_channel(0);
+    //const float output_scale = output->params.scale;
+    const float output_scale = outputs[out].tensor()->get_quantization_params().get_scale_for_channel(0);
+
+    for (int i = 0; i < num_channels; ++i) {
+      // If per-tensor quantization parameter is specified, broadcast it along the
+      // quantization dimension (channels_out).
+      const float scale = is_per_channel ?  inputs[filter].tensor()->get_quantization_params().get_scale_for_channel(i) :  inputs[filter].tensor()->get_quantization_params().get_scale_for_channel(0);
+      const double filter_scale = static_cast<double>(scale);
+      const double effective_output_scale = static_cast<double>(input_scale) *
+                                            filter_scale /
+                                            static_cast<double>(output_scale);
+      int32_t significand;
+      int channel_shift;
+      QuantizeMultiplier(effective_output_scale, &significand, &channel_shift);
+      per_channel_multiplier[i] = significand;
+      per_channel_shift[i] = channel_shift;
+
+      /*
+      // Populate scalar quantization parameters.
+      // This check on legacy quantization parameters is kept only for backward
+      // compatibility.
+      if (input->type == kTfLiteUInt8) {
+        // Check bias scale == input scale * filter scale.
+        double real_multiplier = 0.0;
+        TF_LITE_ENSURE_STATUS(GetQuantizedConvolutionMultipler(
+            context, input, filter, bias, output, &real_multiplier));
+        int exponent;
+
+        // Populate quantization parameteters with multiplier and shift.
+        QuantizeMultiplier(real_multiplier, multiplier, &exponent);
+        *shift = -exponent;
+      }
+      */
+      //if (input->type == kTfLiteInt8 || input->type == kTfLiteUInt8) {
+      CalculateActivationRangeQuantized(
+            context, activation, outputs[out].tensor(), output_activation_min,
+            output_activation_max);
+    }
+
+  }
+
+  //FIXME: remove this method
   DepthwiseSeparableConvOperator& set_params(DepthwiseParams&& _params, const int32_t&& _output_multiplier, const int32_t&& _output_shift) {
     params = _params;
     output_multiplier = _output_multiplier;
