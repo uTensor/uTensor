@@ -40,9 +40,10 @@ class DequantizeOperator : public OperatorInterface<1, 1> {
 };
 
 template<typename Tout, typename Tin>
-void affine_quantize_kernel(Tensor& output, const Tensor& input, const QuantizationParams& quant_params) {
+void affine_quantize_kernel(Tensor& output, const Tensor& input) {
   // op: https://github.com/tensorflow/tensorflow/blob/fb4ec5cbde3973050e7350f0aca7f07ab7757bac/tensorflow/lite/micro/kernels/quantize.cc
   // kernel: https://github.com/tensorflow/tensorflow/blob/fb4ec5cbde3973050e7350f0aca7f07ab7757bac/tensorflow/lite/kernels/internal/reference/quantize.h
+  const QuantizationParams& quant_params = output->get_quantization_params();
   if (output->num_elems() == 0) {
     output->resize(input->get_shape());
   }
@@ -72,11 +73,9 @@ class QuantizeOperator : public OperatorInterface<1, 1> {
   
   protected:
   void compute(){
-    const Tensor input_tensor = inputs[input].tensor();
     affine_quantize_kernel<Tout, Tin>(
       outputs[output].tensor(),
-      input_tensor,
-      input_tensor->get_quantization_params()
+      inputs[input].tensor()
     );
   }
 };
