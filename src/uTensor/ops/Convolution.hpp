@@ -202,65 +202,18 @@ using AvgPoolOp = GenericPoolOp<T, AvgFilter<T>>;
 namespace TFLM {
 
 
-template <typename T>
-class DepthwiseSeparableConvOperator : public OperatorInterface<3, 1> {
- public:
-  enum names_in : uint8_t { in, filter, bias };
-  enum names_out : uint8_t { out };
-
-  DepthwiseSeparableConvOperator& set_params(DepthwiseParams&& _params, const int32_t&& _output_multiplier, const int32_t&& _output_shift) {
-    params = _params;
-    output_multiplier = _output_multiplier;
-    output_shift = _output_shift;
-    return *this;
-  }
-
- protected:
-  virtual void compute() {
-    TensorShape& in_shape = inputs[in].tensor()->get_shape();
-    TensorShape& df_shape = inputs[depthwise_filter].tensor()->get_shape();
-    TensorShape& pf_shape = inputs[pointwise_filter].tensor()->get_shape();
-    TensorShape& out_shape = outputs[out].tensor()->get_shape();
-
-    if (in_shape[3] != df_shape[2]) {
-      Context::get_default_context()->throwError(
-          new InvalidTensorDimensionsError);
-    }
-    if (pf_shape[0] != 1 || pf_shape[1] != 1) {
-      Context::get_default_context()->throwError(
-          new InvalidTensorDimensionsError);
-    }
-
-    DepthwiseConvPerChannel( 
-      DepthwiseParams& params, output_multiplier, output_shift,
-      inputs[in].tensor(), inputs[filter].tensor(), inputs[bias].tensor(), outputs[out].tensor()
-    );
-  }
-
-private:
-  DepthwiseParams params;
-  int32_t output_multiplier;
-  int32_t output_shift;
-};
-
-
-
-uint16_t MatchingDim(TensorShape s0, uint8_t i0, TensorShape s1, uint8_t i1) {
-  assert(s0[i0] == s1[i1]);
-  return s0[i0];
-}
-
-template <typename T>
-void DCHECK_LE(T v0, T v1) {
-  assert(v0 <= v1);
-}
-
-template <typename T>
-void DCHECK_EQ(T v0, T v1) {
-  assert(v0 == v1);
-}
-
 enum PaddingType : uint8_t { kNone, kSame, kValid };
+
+struct PaddingValues {
+  int16_t width;
+  int16_t height;
+  // offset is used for calculating "remaining" padding, for example, `width`
+  // is 1 and `width_offset` is 1, so padding_left is 1 while padding_right is
+  // 1 + 1 = 2.
+  int16_t width_offset;
+  // Same as width_offset except it's over the height dimension.
+  int16_t height_offset;
+};
 struct DepthwiseParams {
   PaddingType padding_type;
   PaddingValues padding_values;
@@ -286,16 +239,20 @@ struct DepthwiseParams {
   const int32_t* output_shift_per_channel;
 };
 
-struct PaddingValues {
-  int16_t width;
-  int16_t height;
-  // offset is used for calculating "remaining" padding, for example, `width`
-  // is 1 and `width_offset` is 1, so padding_left is 1 while padding_right is
-  // 1 + 1 = 2.
-  int16_t width_offset;
-  // Same as width_offset except it's over the height dimension.
-  int16_t height_offset;
-};
+uint16_t MatchingDim(TensorShape s0, uint8_t i0, TensorShape s1, uint8_t i1) {
+  assert(s0[i0] == s1[i1]);
+  return s0[i0];
+}
+
+template <typename T>
+void DCHECK_LE(T v0, T v1) {
+  assert(v0 <= v1);
+}
+
+template <typename T>
+void DCHECK_EQ(T v0, T v1) {
+  assert(v0 == v1);
+}
 
 inline void DepthwiseConvPerChannel(
 const DepthwiseParams& params, const int32_t* output_multiplier, const int32_t* output_shift,
@@ -405,8 +362,47 @@ Tensor& input, Tensor& filter, Tensor& bias, Tensor& output
     }
   }
 }
+template <typename T>
+class DepthwiseSeparableConvOperator : public OperatorInterface<3, 1> {
+ public:
+  enum names_in : uint8_t { in, filter, bias };
+  enum names_out : uint8_t { out };
 
-}
+  DepthwiseSeparableConvOperator& set_params(DepthwiseParams&& _params, const int32_t&& _output_multiplier, const int32_t&& _output_shift) {
+    params = _params;
+    output_multiplier = _output_multiplier;
+    output_shift = _output_shift;
+    return *this;
+  }
 
+ protected:
+  virtual void compute() {
+    TensorShape& in_shape = inputs[in].tensor()->get_shape();
+    TensorShape& df_shape = inputs[filter].tensor()->get_shape();
+    TensorShape& bias_shape = inputs[bias].tensor()->get_shape();
+    TensorShape& out_shape = outputs[out].tensor()->get_shape();
+
+    if (in_shape[3] != df_shape[2]) {
+      Context::get_default_context()->throwError(
+          new InvalidTensorDimensionsError);
+    }
+    if (bias_shape[0] != 1 || bias_shape[1] != 1) {
+      Context::get_default_context()->throwError(
+          new InvalidTensorDimensionsError);
+    }
+
+    DepthwiseConvPerChannel( 
+      params, &output_multiplier, &output_shift,
+      inputs[in].tensor(), inputs[filter].tensor(), inputs[bias].tensor(), outputs[out].tensor()
+    );
+  }
+
+private:
+  DepthwiseParams params;
+  int32_t output_multiplier;
+  int32_t output_shift;
+};
+
+}  // namespace TFLM
 }  // namespace uTensor
 #endif

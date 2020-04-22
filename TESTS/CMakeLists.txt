@@ -37,7 +37,7 @@ package_add_test_with_libraries(test_romtensor tensors/test_romtensor utensor te
 package_add_test_with_libraries(test_arith operators/test_arithmetic utensor operators "${PROJECT_DIR}/test-data/")
 package_add_test_with_libraries(test_matrix_ops operators/test_matrix utensor operators "${PROJECT_DIR}/test-data/")
 package_add_test_with_libraries(test_convolution operators/test_convolution utensor operators "${PROJECT_DIR}/test-data/")
-package_add_test_with_libraries(test_dws_convolution operators/test_dws_convolution utensor operators "${PROJECT_DIR}/test-data/")
+#package_add_test_with_libraries(test_dws_convolution operators/test_dws_convolution utensor operators "${PROJECT_DIR}/test-data/")
 package_add_test_with_libraries(test_relu operators/test_relu utensor operators "${PROJECT_DIR}/test-data/")
 package_add_test_with_libraries(test_maxpool operators/test_maxpool utensor operators "${PROJECT_DIR}/test-data/")
 package_add_test_with_libraries(test_avgpool operators/test_avgpool utensor operators "${PROJECT_DIR}/test-data/")
@@ -45,6 +45,7 @@ package_add_test_with_libraries(test_squeeze operators/test_squeeze utensor oper
 package_add_test_with_libraries(test_argmax operators/test_argmax utensor operators "${PROJECT_DIR}/test-data/")
 package_add_test_with_libraries(test_argmin operators/test_argmin utensor operators "${PROJECT_DIR}/test-data/")
 package_add_test_with_libraries(test_reshape operators/test_reshape utensor operators "${PROJECT_DIR}/test-data/")
+package_add_test_with_libraries(test_quant_dws_conv operators/test_quantized_dws_conv utensor operators "${PROJECT_DIR}/test-data/")
 
 package_add_test_with_libraries(test_top_include library/test_top_include utensor library "${PROJECT_DIR}/test-data/")
 

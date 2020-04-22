@@ -39,13 +39,13 @@ TEST(Quantized, reference_1_dws_conv) {
   Tensor out = new RamTensor({ 1, 26, 26, 32 }, i8);
                 out->set_quantization_params(PerTensorQuantizationParams(s_ref_output_ref_zp[0], s_ref_output_ref_scale[0] ));
 
-  DepthwiseSeparableConvOperator<float> dw_conv_Aw({ 1,2,2,1}, VALID);
+  TFLM::DepthwiseSeparableConvOperator<float> dw_conv_Aw;
   dw_conv_Aw
        .set_inputs({ {DepthwiseSeparableConvOperator<float>::in, A}, {DepthwiseSeparableConvOperator<float>::depthwise_filter, filter}, {DepthwiseSeparableConvOperator<float>::pointwise_filter, bias} })
        .set_outputs({ {DepthwiseSeparableConvOperator<float>::out, out} })
        .eval();
 
-  for(int i = 0; i < ; i++) {
-    //EXPECT_NEAR((float) out(i), s_ref_output_ref[i], 0.0001);
+  for(int i = 0; i < out->get_shape().get_linear_size(); i++) {
+    EXPECT_NEAR((float) out(i), s_ref_output_ref[i], 0.0001);
   }
 }
