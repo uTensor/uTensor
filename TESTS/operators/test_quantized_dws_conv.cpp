@@ -43,10 +43,20 @@ TEST(Quantized, reference_1_dws_conv) {
 options:
 {'Padding': 1, 'StrideW': 1, 'StrideH': 1, 'DepthMultiplier': 32, 'FusedActivationFunction': '1 (RELU)', 'DilationWFactor': 1, 'DilationHFactor': 1}
 */
-  TFLM::DepthwiseSeparableConvOperator<float> dw_conv_Aw;
+
+  TFLM::TfLiteDepthwiseConvParams dws_param;
+  dws_param.padding = TFLM::TfLitePadding::kTfLitePaddingSame;
+  dws_param.stride_width = 1;
+  dws_param.stride_height = 1;
+  dws_param.depth_multiplier = 32;
+  dws_param.activation = TFLM::TfLiteFusedActivation::kTfLiteActRelu;
+  dws_param.dilation_width_factor = 1;
+  dws_param.dilation_height_factor = 1;
+
+  TFLM::DepthwiseSeparableConvOperator<float> dw_conv_Aw(dws_param);
   dw_conv_Aw
        .set_inputs({ {DepthwiseSeparableConvOperator<float>::in, A}, {DepthwiseSeparableConvOperator<float>::depthwise_filter, filter}, {DepthwiseSeparableConvOperator<float>::pointwise_filter, bias} })
-       .set_outputs({ {DepthwiseSeparableConvOperator<float>::out, out} })
+       .set_outputs({ {DepthwiseSeparableConvOperator<float>::out, out} });
        .eval();
 
   for(int i = 0; i < out->get_shape().get_linear_size(); i++) {
