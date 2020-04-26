@@ -3,6 +3,7 @@
 #include <algorithm>
 #include <limits>
 #include <cmath>
+#include <cstdlib>
 
 #include "operatorBase.hpp"
 
@@ -54,8 +55,8 @@ void affine_quantize_kernel(Tensor& output, const Tensor& input) {
   }
   const int32_t zp = quant_params.get_zeroP_for_channel(0);
   const float scale = quant_params.get_scale_for_channel(0);
-  const int32_t minVal = std::numeric_limits<Tout>::min();
-  const int32_t maxVal = std::numeric_limits<Tout>::max();
+  const int32_t minVal = static_cast<int32_t>(std::numeric_limits<Tout>::min());
+  const int32_t maxVal = static_cast<int32_t>(std::numeric_limits<Tout>::max());
   for (uint32_t i = 0; i < input->num_elems(); i++){
     const Tin inVal = input(i);
     const float inVal_f = static_cast<float>(inVal);
