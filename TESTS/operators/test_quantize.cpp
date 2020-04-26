@@ -30,6 +30,7 @@ TEST(Quantized, reference_0_quantize) {
     .eval();
   for (int i = 0; i < 784; ++i) {
     int8_t value = static_cast<int8_t>(output_tensor(i));
+    uTensor_printf("%d\n", i);
     EXPECT_EQ(value, ref_output_arr[i]);
   }
 }
