@@ -3,11 +3,18 @@ import pickle
 from collections import namedtuple
 from pathlib import Path
 
+import numpy as np
+
 from jinja_env import env
 
 TFLM_Tensor = namedtuple(
     "TFLM_Tensor", ["tensor", "quantization"]
 )  # it's required for loading the pickle files
+
+
+def quantize(arr, zero_point, scale):
+    # the spec: https://www.tensorflow.org/lite/performance/quantization_spec
+    return (np.round(arr / scale) + zero_point).astype("int8")
 
 
 def main(
@@ -18,8 +25,13 @@ def main(
     with (test_data_dir / "inputs.pkl").open("rb") as input_fid, (
         test_data_dir / "outputs.pkl"
     ).open("rb") as output_fid:
-        inputs_data = pickle.load(input_fid)["input_1"]
-        outputs_data = pickle.load(output_fid)["input_1_int8"]
+        outputs_quant_param = pickle.load(output_fid)["input_1_int8"].quantization
+        input_tensor = pickle.load(input_fid)["input_1"].tensor
+        quant_tensor = quantize(
+            input_tensor,
+            zero_point=outputs_quant_param[1],
+            scale=outputs_quant_param[0],
+        )
 
     # template render variables
     utensor_headers = set(["QuantizeOps.hpp", "RamTensor.hpp", "RomTensor.hpp"])
@@ -27,7 +39,7 @@ def main(
     constants_map = {}
     test_suit_name = "Quantized"
     test_name = "reference_0_quantize"
-    output_size = outputs_data.tensor.size
+    output_size = quant_tensor.size
     declare_tensor_strs = []
     op_cls = "::TFLM::QuantizeOperator"
     op_type_signature = "int8_t, float"
@@ -38,21 +50,21 @@ def main(
     output_names = []
     ref_output_names = []
 
-    constants_map["input_arr"] = (inputs_data.tensor.flatten().tolist(), "float")
-    constants_map["ref_output_arr"] = (outputs_data.tensor.flatten().tolist(), "int8_t")
+    constants_map["input_arr"] = (input_tensor.flatten().tolist(), "float")
+    constants_map["ref_output_arr"] = (quant_tensor.flatten().tolist(), "int8_t")
     declare_tensor_strs.extend(
         [
             env.get_template("declare_rom_tensor.cpp").render(
                 tensor_name="input_tensor",
-                shape=inputs_data.tensor.shape,
+                shape=input_tensor.shape,
                 tensor_type_str="float",
                 const_var_name="input_arr",
             ),
             env.get_template("declare_ram_tensor.cpp").render(
                 tensor_name="output_tensor",
-                shape=outputs_data.tensor.shape,
+                shape=quant_tensor.shape,
                 tensor_type_str="int8_t",
-                quantize_params=outputs_data.quantization,
+                quantize_params=outputs_quant_param,
             ),
         ]
     )
@@ -71,7 +83,7 @@ def main(
                 test_name=test_name,
                 utensor_headers=utensor_headers,
                 test_headers=test_headers,
-                output_size=outputs_data.tensor.size,
+                output_size=quant_tensor.size,
                 declare_tensor_strs=declare_tensor_strs,
                 op_cls=op_cls,
                 op_type_signature=op_type_signature,
