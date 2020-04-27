@@ -65,7 +65,7 @@ void affine_quantize_kernel(Tensor& output, const Tensor& input) {
     output(i) = static_cast<Tout>(clamped);
   }
 }
-
+//TODO @mbartling  Add template specializations for invalid type combos to sanity check
 template<typename Tout, typename Tin>
 class QuantizeOperator : public OperatorInterface<1, 1> {
   public:
