@@ -34,15 +34,14 @@ TEST({{test_suit_name}}, {{test_name}}) {
     .set_outputs({ {{outputs_str}} })
     .eval();
   {%for output_name, ref_output_name in zip(output_names, ref_output_names)%}
-  {%if tol %}
   for (int i = 0; i < {{output_size}}; ++i) {
-    EXPECT_NEAR(({{output_type_str}}) {{output_name}}(i), {{ref_output_name}}[i], {{tol}});
+    {{output_type_str}} value = static_cast<{{output_type_str}}>({{output_name}}(i));
+    {%if tol %}
+    EXPECT_NEAR(value, {{ref_output_name}}[i], {{tol}});
+    {%else%}
+    EXPECT_EQ(value, {{ref_output_name}}[i]);
+    {%endif%}
   }
-  {%else%}
-  for (int i = 0; i < {{output_size}}; ++i) {
-    EXPECT_EQ(({{output_type_str}}) {{output_name}}(i), {{ref_output_name}}[i]);
-  }
-  {%endif%}
   {%endfor%}
   {%if other_tests_str%}
   {%for test_template_str in other_tests_str%}
