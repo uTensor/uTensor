@@ -404,10 +404,10 @@ Tensor& input, Tensor& filter, Tensor& bias, Tensor& output
                 if (is_point_inside_image) {
                   // int32_t input_val = input_data[Offset(input_shape, batch, in_y,
                   //                                     in_x, in_channel)];
-                  int32_t input_val = input(batch, in_y, in_x, in_channel);
+                  int32_t input_val = static_cast<int8_t>(input(batch, in_y, in_x, in_channel));
                   // int32_t filter_val = filter_data[Offset(
                   //     filter_shape, 0, filter_y, filter_x, output_channel)];
-                  int32_t filter_val = filter(batch, filter_y, filter_x, output_channel);
+                  int32_t filter_val = static_cast<int8_t>(filter(batch, filter_y, filter_x, output_channel));
                   // Accumulate with 32 bits accumulator.
                   // In the nudging process during model quantization, we force
                   // real value of 0.0 be represented by a quantized value. This
