@@ -31,7 +31,7 @@ TEST(MaxPool, random_inputs_VALID_0_kh_1_kw_1_stride_1) {
   Tensor in = new RomTensor({ 1,28,28,3 }, flt, s_in_VALID_0_kh_1_kw_1_stride_1);
   Tensor out = new RamTensor({ 1,28,28,3 }, flt);
 
-  MaxPoolOp<float> mxpool({ 1,1}, { 1,1,1,1}, VALID);
+  MaxPoolOperator<float> mxpool({ 1,1}, { 1,1,1,1}, VALID);
   mxpool
        .set_inputs({ {ConvOperator<float>::in, in} })
        .set_outputs({ {ConvOperator<float>::out, out} })
@@ -57,7 +57,7 @@ TEST(MaxPool, random_inputs_VALID_0_kh_1_kw_1_stride_2) {
   Tensor in = new RomTensor({ 1,28,28,3 }, flt, s_in_VALID_0_kh_1_kw_1_stride_2);
   Tensor out = new RamTensor({ 1,14,14,3 }, flt);
 
-  MaxPoolOp<float> mxpool({ 1,1}, { 1,2,2,1}, VALID);
+  MaxPoolOperator<float> mxpool({ 1,1}, { 1,2,2,1}, VALID);
   mxpool
        .set_inputs({ {ConvOperator<float>::in, in} })
        .set_outputs({ {ConvOperator<float>::out, out} })
@@ -83,7 +83,7 @@ TEST(MaxPool, random_inputs_VALID_0_kh_1_kw_3_stride_1) {
   Tensor in = new RomTensor({ 1,28,28,3 }, flt, s_in_VALID_0_kh_1_kw_3_stride_1);
   Tensor out = new RamTensor({ 1,28,26,3 }, flt);
 
-  MaxPoolOp<float> mxpool({ 1,3}, { 1,1,1,1}, VALID);
+  MaxPoolOperator<float> mxpool({ 1,3}, { 1,1,1,1}, VALID);
   mxpool
        .set_inputs({ {ConvOperator<float>::in, in} })
        .set_outputs({ {ConvOperator<float>::out, out} })
@@ -109,7 +109,7 @@ TEST(MaxPool, random_inputs_VALID_0_kh_1_kw_3_stride_2) {
   Tensor in = new RomTensor({ 1,28,28,3 }, flt, s_in_VALID_0_kh_1_kw_3_stride_2);
   Tensor out = new RamTensor({ 1,14,13,3 }, flt);
 
-  MaxPoolOp<float> mxpool({ 1,3}, { 1,2,2,1}, VALID);
+  MaxPoolOperator<float> mxpool({ 1,3}, { 1,2,2,1}, VALID);
   mxpool
        .set_inputs({ {ConvOperator<float>::in, in} })
        .set_outputs({ {ConvOperator<float>::out, out} })
@@ -135,7 +135,7 @@ TEST(MaxPool, random_inputs_VALID_0_kh_1_kw_5_stride_1) {
   Tensor in = new RomTensor({ 1,28,28,3 }, flt, s_in_VALID_0_kh_1_kw_5_stride_1);
   Tensor out = new RamTensor({ 1,28,24,3 }, flt);
 
-  MaxPoolOp<float> mxpool({ 1,5}, { 1,1,1,1}, VALID);
+  MaxPoolOperator<float> mxpool({ 1,5}, { 1,1,1,1}, VALID);
   mxpool
        .set_inputs({ {ConvOperator<float>::in, in} })
        .set_outputs({ {ConvOperator<float>::out, out} })
@@ -161,7 +161,7 @@ TEST(MaxPool, random_inputs_VALID_0_kh_1_kw_5_stride_2) {
   Tensor in = new RomTensor({ 1,28,28,3 }, flt, s_in_VALID_0_kh_1_kw_5_stride_2);
   Tensor out = new RamTensor({ 1,14,12,3 }, flt);
 
-  MaxPoolOp<float> mxpool({ 1,5}, { 1,2,2,1}, VALID);
+  MaxPoolOperator<float> mxpool({ 1,5}, { 1,2,2,1}, VALID);
   mxpool
        .set_inputs({ {ConvOperator<float>::in, in} })
        .set_outputs({ {ConvOperator<float>::out, out} })
@@ -187,7 +187,7 @@ TEST(MaxPool, random_inputs_VALID_0_kh_3_kw_1_stride_1) {
   Tensor in = new RomTensor({ 1,28,28,3 }, flt, s_in_VALID_0_kh_3_kw_1_stride_1);
   Tensor out = new RamTensor({ 1,26,28,3 }, flt);
 
-  MaxPoolOp<float> mxpool({ 3,1}, { 1,1,1,1}, VALID);
+  MaxPoolOperator<float> mxpool({ 3,1}, { 1,1,1,1}, VALID);
   mxpool
        .set_inputs({ {ConvOperator<float>::in, in} })
        .set_outputs({ {ConvOperator<float>::out, out} })
@@ -213,7 +213,7 @@ TEST(MaxPool, random_inputs_VALID_0_kh_3_kw_1_stride_2) {
   Tensor in = new RomTensor({ 1,28,28,3 }, flt, s_in_VALID_0_kh_3_kw_1_stride_2);
   Tensor out = new RamTensor({ 1,13,14,3 }, flt);
 
-  MaxPoolOp<float> mxpool({ 3,1}, { 1,2,2,1}, VALID);
+  MaxPoolOperator<float> mxpool({ 3,1}, { 1,2,2,1}, VALID);
   mxpool
        .set_inputs({ {ConvOperator<float>::in, in} })
        .set_outputs({ {ConvOperator<float>::out, out} })
@@ -239,7 +239,7 @@ TEST(MaxPool, random_inputs_VALID_0_kh_3_kw_3_stride_1) {
   Tensor in = new RomTensor({ 1,28,28,3 }, flt, s_in_VALID_0_kh_3_kw_3_stride_1);
   Tensor out = new RamTensor({ 1,26,26,3 }, flt);
 
-  MaxPoolOp<float> mxpool({ 3,3}, { 1,1,1,1}, VALID);
+  MaxPoolOperator<float> mxpool({ 3,3}, { 1,1,1,1}, VALID);
   mxpool
        .set_inputs({ {ConvOperator<float>::in, in} })
        .set_outputs({ {ConvOperator<float>::out, out} })
@@ -265,7 +265,7 @@ TEST(MaxPool, random_inputs_VALID_0_kh_3_kw_3_stride_2) {
   Tensor in = new RomTensor({ 1,28,28,3 }, flt, s_in_VALID_0_kh_3_kw_3_stride_2);
   Tensor out = new RamTensor({ 1,13,13,3 }, flt);
 
-  MaxPoolOp<float> mxpool({ 3,3}, { 1,2,2,1}, VALID);
+  MaxPoolOperator<float> mxpool({ 3,3}, { 1,2,2,1}, VALID);
   mxpool
        .set_inputs({ {ConvOperator<float>::in, in} })
        .set_outputs({ {ConvOperator<float>::out, out} })
@@ -291,7 +291,7 @@ TEST(MaxPool, random_inputs_VALID_0_kh_3_kw_5_stride_1) {
   Tensor in = new RomTensor({ 1,28,28,3 }, flt, s_in_VALID_0_kh_3_kw_5_stride_1);
   Tensor out = new RamTensor({ 1,26,24,3 }, flt);
 
-  MaxPoolOp<float> mxpool({ 3,5}, { 1,1,1,1}, VALID);
+  MaxPoolOperator<float> mxpool({ 3,5}, { 1,1,1,1}, VALID);
   mxpool
        .set_inputs({ {ConvOperator<float>::in, in} })
        .set_outputs({ {ConvOperator<float>::out, out} })
@@ -317,7 +317,7 @@ TEST(MaxPool, random_inputs_VALID_0_kh_3_kw_5_stride_2) {
   Tensor in = new RomTensor({ 1,28,28,3 }, flt, s_in_VALID_0_kh_3_kw_5_stride_2);
   Tensor out = new RamTensor({ 1,13,12,3 }, flt);
 
-  MaxPoolOp<float> mxpool({ 3,5}, { 1,2,2,1}, VALID);
+  MaxPoolOperator<float> mxpool({ 3,5}, { 1,2,2,1}, VALID);
   mxpool
        .set_inputs({ {ConvOperator<float>::in, in} })
        .set_outputs({ {ConvOperator<float>::out, out} })
@@ -343,7 +343,7 @@ TEST(MaxPool, random_inputs_VALID_0_kh_5_kw_1_stride_1) {
   Tensor in = new RomTensor({ 1,28,28,3 }, flt, s_in_VALID_0_kh_5_kw_1_stride_1);
   Tensor out = new RamTensor({ 1,24,28,3 }, flt);
 
-  MaxPoolOp<float> mxpool({ 5,1}, { 1,1,1,1}, VALID);
+  MaxPoolOperator<float> mxpool({ 5,1}, { 1,1,1,1}, VALID);
   mxpool
        .set_inputs({ {ConvOperator<float>::in, in} })
        .set_outputs({ {ConvOperator<float>::out, out} })
@@ -369,7 +369,7 @@ TEST(MaxPool, random_inputs_VALID_0_kh_5_kw_1_stride_2) {
   Tensor in = new RomTensor({ 1,28,28,3 }, flt, s_in_VALID_0_kh_5_kw_1_stride_2);
   Tensor out = new RamTensor({ 1,12,14,3 }, flt);
 
-  MaxPoolOp<float> mxpool({ 5,1}, { 1,2,2,1}, VALID);
+  MaxPoolOperator<float> mxpool({ 5,1}, { 1,2,2,1}, VALID);
   mxpool
        .set_inputs({ {ConvOperator<float>::in, in} })
        .set_outputs({ {ConvOperator<float>::out, out} })
@@ -395,7 +395,7 @@ TEST(MaxPool, random_inputs_VALID_0_kh_5_kw_3_stride_1) {
   Tensor in = new RomTensor({ 1,28,28,3 }, flt, s_in_VALID_0_kh_5_kw_3_stride_1);
   Tensor out = new RamTensor({ 1,24,26,3 }, flt);
 
-  MaxPoolOp<float> mxpool({ 5,3}, { 1,1,1,1}, VALID);
+  MaxPoolOperator<float> mxpool({ 5,3}, { 1,1,1,1}, VALID);
   mxpool
        .set_inputs({ {ConvOperator<float>::in, in} })
        .set_outputs({ {ConvOperator<float>::out, out} })
@@ -421,7 +421,7 @@ TEST(MaxPool, random_inputs_VALID_0_kh_5_kw_3_stride_2) {
   Tensor in = new RomTensor({ 1,28,28,3 }, flt, s_in_VALID_0_kh_5_kw_3_stride_2);
   Tensor out = new RamTensor({ 1,12,13,3 }, flt);
 
-  MaxPoolOp<float> mxpool({ 5,3}, { 1,2,2,1}, VALID);
+  MaxPoolOperator<float> mxpool({ 5,3}, { 1,2,2,1}, VALID);
   mxpool
        .set_inputs({ {ConvOperator<float>::in, in} })
        .set_outputs({ {ConvOperator<float>::out, out} })
@@ -447,7 +447,7 @@ TEST(MaxPool, random_inputs_VALID_0_kh_5_kw_5_stride_1) {
   Tensor in = new RomTensor({ 1,28,28,3 }, flt, s_in_VALID_0_kh_5_kw_5_stride_1);
   Tensor out = new RamTensor({ 1,24,24,3 }, flt);
 
-  MaxPoolOp<float> mxpool({ 5,5}, { 1,1,1,1}, VALID);
+  MaxPoolOperator<float> mxpool({ 5,5}, { 1,1,1,1}, VALID);
   mxpool
        .set_inputs({ {ConvOperator<float>::in, in} })
        .set_outputs({ {ConvOperator<float>::out, out} })
@@ -473,7 +473,7 @@ TEST(MaxPool, random_inputs_VALID_0_kh_5_kw_5_stride_2) {
   Tensor in = new RomTensor({ 1,28,28,3 }, flt, s_in_VALID_0_kh_5_kw_5_stride_2);
   Tensor out = new RamTensor({ 1,12,12,3 }, flt);
 
-  MaxPoolOp<float> mxpool({ 5,5}, { 1,2,2,1}, VALID);
+  MaxPoolOperator<float> mxpool({ 5,5}, { 1,2,2,1}, VALID);
   mxpool
        .set_inputs({ {ConvOperator<float>::in, in} })
        .set_outputs({ {ConvOperator<float>::out, out} })
@@ -499,7 +499,7 @@ TEST(MaxPool, random_inputs_VALID_1_kh_1_kw_1_stride_1) {
   Tensor in = new RomTensor({ 1,28,28,3 }, flt, s_in_VALID_1_kh_1_kw_1_stride_1);
   Tensor out = new RamTensor({ 1,28,28,3 }, flt);
 
-  MaxPoolOp<float> mxpool({ 1,1}, { 1,1,1,1}, VALID);
+  MaxPoolOperator<float> mxpool({ 1,1}, { 1,1,1,1}, VALID);
   mxpool
        .set_inputs({ {ConvOperator<float>::in, in} })
        .set_outputs({ {ConvOperator<float>::out, out} })
@@ -525,7 +525,7 @@ TEST(MaxPool, random_inputs_VALID_1_kh_1_kw_1_stride_2) {
   Tensor in = new RomTensor({ 1,28,28,3 }, flt, s_in_VALID_1_kh_1_kw_1_stride_2);
   Tensor out = new RamTensor({ 1,14,14,3 }, flt);
 
-  MaxPoolOp<float> mxpool({ 1,1}, { 1,2,2,1}, VALID);
+  MaxPoolOperator<float> mxpool({ 1,1}, { 1,2,2,1}, VALID);
   mxpool
        .set_inputs({ {ConvOperator<float>::in, in} })
        .set_outputs({ {ConvOperator<float>::out, out} })
@@ -551,7 +551,7 @@ TEST(MaxPool, random_inputs_VALID_1_kh_1_kw_3_stride_1) {
   Tensor in = new RomTensor({ 1,28,28,3 }, flt, s_in_VALID_1_kh_1_kw_3_stride_1);
   Tensor out = new RamTensor({ 1,28,26,3 }, flt);
 
-  MaxPoolOp<float> mxpool({ 1,3}, { 1,1,1,1}, VALID);
+  MaxPoolOperator<float> mxpool({ 1,3}, { 1,1,1,1}, VALID);
   mxpool
        .set_inputs({ {ConvOperator<float>::in, in} })
        .set_outputs({ {ConvOperator<float>::out, out} })
@@ -577,7 +577,7 @@ TEST(MaxPool, random_inputs_VALID_1_kh_1_kw_3_stride_2) {
   Tensor in = new RomTensor({ 1,28,28,3 }, flt, s_in_VALID_1_kh_1_kw_3_stride_2);
   Tensor out = new RamTensor({ 1,14,13,3 }, flt);
 
-  MaxPoolOp<float> mxpool({ 1,3}, { 1,2,2,1}, VALID);
+  MaxPoolOperator<float> mxpool({ 1,3}, { 1,2,2,1}, VALID);
   mxpool
        .set_inputs({ {ConvOperator<float>::in, in} })
        .set_outputs({ {ConvOperator<float>::out, out} })
@@ -603,7 +603,7 @@ TEST(MaxPool, random_inputs_VALID_1_kh_1_kw_5_stride_1) {
   Tensor in = new RomTensor({ 1,28,28,3 }, flt, s_in_VALID_1_kh_1_kw_5_stride_1);
   Tensor out = new RamTensor({ 1,28,24,3 }, flt);
 
-  MaxPoolOp<float> mxpool({ 1,5}, { 1,1,1,1}, VALID);
+  MaxPoolOperator<float> mxpool({ 1,5}, { 1,1,1,1}, VALID);
   mxpool
        .set_inputs({ {ConvOperator<float>::in, in} })
        .set_outputs({ {ConvOperator<float>::out, out} })
@@ -629,7 +629,7 @@ TEST(MaxPool, random_inputs_VALID_1_kh_1_kw_5_stride_2) {
   Tensor in = new RomTensor({ 1,28,28,3 }, flt, s_in_VALID_1_kh_1_kw_5_stride_2);
   Tensor out = new RamTensor({ 1,14,12,3 }, flt);
 
-  MaxPoolOp<float> mxpool({ 1,5}, { 1,2,2,1}, VALID);
+  MaxPoolOperator<float> mxpool({ 1,5}, { 1,2,2,1}, VALID);
   mxpool
        .set_inputs({ {ConvOperator<float>::in, in} })
        .set_outputs({ {ConvOperator<float>::out, out} })
@@ -655,7 +655,7 @@ TEST(MaxPool, random_inputs_VALID_1_kh_3_kw_1_stride_1) {
   Tensor in = new RomTensor({ 1,28,28,3 }, flt, s_in_VALID_1_kh_3_kw_1_stride_1);
   Tensor out = new RamTensor({ 1,26,28,3 }, flt);
 
-  MaxPoolOp<float> mxpool({ 3,1}, { 1,1,1,1}, VALID);
+  MaxPoolOperator<float> mxpool({ 3,1}, { 1,1,1,1}, VALID);
   mxpool
        .set_inputs({ {ConvOperator<float>::in, in} })
        .set_outputs({ {ConvOperator<float>::out, out} })
@@ -681,7 +681,7 @@ TEST(MaxPool, random_inputs_VALID_1_kh_3_kw_1_stride_2) {
   Tensor in = new RomTensor({ 1,28,28,3 }, flt, s_in_VALID_1_kh_3_kw_1_stride_2);
   Tensor out = new RamTensor({ 1,13,14,3 }, flt);
 
-  MaxPoolOp<float> mxpool({ 3,1}, { 1,2,2,1}, VALID);
+  MaxPoolOperator<float> mxpool({ 3,1}, { 1,2,2,1}, VALID);
   mxpool
        .set_inputs({ {ConvOperator<float>::in, in} })
        .set_outputs({ {ConvOperator<float>::out, out} })
@@ -707,7 +707,7 @@ TEST(MaxPool, random_inputs_VALID_1_kh_3_kw_3_stride_1) {
   Tensor in = new RomTensor({ 1,28,28,3 }, flt, s_in_VALID_1_kh_3_kw_3_stride_1);
   Tensor out = new RamTensor({ 1,26,26,3 }, flt);
 
-  MaxPoolOp<float> mxpool({ 3,3}, { 1,1,1,1}, VALID);
+  MaxPoolOperator<float> mxpool({ 3,3}, { 1,1,1,1}, VALID);
   mxpool
        .set_inputs({ {ConvOperator<float>::in, in} })
        .set_outputs({ {ConvOperator<float>::out, out} })
@@ -733,7 +733,7 @@ TEST(MaxPool, random_inputs_VALID_1_kh_3_kw_3_stride_2) {
   Tensor in = new RomTensor({ 1,28,28,3 }, flt, s_in_VALID_1_kh_3_kw_3_stride_2);
   Tensor out = new RamTensor({ 1,13,13,3 }, flt);
 
-  MaxPoolOp<float> mxpool({ 3,3}, { 1,2,2,1}, VALID);
+  MaxPoolOperator<float> mxpool({ 3,3}, { 1,2,2,1}, VALID);
   mxpool
        .set_inputs({ {ConvOperator<float>::in, in} })
        .set_outputs({ {ConvOperator<float>::out, out} })
@@ -759,7 +759,7 @@ TEST(MaxPool, random_inputs_VALID_1_kh_3_kw_5_stride_1) {
   Tensor in = new RomTensor({ 1,28,28,3 }, flt, s_in_VALID_1_kh_3_kw_5_stride_1);
   Tensor out = new RamTensor({ 1,26,24,3 }, flt);
 
-  MaxPoolOp<float> mxpool({ 3,5}, { 1,1,1,1}, VALID);
+  MaxPoolOperator<float> mxpool({ 3,5}, { 1,1,1,1}, VALID);
   mxpool
        .set_inputs({ {ConvOperator<float>::in, in} })
        .set_outputs({ {ConvOperator<float>::out, out} })
@@ -785,7 +785,7 @@ TEST(MaxPool, random_inputs_VALID_1_kh_3_kw_5_stride_2) {
   Tensor in = new RomTensor({ 1,28,28,3 }, flt, s_in_VALID_1_kh_3_kw_5_stride_2);
   Tensor out = new RamTensor({ 1,13,12,3 }, flt);
 
-  MaxPoolOp<float> mxpool({ 3,5}, { 1,2,2,1}, VALID);
+  MaxPoolOperator<float> mxpool({ 3,5}, { 1,2,2,1}, VALID);
   mxpool
        .set_inputs({ {ConvOperator<float>::in, in} })
        .set_outputs({ {ConvOperator<float>::out, out} })
@@ -811,7 +811,7 @@ TEST(MaxPool, random_inputs_VALID_1_kh_5_kw_1_stride_1) {
   Tensor in = new RomTensor({ 1,28,28,3 }, flt, s_in_VALID_1_kh_5_kw_1_stride_1);
   Tensor out = new RamTensor({ 1,24,28,3 }, flt);
 
-  MaxPoolOp<float> mxpool({ 5,1}, { 1,1,1,1}, VALID);
+  MaxPoolOperator<float> mxpool({ 5,1}, { 1,1,1,1}, VALID);
   mxpool
        .set_inputs({ {ConvOperator<float>::in, in} })
        .set_outputs({ {ConvOperator<float>::out, out} })
@@ -837,7 +837,7 @@ TEST(MaxPool, random_inputs_VALID_1_kh_5_kw_1_stride_2) {
   Tensor in = new RomTensor({ 1,28,28,3 }, flt, s_in_VALID_1_kh_5_kw_1_stride_2);
   Tensor out = new RamTensor({ 1,12,14,3 }, flt);
 
-  MaxPoolOp<float> mxpool({ 5,1}, { 1,2,2,1}, VALID);
+  MaxPoolOperator<float> mxpool({ 5,1}, { 1,2,2,1}, VALID);
   mxpool
        .set_inputs({ {ConvOperator<float>::in, in} })
        .set_outputs({ {ConvOperator<float>::out, out} })
@@ -863,7 +863,7 @@ TEST(MaxPool, random_inputs_VALID_1_kh_5_kw_3_stride_1) {
   Tensor in = new RomTensor({ 1,28,28,3 }, flt, s_in_VALID_1_kh_5_kw_3_stride_1);
   Tensor out = new RamTensor({ 1,24,26,3 }, flt);
 
-  MaxPoolOp<float> mxpool({ 5,3}, { 1,1,1,1}, VALID);
+  MaxPoolOperator<float> mxpool({ 5,3}, { 1,1,1,1}, VALID);
   mxpool
        .set_inputs({ {ConvOperator<float>::in, in} })
        .set_outputs({ {ConvOperator<float>::out, out} })
@@ -889,7 +889,7 @@ TEST(MaxPool, random_inputs_VALID_1_kh_5_kw_3_stride_2) {
   Tensor in = new RomTensor({ 1,28,28,3 }, flt, s_in_VALID_1_kh_5_kw_3_stride_2);
   Tensor out = new RamTensor({ 1,12,13,3 }, flt);
 
-  MaxPoolOp<float> mxpool({ 5,3}, { 1,2,2,1}, VALID);
+  MaxPoolOperator<float> mxpool({ 5,3}, { 1,2,2,1}, VALID);
   mxpool
        .set_inputs({ {ConvOperator<float>::in, in} })
        .set_outputs({ {ConvOperator<float>::out, out} })
@@ -915,7 +915,7 @@ TEST(MaxPool, random_inputs_VALID_1_kh_5_kw_5_stride_1) {
   Tensor in = new RomTensor({ 1,28,28,3 }, flt, s_in_VALID_1_kh_5_kw_5_stride_1);
   Tensor out = new RamTensor({ 1,24,24,3 }, flt);
 
-  MaxPoolOp<float> mxpool({ 5,5}, { 1,1,1,1}, VALID);
+  MaxPoolOperator<float> mxpool({ 5,5}, { 1,1,1,1}, VALID);
   mxpool
        .set_inputs({ {ConvOperator<float>::in, in} })
        .set_outputs({ {ConvOperator<float>::out, out} })
@@ -941,7 +941,7 @@ TEST(MaxPool, random_inputs_VALID_1_kh_5_kw_5_stride_2) {
   Tensor in = new RomTensor({ 1,28,28,3 }, flt, s_in_VALID_1_kh_5_kw_5_stride_2);
   Tensor out = new RamTensor({ 1,12,12,3 }, flt);
 
-  MaxPoolOp<float> mxpool({ 5,5}, { 1,2,2,1}, VALID);
+  MaxPoolOperator<float> mxpool({ 5,5}, { 1,2,2,1}, VALID);
   mxpool
        .set_inputs({ {ConvOperator<float>::in, in} })
        .set_outputs({ {ConvOperator<float>::out, out} })
@@ -967,7 +967,7 @@ TEST(MaxPool, random_inputs_VALID_2_kh_1_kw_1_stride_1) {
   Tensor in = new RomTensor({ 1,28,28,3 }, flt, s_in_VALID_2_kh_1_kw_1_stride_1);
   Tensor out = new RamTensor({ 1,28,28,3 }, flt);
 
-  MaxPoolOp<float> mxpool({ 1,1}, { 1,1,1,1}, VALID);
+  MaxPoolOperator<float> mxpool({ 1,1}, { 1,1,1,1}, VALID);
   mxpool
        .set_inputs({ {ConvOperator<float>::in, in} })
        .set_outputs({ {ConvOperator<float>::out, out} })
@@ -993,7 +993,7 @@ TEST(MaxPool, random_inputs_VALID_2_kh_1_kw_1_stride_2) {
   Tensor in = new RomTensor({ 1,28,28,3 }, flt, s_in_VALID_2_kh_1_kw_1_stride_2);
   Tensor out = new RamTensor({ 1,14,14,3 }, flt);
 
-  MaxPoolOp<float> mxpool({ 1,1}, { 1,2,2,1}, VALID);
+  MaxPoolOperator<float> mxpool({ 1,1}, { 1,2,2,1}, VALID);
   mxpool
        .set_inputs({ {ConvOperator<float>::in, in} })
        .set_outputs({ {ConvOperator<float>::out, out} })
@@ -1019,7 +1019,7 @@ TEST(MaxPool, random_inputs_VALID_2_kh_1_kw_3_stride_1) {
   Tensor in = new RomTensor({ 1,28,28,3 }, flt, s_in_VALID_2_kh_1_kw_3_stride_1);
   Tensor out = new RamTensor({ 1,28,26,3 }, flt);
 
-  MaxPoolOp<float> mxpool({ 1,3}, { 1,1,1,1}, VALID);
+  MaxPoolOperator<float> mxpool({ 1,3}, { 1,1,1,1}, VALID);
   mxpool
        .set_inputs({ {ConvOperator<float>::in, in} })
        .set_outputs({ {ConvOperator<float>::out, out} })
@@ -1045,7 +1045,7 @@ TEST(MaxPool, random_inputs_VALID_2_kh_1_kw_3_stride_2) {
   Tensor in = new RomTensor({ 1,28,28,3 }, flt, s_in_VALID_2_kh_1_kw_3_stride_2);
   Tensor out = new RamTensor({ 1,14,13,3 }, flt);
 
-  MaxPoolOp<float> mxpool({ 1,3}, { 1,2,2,1}, VALID);
+  MaxPoolOperator<float> mxpool({ 1,3}, { 1,2,2,1}, VALID);
   mxpool
        .set_inputs({ {ConvOperator<float>::in, in} })
        .set_outputs({ {ConvOperator<float>::out, out} })
@@ -1071,7 +1071,7 @@ TEST(MaxPool, random_inputs_VALID_2_kh_1_kw_5_stride_1) {
   Tensor in = new RomTensor({ 1,28,28,3 }, flt, s_in_VALID_2_kh_1_kw_5_stride_1);
   Tensor out = new RamTensor({ 1,28,24,3 }, flt);
 
-  MaxPoolOp<float> mxpool({ 1,5}, { 1,1,1,1}, VALID);
+  MaxPoolOperator<float> mxpool({ 1,5}, { 1,1,1,1}, VALID);
   mxpool
        .set_inputs({ {ConvOperator<float>::in, in} })
        .set_outputs({ {ConvOperator<float>::out, out} })
@@ -1097,7 +1097,7 @@ TEST(MaxPool, random_inputs_VALID_2_kh_1_kw_5_stride_2) {
   Tensor in = new RomTensor({ 1,28,28,3 }, flt, s_in_VALID_2_kh_1_kw_5_stride_2);
   Tensor out = new RamTensor({ 1,14,12,3 }, flt);
 
-  MaxPoolOp<float> mxpool({ 1,5}, { 1,2,2,1}, VALID);
+  MaxPoolOperator<float> mxpool({ 1,5}, { 1,2,2,1}, VALID);
   mxpool
        .set_inputs({ {ConvOperator<float>::in, in} })
        .set_outputs({ {ConvOperator<float>::out, out} })
@@ -1123,7 +1123,7 @@ TEST(MaxPool, random_inputs_VALID_2_kh_3_kw_1_stride_1) {
   Tensor in = new RomTensor({ 1,28,28,3 }, flt, s_in_VALID_2_kh_3_kw_1_stride_1);
   Tensor out = new RamTensor({ 1,26,28,3 }, flt);
 
-  MaxPoolOp<float> mxpool({ 3,1}, { 1,1,1,1}, VALID);
+  MaxPoolOperator<float> mxpool({ 3,1}, { 1,1,1,1}, VALID);
   mxpool
        .set_inputs({ {ConvOperator<float>::in, in} })
        .set_outputs({ {ConvOperator<float>::out, out} })
@@ -1149,7 +1149,7 @@ TEST(MaxPool, random_inputs_VALID_2_kh_3_kw_1_stride_2) {
   Tensor in = new RomTensor({ 1,28,28,3 }, flt, s_in_VALID_2_kh_3_kw_1_stride_2);
   Tensor out = new RamTensor({ 1,13,14,3 }, flt);
 
-  MaxPoolOp<float> mxpool({ 3,1}, { 1,2,2,1}, VALID);
+  MaxPoolOperator<float> mxpool({ 3,1}, { 1,2,2,1}, VALID);
   mxpool
        .set_inputs({ {ConvOperator<float>::in, in} })
        .set_outputs({ {ConvOperator<float>::out, out} })
@@ -1175,7 +1175,7 @@ TEST(MaxPool, random_inputs_VALID_2_kh_3_kw_3_stride_1) {
   Tensor in = new RomTensor({ 1,28,28,3 }, flt, s_in_VALID_2_kh_3_kw_3_stride_1);
   Tensor out = new RamTensor({ 1,26,26,3 }, flt);
 
-  MaxPoolOp<float> mxpool({ 3,3}, { 1,1,1,1}, VALID);
+  MaxPoolOperator<float> mxpool({ 3,3}, { 1,1,1,1}, VALID);
   mxpool
        .set_inputs({ {ConvOperator<float>::in, in} })
        .set_outputs({ {ConvOperator<float>::out, out} })
@@ -1201,7 +1201,7 @@ TEST(MaxPool, random_inputs_VALID_2_kh_3_kw_3_stride_2) {
   Tensor in = new RomTensor({ 1,28,28,3 }, flt, s_in_VALID_2_kh_3_kw_3_stride_2);
   Tensor out = new RamTensor({ 1,13,13,3 }, flt);
 
-  MaxPoolOp<float> mxpool({ 3,3}, { 1,2,2,1}, VALID);
+  MaxPoolOperator<float> mxpool({ 3,3}, { 1,2,2,1}, VALID);
   mxpool
        .set_inputs({ {ConvOperator<float>::in, in} })
        .set_outputs({ {ConvOperator<float>::out, out} })
@@ -1227,7 +1227,7 @@ TEST(MaxPool, random_inputs_VALID_2_kh_3_kw_5_stride_1) {
   Tensor in = new RomTensor({ 1,28,28,3 }, flt, s_in_VALID_2_kh_3_kw_5_stride_1);
   Tensor out = new RamTensor({ 1,26,24,3 }, flt);
 
-  MaxPoolOp<float> mxpool({ 3,5}, { 1,1,1,1}, VALID);
+  MaxPoolOperator<float> mxpool({ 3,5}, { 1,1,1,1}, VALID);
   mxpool
        .set_inputs({ {ConvOperator<float>::in, in} })
        .set_outputs({ {ConvOperator<float>::out, out} })
@@ -1253,7 +1253,7 @@ TEST(MaxPool, random_inputs_VALID_2_kh_3_kw_5_stride_2) {
   Tensor in = new RomTensor({ 1,28,28,3 }, flt, s_in_VALID_2_kh_3_kw_5_stride_2);
   Tensor out = new RamTensor({ 1,13,12,3 }, flt);
 
-  MaxPoolOp<float> mxpool({ 3,5}, { 1,2,2,1}, VALID);
+  MaxPoolOperator<float> mxpool({ 3,5}, { 1,2,2,1}, VALID);
   mxpool
        .set_inputs({ {ConvOperator<float>::in, in} })
        .set_outputs({ {ConvOperator<float>::out, out} })
@@ -1279,7 +1279,7 @@ TEST(MaxPool, random_inputs_VALID_2_kh_5_kw_1_stride_1) {
   Tensor in = new RomTensor({ 1,28,28,3 }, flt, s_in_VALID_2_kh_5_kw_1_stride_1);
   Tensor out = new RamTensor({ 1,24,28,3 }, flt);
 
-  MaxPoolOp<float> mxpool({ 5,1}, { 1,1,1,1}, VALID);
+  MaxPoolOperator<float> mxpool({ 5,1}, { 1,1,1,1}, VALID);
   mxpool
        .set_inputs({ {ConvOperator<float>::in, in} })
        .set_outputs({ {ConvOperator<float>::out, out} })
@@ -1305,7 +1305,7 @@ TEST(MaxPool, random_inputs_VALID_2_kh_5_kw_1_stride_2) {
   Tensor in = new RomTensor({ 1,28,28,3 }, flt, s_in_VALID_2_kh_5_kw_1_stride_2);
   Tensor out = new RamTensor({ 1,12,14,3 }, flt);
 
-  MaxPoolOp<float> mxpool({ 5,1}, { 1,2,2,1}, VALID);
+  MaxPoolOperator<float> mxpool({ 5,1}, { 1,2,2,1}, VALID);
   mxpool
        .set_inputs({ {ConvOperator<float>::in, in} })
        .set_outputs({ {ConvOperator<float>::out, out} })
@@ -1331,7 +1331,7 @@ TEST(MaxPool, random_inputs_VALID_2_kh_5_kw_3_stride_1) {
   Tensor in = new RomTensor({ 1,28,28,3 }, flt, s_in_VALID_2_kh_5_kw_3_stride_1);
   Tensor out = new RamTensor({ 1,24,26,3 }, flt);
 
-  MaxPoolOp<float> mxpool({ 5,3}, { 1,1,1,1}, VALID);
+  MaxPoolOperator<float> mxpool({ 5,3}, { 1,1,1,1}, VALID);
   mxpool
        .set_inputs({ {ConvOperator<float>::in, in} })
        .set_outputs({ {ConvOperator<float>::out, out} })
@@ -1357,7 +1357,7 @@ TEST(MaxPool, random_inputs_VALID_2_kh_5_kw_3_stride_2) {
   Tensor in = new RomTensor({ 1,28,28,3 }, flt, s_in_VALID_2_kh_5_kw_3_stride_2);
   Tensor out = new RamTensor({ 1,12,13,3 }, flt);
 
-  MaxPoolOp<float> mxpool({ 5,3}, { 1,2,2,1}, VALID);
+  MaxPoolOperator<float> mxpool({ 5,3}, { 1,2,2,1}, VALID);
   mxpool
        .set_inputs({ {ConvOperator<float>::in, in} })
        .set_outputs({ {ConvOperator<float>::out, out} })
@@ -1383,7 +1383,7 @@ TEST(MaxPool, random_inputs_VALID_2_kh_5_kw_5_stride_1) {
   Tensor in = new RomTensor({ 1,28,28,3 }, flt, s_in_VALID_2_kh_5_kw_5_stride_1);
   Tensor out = new RamTensor({ 1,24,24,3 }, flt);
 
-  MaxPoolOp<float> mxpool({ 5,5}, { 1,1,1,1}, VALID);
+  MaxPoolOperator<float> mxpool({ 5,5}, { 1,1,1,1}, VALID);
   mxpool
        .set_inputs({ {ConvOperator<float>::in, in} })
        .set_outputs({ {ConvOperator<float>::out, out} })
@@ -1409,7 +1409,7 @@ TEST(MaxPool, random_inputs_VALID_2_kh_5_kw_5_stride_2) {
   Tensor in = new RomTensor({ 1,28,28,3 }, flt, s_in_VALID_2_kh_5_kw_5_stride_2);
   Tensor out = new RamTensor({ 1,12,12,3 }, flt);
 
-  MaxPoolOp<float> mxpool({ 5,5}, { 1,2,2,1}, VALID);
+  MaxPoolOperator<float> mxpool({ 5,5}, { 1,2,2,1}, VALID);
   mxpool
        .set_inputs({ {ConvOperator<float>::in, in} })
        .set_outputs({ {ConvOperator<float>::out, out} })
@@ -1435,7 +1435,7 @@ TEST(MaxPool, random_inputs_VALID_3_kh_1_kw_1_stride_1) {
   Tensor in = new RomTensor({ 1,28,28,3 }, flt, s_in_VALID_3_kh_1_kw_1_stride_1);
   Tensor out = new RamTensor({ 1,28,28,3 }, flt);
 
-  MaxPoolOp<float> mxpool({ 1,1}, { 1,1,1,1}, VALID);
+  MaxPoolOperator<float> mxpool({ 1,1}, { 1,1,1,1}, VALID);
   mxpool
        .set_inputs({ {ConvOperator<float>::in, in} })
        .set_outputs({ {ConvOperator<float>::out, out} })
@@ -1461,7 +1461,7 @@ TEST(MaxPool, random_inputs_VALID_3_kh_1_kw_1_stride_2) {
   Tensor in = new RomTensor({ 1,28,28,3 }, flt, s_in_VALID_3_kh_1_kw_1_stride_2);
   Tensor out = new RamTensor({ 1,14,14,3 }, flt);
 
-  MaxPoolOp<float> mxpool({ 1,1}, { 1,2,2,1}, VALID);
+  MaxPoolOperator<float> mxpool({ 1,1}, { 1,2,2,1}, VALID);
   mxpool
        .set_inputs({ {ConvOperator<float>::in, in} })
        .set_outputs({ {ConvOperator<float>::out, out} })
@@ -1487,7 +1487,7 @@ TEST(MaxPool, random_inputs_VALID_3_kh_1_kw_3_stride_1) {
   Tensor in = new RomTensor({ 1,28,28,3 }, flt, s_in_VALID_3_kh_1_kw_3_stride_1);
   Tensor out = new RamTensor({ 1,28,26,3 }, flt);
 
-  MaxPoolOp<float> mxpool({ 1,3}, { 1,1,1,1}, VALID);
+  MaxPoolOperator<float> mxpool({ 1,3}, { 1,1,1,1}, VALID);
   mxpool
        .set_inputs({ {ConvOperator<float>::in, in} })
        .set_outputs({ {ConvOperator<float>::out, out} })
@@ -1513,7 +1513,7 @@ TEST(MaxPool, random_inputs_VALID_3_kh_1_kw_3_stride_2) {
   Tensor in = new RomTensor({ 1,28,28,3 }, flt, s_in_VALID_3_kh_1_kw_3_stride_2);
   Tensor out = new RamTensor({ 1,14,13,3 }, flt);
 
-  MaxPoolOp<float> mxpool({ 1,3}, { 1,2,2,1}, VALID);
+  MaxPoolOperator<float> mxpool({ 1,3}, { 1,2,2,1}, VALID);
   mxpool
        .set_inputs({ {ConvOperator<float>::in, in} })
        .set_outputs({ {ConvOperator<float>::out, out} })
@@ -1539,7 +1539,7 @@ TEST(MaxPool, random_inputs_VALID_3_kh_1_kw_5_stride_1) {
   Tensor in = new RomTensor({ 1,28,28,3 }, flt, s_in_VALID_3_kh_1_kw_5_stride_1);
   Tensor out = new RamTensor({ 1,28,24,3 }, flt);
 
-  MaxPoolOp<float> mxpool({ 1,5}, { 1,1,1,1}, VALID);
+  MaxPoolOperator<float> mxpool({ 1,5}, { 1,1,1,1}, VALID);
   mxpool
        .set_inputs({ {ConvOperator<float>::in, in} })
        .set_outputs({ {ConvOperator<float>::out, out} })
@@ -1565,7 +1565,7 @@ TEST(MaxPool, random_inputs_VALID_3_kh_1_kw_5_stride_2) {
   Tensor in = new RomTensor({ 1,28,28,3 }, flt, s_in_VALID_3_kh_1_kw_5_stride_2);
   Tensor out = new RamTensor({ 1,14,12,3 }, flt);
 
-  MaxPoolOp<float> mxpool({ 1,5}, { 1,2,2,1}, VALID);
+  MaxPoolOperator<float> mxpool({ 1,5}, { 1,2,2,1}, VALID);
   mxpool
        .set_inputs({ {ConvOperator<float>::in, in} })
        .set_outputs({ {ConvOperator<float>::out, out} })
@@ -1591,7 +1591,7 @@ TEST(MaxPool, random_inputs_VALID_3_kh_3_kw_1_stride_1) {
   Tensor in = new RomTensor({ 1,28,28,3 }, flt, s_in_VALID_3_kh_3_kw_1_stride_1);
   Tensor out = new RamTensor({ 1,26,28,3 }, flt);
 
-  MaxPoolOp<float> mxpool({ 3,1}, { 1,1,1,1}, VALID);
+  MaxPoolOperator<float> mxpool({ 3,1}, { 1,1,1,1}, VALID);
   mxpool
        .set_inputs({ {ConvOperator<float>::in, in} })
        .set_outputs({ {ConvOperator<float>::out, out} })
@@ -1617,7 +1617,7 @@ TEST(MaxPool, random_inputs_VALID_3_kh_3_kw_1_stride_2) {
   Tensor in = new RomTensor({ 1,28,28,3 }, flt, s_in_VALID_3_kh_3_kw_1_stride_2);
   Tensor out = new RamTensor({ 1,13,14,3 }, flt);
 
-  MaxPoolOp<float> mxpool({ 3,1}, { 1,2,2,1}, VALID);
+  MaxPoolOperator<float> mxpool({ 3,1}, { 1,2,2,1}, VALID);
   mxpool
        .set_inputs({ {ConvOperator<float>::in, in} })
        .set_outputs({ {ConvOperator<float>::out, out} })
@@ -1643,7 +1643,7 @@ TEST(MaxPool, random_inputs_VALID_3_kh_3_kw_3_stride_1) {
   Tensor in = new RomTensor({ 1,28,28,3 }, flt, s_in_VALID_3_kh_3_kw_3_stride_1);
   Tensor out = new RamTensor({ 1,26,26,3 }, flt);
 
-  MaxPoolOp<float> mxpool({ 3,3}, { 1,1,1,1}, VALID);
+  MaxPoolOperator<float> mxpool({ 3,3}, { 1,1,1,1}, VALID);
   mxpool
        .set_inputs({ {ConvOperator<float>::in, in} })
        .set_outputs({ {ConvOperator<float>::out, out} })
@@ -1669,7 +1669,7 @@ TEST(MaxPool, random_inputs_VALID_3_kh_3_kw_3_stride_2) {
   Tensor in = new RomTensor({ 1,28,28,3 }, flt, s_in_VALID_3_kh_3_kw_3_stride_2);
   Tensor out = new RamTensor({ 1,13,13,3 }, flt);
 
-  MaxPoolOp<float> mxpool({ 3,3}, { 1,2,2,1}, VALID);
+  MaxPoolOperator<float> mxpool({ 3,3}, { 1,2,2,1}, VALID);
   mxpool
        .set_inputs({ {ConvOperator<float>::in, in} })
        .set_outputs({ {ConvOperator<float>::out, out} })
@@ -1695,7 +1695,7 @@ TEST(MaxPool, random_inputs_VALID_3_kh_3_kw_5_stride_1) {
   Tensor in = new RomTensor({ 1,28,28,3 }, flt, s_in_VALID_3_kh_3_kw_5_stride_1);
   Tensor out = new RamTensor({ 1,26,24,3 }, flt);
 
-  MaxPoolOp<float> mxpool({ 3,5}, { 1,1,1,1}, VALID);
+  MaxPoolOperator<float> mxpool({ 3,5}, { 1,1,1,1}, VALID);
   mxpool
        .set_inputs({ {ConvOperator<float>::in, in} })
        .set_outputs({ {ConvOperator<float>::out, out} })
@@ -1721,7 +1721,7 @@ TEST(MaxPool, random_inputs_VALID_3_kh_3_kw_5_stride_2) {
   Tensor in = new RomTensor({ 1,28,28,3 }, flt, s_in_VALID_3_kh_3_kw_5_stride_2);
   Tensor out = new RamTensor({ 1,13,12,3 }, flt);
 
-  MaxPoolOp<float> mxpool({ 3,5}, { 1,2,2,1}, VALID);
+  MaxPoolOperator<float> mxpool({ 3,5}, { 1,2,2,1}, VALID);
   mxpool
        .set_inputs({ {ConvOperator<float>::in, in} })
        .set_outputs({ {ConvOperator<float>::out, out} })
@@ -1747,7 +1747,7 @@ TEST(MaxPool, random_inputs_VALID_3_kh_5_kw_1_stride_1) {
   Tensor in = new RomTensor({ 1,28,28,3 }, flt, s_in_VALID_3_kh_5_kw_1_stride_1);
   Tensor out = new RamTensor({ 1,24,28,3 }, flt);
 
-  MaxPoolOp<float> mxpool({ 5,1}, { 1,1,1,1}, VALID);
+  MaxPoolOperator<float> mxpool({ 5,1}, { 1,1,1,1}, VALID);
   mxpool
        .set_inputs({ {ConvOperator<float>::in, in} })
        .set_outputs({ {ConvOperator<float>::out, out} })
@@ -1773,7 +1773,7 @@ TEST(MaxPool, random_inputs_VALID_3_kh_5_kw_1_stride_2) {
   Tensor in = new RomTensor({ 1,28,28,3 }, flt, s_in_VALID_3_kh_5_kw_1_stride_2);
   Tensor out = new RamTensor({ 1,12,14,3 }, flt);
 
-  MaxPoolOp<float> mxpool({ 5,1}, { 1,2,2,1}, VALID);
+  MaxPoolOperator<float> mxpool({ 5,1}, { 1,2,2,1}, VALID);
   mxpool
        .set_inputs({ {ConvOperator<float>::in, in} })
        .set_outputs({ {ConvOperator<float>::out, out} })
@@ -1799,7 +1799,7 @@ TEST(MaxPool, random_inputs_VALID_3_kh_5_kw_3_stride_1) {
   Tensor in = new RomTensor({ 1,28,28,3 }, flt, s_in_VALID_3_kh_5_kw_3_stride_1);
   Tensor out = new RamTensor({ 1,24,26,3 }, flt);
 
-  MaxPoolOp<float> mxpool({ 5,3}, { 1,1,1,1}, VALID);
+  MaxPoolOperator<float> mxpool({ 5,3}, { 1,1,1,1}, VALID);
   mxpool
        .set_inputs({ {ConvOperator<float>::in, in} })
        .set_outputs({ {ConvOperator<float>::out, out} })
@@ -1825,7 +1825,7 @@ TEST(MaxPool, random_inputs_VALID_3_kh_5_kw_3_stride_2) {
   Tensor in = new RomTensor({ 1,28,28,3 }, flt, s_in_VALID_3_kh_5_kw_3_stride_2);
   Tensor out = new RamTensor({ 1,12,13,3 }, flt);
 
-  MaxPoolOp<float> mxpool({ 5,3}, { 1,2,2,1}, VALID);
+  MaxPoolOperator<float> mxpool({ 5,3}, { 1,2,2,1}, VALID);
   mxpool
        .set_inputs({ {ConvOperator<float>::in, in} })
        .set_outputs({ {ConvOperator<float>::out, out} })
@@ -1851,7 +1851,7 @@ TEST(MaxPool, random_inputs_VALID_3_kh_5_kw_5_stride_1) {
   Tensor in = new RomTensor({ 1,28,28,3 }, flt, s_in_VALID_3_kh_5_kw_5_stride_1);
   Tensor out = new RamTensor({ 1,24,24,3 }, flt);
 
-  MaxPoolOp<float> mxpool({ 5,5}, { 1,1,1,1}, VALID);
+  MaxPoolOperator<float> mxpool({ 5,5}, { 1,1,1,1}, VALID);
   mxpool
        .set_inputs({ {ConvOperator<float>::in, in} })
        .set_outputs({ {ConvOperator<float>::out, out} })
@@ -1877,7 +1877,7 @@ TEST(MaxPool, random_inputs_VALID_3_kh_5_kw_5_stride_2) {
   Tensor in = new RomTensor({ 1,28,28,3 }, flt, s_in_VALID_3_kh_5_kw_5_stride_2);
   Tensor out = new RamTensor({ 1,12,12,3 }, flt);
 
-  MaxPoolOp<float> mxpool({ 5,5}, { 1,2,2,1}, VALID);
+  MaxPoolOperator<float> mxpool({ 5,5}, { 1,2,2,1}, VALID);
   mxpool
        .set_inputs({ {ConvOperator<float>::in, in} })
        .set_outputs({ {ConvOperator<float>::out, out} })
@@ -1903,7 +1903,7 @@ TEST(MaxPool, random_inputs_VALID_4_kh_1_kw_1_stride_1) {
   Tensor in = new RomTensor({ 1,28,28,3 }, flt, s_in_VALID_4_kh_1_kw_1_stride_1);
   Tensor out = new RamTensor({ 1,28,28,3 }, flt);
 
-  MaxPoolOp<float> mxpool({ 1,1}, { 1,1,1,1}, VALID);
+  MaxPoolOperator<float> mxpool({ 1,1}, { 1,1,1,1}, VALID);
   mxpool
        .set_inputs({ {ConvOperator<float>::in, in} })
        .set_outputs({ {ConvOperator<float>::out, out} })
@@ -1929,7 +1929,7 @@ TEST(MaxPool, random_inputs_VALID_4_kh_1_kw_1_stride_2) {
   Tensor in = new RomTensor({ 1,28,28,3 }, flt, s_in_VALID_4_kh_1_kw_1_stride_2);
   Tensor out = new RamTensor({ 1,14,14,3 }, flt);
 
-  MaxPoolOp<float> mxpool({ 1,1}, { 1,2,2,1}, VALID);
+  MaxPoolOperator<float> mxpool({ 1,1}, { 1,2,2,1}, VALID);
   mxpool
        .set_inputs({ {ConvOperator<float>::in, in} })
        .set_outputs({ {ConvOperator<float>::out, out} })
@@ -1955,7 +1955,7 @@ TEST(MaxPool, random_inputs_VALID_4_kh_1_kw_3_stride_1) {
   Tensor in = new RomTensor({ 1,28,28,3 }, flt, s_in_VALID_4_kh_1_kw_3_stride_1);
   Tensor out = new RamTensor({ 1,28,26,3 }, flt);
 
-  MaxPoolOp<float> mxpool({ 1,3}, { 1,1,1,1}, VALID);
+  MaxPoolOperator<float> mxpool({ 1,3}, { 1,1,1,1}, VALID);
   mxpool
        .set_inputs({ {ConvOperator<float>::in, in} })
        .set_outputs({ {ConvOperator<float>::out, out} })
@@ -1981,7 +1981,7 @@ TEST(MaxPool, random_inputs_VALID_4_kh_1_kw_3_stride_2) {
   Tensor in = new RomTensor({ 1,28,28,3 }, flt, s_in_VALID_4_kh_1_kw_3_stride_2);
   Tensor out = new RamTensor({ 1,14,13,3 }, flt);
 
-  MaxPoolOp<float> mxpool({ 1,3}, { 1,2,2,1}, VALID);
+  MaxPoolOperator<float> mxpool({ 1,3}, { 1,2,2,1}, VALID);
   mxpool
        .set_inputs({ {ConvOperator<float>::in, in} })
        .set_outputs({ {ConvOperator<float>::out, out} })
@@ -2007,7 +2007,7 @@ TEST(MaxPool, random_inputs_VALID_4_kh_1_kw_5_stride_1) {
   Tensor in = new RomTensor({ 1,28,28,3 }, flt, s_in_VALID_4_kh_1_kw_5_stride_1);
   Tensor out = new RamTensor({ 1,28,24,3 }, flt);
 
-  MaxPoolOp<float> mxpool({ 1,5}, { 1,1,1,1}, VALID);
+  MaxPoolOperator<float> mxpool({ 1,5}, { 1,1,1,1}, VALID);
   mxpool
        .set_inputs({ {ConvOperator<float>::in, in} })
        .set_outputs({ {ConvOperator<float>::out, out} })
@@ -2033,7 +2033,7 @@ TEST(MaxPool, random_inputs_VALID_4_kh_1_kw_5_stride_2) {
   Tensor in = new RomTensor({ 1,28,28,3 }, flt, s_in_VALID_4_kh_1_kw_5_stride_2);
   Tensor out = new RamTensor({ 1,14,12,3 }, flt);
 
-  MaxPoolOp<float> mxpool({ 1,5}, { 1,2,2,1}, VALID);
+  MaxPoolOperator<float> mxpool({ 1,5}, { 1,2,2,1}, VALID);
   mxpool
        .set_inputs({ {ConvOperator<float>::in, in} })
        .set_outputs({ {ConvOperator<float>::out, out} })
@@ -2059,7 +2059,7 @@ TEST(MaxPool, random_inputs_VALID_4_kh_3_kw_1_stride_1) {
   Tensor in = new RomTensor({ 1,28,28,3 }, flt, s_in_VALID_4_kh_3_kw_1_stride_1);
   Tensor out = new RamTensor({ 1,26,28,3 }, flt);
 
-  MaxPoolOp<float> mxpool({ 3,1}, { 1,1,1,1}, VALID);
+  MaxPoolOperator<float> mxpool({ 3,1}, { 1,1,1,1}, VALID);
   mxpool
        .set_inputs({ {ConvOperator<float>::in, in} })
        .set_outputs({ {ConvOperator<float>::out, out} })
@@ -2085,7 +2085,7 @@ TEST(MaxPool, random_inputs_VALID_4_kh_3_kw_1_stride_2) {
   Tensor in = new RomTensor({ 1,28,28,3 }, flt, s_in_VALID_4_kh_3_kw_1_stride_2);
   Tensor out = new RamTensor({ 1,13,14,3 }, flt);
 
-  MaxPoolOp<float> mxpool({ 3,1}, { 1,2,2,1}, VALID);
+  MaxPoolOperator<float> mxpool({ 3,1}, { 1,2,2,1}, VALID);
   mxpool
        .set_inputs({ {ConvOperator<float>::in, in} })
        .set_outputs({ {ConvOperator<float>::out, out} })
@@ -2111,7 +2111,7 @@ TEST(MaxPool, random_inputs_VALID_4_kh_3_kw_3_stride_1) {
   Tensor in = new RomTensor({ 1,28,28,3 }, flt, s_in_VALID_4_kh_3_kw_3_stride_1);
   Tensor out = new RamTensor({ 1,26,26,3 }, flt);
 
-  MaxPoolOp<float> mxpool({ 3,3}, { 1,1,1,1}, VALID);
+  MaxPoolOperator<float> mxpool({ 3,3}, { 1,1,1,1}, VALID);
   mxpool
        .set_inputs({ {ConvOperator<float>::in, in} })
        .set_outputs({ {ConvOperator<float>::out, out} })
@@ -2137,7 +2137,7 @@ TEST(MaxPool, random_inputs_VALID_4_kh_3_kw_3_stride_2) {
   Tensor in = new RomTensor({ 1,28,28,3 }, flt, s_in_VALID_4_kh_3_kw_3_stride_2);
   Tensor out = new RamTensor({ 1,13,13,3 }, flt);
 
-  MaxPoolOp<float> mxpool({ 3,3}, { 1,2,2,1}, VALID);
+  MaxPoolOperator<float> mxpool({ 3,3}, { 1,2,2,1}, VALID);
   mxpool
        .set_inputs({ {ConvOperator<float>::in, in} })
        .set_outputs({ {ConvOperator<float>::out, out} })
@@ -2163,7 +2163,7 @@ TEST(MaxPool, random_inputs_VALID_4_kh_3_kw_5_stride_1) {
   Tensor in = new RomTensor({ 1,28,28,3 }, flt, s_in_VALID_4_kh_3_kw_5_stride_1);
   Tensor out = new RamTensor({ 1,26,24,3 }, flt);
 
-  MaxPoolOp<float> mxpool({ 3,5}, { 1,1,1,1}, VALID);
+  MaxPoolOperator<float> mxpool({ 3,5}, { 1,1,1,1}, VALID);
   mxpool
        .set_inputs({ {ConvOperator<float>::in, in} })
        .set_outputs({ {ConvOperator<float>::out, out} })
@@ -2189,7 +2189,7 @@ TEST(MaxPool, random_inputs_VALID_4_kh_3_kw_5_stride_2) {
   Tensor in = new RomTensor({ 1,28,28,3 }, flt, s_in_VALID_4_kh_3_kw_5_stride_2);
   Tensor out = new RamTensor({ 1,13,12,3 }, flt);
 
-  MaxPoolOp<float> mxpool({ 3,5}, { 1,2,2,1}, VALID);
+  MaxPoolOperator<float> mxpool({ 3,5}, { 1,2,2,1}, VALID);
   mxpool
        .set_inputs({ {ConvOperator<float>::in, in} })
        .set_outputs({ {ConvOperator<float>::out, out} })
@@ -2215,7 +2215,7 @@ TEST(MaxPool, random_inputs_VALID_4_kh_5_kw_1_stride_1) {
   Tensor in = new RomTensor({ 1,28,28,3 }, flt, s_in_VALID_4_kh_5_kw_1_stride_1);
   Tensor out = new RamTensor({ 1,24,28,3 }, flt);
 
-  MaxPoolOp<float> mxpool({ 5,1}, { 1,1,1,1}, VALID);
+  MaxPoolOperator<float> mxpool({ 5,1}, { 1,1,1,1}, VALID);
   mxpool
        .set_inputs({ {ConvOperator<float>::in, in} })
        .set_outputs({ {ConvOperator<float>::out, out} })
@@ -2241,7 +2241,7 @@ TEST(MaxPool, random_inputs_VALID_4_kh_5_kw_1_stride_2) {
   Tensor in = new RomTensor({ 1,28,28,3 }, flt, s_in_VALID_4_kh_5_kw_1_stride_2);
   Tensor out = new RamTensor({ 1,12,14,3 }, flt);
 
-  MaxPoolOp<float> mxpool({ 5,1}, { 1,2,2,1}, VALID);
+  MaxPoolOperator<float> mxpool({ 5,1}, { 1,2,2,1}, VALID);
   mxpool
        .set_inputs({ {ConvOperator<float>::in, in} })
        .set_outputs({ {ConvOperator<float>::out, out} })
@@ -2267,7 +2267,7 @@ TEST(MaxPool, random_inputs_VALID_4_kh_5_kw_3_stride_1) {
   Tensor in = new RomTensor({ 1,28,28,3 }, flt, s_in_VALID_4_kh_5_kw_3_stride_1);
   Tensor out = new RamTensor({ 1,24,26,3 }, flt);
 
-  MaxPoolOp<float> mxpool({ 5,3}, { 1,1,1,1}, VALID);
+  MaxPoolOperator<float> mxpool({ 5,3}, { 1,1,1,1}, VALID);
   mxpool
        .set_inputs({ {ConvOperator<float>::in, in} })
        .set_outputs({ {ConvOperator<float>::out, out} })
@@ -2293,7 +2293,7 @@ TEST(MaxPool, random_inputs_VALID_4_kh_5_kw_3_stride_2) {
   Tensor in = new RomTensor({ 1,28,28,3 }, flt, s_in_VALID_4_kh_5_kw_3_stride_2);
   Tensor out = new RamTensor({ 1,12,13,3 }, flt);
 
-  MaxPoolOp<float> mxpool({ 5,3}, { 1,2,2,1}, VALID);
+  MaxPoolOperator<float> mxpool({ 5,3}, { 1,2,2,1}, VALID);
   mxpool
        .set_inputs({ {ConvOperator<float>::in, in} })
        .set_outputs({ {ConvOperator<float>::out, out} })
@@ -2319,7 +2319,7 @@ TEST(MaxPool, random_inputs_VALID_4_kh_5_kw_5_stride_1) {
   Tensor in = new RomTensor({ 1,28,28,3 }, flt, s_in_VALID_4_kh_5_kw_5_stride_1);
   Tensor out = new RamTensor({ 1,24,24,3 }, flt);
 
-  MaxPoolOp<float> mxpool({ 5,5}, { 1,1,1,1}, VALID);
+  MaxPoolOperator<float> mxpool({ 5,5}, { 1,1,1,1}, VALID);
   mxpool
        .set_inputs({ {ConvOperator<float>::in, in} })
        .set_outputs({ {ConvOperator<float>::out, out} })
@@ -2345,7 +2345,7 @@ TEST(MaxPool, random_inputs_VALID_4_kh_5_kw_5_stride_2) {
   Tensor in = new RomTensor({ 1,28,28,3 }, flt, s_in_VALID_4_kh_5_kw_5_stride_2);
   Tensor out = new RamTensor({ 1,12,12,3 }, flt);
 
-  MaxPoolOp<float> mxpool({ 5,5}, { 1,2,2,1}, VALID);
+  MaxPoolOperator<float> mxpool({ 5,5}, { 1,2,2,1}, VALID);
   mxpool
        .set_inputs({ {ConvOperator<float>::in, in} })
        .set_outputs({ {ConvOperator<float>::out, out} })
