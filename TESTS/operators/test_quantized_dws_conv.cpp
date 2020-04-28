@@ -56,10 +56,10 @@ options:
   TFLM::DepthwiseSeparableConvOperator<float> dw_conv_Aw(dws_param);
   dw_conv_Aw
        .set_inputs({ {DepthwiseSeparableConvOperator<float>::in, A}, {DepthwiseSeparableConvOperator<float>::depthwise_filter, filter}, {DepthwiseSeparableConvOperator<float>::pointwise_filter, bias} })
-       .set_outputs({ {DepthwiseSeparableConvOperator<float>::out, out} });
+       .set_outputs({ {DepthwiseSeparableConvOperator<float>::out, out} })
        .eval();
 
   for(int i = 0; i < out->get_shape().get_linear_size(); i++) {
-    EXPECT_NEAR((float) out(i), s_ref_output_ref[i], 0.0001);
+    EXPECT_NEAR(out(i), s_ref_output_ref[i], 1);
   }
 }

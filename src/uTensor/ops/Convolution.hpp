@@ -506,6 +506,7 @@ int64_t IntegerFrExp(double input, int* shift) {
       }
     }
   }
+}
 
 constexpr int kDepthwiseConvQuantizedDimension = 3;
 void QuantizeMultiplier(double double_multiplier, int32_t* quantized_multiplier,
@@ -547,16 +548,6 @@ void QuantizeMultiplier(double double_multiplier, int32_t* quantized_multiplier,
   }
   *quantized_multiplier = static_cast<int32_t>(q_fixed);
 }
-
-typedef enum {
-  kTfLiteActNone = 0,
-  kTfLiteActRelu,
-  kTfLiteActRelu1,  // min(max(-1, x), 1)
-  kTfLiteActRelu6,  // min(max(0, x), 6)
-  kTfLiteActTanh,
-  kTfLiteActSignBit,
-  kTfLiteActSigmoid,
-} TfLiteFusedActivation;
 
 void CalculateActivationRangeQuantizedImpl(TfLiteFusedActivation activation,
                                            int32_t qmin, int32_t qmax,
@@ -616,14 +607,16 @@ class DepthwiseSeparableConvOperator : public OperatorInterface<3, 1> {
   enum names_in : uint8_t { in, filter, bias };
   enum names_out : uint8_t { out };
 
-  DepthwiseSeparableConvOperator(TfLiteDepthwiseConvParams& _param) param(_params) {}
+  DepthwiseSeparableConvOperator(TfLiteDepthwiseConvParams& _params) : params(_params) {}
 
   DepthwiseSeparableConvOperator& set_params(TfLiteDepthwiseConvParams& _params) {
-    param = _params;
+    params = _params;
     return *this;
   }
 
-  struct DWSConvOpData {
+static const int kMaxChannels = 32;  //was 256
+
+struct DWSConvOpData {
   TfLitePaddingValues padding;
   // The scaling factor from input to output (aka the 'real multiplier') can
   // be represented as a fixed point multiplier plus a left shift.
@@ -644,6 +637,8 @@ class DepthwiseSeparableConvOperator : public OperatorInterface<3, 1> {
 
   void calculateOpData(DWSConvOpData* data) { //assume kTfLiteInt8
 
+    //int channels_out = SizeOfDimension(filter, 3);
+    int channels_out = inputs[filter].tensor()->get_shape()[3];
     //int width = SizeOfDimension(input, 2);
     int width = inputs[in].tensor()->get_shape()[2];
     //int height = SizeOfDimension(input, 1);
@@ -661,15 +656,15 @@ class DepthwiseSeparableConvOperator : public OperatorInterface<3, 1> {
 
     int num_channels = inputs[filter].tensor()->get_shape()[kDepthwiseConvQuantizedDimension];
     QuantizationParams affine_quantization = inputs[filter].tensor()->get_quantization_params();
-    const bool is_per_channel = affine_quantization->num_channels() > 1;
+    const bool is_per_channel = affine_quantization.num_channels() > 1;
 
     if (is_per_channel) {
     //  Currently only Int8 is supported for per channel quantization.
     // TF_LITE_ENSURE_EQ(context, input->type, kTfLiteInt8);
     // TF_LITE_ENSURE_EQ(context, filter->type, kTfLiteInt8);
-    TF_LITE_ENSURE_EQ(affine_quantization->num_channels(), num_channels);
-    TF_LITE_ENSURE_EQ(num_channels,
-        filter->get_shape()[affine_quantization.num_channels()]);  //FIXME: affine_quantization.num_channels()-1?
+    DCHECK_EQ(affine_quantization.num_channels(), num_channels);
+    DCHECK_EQ(num_channels,
+        inputs[filter].tensor()->get_shape()[affine_quantization.num_channels()]);  //FIXME: affine_quantization.num_channels()-1?
     }
 
     // Populate multiplier and shift using affine quantization.
@@ -690,8 +685,8 @@ class DepthwiseSeparableConvOperator : public OperatorInterface<3, 1> {
       int32_t significand;
       int channel_shift;
       QuantizeMultiplier(effective_output_scale, &significand, &channel_shift);
-      per_channel_multiplier[i] = significand;
-      per_channel_shift[i] = channel_shift;
+      reinterpret_cast<int32_t*>(data->per_channel_output_multiplier)[i] = significand;
+      reinterpret_cast<int32_t*>(data->per_channel_output_shift)[i] = channel_shift;
 
       /*
       // Populate scalar quantization parameters.
@@ -711,8 +706,8 @@ class DepthwiseSeparableConvOperator : public OperatorInterface<3, 1> {
       */
       //if (input->type == kTfLiteInt8 || input->type == kTfLiteUInt8) {
       CalculateActivationRangeQuantized(
-            context, activation, outputs[out].tensor(), output_activation_min,
-            output_activation_max);
+            params.activation, outputs[out].tensor(), &data->output_activation_min,
+            &data->output_activation_max);
     }
 
   }
