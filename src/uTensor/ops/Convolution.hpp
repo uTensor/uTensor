@@ -161,13 +161,13 @@ class DepthwiseSeparableConvOperator : public OperatorInterface<3, 1> {
 };
 
 template <typename T, typename Filter>
-class GenericPoolOp : public OperatorInterface<1, 1> {
+class GenericPoolOperator : public OperatorInterface<1, 1> {
  public:
   enum names_in : uint8_t { in };
   enum names_out : uint8_t { out };
 
   // TODO Add dialations
-  GenericPoolOp(std::initializer_list<uint16_t> k_size,
+  GenericPoolOperator(std::initializer_list<uint16_t> k_size,
                 std::initializer_list<uint16_t> strides, Padding padding)
       : _padding(padding) {
     int i = 0;
@@ -195,10 +195,10 @@ class GenericPoolOp : public OperatorInterface<1, 1> {
 };
 
 template <typename T>
-using MaxPoolOp = GenericPoolOp<T, MaxFilter<T>>;
+using MaxPoolOperator = GenericPoolOperator<T, MaxFilter<T>>;
 
 template <typename T>
-using AvgPoolOp = GenericPoolOp<T, AvgFilter<T>>;
+using AvgPoolOperator = GenericPoolOperator<T, AvgFilter<T>>;
 
 namespace TFLM {
 

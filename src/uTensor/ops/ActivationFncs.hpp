@@ -25,7 +25,7 @@ class InPlaceReLU : public InPlaceActivationFnc {
 };
 
 template <typename T>
-class ReLUOp : public OperatorInterface<1, 1> {
+class ReLUOperator : public OperatorInterface<1, 1> {
   // ReLU only makes sense if there is a notion of negative
   static_assert(std::is_signed<T>::value,
                 "Error attempted to construct ReLU on non-signed types");
@@ -59,7 +59,7 @@ class InPlaceReLU6 : public InPlaceActivationFnc {
 };
 
 template <typename T>
-class ReLU6Op : public OperatorInterface<1, 1> {
+class ReLU6Operator : public OperatorInterface<1, 1> {
   // ReLU only makes sense if there is a notion of negative
   static_assert(std::is_signed<T>::value,
                 "Error attempted to construct ReLU on non-signed types");
