@@ -713,12 +713,12 @@ struct DWSConvOpData {
   }
 
   //FIXME: remove this method
-  DepthwiseSeparableConvOperator& set_params(DepthwiseParams&& _params, const int32_t&& _output_multiplier, const int32_t&& _output_shift) {
-    //params = _params;
-    output_multiplier = _output_multiplier;
-    output_shift = _output_shift;
-    return *this;
-  }
+  // DepthwiseSeparableConvOperator& set_params(DepthwiseParams&& _params, const int32_t&& _output_multiplier, const int32_t&& _output_shift) {
+  //   //params = _params;
+  //   output_multiplier = _output_multiplier;
+  //   output_shift = _output_shift;
+  //   return *this;
+  // }
 
  protected:
   virtual void compute() {
@@ -758,15 +758,13 @@ struct DWSConvOpData {
     op_params.quantized_activation_max = std::numeric_limits<int8_t>::max();
 
     DepthwiseConvPerChannel( 
-      op_params, &output_multiplier, &output_shift,
+      op_params, data.per_channel_output_multiplier, data.per_channel_output_shift,
       inputs[in].tensor(), inputs[filter].tensor(), inputs[bias].tensor(), outputs[out].tensor()
     );
   }
 
 private:
   TfLiteDepthwiseConvParams params;
-  int32_t output_multiplier;
-  int32_t output_shift;
 };
 
 }  // namespace TFLM
