@@ -2,6 +2,7 @@
 #define UTENSOR_CONVOLUTION_OPS_H
 #include <algorithm>
 #include <cmath>
+#include <cassert>
 #include <limits>
 
 #include "Convolution_kernels.hpp"
