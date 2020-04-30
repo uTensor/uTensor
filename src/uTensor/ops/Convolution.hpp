@@ -343,10 +343,10 @@ uint16_t MatchingDim(TensorShape s0, uint8_t i0, TensorShape s1, uint8_t i1) {
 #define DCHECK_EQ(a,b) assert(a == b)
 #define DCHECK(a) assert(a)
 
-inline void DepthwiseConvPerChannel(
-const DepthwiseParams& params, const int32_t* output_multiplier, const int32_t* output_shift,
-Tensor& input, Tensor& filter, Tensor& bias, Tensor& output
-) {
+template <typename Tout>
+void DepthwiseConvPerChannel(
+  const DepthwiseParams& params, const int32_t* output_multiplier, const int32_t* output_shift,
+  Tensor& input, Tensor& filter, Tensor& bias, Tensor& output) {
   // Get parameters.
   // TODO(b/141565753): Re-introduce ScopedProfilingLabel on Micro.
   const int stride_width = params.stride_width;
@@ -444,7 +444,7 @@ Tensor& input, Tensor& filter, Tensor& bias, Tensor& output
             acc = std::max(acc, output_activation_min);
             acc = std::min(acc, output_activation_max);
             output(batch, out_y, out_x,
-                               output_channel) = static_cast<int8_t>(acc);
+                               output_channel) = static_cast<Tout>(acc);
           }
         }
       }
@@ -602,7 +602,7 @@ void CalculateActivationRangeQuantized(
                                         act_max);
 }
 
-template <typename T>
+template <typename Tout>
 class DepthwiseSeparableConvOperator : public OperatorInterface<3, 1> {
  public:
   enum names_in : uint8_t { in, filter, bias };
@@ -722,7 +722,7 @@ struct DWSConvOpData {
   //   return *this;
   // }
 
- protected:
+protected:
   virtual void compute() {
     TensorShape& in_shape = inputs[in].tensor()->get_shape();
     TensorShape& df_shape = inputs[filter].tensor()->get_shape();
@@ -759,7 +759,7 @@ struct DWSConvOpData {
     op_params.quantized_activation_min = std::numeric_limits<int8_t>::min();
     op_params.quantized_activation_max = std::numeric_limits<int8_t>::max();
 
-    DepthwiseConvPerChannel( 
+    DepthwiseConvPerChannel<Tout>( 
       op_params, data.per_channel_output_multiplier, data.per_channel_output_shift,
       inputs[in].tensor(), inputs[filter].tensor(), inputs[bias].tensor(), outputs[out].tensor()
     );
