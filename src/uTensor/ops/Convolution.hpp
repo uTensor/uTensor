@@ -608,6 +608,7 @@ class DepthwiseSeparableConvOperator : public OperatorInterface<3, 1> {
   enum names_in : uint8_t { in, filter, bias };
   enum names_out : uint8_t { out };
 
+  DepthwiseSeparableConvOperator() = default;
   DepthwiseSeparableConvOperator(TfLiteDepthwiseConvParams& _params) : params(_params) {}
 
   DepthwiseSeparableConvOperator& set_params(TfLiteDepthwiseConvParams& _params) {
