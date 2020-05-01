@@ -7,38 +7,18 @@ set(src_utensor_alloc
     allocators/arenaAllocator.cpp
    )
 
-set(hdr_utensor_alloc
-    allocators/arenaAllocator.hpp
-   )
-    
 set(src_utensor_tensors
   tensors/RamTensor.cpp
   tensors/BufferTensor.cpp
   tensors/RomTensor.cpp
    )
-set(hdr_utensor_tensors
-  tensors/RamTensor.hpp
-  tensors/BufferTensor.hpp
-  tensors/RomTensor.hpp
-   )
 set(src_utensor_ops
     ops/Matrix.cpp
-   )
-set(hdr_utensor_ops
-    ops/Arithmetic.hpp
-    ops/Convolution.hpp
-    ops/Matrix.hpp
-    ops/ActivationFncs.hpp
-    ops/ArgMinMax.hpp
-    ops/Reshape.hpp
    )
 set(src_utensor_errhndl
   errorHandlers/SimpleErrorHandler.cpp
    )
 
-set(hdr_utensor_errhndl
-  errorHandlers/SimpleErrorHandler.hpp
-   )
 set(src_utensor_legacy_ops
     ops/legacy/LegacyMath.cpp
     ops/legacy/legacyQuantizationUtils.cpp
