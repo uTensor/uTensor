@@ -56,8 +56,8 @@ options:
   TFLM::DepthwiseSeparableConvOperator<int8_t> dw_conv_Aw;
   dw_conv_Aw
     .set_params(dws_param)
-    .set_inputs({ {DepthwiseSeparableConvOperator<int8_t>::in, A}, {DepthwiseSeparableConvOperator<int8_t>::depthwise_filter, filter}, {DepthwiseSeparableConvOperator<float>::pointwise_filter, bias} })
-    .set_outputs({ {DepthwiseSeparableConvOperator<int8_t>::out, out} })
+    .set_inputs({ {TFLM::DepthwiseSeparableConvOperator<int8_t>::in, A}, {TFLM::DepthwiseSeparableConvOperator<int8_t>::filter, filter}, {TFLM::DepthwiseSeparableConvOperator<int8_t>::bias, bias} })
+    .set_outputs({ {TFLM::DepthwiseSeparableConvOperator<int8_t>::out, out} })
     .eval();
 
 //  for(int i = 0; i < out->get_shape().get_linear_size(); i++) {
