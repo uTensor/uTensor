@@ -144,9 +144,16 @@ void DepthwiseConvPerChannel(const DepthwiseParams& params,
   TensorShape filter_shape = filter->get_shape();
   TensorShape output_shape = output->get_shape();
 
-  assert(input_shape.num_dims() == 4);
-  assert(filter_shape.num_dims() == 4);
-  assert(output_shape.num_dims() == 4);
+  if(!(input_shape.num_dims() == 4 )){
+    Context::get_default_context()->throwError(new InvalidTensorDimensionsError);
+
+  }
+  if(!(filter_shape.num_dims() == 4)){
+    Context::get_default_context()->throwError(new InvalidTensorDimensionsError);
+  }
+  if(!(output_shape.num_dims() == 4)){
+    Context::get_default_context()->throwError(new InvalidTensorDimensionsError);
+  }
 
   if(!(output_activation_min < output_activation_max)){
     Context::get_default_context()->throwError(new InvalidQDwsActivationRangeError);
