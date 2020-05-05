@@ -7,10 +7,14 @@
 #include "tflm_defs.hpp"
 
 namespace uTensor {
-namespace TFLM {
 
 DECLARE_ERROR(SymmetricQuantizationFixedPointError);
 DECLARE_ERROR(SymmetricQuantizationFixedPointRangeError);
+DECLARE_ERROR(InvalidFCQuantizationScalesError);
+DECLARE_ERROR(FCQuantizationScaleMultipleLTzeroError);
+
+namespace TFLM {
+
 
 typedef struct TfLiteAffineQuantization {
   float* scale;
@@ -31,6 +35,16 @@ void CalculateActivationRangeQuantizedImpl(TfLiteFusedActivation activation,
 void CalculateActivationRangeQuantized(TfLiteFusedActivation activation,
                                        Tensor& output, int32_t* act_min,
                                        int32_t* act_max);
+
+// Following two functions are borrowed from
+// https://github.com/tensorflow/tensorflow/blob/master/tensorflow/lite/micro/kernels/fully_connected.cc
+// for operator compatibility
+void GetQuantizedConvolutionMultipler(const Tensor& input, const Tensor& filter,
+                                      const Tensor& bias, Tensor& output,
+                                      double* multiplier);
+
+void GetQuantizedConvolutionMultipler(const Tensor& input, const Tensor& filter,
+                                      Tensor& output, double* multiplier);
 
 }
 }
