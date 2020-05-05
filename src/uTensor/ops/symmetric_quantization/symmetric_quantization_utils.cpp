@@ -190,19 +190,18 @@ void GetQuantizedConvolutionMultipler(const Tensor& input,
 }
 
 int32_t MultiplyByQuantizedMultiplier(int32_t acc, int32_t output_multiplier, int32_t output_shift) {
-
-            // simplified MultiplyByQuantizedMultiplier, may introduce rounding
-            // error
-            int left_shift = output_shift > 0
-                                 ? output_shift
-                                 : 0;
-            int right_shift = output_shift > 0
-                                  ? 0
-                                  : -output_shift;
-            acc = ((acc * (1 << left_shift)) *
-                   output_multiplier) >>
-                  right_shift;
-            return acc;
+  // simplified MultiplyByQuantizedMultiplier, may introduce rounding
+  // error
+  int left_shift = output_shift > 0
+                        ? output_shift
+                        : 0;
+  int right_shift = output_shift > 0
+                        ? 0
+                        : -output_shift;
+  acc = ((acc * (1 << left_shift)) *
+          output_multiplier) >>
+        right_shift;
+  return acc;
 }
 
 }
