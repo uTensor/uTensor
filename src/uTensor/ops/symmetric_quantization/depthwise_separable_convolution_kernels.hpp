@@ -224,21 +224,21 @@ void DepthwiseConvPerChannel(const DepthwiseParams& params,
             }
             // assuming bias data will always be provided
             acc += (int32_t)bias(output_channel);
-            // acc = MultiplyByQuantizedMultiplier(
-            //     acc, output_multiplier[output_channel],
-            //     output_shift[output_channel]);
+            acc = MultiplyByQuantizedMultiplier(
+                acc, output_multiplier[output_channel],
+                output_shift[output_channel]);
 
-            // simplified MultiplyByQuantizedMultiplier, may introduce rounding
-            // error
-            int left_shift = output_shift[output_channel] > 0
-                                 ? output_shift[output_channel]
-                                 : 0;
-            int right_shift = output_shift[output_channel] > 0
-                                  ? 0
-                                  : -output_shift[output_channel];
-            acc = ((acc * (1 << left_shift)) *
-                   output_multiplier[output_channel]) >>
-                  right_shift;
+            // // simplified MultiplyByQuantizedMultiplier, may introduce rounding
+            // // error
+            // int left_shift = output_shift[output_channel] > 0
+            //                      ? output_shift[output_channel]
+            //                      : 0;
+            // int right_shift = output_shift[output_channel] > 0
+            //                       ? 0
+            //                       : -output_shift[output_channel];
+            // acc = ((acc * (1 << left_shift)) *
+            //        output_multiplier[output_channel]) >>
+            //       right_shift;
 
             acc += output_offset;
             acc = std::max(acc, output_activation_min);
