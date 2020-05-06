@@ -1,4 +1,5 @@
 #include "fully_connected_kernel.hpp"
+#include "symmetric_quantization_utils.hpp"
 
 namespace uTensor {
 namespace TFLM {
@@ -16,8 +17,8 @@ void quantized_matrix_mult_kernel(Tensor& output, const Tensor& input,
   //quantized_activation_min = data->output_activation_min;
   //quantized_activation_max = data->output_activation_max;
 
-  TensorShape& input_shape = input->get_shape();
-  TensorShape& filter_shape  = filter->get_shape();
+  const TensorShape& input_shape = input->get_shape();
+  const TensorShape& filter_shape  = filter->get_shape();
   TensorShape& output_shape  = output->get_shape();
 
   const int filter_dim_count = filter_shape.num_dims();
@@ -60,8 +61,8 @@ void quantized_matrix_mult_kernel(Tensor& output, const Tensor& input,
   //quantized_activation_min = data->output_activation_min;
   //quantized_activation_max = data->output_activation_max;
 
-  TensorShape& input_shape = input->get_shape();
-  TensorShape& filter_shape  = filter->get_shape();
+  const TensorShape& input_shape = input->get_shape();
+  const TensorShape& filter_shape  = filter->get_shape();
   TensorShape& output_shape  = output->get_shape();
 
   const int filter_dim_count = filter_shape.num_dims();

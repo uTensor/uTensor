@@ -2,6 +2,7 @@
 #define UTENSOR_S_QUANTIZED_FC_KERNELS_H
 #include "context.hpp"
 #include "operatorBase.hpp"
+#include "Matrix.hpp"
 
 namespace uTensor {
 namespace TFLM {

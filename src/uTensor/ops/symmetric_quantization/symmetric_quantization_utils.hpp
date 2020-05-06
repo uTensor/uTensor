@@ -46,6 +46,9 @@ void GetQuantizedConvolutionMultipler(const Tensor& input, const Tensor& filter,
 void GetQuantizedConvolutionMultipler(const Tensor& input, const Tensor& filter,
                                       Tensor& output, double* multiplier);
 
+int32_t MultiplyByQuantizedMultiplier(int32_t acc, int32_t output_multiplier,
+                                      int32_t output_shift);
+
 }
 }
 
