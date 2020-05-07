@@ -57,7 +57,14 @@ Although the default R/W interface is super clear and compiles to somewhat effic
 
 
 ### Tensors, just Handles bound to objects implementing TensorInteface
-TODO
+
+Up until now we have described tensors as "tensor-like objects" that implement `TensorInterface`, but given our newfound knowledge of the memory allocator system we can extend the concept of `Handle`s to specialize on these tensor-like objects and make them fully *managed* by the uTensor runtime. 
+`Tensors` are exactly that, they are `Handles` that exclusively bind to `TensorInterface` objects managed in the allocators, and therefore get all the benefits of being a bound region. 
+
+Furthermore, `Tensors` provide some extra helper functions that make it feel more like we are operating on general tensor-like objects, rather than some externally referenced object in some magical memory manager. For example, constructing/assigning a `Tensor` to a dynamically allocated `TensorInterface*` will automatically bind it in the memory manager! Also, dereferencing a `Tensor` handle will automatically cast the referenced data to `TensorInterface*` so you don't have to worry about polymophism corner cases. 
+
+Like `Handles`, when a `Tensor` goes out of scope, or more generally when it's destructor gets called, the underlying tensor object is unbound and deallocated in the associated memory allocator.
+
 ### TensorMap
 
 `TensorMap`s are nothing more than an ordered map of `uTensor::string`s to `Tensor` references. Tensors can be looked up by "name", or more accurately ID. These are used heavily in the operators to map named inputs to tensors. Seeing `mOperator.setInputs({{mOperator::a, tensor1}, {mOperator::filter, f_tensor_891293}, {mOperator::bias, cowsay_tensor}}))` it's much clearer which tensor is being used for what purpose in the operator without having to jump to the operator class declaration.
