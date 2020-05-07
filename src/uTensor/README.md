@@ -45,10 +45,17 @@ From the name classes that extend the `AllocatorInterface` can do really anythin
 In uTensor, `Handle`s are basically unique (non-copyable) pointer-like proxy reference **bound** to some allocated region in the memory manager. Under the hood, this is just a void pointer, but the user cannot access it directly. Instead, you must you must dereference the `Handle` object to get access to the underlying pointer to data (automatically a double dereference). This is important because the memory manger keeps track of `Handle`s internally and can move the underlying data blocks around without breaking the user code! Making the `Handle`s non-copyable means the memory manager only needs to record one instance per bound region which saves a good chunk of space and speeds up the query. Likewise in user-land, if `Handles` are passed around by reference then if the Allocator moved the underlying data, all user-land references effectively get *notified*. 
 
 The most important part about handles:
-`Handle`s bound to an allocated region in a memory manager are guaranteed to be valid until expressly unbound. In other words the allocator is **not-allowed** to deallocate a bound region, but it is allowed to move it around as long as it updates the associated `Handle`. We eventually plan on adding a `Scheduler` which has the ability to move around bound data in the memory allocator given some memory optimal *plan*, and the `Handle`s let us do that as well as minimize fragmentation without breaking user-space coherency.
+`Handle`s bound to an allocated region in a memory manager are guaranteed to be valid until expressly unbound. In other words the allocator is **not-allowed** to deallocate a bound region, but it is allowed to move it around as long as it updates the associated `Handle`. We eventually plan on adding a `Scheduler` which has the ability to move around bound data in the memory allocator given some memory optimal *plan*, and the `Handle`s let us do that as well as minimize fragmentation without breaking user-space coherency. *Note*, `Handle`s will automatically deallocate their data when they go out of scope or more generally if the destructor is called.
 
 ### TensorInterface and the tensor lifecycle
-TODO
+
+In uTensor, tensor-like objects that implement `TensorInterface` get two things 1) automatic uTensor-internal lifecycle management and 2) a consistent user interface. `new` and `delete` are overwritten such that child classes of `TensorInterface` are automatically placed in a uTensor managed allocator with all associated behavior intact. Furthermore, on construction these objects get automatically registered in the uTensor runtime context, which is useful for profiling, debugging, and building scheduling systems. 
+
+The default user interface provides various operations expected of ALL tensor-like objects, such as shape queries, and reading/writing values. This R/W interface defaults to passing around `IntegralValue`s which can be roughly controlled via static casting of values (described in the `IntegralValue` section. 
+
+Although the default R/W interface is super clear and compiles to somewhat efficient code, it does not allow for the knuckle-bleeding rip-your-face-off drag-race speeds of accessing the underlying blocks of data directly often needed in latency optimized models. For that, we provide a protected interface for querying a span of the underlying data directly for reading/writing. This interface is meant for advanced capabilities and can only be accessed by friend tags like `FastOperator`. All the optimized operators use this interface plus pointer indexing, whereas the reference operators use the N-D tensor indexing with default R/W for clarity.
+
+
 ### Tensors, just Handles bound to objects implementing TensorInteface
 TODO
 ### TensorMap
