@@ -30,6 +30,8 @@ We get it, C-strings are extremely useful for user interfaces and early debuggin
 It is better to thing about `uTensor::string` as an identifier rather than a string.
 
 #### TensorShape
+`TensorShape` is exactly that, it describes the shape of a tensor as well as some basic helper functions like how many elements represented by this shape. `TensorShape` is **a fixed size object**, at the moment it always has exactly 4 stored dimensions even when some are not used, and furthermore it does not have any virtual functions. 
+
 #### Quantization Primitives
 
 ### Memory Allocator Interfaces
