@@ -36,6 +36,15 @@ It is better to thing about `uTensor::string` as an identifier rather than a str
 
 ### Memory Allocator Interfaces
 
+Probably the **two most important concepts in uTensor** are those of the Memory Allocators and `Handles`
+
+From the name classes that extend the `AllocatorInterface` can do really anything a normal memory manager can, such as allocating and deallocating raw data and querying the amount of space left. However, they way this differs from standard implementations is the uTensor notion of `Handles` and how they allow the allocator to do things not normally permitted in systems without virtual memory. 
+
+In uTensor, `Handle`s are basically unique (non-copyable) pointer-like proxy reference **bound** to some allocated region in the memory manager. Under the hood, this is just a void pointer, but the user cannot access it directly. Instead, you must you must dereference the `Handle` object to get access to the underlying pointer to data (automatically a double dereference). This is important because the memory manger keeps track of `Handle`s internally and can move the underlying data blocks around without breaking the user code! Making the `Handle`s non-copyable means the memory manager only needs to record one instance per bound region which saves a good chunk of space and speeds up the query. Likewise in user-land, if `Handles` are passed around by reference then if the Allocator moved the underlying data, all user-land references effectively get *notified*. 
+
+The most important part about handles:
+`Handle`s bound to an allocated region in a memory manager are guaranteed to be valid until expressly unbound. In other words the allocator is **not-allowed** to deallocate a bound region, but it is allowed to move it around as long as it updates the associated `Handle`. We eventually plan on adding a `Scheduler` which has the ability to move around bound data in the memory allocator given some memory optimal *plan*, and the `Handle`s let us do that as well as minimize fragmentation without breaking user-space coherency.
+
 ### TensorInterface and the tensor lifecycle
 ### Tensors, just Handles bound to objects implementing TensorInteface
 ### TensorMap
