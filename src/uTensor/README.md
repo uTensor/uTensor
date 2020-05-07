@@ -17,7 +17,12 @@ In general RTTI, run time type information, is expensive for tiny systems. Rathe
 This IDs are pretty useful when debugging remote deployments. All you have to do is `grep` your source code for `DECLARE_EVENT({EVENT_NAME})` or `DECLARE_ERROR({ERROR_NAME})`, run the same hash function on the `{EVENT_NAME}`s, and store this in a simple `map(hash({EVENT_NAME}) => {EVENT_NAME})`. Then if an `Event` or `Error` occurs you just have to query this map.
 
 ### Basic Types
-#### IntegerType
+#### IntegralType
+
+The `IntegralType` is basically an intermediate type that can take on `{u}int8_t`, `{u}int16_t`, `{u}int32_t`, or `float32` depending on the corresponding data type being written to/read from it. It can also behave as a reference to the target types, as is the case for the write interface for the `TensorInterface`. Really this class is only used by the reference operators and reference TensorInterface R/W interface, but from our initial experiments it actually compiles to relatively efficient machine code for Arm targets. 
+
+As a user, you will **almost NEVER** have a reason to use this type directly, instead opt for `static_cast`s at functions/functors boundaries that deal with these types. It makes the code way more readable and better captures intent. 
+
 #### uTensor Strings
 
 We get it, C-strings are extremely useful for user interfaces and early debugging of code. However, when dealing with KB sized binaries even a small number of short strings add up to a non-trivial number of bytes. The `uTensor::string` class is basically a proxy string that can do quick string comparisons for various data structure by first hashing the string. Eventually, we plan on doing the hash at compile time so we can quickly remove all references to string data between debug and release builds with a simple build flag.
