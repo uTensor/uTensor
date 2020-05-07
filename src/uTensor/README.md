@@ -34,6 +34,8 @@ It is better to thing about `uTensor::string` as an identifier rather than a str
 
 #### Quantization Primitives
 
+TODO
+
 ### Memory Allocator Interfaces
 
 Probably the **two most important concepts in uTensor** are those of the Memory Allocators and `Handles`
@@ -46,12 +48,15 @@ The most important part about handles:
 `Handle`s bound to an allocated region in a memory manager are guaranteed to be valid until expressly unbound. In other words the allocator is **not-allowed** to deallocate a bound region, but it is allowed to move it around as long as it updates the associated `Handle`. We eventually plan on adding a `Scheduler` which has the ability to move around bound data in the memory allocator given some memory optimal *plan*, and the `Handle`s let us do that as well as minimize fragmentation without breaking user-space coherency.
 
 ### TensorInterface and the tensor lifecycle
+TODO
 ### Tensors, just Handles bound to objects implementing TensorInteface
+TODO
 ### TensorMap
 
 `TensorMap`s are nothing more than an ordered map of `uTensor::string`s to `Tensor` references. Tensors can be looked up by "name", or more accurately ID. These are used heavily in the operators to map named inputs to tensors. Seeing `mOperator.setInputs({{mOperator::a, tensor1}, {mOperator::filter, f_tensor_891293}, {mOperator::bias, cowsay_tensor}}))` it's much clearer which tensor is being used for what purpose in the operator without having to jump to the operator class declaration.
 
 ### OperatorInterface
+TODO
 
 ## uTensor Lib
 
