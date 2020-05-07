@@ -53,11 +53,11 @@ options:
   dws_param.dilation_width_factor = 1;
   dws_param.dilation_height_factor = 1;
 
-  TFLM::DepthwiseSeparableConvOperator<int8_t> dw_conv_Aw;
+  QuantizedDepthwiseSeparableConvOperator<int8_t> dw_conv_Aw;
   dw_conv_Aw
     .set_params(dws_param)
-    .set_inputs({ {TFLM::DepthwiseSeparableConvOperator<int8_t>::in, A}, {TFLM::DepthwiseSeparableConvOperator<int8_t>::filter, filter}, {TFLM::DepthwiseSeparableConvOperator<int8_t>::bias, bias} })
-    .set_outputs({ {TFLM::DepthwiseSeparableConvOperator<int8_t>::out, out} })
+    .set_inputs({ {QuantizedDepthwiseSeparableConvOperator<int8_t>::in, A}, {QuantizedDepthwiseSeparableConvOperator<int8_t>::filter, filter}, {QuantizedDepthwiseSeparableConvOperator<int8_t>::bias, bias} })
+    .set_outputs({ {QuantizedDepthwiseSeparableConvOperator<int8_t>::out, out} })
     .eval();
 
 //  for(int i = 0; i < out->get_shape().get_linear_size(); i++) {

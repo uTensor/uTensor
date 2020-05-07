@@ -6,13 +6,13 @@
 #include "symmetric_quantization_utils.hpp"
 
 namespace uTensor {
+DECLARE_ERROR(qDwsConvPerChannelMismatchError);
+
 namespace TFLM {
 
 // Keep this outside the Operator since we can include this file in the Optimized Ops and get option data.
 static const int kMaxChannels = 32;  // was 256
 constexpr int kDepthwiseConvQuantizedDimension = 3;
-
-DECLARE_ERROR(qDwsConvPerChannelMismatchError);
 
 
 struct DWSConvOpData {
@@ -32,25 +32,26 @@ struct DWSConvOpData {
   int32_t output_activation_min;
   int32_t output_activation_max;
 };
+} //TFLM
 
 template <typename Tout>
-class DepthwiseSeparableConvOperator : public OperatorInterface<3, 1> {
+class QuantizedDepthwiseSeparableConvOperator : public OperatorInterface<3, 1> {
  public:
   enum names_in : uint8_t { in, filter, bias };
   enum names_out : uint8_t { out };
   
 
 public:
-  DepthwiseSeparableConvOperator() = default;
-  DepthwiseSeparableConvOperator(TfLiteDepthwiseConvParams& _params);
+  QuantizedDepthwiseSeparableConvOperator() = default;
+  QuantizedDepthwiseSeparableConvOperator(TFLM::TfLiteDepthwiseConvParams& _params);
 
-  DepthwiseSeparableConvOperator& set_params(
-      TfLiteDepthwiseConvParams& _params);
+  QuantizedDepthwiseSeparableConvOperator& set_params(
+      TFLM::TfLiteDepthwiseConvParams& _params);
 
-  void calculateOpData(DWSConvOpData* data);
+  void calculateOpData(TFLM::DWSConvOpData* data);
 
   // FIXME: remove this method
-  // DepthwiseSeparableConvOperator& set_params(DepthwiseParams&& _params, const
+  // QuantizedDepthwiseSeparableConvOperator& set_params(DepthwiseParams&& _params, const
   // int32_t&& _output_multiplier, const int32_t&& _output_shift) {
   //   //params = _params;
   //   output_multiplier = _output_multiplier;
@@ -76,11 +77,11 @@ public:
 
     // TODO: compute param here
 
-    DWSConvOpData data;
+    TFLM::DWSConvOpData data;
     calculateOpData(&data);
 
-    DepthwiseParams op_params;
-    op_params.padding_type = PaddingType::kSame;
+    TFLM::DepthwiseParams op_params;
+    op_params.padding_type = TFLM::PaddingType::kSame;
     op_params.padding_values.width = data.padding.width;
     op_params.padding_values.height = data.padding.height;
     op_params.stride_width = params.stride_width;
@@ -100,29 +101,29 @@ public:
     op_params.quantized_activation_min = std::numeric_limits<int8_t>::min();
     op_params.quantized_activation_max = std::numeric_limits<int8_t>::max();
 
-    DepthwiseConvPerChannel<Tout>(op_params, data.per_channel_output_multiplier,
+    TFLM::DepthwiseConvPerChannel<Tout>(op_params, data.per_channel_output_multiplier,
                                   data.per_channel_output_shift,
                                   inputs[in].tensor(), inputs[filter].tensor(),
                                   inputs[bias].tensor(), outputs[out].tensor());
   }
 
  private:
-  TfLiteDepthwiseConvParams params;
+  TFLM::TfLiteDepthwiseConvParams params;
 };
 
 template <typename Tout>
-DepthwiseSeparableConvOperator<Tout>::DepthwiseSeparableConvOperator(TfLiteDepthwiseConvParams& _params)
+QuantizedDepthwiseSeparableConvOperator<Tout>::QuantizedDepthwiseSeparableConvOperator(TFLM::TfLiteDepthwiseConvParams& _params)
       : params(_params) {}
 
 template <typename Tout>
-DepthwiseSeparableConvOperator<Tout>& DepthwiseSeparableConvOperator<Tout>::set_params(
-      TfLiteDepthwiseConvParams& _params) {
+QuantizedDepthwiseSeparableConvOperator<Tout>& QuantizedDepthwiseSeparableConvOperator<Tout>::set_params(
+      TFLM::TfLiteDepthwiseConvParams& _params) {
     params = _params;
     return *this;
 }
 
 template <typename Tout>
-void DepthwiseSeparableConvOperator<Tout>::calculateOpData(DWSConvOpData* data) {  // assume kTfLiteInt8
+void QuantizedDepthwiseSeparableConvOperator<Tout>::calculateOpData(TFLM::DWSConvOpData* data) {  // assume kTfLiteInt8
 
     // int channels_out = SizeOfDimension(filter, 3);
     int channels_out = inputs[filter].tensor()->get_shape()[3];
@@ -136,13 +137,13 @@ void DepthwiseSeparableConvOperator<Tout>::calculateOpData(DWSConvOpData* data) 
     int filter_height = inputs[filter].tensor()->get_shape()[1];
 
     int unused_output_height, unused_output_width;
-    data->padding = ComputePaddingHeightWidth(
+    data->padding = TFLM::ComputePaddingHeightWidth(
         params.stride_height, params.stride_width, 1, 1, height, width,
         filter_height, filter_width, params.padding, &unused_output_height,
         &unused_output_width);
 
     int num_channels =
-        inputs[filter].tensor()->get_shape()[kDepthwiseConvQuantizedDimension];
+        inputs[filter].tensor()->get_shape()[TFLM::kDepthwiseConvQuantizedDimension];
     QuantizationParams affine_quantization =
         inputs[filter].tensor()->get_quantization_params();
     const bool is_per_channel = affine_quantization.num_channels() > 1;
@@ -189,7 +190,7 @@ void DepthwiseSeparableConvOperator<Tout>::calculateOpData(DWSConvOpData* data) 
                                             static_cast<double>(output_scale);
       int32_t significand;
       int channel_shift;
-      QuantizeMultiplier(effective_output_scale, &significand, &channel_shift);
+      TFLM::QuantizeMultiplier(effective_output_scale, &significand, &channel_shift);
       reinterpret_cast<int32_t*>(data->per_channel_output_multiplier)[i] =
           significand;
       reinterpret_cast<int32_t*>(data->per_channel_output_shift)[i] =
@@ -212,12 +213,11 @@ void DepthwiseSeparableConvOperator<Tout>::calculateOpData(DWSConvOpData* data) 
       }
       */
       // if (input->type == kTfLiteInt8 || input->type == kTfLiteUInt8) {
-      CalculateActivationRangeQuantized(
+      TFLM::CalculateActivationRangeQuantized(
           params.activation, outputs[out].tensor(),
           &data->output_activation_min, &data->output_activation_max);
     }
   }
 
-}  // namespace TFLM
 }  // namespace uTensor
 #endif
