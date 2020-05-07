@@ -2,6 +2,7 @@
 #define UTENSOR_S_QUANTIZED_FC_OPS_H
 #include "Matrix.hpp"
 #include "context.hpp"
+#include "fully_connected_kernel.hpp"
 #include "operatorBase.hpp"
 #include "symmetric_quantization_utils.hpp"
 
@@ -30,7 +31,7 @@ class QuantizedMatrixMultiplyOperator<int8_t> : public OperatorInterface<3, 1> {
       Context::get_default_context()->throwError(
           new InvalidMatrixMultIndicesError);
     }
-    //TODO check that all the Tensor types are int8
+    // TODO check that all the Tensor types are int8
 
     // Taken from TFLu to maintain operator compatibility.
     // The scaling factor from input to output (aka the 'real multiplier') can
@@ -51,25 +52,25 @@ class QuantizedMatrixMultiplyOperator<int8_t> : public OperatorInterface<3, 1> {
     output_shift = -exponent;
     TFLM::CalculateActivationRangeQuantized(
         TFLM::kTfLiteActNone, outputs[output].tensor(), &output_activation_min,
-        &doutput_activation_max);
+        &output_activation_max);
 
     // gets rid of IF case in mult loop
-    if(have_bias){
+    if (have_bias) {
       TFLM::quantized_matrix_mult_kernel(
-        outputs[output].tensor(), inputs[input].tensor(),
-        inputs[filter].tensor(), inputs[bias].tensor(), output_multiplier,
-        output_shift, output_activation_min, output_activation_max);
+          outputs[output].tensor(), inputs[input].tensor(),
+          inputs[filter].tensor(), inputs[bias].tensor(), output_multiplier,
+          output_shift, output_activation_min, output_activation_max);
     } else {
       TFLM::quantized_matrix_mult_kernel(
-        outputs[output].tensor(), inputs[input].tensor(),
-        inputs[filter].tensor(), output_multiplier,
-        output_shift, output_activation_min, output_activation_max);
-
+          outputs[output].tensor(), inputs[input].tensor(),
+          inputs[filter].tensor(), output_multiplier, output_shift,
+          output_activation_min, output_activation_max);
     }
   }
 };
 
-using QuantizedFullyConnectedOperator = QuantizedMatrixMultiplyOperator;
+template <typename Tout>
+using QuantizedFullyConnectedOperator = QuantizedMatrixMultiplyOperator<Tout>;
 
 }  // namespace uTensor
 #endif
