@@ -29,6 +29,7 @@ endmacro()
 package_add_test_with_libraries(test_types core/test_types.cpp utensor_core core "${PROJECT_DIR}/test-data/")
 package_add_test_with_libraries(test_alloc allocators/test_arenaAllocator utensor allocators "${PROJECT_DIR}/test-data/")
 package_add_test_with_libraries(test_context core/test_context utensor core "${PROJECT_DIR}/test-data/")
+package_add_test_with_libraries(test_quantparams core/test_quantization_params utensor core "${PROJECT_DIR}/test-data/")
 
 package_add_test_with_libraries(test_ramtensor tensors/test_ramtensor utensor tensors "${PROJECT_DIR}/test-data/")
 package_add_test_with_libraries(test_buffertensor tensors/test_buffertensor utensor tensors "${PROJECT_DIR}/test-data/")

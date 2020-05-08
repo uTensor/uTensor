@@ -50,7 +50,8 @@ class TensorInterface : public TensorBase {
   IntegralValue operator()(uint32_t linear_index);
 
   virtual void resize(TensorShape new_shape) = 0;
-  TensorInterface& set_quantization_params(const QuantizationParams& params);
+  template<typename QType>
+  TensorInterface& set_quantization_params(const QType& params);
   const QuantizationParams& get_quantization_params() const;
 
  private:
@@ -78,8 +79,20 @@ class TensorInterface : public TensorBase {
   TensorShape _shape;
   ttype _type;  // Maybe make this const
   uint8_t _type_size;
-  QuantizationParams _qnt_params;
+  QuantizationParams* _qnt_params;
 };
+  
+template<typename QType>
+TensorInterface& TensorInterface::set_quantization_params(const QType& params){
+  if(!_qnt_params){
+    _qnt_params = new QType(params);
+  }
+  else {
+    *_qnt_params = params;
+  }
+  return *this;
+
+}
 
 }  // namespace uTensor
 #endif
