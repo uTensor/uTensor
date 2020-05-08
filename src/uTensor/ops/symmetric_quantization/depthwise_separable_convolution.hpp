@@ -42,21 +42,17 @@ class DepthwiseSeparableConvOperator : public OperatorInterface<3, 1> {
 
 public:
   DepthwiseSeparableConvOperator() = default;
-  DepthwiseSeparableConvOperator(TfLiteDepthwiseConvParams& _params);
+  DepthwiseSeparableConvOperator(TfLitePadding const &param_padding,
+                      int const &stride_width, int const &stride_height, int const &depth_multiplier,
+                      TfLiteFusedActivation const &activation, int const &dilation_width_factor,
+                      int const &dilation_height_factor);
 
-  DepthwiseSeparableConvOperator& set_params(
-      TfLiteDepthwiseConvParams& _params);
 
-  void calculateOpData(DWSConvOpData* data);
+  void calculateOpData(TfLitePaddingValues &padding, int32_t &output_multiplier,
+                        int output_shift, int32_t *per_channel_output_multiplier,
+                        int32_t *per_channel_output_shift, int32_t &output_activation_min,
+                        int32_t &output_activation_max);
 
-  // FIXME: remove this method
-  // DepthwiseSeparableConvOperator& set_params(DepthwiseParams&& _params, const
-  // int32_t&& _output_multiplier, const int32_t&& _output_shift) {
-  //   //params = _params;
-  //   output_multiplier = _output_multiplier;
-  //   output_shift = _output_shift;
-  //   return *this;
-  // }
 
  protected:
   virtual void compute() {
@@ -74,20 +70,21 @@ public:
           new InvalidTensorDimensionsError);
     }
 
-    // TODO: compute param here
-
-    DWSConvOpData data;
-    calculateOpData(&data);
-
+  
     DepthwiseParams op_params;
+    TfLitePaddingValues padding;
+    calculateOpData(padding, output_multiplier,
+                    output_shift, per_channel_output_multiplier,
+                    per_channel_output_shift, output_activation_min,
+                    output_activation_max);
     op_params.padding_type = PaddingType::kSame;
-    op_params.padding_values.width = data.padding.width;
-    op_params.padding_values.height = data.padding.height;
-    op_params.stride_width = params.stride_width;
-    op_params.stride_height = params.stride_height;
-    op_params.dilation_width_factor = params.dilation_width_factor;
-    op_params.dilation_height_factor = params.dilation_height_factor;
-    op_params.depth_multiplier = params.depth_multiplier;
+    op_params.padding_values.width = padding.width;
+    op_params.padding_values.height = padding.height;
+    op_params.stride_width = stride_width;
+    op_params.stride_height = stride_height;
+    op_params.dilation_width_factor = dilation_width_factor;
+    op_params.dilation_height_factor = dilation_height_factor;
+    op_params.depth_multiplier = depth_multiplier;
     op_params.input_offset =
         -inputs[in].tensor()->get_quantization_params().get_zeroP_for_channel(
             0);
@@ -100,47 +97,60 @@ public:
     op_params.quantized_activation_min = std::numeric_limits<int8_t>::min();
     op_params.quantized_activation_max = std::numeric_limits<int8_t>::max();
 
-    DepthwiseConvPerChannel<Tout>(op_params, data.per_channel_output_multiplier,
-                                  data.per_channel_output_shift,
+    DepthwiseConvPerChannel<Tout>(op_params, per_channel_output_multiplier,
+                                  per_channel_output_shift,
                                   inputs[in].tensor(), inputs[filter].tensor(),
                                   inputs[bias].tensor(), outputs[out].tensor());
   }
 
  private:
-  TfLiteDepthwiseConvParams params;
+ //TfLiteDepthwiseConvParams
+ //Set by constructors
+  TfLitePadding param_padding;
+  int stride_width;
+  int stride_height;
+  int depth_multiplier;
+  TfLiteFusedActivation activation;
+  int dilation_width_factor;
+  int dilation_height_factor;
+  //DWSConvOpData (check the previous commit)
+  TfLitePaddingValues padding;
+  int32_t output_multiplier;
+  int output_shift;
+  int32_t per_channel_output_multiplier[kMaxChannels];
+  int32_t per_channel_output_shift[kMaxChannels];
+  int32_t output_activation_min;
+  int32_t output_activation_max;
 };
 
 template <typename Tout>
-DepthwiseSeparableConvOperator<Tout>::DepthwiseSeparableConvOperator(TfLiteDepthwiseConvParams& _params)
-      : params(_params) {}
+DepthwiseSeparableConvOperator<Tout>::DepthwiseSeparableConvOperator(TfLitePadding const &_param_padding,
+                      int const &_stride_width, int const &_stride_height, int const &_depth_multiplier,
+                      TfLiteFusedActivation const &_activation, int const &_dilation_width_factor,
+                      int const &_dilation_height_factor)
+                      : param_padding(_param_padding), stride_width(_stride_width),
+                      stride_height(_stride_height), depth_multiplier(_depth_multiplier),
+                      activation(_activation), dilation_width_factor(_dilation_width_factor),
+                      dilation_height_factor(_dilation_height_factor) {}
 
-template <typename Tout>
-DepthwiseSeparableConvOperator<Tout>& DepthwiseSeparableConvOperator<Tout>::set_params(
-      TfLiteDepthwiseConvParams& _params) {
-    params = _params;
-    return *this;
-}
-
-template <typename Tout>
-void DepthwiseSeparableConvOperator<Tout>::calculateOpData(DWSConvOpData* data) {  // assume kTfLiteInt8
-
-    // int channels_out = SizeOfDimension(filter, 3);
+  template <typename Tout>
+  void DepthwiseSeparableConvOperator<Tout>::calculateOpData(TfLitePaddingValues &padding, int32_t &output_multiplier,
+                      int output_shift, int32_t *per_channel_output_multiplier,
+                      int32_t *per_channel_output_shift, int32_t &output_activation_min,
+                      int32_t &output_activation_max) {
     int channels_out = inputs[filter].tensor()->get_shape()[3];
-    // int width = SizeOfDimension(input, 2);
     int width = inputs[in].tensor()->get_shape()[2];
-    // int height = SizeOfDimension(input, 1);
     int height = inputs[in].tensor()->get_shape()[1];
-    // int filter_width = SizeOfDimension(filter, 2);
     int filter_width = inputs[filter].tensor()->get_shape()[2];
-    // int filter_height = SizeOfDimension(filter, 1);
     int filter_height = inputs[filter].tensor()->get_shape()[1];
 
     int unused_output_height, unused_output_width;
-    data->padding = ComputePaddingHeightWidth(
-        params.stride_height, params.stride_width, 1, 1, height, width,
-        filter_height, filter_width, params.padding, &unused_output_height,
-        &unused_output_width);
 
+    padding = ComputePaddingHeightWidth(
+        stride_height, stride_width, 1, 1, height, width,
+        filter_height, filter_width, param_padding, &unused_output_height,
+        &unused_output_width);
+    
     int num_channels =
         inputs[filter].tensor()->get_shape()[kDepthwiseConvQuantizedDimension];
     QuantizationParams affine_quantization =
@@ -163,9 +173,6 @@ void DepthwiseSeparableConvOperator<Tout>::calculateOpData(DWSConvOpData* data) 
       }
     }
 
-    // Populate multiplier and shift using affine quantization.
-    // FIXME: where does params.scale comes from? vs. quantization.params
-    // const float input_scale = input->params.scale;
     const float input_scale =
         inputs[in].tensor()->get_quantization_params().get_scale_for_channel(0);
     // const float output_scale = output->params.scale;
@@ -190,32 +197,17 @@ void DepthwiseSeparableConvOperator<Tout>::calculateOpData(DWSConvOpData* data) 
       int32_t significand;
       int channel_shift;
       QuantizeMultiplier(effective_output_scale, &significand, &channel_shift);
-      reinterpret_cast<int32_t*>(data->per_channel_output_multiplier)[i] =
+      reinterpret_cast<int32_t*>(per_channel_output_multiplier)[i] =
           significand;
-      reinterpret_cast<int32_t*>(data->per_channel_output_shift)[i] =
+      reinterpret_cast<int32_t*>(per_channel_output_shift)[i] =
           channel_shift;
 
-      /*
-      // Populate scalar quantization parameters.
-      // This check on legacy quantization parameters is kept only for backward
-      // compatibility.
-      if (input->type == kTfLiteUInt8) {
-        // Check bias scale == input scale * filter scale.
-        double real_multiplier = 0.0;
-        TF_LITE_ENSURE_STATUS(GetQuantizedConvolutionMultipler(
-            context, input, filter, bias, output, &real_multiplier));
-        int exponent;
-
-        // Populate quantization parameteters with multiplier and shift.
-        QuantizeMultiplier(real_multiplier, multiplier, &exponent);
-        *shift = -exponent;
-      }
-      */
       // if (input->type == kTfLiteInt8 || input->type == kTfLiteUInt8) {
       CalculateActivationRangeQuantized(
-          params.activation, outputs[out].tensor(),
-          &data->output_activation_min, &data->output_activation_max);
+          activation, outputs[out].tensor(),
+          &output_activation_min, &output_activation_max);
     }
+
   }
 
 }  // namespace TFLM
