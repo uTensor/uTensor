@@ -51,7 +51,10 @@ public:
   void calculateOpData(TfLitePaddingValues &padding, int32_t &output_multiplier,
                         int output_shift, int32_t *per_channel_output_multiplier,
                         int32_t *per_channel_output_shift, int32_t &output_activation_min,
-                        int32_t &output_activation_max);
+                        int32_t &output_activation_max, TfLitePadding const param_padding,
+                      int const stride_width, int const stride_height, int const depth_multiplier,
+                      TfLiteFusedActivation const activation, int const dilation_width_factor,
+                      int const dilation_height_factor);
 
 
  protected:
@@ -76,7 +79,10 @@ public:
     calculateOpData(padding, output_multiplier,
                     output_shift, per_channel_output_multiplier,
                     per_channel_output_shift, output_activation_min,
-                    output_activation_max);
+                    output_activation_max, param_padding,
+                    stride_width, stride_height, depth_multiplier,
+                    activation, dilation_width_factor,
+                    dilation_height_factor);
     op_params.padding_type = PaddingType::kSame;
     op_params.padding_values.width = padding.width;
     op_params.padding_values.height = padding.height;
@@ -137,7 +143,10 @@ DepthwiseSeparableConvOperator<Tout>::DepthwiseSeparableConvOperator(TfLitePaddi
   void DepthwiseSeparableConvOperator<Tout>::calculateOpData(TfLitePaddingValues &padding, int32_t &output_multiplier,
                       int output_shift, int32_t *per_channel_output_multiplier,
                       int32_t *per_channel_output_shift, int32_t &output_activation_min,
-                      int32_t &output_activation_max) {
+                      int32_t &output_activation_max, TfLitePadding const param_padding,
+                      int const stride_width, int const stride_height, int const depth_multiplier,
+                      TfLiteFusedActivation const activation, int const dilation_width_factor,
+                      int const dilation_height_factor) {
     int channels_out = inputs[filter].tensor()->get_shape()[3];
     int width = inputs[in].tensor()->get_shape()[2];
     int height = inputs[in].tensor()->get_shape()[1];
