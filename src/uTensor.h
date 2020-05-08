@@ -20,6 +20,7 @@
 #include "uTensor/ops/Matrix.hpp"
 #include "uTensor/ops/symmetric_quantization/depthwise_separable_convolution.hpp"
 #include "uTensor/ops/symmetric_quantization/QuantizeOps.hpp"
+#include "uTensor/ops/symmetric_quantization/fully_connected.hpp"
 
 /*
  * Tensors

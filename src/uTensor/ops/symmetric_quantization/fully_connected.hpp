@@ -9,7 +9,7 @@
 namespace uTensor {
 
 template <typename T>
-class QuantizedMatrixMultiplyOperator : public OperatorInterface<3, 1>;
+class QuantizedMatrixMultiplyOperator : public OperatorInterface<3, 1> {};
 
 template <>
 class QuantizedMatrixMultiplyOperator<int8_t> : public OperatorInterface<3, 1> {
@@ -19,7 +19,8 @@ class QuantizedMatrixMultiplyOperator<int8_t> : public OperatorInterface<3, 1> {
 
  protected:
   virtual void compute() {
-    bool have_bias = inputs[bias].name != *(TensorMapInterface::not_found.name);
+    bool have_bias =
+        *(inputs[bias].name) != *(TensorMapInterface::not_found.name);
     // Decide on c shape
     TensorShape& a_shape = inputs[input].tensor()->get_shape();
     TensorShape& b_shape = inputs[filter].tensor()->get_shape();
