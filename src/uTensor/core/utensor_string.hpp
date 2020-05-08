@@ -32,6 +32,9 @@ class string {
   bool operator==(const string& that) const {
     return this->value == that.value;
   }
+  bool operator!=(const string& that) const {
+    return this->value != that.value;
+  }
 
   uint32_t get_value() const { return value; }
   const char* c_str() const { return cstr; }
