@@ -24,6 +24,8 @@ set(src_utensor_legacy_ops
     ops/legacy/legacyQuantizationUtils.cpp
     )
 set(src_utensor_sq_ops
+    ops/symmetric_quantization/fully_connected.cpp
+    ops/symmetric_quantization/fully_connected_kernel.cpp
     ops/symmetric_quantization/depthwise_separable_convolution.cpp
     ops/symmetric_quantization/depthwise_separable_convolution_kernels.cpp
     ops/symmetric_quantization/symmetric_quantization_utils.cpp
