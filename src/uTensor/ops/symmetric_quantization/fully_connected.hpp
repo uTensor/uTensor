@@ -7,6 +7,7 @@
 #include "symmetric_quantization_utils.hpp"
 
 namespace uTensor {
+namespace TflmSymQuantOps {
 
 template <typename T>
 class QuantizedMatrixMultiplyOperator : public OperatorInterface<3, 1> {};
@@ -78,5 +79,6 @@ class QuantizedMatrixMultiplyOperator<int8_t> : public OperatorInterface<3, 1> {
 template <typename Tout>
 using QuantizedFullyConnectedOperator = QuantizedMatrixMultiplyOperator<Tout>;
 
+}
 }  // namespace uTensor
 #endif

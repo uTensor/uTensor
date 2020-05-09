@@ -3,6 +3,7 @@
 #include "uTensor.h"
 
 using namespace uTensor;
+using TflmSymQuantOps::QuantizedFullyConnectedOperator;
 
 TEST(Quantization, QuantFullyConnectOp_2) {
   localCircularArenaAllocator<2048> meta_allocator;

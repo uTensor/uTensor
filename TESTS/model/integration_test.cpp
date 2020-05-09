@@ -6,6 +6,11 @@
 #include "uTensor.h"
 
 using namespace uTensor;
+using TflmSymQuantOps::QuantizeOperator;
+using TflmSymQuantOps::DequantizeOperator;
+using TflmSymQuantOps::QuantizedFullyConnectedOperator;
+using TflmSymQuantOps::QuantizedDepthwiseSeparableConvOperator;
+using uTensor::TFLM::TfLiteFusedActivation;
 
 void compute_model(Tensor& input_10, Tensor& Identity0);
 
@@ -84,22 +89,22 @@ TEST(Integration, run_10x_mem_check) {
 
 void compute_model(Tensor& input_10, Tensor& Identity0) {
   // start rendering local declare snippets
-  TFLM::QuantizeOperator<int8_t, float> op_000;
+  QuantizeOperator<int8_t, float> op_000;
 
   QuantizedFullyConnectedOperator<int8_t> op_001(
-      TFLM::TfLiteFusedActivation::kTfLiteActRelu);
+      TfLiteFusedActivation::kTfLiteActRelu);
 
   QuantizedDepthwiseSeparableConvOperator<int8_t> op_002(
-      {1, 1}, VALID, 32, {1, 1}, TFLM::TfLiteFusedActivation::kTfLiteActRelu);
+      {1, 1}, VALID, 32, {1, 1}, TfLiteFusedActivation::kTfLiteActRelu);
 
   MaxPoolOperator<int8_t> op_003({2, 2}, {1, 2, 2, 1}, VALID);
 
   ReshapeOperator<int8_t> op_004({1, 5408});
 
-  TFLM::DequantizeOperator<float, int8_t> op_005;
+  DequantizeOperator<float, int8_t> op_005;
 
   QuantizedFullyConnectedOperator<int8_t> op_006(
-      TFLM::TfLiteFusedActivation::kTfLiteActNone);
+      TfLiteFusedActivation::kTfLiteActNone);
 
   Tensor input_1_int80 = new RamTensor({1, 28, 28, 1}, i8);
   int input_1_int80_zp = -128;
@@ -267,10 +272,10 @@ void compute_model(Tensor& input_10, Tensor& Identity0) {
   // start rendering eval snippets
   op_000
       .set_inputs({
-          {TFLM::QuantizeOperator<int8_t, float>::input, input_10},
+          {QuantizeOperator<int8_t, float>::input, input_10},
       })
       .set_outputs(
-          {{TFLM::QuantizeOperator<int8_t, float>::output, input_1_int80}})
+          {{QuantizeOperator<int8_t, float>::output, input_1_int80}})
       .eval();
 
   op_002
@@ -332,9 +337,9 @@ void compute_model(Tensor& input_10, Tensor& Identity0) {
 
   op_005
       .set_inputs({
-          {TFLM::DequantizeOperator<float, int8_t>::a, Identity_int80},
+          {DequantizeOperator<float, int8_t>::a, Identity_int80},
       })
-      .set_outputs({{TFLM::DequantizeOperator<float, int8_t>::b, Identity0}})
+      .set_outputs({{DequantizeOperator<float, int8_t>::b, Identity0}})
       .eval();
   // end of rendering eval snippets
 }

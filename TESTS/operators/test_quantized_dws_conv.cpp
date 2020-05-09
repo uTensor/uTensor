@@ -9,6 +9,7 @@ using std::cout;
 using std::endl;
 
 using namespace uTensor;
+using namespace TflmSymQuantOps;
 
 TEST(Quantized, reference_1_dws_conv) {
   localCircularArenaAllocator<1024> meta_allocator;

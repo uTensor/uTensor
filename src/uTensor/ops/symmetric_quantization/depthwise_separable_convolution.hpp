@@ -10,13 +10,11 @@ namespace uTensor {
 DECLARE_ERROR(qDwsConvPerChannelMismatchError);
 DECLARE_ERROR(InvalidQuantizationSchemeError);
 
-namespace TFLM {
+namespace TflmSymQuantOps {
 
 // Keep this outside the Operator since we can include this file in the
 // Optimized Ops and get option data.
 constexpr int kDepthwiseConvQuantizedDimension = 3;
-
-}  // namespace TFLM
 
 template <typename Tout>
 class QuantizedDepthwiseSeparableConvOperator : public OperatorInterface<3, 1> {
@@ -132,7 +130,7 @@ void QuantizedDepthwiseSeparableConvOperator<Tout>::calculateOpData(
                                   &unused_output_height, &unused_output_width);
 
   int num_channels =
-      filter->get_shape()[TFLM::kDepthwiseConvQuantizedDimension];
+      filter->get_shape()[kDepthwiseConvQuantizedDimension];
   QuantizationParams affine_quantization = filter->get_quantization_params();
   const bool is_per_channel = affine_quantization.num_channels() > 1;
   // dws conv should be per channel quantized
@@ -207,7 +205,7 @@ void QuantizedDepthwiseSeparableConvOperator<Tout>::compute() {
 
   int num_channels = inputs[filter]
                          .tensor()
-                         ->get_shape()[TFLM::kDepthwiseConvQuantizedDimension];
+                         ->get_shape()[kDepthwiseConvQuantizedDimension];
   // Bind these params to a Handle so they dont accidentally get thrown away on
   // possible rebalance
   per_channel_output_multiplier = reinterpret_cast<int32_t*>(
@@ -260,5 +258,6 @@ void QuantizedDepthwiseSeparableConvOperator<Tout>::compute() {
   ram_allocator->deallocate(per_channel_output_multiplier);
 }
 
+}
 }  // namespace uTensor
 #endif
