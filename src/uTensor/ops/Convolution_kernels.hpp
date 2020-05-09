@@ -7,7 +7,7 @@
 
 namespace uTensor {
 
-enum Padding : uint8_t { VALID = 1, SAME = 2 };
+enum Padding : uint8_t { UNKNOWN = 0, VALID = 1, SAME = 2 };
 
 template <typename T, typename Filter>
 void generic_convolution_kernel(Tensor& out, const Tensor& in, Filter filter,

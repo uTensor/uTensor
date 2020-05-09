@@ -27,8 +27,8 @@ TEST(Quantized, reference_0_quantize) {
 
   ::TFLM::QuantizeOperator<int8_t, float> op;
   op
-    .set_inputs({ { ::TFLM::QuantizeOperator<int8_t, float>::input, input_tensor } })
-    .set_outputs({ { ::TFLM::QuantizeOperator<int8_t, float>::output, output_tensor } })
+    .set_inputs({ { TFLM::QuantizeOperator<int8_t, float>::input, input_tensor } })
+    .set_outputs({ { TFLM::QuantizeOperator<int8_t, float>::output, output_tensor } })
     .eval();
   for (int i = 0; i < 784; ++i) {
     int8_t value = static_cast<int8_t>(output_tensor(i));

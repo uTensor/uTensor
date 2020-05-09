@@ -29,16 +29,19 @@ const TensorShape& TensorInterface::get_shape() const { return _shape; }
 uint32_t TensorInterface::num_elems() const { return _shape.num_elems(); }
 
 TensorInterface::TensorInterface()
-    : TensorBase(), _shape(0), _type(undefined), _type_size(0) {}
+    : TensorBase(), _shape(0), _type(undefined), _type_size(0), _qnt_params(nullptr) {}
 TensorInterface::TensorInterface(ttype _type)
-    : TensorBase(), _shape(0), _type(_type) {
+    : TensorBase(), _shape(0), _type(_type), _qnt_params(nullptr) {
   _type_size = type_size(_type);
 }
 TensorInterface::TensorInterface(TensorShape _shape, ttype _type)
-    : TensorBase(), _shape(_shape), _type(_type) {
+    : TensorBase(), _shape(_shape), _type(_type), _qnt_params(nullptr) {
   _type_size = type_size(_type);
 }
-TensorInterface::~TensorInterface(){};
+TensorInterface::~TensorInterface(){
+  if(_qnt_params)
+    delete _qnt_params;
+};
 
 // Can access Tensors like
 // mTensor(1) = 5, mTensor(2,2) = 5, etc.
@@ -61,14 +64,8 @@ IntegralValue TensorInterface::operator()(uint32_t linear_index) {
   return write(linear_index);
 }
 
-TensorInterface& TensorInterface::set_quantization_params(
-    const QuantizationParams& params) {
-  _qnt_params = params;
-  return *this;
-}
-
 const QuantizationParams& TensorInterface::get_quantization_params() const {
-  return _qnt_params;
+  return *_qnt_params;
 }
 
 size_t TensorInterface::_get_readable_block(void* buffer,

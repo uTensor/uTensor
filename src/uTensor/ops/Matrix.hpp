@@ -18,7 +18,7 @@ void matrix_mult_kernel(Tensor& c, const Tensor& a, const Tensor& b) {
   if (a_shape.num_dims() > 2 || b_shape.num_dims() > 2 ||
       c_shape.num_dims() > 2 || a_shape[1] != b_shape[0] ||
       a_shape[0] != c_shape[0] || b_shape[1] != c_shape[1]) {
-    printf("[Error] Invalid matrix multiple shape mismatch\n");
+    uTensor_printf("[Error] Invalid matrix multiple shape mismatch\n");
     Context::get_default_context()->throwError(
         new InvalidMatrixMultIndicesError);
   }
