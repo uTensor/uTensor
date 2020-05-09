@@ -36,4 +36,3 @@
  */
 #include "uTensor/errorHandlers/SimpleErrorHandler.hpp"
 
-using namespace uTensor::ReferenceOperators;
