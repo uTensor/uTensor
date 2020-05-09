@@ -6,6 +6,7 @@
 // https://github.com/ARM-software/ML-KWS-for-MCU/blob/master/Deployment/Source/MFCC/mfcc.h
 
 namespace uTensor {
+namespace ReferenceOperators {
 
 #define SAMP_FREQ 16000
 #define NUM_FBANK_BINS 40
@@ -152,6 +153,6 @@ void FixedMfccOperator<Tin, Tout>::populate_dct_matrix(
     }
   }
 }
-
+}
 }  // namespace uTensor
 #endif

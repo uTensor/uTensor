@@ -9,6 +9,7 @@ using std::cout;
 using std::endl;
 
 using namespace uTensor;
+using namespace uTensor::ReferenceOperators;
 
 /*********************************************
  * Generated Test number

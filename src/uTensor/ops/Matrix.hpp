@@ -6,6 +6,7 @@
 namespace uTensor {
 
 DECLARE_ERROR(InvalidMatrixMultIndicesError);
+namespace ReferenceOperators {
 
 // Assume c is already allocated to the correct size
 // Naive implementation
@@ -52,5 +53,6 @@ class MatrixMultOperator : public OperatorInterface<2, 1> {
   }
 };
 
+}
 }  // namespace uTensor
 #endif

@@ -14,6 +14,7 @@ using std::cout;
 using std::endl;
 
 using namespace uTensor;
+using namespace uTensor::ReferenceOperators;
 
 #define DO_STRIDE_TESTS 1
 /*********************************************

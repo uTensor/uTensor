@@ -4,7 +4,7 @@
 #include "ArgMinMax_kernel.hpp"
 
 namespace uTensor {
-
+namespace ReferenceOperators {
 template <typename Tin>
 class ArgMaxOperator : public OperatorInterface<2, 1>
 {
@@ -39,6 +39,7 @@ protected:
   }
 };
 
+}
 } // namespace uTensor
 
 #endif // UTENSOR_ARG_MIN_MAX_H
