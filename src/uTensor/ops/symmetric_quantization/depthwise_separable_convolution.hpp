@@ -215,8 +215,8 @@ void QuantizedDepthwiseSeparableConvOperator<Tout>::compute() {
      // Bind these params to a Handle so they dont accidentally get thrown away on possible rebalance
      Handle per_channel_output_multiplier_h(per_channel_output_multiplier);
      Handle per_channel_output_shift_h(per_channel_output_shift);
-     ram_allocator->unbind(per_channel_output_multiplier, &per_channel_output_multiplier_h);
-     ram_allocator->unbind(per_channel_output_shift, &per_channel_output_shift_h);
+     ram_allocator->bind(per_channel_output_multiplier, &per_channel_output_multiplier_h);
+     ram_allocator->bind(per_channel_output_shift, &per_channel_output_shift_h);
 
 
     calculateOpData(inputs[in].tensor(), inputs[filter].tensor(), inputs[bias].tensor(), outputs[out].tensor(), 
@@ -231,6 +231,7 @@ void QuantizedDepthwiseSeparableConvOperator<Tout>::compute() {
         );
     
     op_params.padding_type = TFLM::PaddingType::kSame;
+    //op_params.padding_type = static_cast<TFLM::PaddingType>(_padding);
     op_params.padding_values.width = paddingVals.width;
     op_params.padding_values.height = paddingVals.height;
     op_params.stride_width = _stride[1];
