@@ -44,9 +44,7 @@ options:
 {'Padding': 1, 'StrideW': 1, 'StrideH': 1, 'DepthMultiplier': 32, 'FusedActivationFunction': '1 (RELU)', 'DilationWFactor': 1, 'DilationHFactor': 1}
 */
 
-  QuantizedDepthwiseSeparableConvOperator<int8_t> dw_conv_Aw(TFLM::TfLitePadding::kTfLitePaddingSame, 1,
-                                                          1, 32, TFLM::TfLiteFusedActivation::kTfLiteActRelu,
-                                                          1, 1);
+  QuantizedDepthwiseSeparableConvOperator<int8_t> dw_conv_Aw({1,1}, SAME, 32, {1, 1}, TFLM::TfLiteFusedActivation::kTfLiteActRelu );
   dw_conv_Aw
     .set_inputs({ {QuantizedDepthwiseSeparableConvOperator<int8_t>::in, A}, {QuantizedDepthwiseSeparableConvOperator<int8_t>::filter, filter}, {QuantizedDepthwiseSeparableConvOperator<int8_t>::bias, bias} })
     .set_outputs({ {QuantizedDepthwiseSeparableConvOperator<int8_t>::out, out} })

@@ -42,7 +42,7 @@ struct TfLiteDepthwiseConvParams {
   int dilation_height_factor;
 };
 
-enum PaddingType : uint8_t { kNone, kSame, kValid };
+enum PaddingType : uint8_t { kNone=0, kSame, kValid };
 
 struct PaddingValues {
   int16_t width;
@@ -117,6 +117,11 @@ TfLitePaddingValues ComputePaddingHeightWidth(
     int stride_height, int stride_width, int dilation_rate_height,
     int dilation_rate_width, int in_height, int in_width, int filter_height,
     int filter_width, TfLitePadding padding, int* out_height, int* out_width);
+
+void ComputePaddingHeightWidth(
+    int stride_height, int stride_width, int dilation_rate_height,
+    int dilation_rate_width, int in_height, int in_width, int filter_height,
+    int filter_width, int* padding_height, int* padding_width, TfLitePadding padding, int* out_height, int* out_width);
 
 uint16_t MatchingDim(TensorShape s0, uint8_t i0, TensorShape s1, uint8_t i1);
 
