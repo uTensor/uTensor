@@ -3,7 +3,7 @@
 #include "uTensor.h"
 
 using namespace uTensor;
-using TflmSymQuantOps::QuantizedDepthwiseSeparableConvOperator;
+using TflmSymQuantOps::DepthwiseSeparableConvOperator;
 
 static localCircularArenaAllocator<2048> ram_allocator;
 static localCircularArenaAllocator<2048> meta_allocator;
@@ -28,16 +28,16 @@ TEST(LayerByLayer, DWSConv2D_3) {
   PerTensorQuantizationParams out_params(out_zp, out_scale);
   output->set_quantization_params(out_params);
 
-  QuantizedDepthwiseSeparableConvOperator<int8_t> op({2, 2}, SAME, 10, {1, 1},
+  DepthwiseSeparableConvOperator<int8_t> op({2, 2}, SAME, 10, {1, 1},
                                                      ::TFLM::kTfLiteActNone);
   op
       .set_inputs({
-          {QuantizedDepthwiseSeparableConvOperator<int8_t>::in, input},
-          {QuantizedDepthwiseSeparableConvOperator<int8_t>::filter, filter},
-          {QuantizedDepthwiseSeparableConvOperator<int8_t>::bias, bias},
+          {DepthwiseSeparableConvOperator<int8_t>::in, input},
+          {DepthwiseSeparableConvOperator<int8_t>::filter, filter},
+          {DepthwiseSeparableConvOperator<int8_t>::bias, bias},
       })
       .set_outputs({
-          {QuantizedDepthwiseSeparableConvOperator<int8_t>::out, output},
+          {DepthwiseSeparableConvOperator<int8_t>::out, output},
       })
       .eval();
   for (int i = 0; i < 250; ++i) {

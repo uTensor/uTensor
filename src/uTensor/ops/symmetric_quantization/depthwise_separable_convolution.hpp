@@ -17,28 +17,28 @@ namespace TflmSymQuantOps {
 constexpr int kDepthwiseConvQuantizedDimension = 3;
 
 template <typename Tout>
-class QuantizedDepthwiseSeparableConvOperator : public OperatorInterface<3, 1> {
+class DepthwiseSeparableConvOperator : public OperatorInterface<3, 1> {
  public:
   enum names_in : uint8_t { in, filter, bias };
   enum names_out : uint8_t { out };
 
  public:
-  QuantizedDepthwiseSeparableConvOperator();
+  DepthwiseSeparableConvOperator();
   /*
-  QuantizedDepthwiseSeparableConvOperator(
+  DepthwiseSeparableConvOperator(
       const uint16_t (&strides)[2], Padding padding,
       const int depth_multiplier = 1, const uint16_t (&dialation)[2] = {1, 1});
-  QuantizedDepthwiseSeparableConvOperator(
+  DepthwiseSeparableConvOperator(
       const uint16_t (&strides)[4], Padding padding,
       const int depth_multiplier = 1, const uint16_t (&dialation)[2] = {1, 1});
   */
   // activation basically only used for TESTING, USE AT YOUR OWN RISK
-  QuantizedDepthwiseSeparableConvOperator(
+  DepthwiseSeparableConvOperator(
       const uint16_t (&strides)[2], Padding padding,
       const int depth_multiplier = 1, const uint16_t (&dialation)[2] = {1, 1},
       const TFLM::TfLiteFusedActivation activation = TFLM::kTfLiteActNone);
   //// activation basically only used for TESTING, USE AT YOUR OWN RISK
-  // QuantizedDepthwiseSeparableConvOperator(
+  // DepthwiseSeparableConvOperator(
   //    std::initializer_list<uint16_t> strides, Padding padding,
   //    const int depth_multiplier = 1, const uint16_t (&dialation)[2] = {1, 1},
   //    const TFLM::TfLiteFusedActivation activation = TFLM::kTfLiteActNone);
@@ -78,8 +78,8 @@ class QuantizedDepthwiseSeparableConvOperator : public OperatorInterface<3, 1> {
 };
 
 template <typename Tout>
-QuantizedDepthwiseSeparableConvOperator<
-    Tout>::QuantizedDepthwiseSeparableConvOperator()
+DepthwiseSeparableConvOperator<
+    Tout>::DepthwiseSeparableConvOperator()
     : _stride{1, 1, 1, 1},
       _padding(SAME),
       depth_multiplier(1),
@@ -92,8 +92,8 @@ QuantizedDepthwiseSeparableConvOperator<
       output_activation_max(std::numeric_limits<Tout>::max()) {}
 
 template <typename Tout>
-QuantizedDepthwiseSeparableConvOperator<Tout>::
-    QuantizedDepthwiseSeparableConvOperator(
+DepthwiseSeparableConvOperator<Tout>::
+    DepthwiseSeparableConvOperator(
         const uint16_t (&strides)[2], Padding padding,
         const int depth_multiplier, const uint16_t (&dialation)[2],
         TFLM::TfLiteFusedActivation activation)
@@ -104,7 +104,7 @@ QuantizedDepthwiseSeparableConvOperator<Tout>::
       activation(activation) {}
 
 template <typename Tout>
-void QuantizedDepthwiseSeparableConvOperator<Tout>::calculateOpData(
+void DepthwiseSeparableConvOperator<Tout>::calculateOpData(
     const Tensor& input, const Tensor& filter, const Tensor& bias,
     Tensor& output, const uint16_t (&strides)[4], const Padding padding,
     const uint16_t (&dialations)[2], int output_shift,
@@ -180,7 +180,7 @@ void QuantizedDepthwiseSeparableConvOperator<Tout>::calculateOpData(
 }
 
 template <typename Tout>
-void QuantizedDepthwiseSeparableConvOperator<Tout>::compute() {
+void DepthwiseSeparableConvOperator<Tout>::compute() {
   AllocatorInterface* ram_allocator =
       Context::get_default_context()->get_ram_data_allocator();
   const TensorShape& in_shape = inputs[in].tensor()->get_shape();

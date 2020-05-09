@@ -9,8 +9,10 @@ using namespace uTensor;
 using TflmSymQuantOps::QuantizeOperator;
 using TflmSymQuantOps::DequantizeOperator;
 using TflmSymQuantOps::QuantizedFullyConnectedOperator;
-using TflmSymQuantOps::QuantizedDepthwiseSeparableConvOperator;
+using TflmSymQuantOps::DepthwiseSeparableConvOperator;
 using uTensor::TFLM::TfLiteFusedActivation;
+using ReferenceOperators::MaxPoolOperator;
+using ReferenceOperators::ReshapeOperator;
 
 void compute_model(Tensor& input_10, Tensor& Identity0);
 
@@ -94,7 +96,7 @@ void compute_model(Tensor& input_10, Tensor& Identity0) {
   QuantizedFullyConnectedOperator<int8_t> op_001(
       TfLiteFusedActivation::kTfLiteActRelu);
 
-  QuantizedDepthwiseSeparableConvOperator<int8_t> op_002(
+  DepthwiseSeparableConvOperator<int8_t> op_002(
       {1, 1}, VALID, 32, {1, 1}, TfLiteFusedActivation::kTfLiteActRelu);
 
   MaxPoolOperator<int8_t> op_003({2, 2}, {1, 2, 2, 1}, VALID);
@@ -280,13 +282,13 @@ void compute_model(Tensor& input_10, Tensor& Identity0) {
 
   op_002
       .set_inputs({
-          {QuantizedDepthwiseSeparableConvOperator<int8_t>::in, input_1_int80},
-          {QuantizedDepthwiseSeparableConvOperator<int8_t>::filter,
+          {DepthwiseSeparableConvOperator<int8_t>::in, input_1_int80},
+          {DepthwiseSeparableConvOperator<int8_t>::filter,
            StatefulPartitionedCallmy_modelconv2dConv2DReadVariableOp0},
-          {QuantizedDepthwiseSeparableConvOperator<int8_t>::bias,
+          {DepthwiseSeparableConvOperator<int8_t>::bias,
            StatefulPartitionedCallmy_modelconv2dConv2D_bias0},
       })
-      .set_outputs({{QuantizedDepthwiseSeparableConvOperator<int8_t>::out,
+      .set_outputs({{DepthwiseSeparableConvOperator<int8_t>::out,
                      StatefulPartitionedCallmy_modelconv2dRelu0}})
       .eval();
 
