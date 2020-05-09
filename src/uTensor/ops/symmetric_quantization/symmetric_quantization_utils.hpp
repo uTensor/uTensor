@@ -2,6 +2,7 @@
 #define UTENSOR_S_QUANTIZE_UTILS_H
 #include <cmath>
 #include <limits>
+
 #include "context.hpp"
 #include "tensor.hpp"
 #include "tflm_defs.hpp"
@@ -14,7 +15,6 @@ DECLARE_ERROR(InvalidFCQuantizationScalesError);
 DECLARE_ERROR(FCQuantizationScaleMultipleLTzeroError);
 
 namespace TFLM {
-
 
 typedef struct TfLiteAffineQuantization {
   float* scale;
@@ -49,7 +49,7 @@ void GetQuantizedConvolutionMultipler(const Tensor& input, const Tensor& filter,
 int32_t MultiplyByQuantizedMultiplier(int32_t acc, int32_t output_multiplier,
                                       int32_t output_shift);
 
-}
-}
+}  // namespace TFLM
+}  // namespace uTensor
 
 #endif

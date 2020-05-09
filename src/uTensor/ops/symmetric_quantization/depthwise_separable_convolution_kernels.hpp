@@ -1,10 +1,10 @@
 #ifndef UTENSOR_S_QUANTIZED_DWS_OPS_KERNELS_H
 #define UTENSOR_S_QUANTIZED_DWS_OPS_KERNELS_H
 #include "context.hpp"
+#include "symmetric_quantization_utils.hpp"
 #include "tensor.hpp"
 #include "types.hpp"
 #include "uTensor_util.hpp"
-#include "symmetric_quantization_utils.hpp"
 
 namespace uTensor {
 namespace TFLM {
@@ -18,7 +18,6 @@ typedef enum {
   kTfLitePaddingSame,
   kTfLitePaddingValid,
 } TfLitePadding;
-
 
 struct TfLiteDepthwiseConvParams {
   // Parameters for DepthwiseConv version 1 or above.
@@ -42,7 +41,7 @@ struct TfLiteDepthwiseConvParams {
   int dilation_height_factor;
 };
 
-enum PaddingType : uint8_t { kNone=0, kSame, kValid };
+enum PaddingType : uint8_t { kNone = 0, kSame, kValid };
 
 struct PaddingValues {
   int16_t width;
@@ -118,10 +117,13 @@ TfLitePaddingValues ComputePaddingHeightWidth(
     int dilation_rate_width, int in_height, int in_width, int filter_height,
     int filter_width, TfLitePadding padding, int* out_height, int* out_width);
 
-void ComputePaddingHeightWidth(
-    int stride_height, int stride_width, int dilation_rate_height,
-    int dilation_rate_width, int in_height, int in_width, int filter_height,
-    int filter_width, int* padding_height, int* padding_width, TfLitePadding padding, int* out_height, int* out_width);
+void ComputePaddingHeightWidth(int stride_height, int stride_width,
+                               int dilation_rate_height,
+                               int dilation_rate_width, int in_height,
+                               int in_width, int filter_height,
+                               int filter_width, int* padding_height,
+                               int* padding_width, TfLitePadding padding,
+                               int* out_height, int* out_width);
 
 uint16_t MatchingDim(TensorShape s0, uint8_t i0, TensorShape s1, uint8_t i1);
 
@@ -149,19 +151,22 @@ void DepthwiseConvPerChannel(const DepthwiseParams& params,
   TensorShape filter_shape = filter->get_shape();
   TensorShape output_shape = output->get_shape();
 
-  if(!(input_shape.num_dims() == 4 )){
-    Context::get_default_context()->throwError(new InvalidTensorDimensionsError);
+  if (!(input_shape.num_dims() == 4)) {
+    Context::get_default_context()->throwError(
+        new InvalidTensorDimensionsError);
+  }
+  if (!(filter_shape.num_dims() == 4)) {
+    Context::get_default_context()->throwError(
+        new InvalidTensorDimensionsError);
+  }
+  if (!(output_shape.num_dims() == 4)) {
+    Context::get_default_context()->throwError(
+        new InvalidTensorDimensionsError);
+  }
 
-  }
-  if(!(filter_shape.num_dims() == 4)){
-    Context::get_default_context()->throwError(new InvalidTensorDimensionsError);
-  }
-  if(!(output_shape.num_dims() == 4)){
-    Context::get_default_context()->throwError(new InvalidTensorDimensionsError);
-  }
-
-  if(!(output_activation_min < output_activation_max)){
-    Context::get_default_context()->throwError(new InvalidQDwsActivationRangeError);
+  if (!(output_activation_min < output_activation_max)) {
+    Context::get_default_context()->throwError(
+        new InvalidQDwsActivationRangeError);
   }
   const int batches = MatchingDim(input_shape, 0, output_shape, 0);
   const int output_depth = MatchingDim(filter_shape, 3, output_shape, 3);
@@ -172,10 +177,10 @@ void DepthwiseConvPerChannel(const DepthwiseParams& params,
   const int filter_width = filter_shape[2];
   const int output_height = output_shape[1];
   const int output_width = output_shape[2];
-  if(!(output_depth == input_depth * depth_multiplier)){
+  if (!(output_depth == input_depth * depth_multiplier)) {
     Context::get_default_context()->throwError(new InvalidQDwsOutputDepthError);
   }
-  if(!(bias->get_shape().get_linear_size() == (uint16_t)output_depth)){
+  if (!(bias->get_shape().get_linear_size() == (uint16_t)output_depth)) {
     Context::get_default_context()->throwError(new InvalidQDwsOutputDepthError);
   }
 
@@ -233,7 +238,8 @@ void DepthwiseConvPerChannel(const DepthwiseParams& params,
                 acc, output_multiplier[output_channel],
                 output_shift[output_channel]);
 
-            // // simplified MultiplyByQuantizedMultiplier, may introduce rounding
+            // // simplified MultiplyByQuantizedMultiplier, may introduce
+            // rounding
             // // error
             // int left_shift = output_shift[output_channel] > 0
             //                      ? output_shift[output_channel]

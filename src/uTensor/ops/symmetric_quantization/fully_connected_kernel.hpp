@@ -1,8 +1,8 @@
 #ifndef UTENSOR_S_QUANTIZED_FC_KERNELS_H
 #define UTENSOR_S_QUANTIZED_FC_KERNELS_H
+#include "Matrix.hpp"
 #include "context.hpp"
 #include "operatorBase.hpp"
-#include "Matrix.hpp"
 
 namespace uTensor {
 namespace TFLM {
@@ -19,8 +19,7 @@ void quantized_matrix_mult_kernel(Tensor& output, const Tensor& input,
                                   int32_t output_activation_min,
                                   int32_t output_activation_max);
 
-
-}
+}  // namespace TFLM
 }  // namespace uTensor
 
 #endif

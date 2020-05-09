@@ -15,5 +15,5 @@ typedef enum {
 } TfLiteFusedActivation;
 
 }
-}
+}  // namespace uTensor
 #endif

@@ -76,15 +76,17 @@ void QuantizeMultiplier(double double_multiplier, int32_t* quantized_multiplier,
   const double q = std::frexp(double_multiplier, shift);
   auto q_fixed = static_cast<int64_t>(std::round(q * (1ll << 31)));
 #endif  // TFLITE_EMULATE_FLOAT
-  if(!(q_fixed <= (1ll << 31))){
-    Context::get_default_context()->throwError(new SymmetricQuantizationFixedPointError);
+  if (!(q_fixed <= (1ll << 31))) {
+    Context::get_default_context()->throwError(
+        new SymmetricQuantizationFixedPointError);
   }
   if (q_fixed == (1ll << 31)) {
     q_fixed /= 2;
     ++*shift;
   }
-  if(!(q_fixed < std::numeric_limits<int32_t>::max())){
-    Context::get_default_context()->throwError(new SymmetricQuantizationFixedPointRangeError);
+  if (!(q_fixed < std::numeric_limits<int32_t>::max())) {
+    Context::get_default_context()->throwError(
+        new SymmetricQuantizationFixedPointRangeError);
   }
   // A shift amount smaller than -31 would cause all bits to be shifted out
   // and thus all results would be zero. We implement that instead with
@@ -154,55 +156,56 @@ void CalculateActivationRangeQuantized(TfLiteFusedActivation activation,
                                         act_max);
 }
 
-// Following two functions are borrowed from https://github.com/tensorflow/tensorflow/blob/master/tensorflow/lite/micro/kernels/fully_connected.cc for operator compatibility
-void GetQuantizedConvolutionMultipler(const Tensor& input,
-                                      const Tensor& filter,
-                                      const Tensor& bias,
-                                      Tensor& output,
+// Following two functions are borrowed from
+// https://github.com/tensorflow/tensorflow/blob/master/tensorflow/lite/micro/kernels/fully_connected.cc
+// for operator compatibility
+void GetQuantizedConvolutionMultipler(const Tensor& input, const Tensor& filter,
+                                      const Tensor& bias, Tensor& output,
                                       double* multiplier) {
-  const double input_product_scale = static_cast<double>(input->get_quantization_params().get_scale_for_channel(0)) *
-                                     static_cast<double>(filter->get_quantization_params().get_scale_for_channel(0));
+  const double input_product_scale =
+      static_cast<double>(
+          input->get_quantization_params().get_scale_for_channel(0)) *
+      static_cast<double>(
+          filter->get_quantization_params().get_scale_for_channel(0));
   // TODO(ahentz): The following conditions must be guaranteed by the training
   // pipeline.
   if (bias) {
-    const double bias_scale = static_cast<double>(bias->get_quantization_params().get_scale_for_channel(0));
-      if(!(std::abs(input_product_scale - bias_scale) <=
-                       1e-6 * std::min(input_product_scale, bias_scale))){
-        Context::get_default_context()->throwError( new InvalidFCQuantizationScalesError );
-      }
+    const double bias_scale = static_cast<double>(
+        bias->get_quantization_params().get_scale_for_channel(0));
+    if (!(std::abs(input_product_scale - bias_scale) <=
+          1e-6 * std::min(input_product_scale, bias_scale))) {
+      Context::get_default_context()->throwError(
+          new InvalidFCQuantizationScalesError);
+    }
   }
-  return GetQuantizedConvolutionMultipler(input, filter, output,
-                                          multiplier);
+  return GetQuantizedConvolutionMultipler(input, filter, output, multiplier);
 }
 
-void GetQuantizedConvolutionMultipler(const Tensor& input,
-                                      const Tensor& filter,
-                                      Tensor& output,
-                                      double* multiplier) {
-  const double input_product_scale =
-      static_cast<double>(input->get_quantization_params().get_scale_for_channel(0) * filter->get_quantization_params().get_scale_for_channel(0));
-  if(!(input_product_scale >= 0)){
-    Context::get_default_context()->throwError( new FCQuantizationScaleMultipleLTzeroError );
+void GetQuantizedConvolutionMultipler(const Tensor& input, const Tensor& filter,
+                                      Tensor& output, double* multiplier) {
+  const double input_product_scale = static_cast<double>(
+      input->get_quantization_params().get_scale_for_channel(0) *
+      filter->get_quantization_params().get_scale_for_channel(0));
+  if (!(input_product_scale >= 0)) {
+    Context::get_default_context()->throwError(
+        new FCQuantizationScaleMultipleLTzeroError);
   }
-  *multiplier = input_product_scale / static_cast<double>(output->get_quantization_params().get_scale_for_channel(0));
+  *multiplier = input_product_scale /
+                static_cast<double>(
+                    output->get_quantization_params().get_scale_for_channel(0));
 
   return;
 }
 
-int32_t MultiplyByQuantizedMultiplier(int32_t acc, int32_t output_multiplier, int32_t output_shift) {
+int32_t MultiplyByQuantizedMultiplier(int32_t acc, int32_t output_multiplier,
+                                      int32_t output_shift) {
   // simplified MultiplyByQuantizedMultiplier, may introduce rounding
   // error
-  int left_shift = output_shift > 0
-                        ? output_shift
-                        : 0;
-  int right_shift = output_shift > 0
-                        ? 0
-                        : -output_shift;
-  acc = ((acc * (1 << left_shift)) *
-          output_multiplier) >>
-        right_shift;
+  int left_shift = output_shift > 0 ? output_shift : 0;
+  int right_shift = output_shift > 0 ? 0 : -output_shift;
+  acc = ((acc * (1 << left_shift)) * output_multiplier) >> right_shift;
   return acc;
 }
 
-}
-}
+}  // namespace TFLM
+}  // namespace uTensor

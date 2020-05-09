@@ -1,5 +1,3 @@
 #include "fully_connected.hpp"
 
-namespace uTensor {
-
-} // uTensor
+namespace uTensor {}  // namespace uTensor
