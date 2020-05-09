@@ -153,6 +153,44 @@ void CalculateActivationRangeQuantized(TfLiteFusedActivation activation,
   CalculateActivationRangeQuantizedImpl(activation, qmin, qmax, output, act_min,
                                         act_max);
 }
+void CalculateActivationRangeQuantizedImpl(
+                                           int32_t qmin, int32_t qmax,
+                                           Tensor& output, int32_t* act_min,
+                                           int32_t* act_max) {
+  // const auto scale = output->params.scale;
+  const auto scale = output->get_quantization_params().get_scale_for_channel(0);
+  // const auto zero_point = output->params.zero_point;
+  const auto zero_point =
+      output->get_quantization_params().get_zeroP_for_channel(0);
+
+  auto quantize = [scale, zero_point](float f) {
+    return zero_point + static_cast<int32_t>(std::round(f / scale));
+  };
+    *act_min = qmin;
+    *act_max = qmax;
+}
+
+void CalculateActivationRangeQuantized(
+                                       Tensor& output, int32_t* act_min,
+                                       int32_t* act_max) {
+  int32_t qmin = 0;
+  int32_t qmax = 0;
+  // if (output->type == kTfLiteUInt8) {
+  //   qmin = std::numeric_limits<uint8_t>::min();
+  //   qmax = std::numeric_limits<uint8_t>::max();
+  // } else if (output->type == kTfLiteInt8) {
+  qmin = std::numeric_limits<int8_t>::min();
+  qmax = std::numeric_limits<int8_t>::max();
+  // } else if (output->type == kTfLiteInt16) {
+  //   qmin = std::numeric_limits<int16_t>::min();
+  //   qmax = std::numeric_limits<int16_t>::max();
+  // } else {
+  //   assert();
+  // }
+
+  CalculateActivationRangeQuantizedImpl(qmin, qmax, output, act_min,
+                                        act_max);
+}
 
 // Following two functions are borrowed from https://github.com/tensorflow/tensorflow/blob/master/tensorflow/lite/micro/kernels/fully_connected.cc for operator compatibility
 void GetQuantizedConvolutionMultipler(const Tensor& input,

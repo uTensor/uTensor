@@ -21,6 +21,7 @@ class Handle {
 
  public:
   Handle();
+//  ~Handle();
   Handle(void* p);
   // return the data directly (looks pointer like)
   void* operator*();

@@ -35,6 +35,14 @@ void CalculateActivationRangeQuantizedImpl(TfLiteFusedActivation activation,
 void CalculateActivationRangeQuantized(TfLiteFusedActivation activation,
                                        Tensor& output, int32_t* act_min,
                                        int32_t* act_max);
+void CalculateActivationRangeQuantizedImpl(
+                                           int32_t qmin, int32_t qmax,
+                                           Tensor& output, int32_t* act_min,
+                                           int32_t* act_max);
+
+void CalculateActivationRangeQuantized(
+                                       Tensor& output, int32_t* act_min,
+                                       int32_t* act_max);
 
 // Following two functions are borrowed from
 // https://github.com/tensorflow/tensorflow/blob/master/tensorflow/lite/micro/kernels/fully_connected.cc

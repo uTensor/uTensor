@@ -1,6 +1,7 @@
 #include "memoryManagementInterface.hpp"
 
 #include "uTensor_util.hpp"
+//#include "context.hpp"
 
 namespace uTensor {
 
@@ -8,6 +9,20 @@ Handle::Handle(const Handle& that) {}
 void* Handle::operator new(size_t sz) { return nullptr; }
 void Handle::operator delete(void* p) {}
 Handle::Handle() : _ptr(nullptr) {}
+/*
+Handle::~Handle() {
+  if (_ptr) {
+    AllocatorInterface* alloc =
+        Context::get_default_context()->get_metadata_allocator();
+    if (alloc->is_bound(_ptr, this)) {
+      alloc->unbind(_ptr, this);
+    }
+
+    alloc->deallocate(_ptr);
+  }
+  _ptr = nullptr;
+}
+*/
 Handle::Handle(void* p) : _ptr(p) {}
 void* Handle::operator*() { return _ptr; }
 bool Handle::operator!() const { return _ptr == nullptr; }
