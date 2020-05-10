@@ -17,6 +17,12 @@ class QuantizedMatrixMultiplyOperator<int8_t> : public OperatorInterface<3, 1> {
   enum names_in : uint8_t { input, filter, bias };
   enum names_out : uint8_t { output };
 
+  QuantizedMatrixMultiplyOperator(TFLM::TfLiteFusedActivation activation)
+      : _activation(activation) {}
+
+ private:
+  TFLM::TfLiteFusedActivation _activation;
+
  protected:
   virtual void compute() {
     bool have_bias =
@@ -52,7 +58,7 @@ class QuantizedMatrixMultiplyOperator<int8_t> : public OperatorInterface<3, 1> {
     TFLM::QuantizeMultiplier(real_multiplier, &output_multiplier, &exponent);
     output_shift = -exponent;
     TFLM::CalculateActivationRangeQuantized(
-        TFLM::kTfLiteActNone, outputs[output].tensor(), &output_activation_min,
+        _activation, outputs[output].tensor(), &output_activation_min,
         &output_activation_max);
 
     // gets rid of IF case in mult loop
