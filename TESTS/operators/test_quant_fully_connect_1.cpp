@@ -11,13 +11,20 @@ TEST(Quantization, QuantFullyConnectOp_1) {
   Context::get_default_context()->set_ram_data_allocator(&ram_allocator);
 
   Tensor input = new RomTensor({1, 5048}, i8, arr_input_1);
-  PerTensorQuantizationParams param(input_zp_1, input_scale_1);
-  input->set_quantization_params(param);
+  PerTensorQuantizationParams in_params(input_zp_1, input_scale_1);
+  input->set_quantization_params(in_params);
 
   Tensor filter = new RomTensor({5048, 128}, i8, arr_filter_1);
+  PerTensorQuantizationParams filter_params(filter_zp_1, filter_scale_1);
+  filter->set_quantization_params(filter_params);
+
   Tensor bias = new RomTensor({128}, i8, arr_bias_1);
+  PerTensorQuantizationParams bias_params(bias_zp_1, bias_scale_1);
+  bias->set_quantization_params(bias_params);
 
   Tensor output = new RamTensor({1, 128}, i8);
+  PerTensorQuantizationParams out_params(out_zp_1, out_scale_1);
+  output->set_quantization_params(out_params);
 
   QuantizedFullyConnectedOperator<int8_t> op(
       TFLM::TfLiteFusedActivation::kTfLiteActRelu);
