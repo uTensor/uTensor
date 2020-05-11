@@ -37,9 +37,8 @@ void quantized_matrix_mult_kernel(Tensor& output, const Tensor& input,
       int32_t acc = 0;
       for (int d = 0; d < accum_depth; ++d) {
         // TODO write this in tensor form
-        int32_t input_val = static_cast<int8_t>(input(b * accum_depth + d));
-        int32_t filter_val =
-            static_cast<int8_t>(filter(out_c * accum_depth + d));
+        int32_t input_val = static_cast<int8_t>(input(b, d, 0, 0));
+        int32_t filter_val = static_cast<int8_t>(filter(d, out_c, 0, 0));
         acc += (filter_val + filter_offset) * (input_val + input_offset);
       }
       acc = MultiplyByQuantizedMultiplier(acc, output_multiplier, output_shift);
@@ -78,15 +77,14 @@ void quantized_matrix_mult_kernel(Tensor& output, const Tensor& input,
     Context::get_default_context()->throwError(
         new InvalidMatrixMultIndicesError);
   }
-  const int accum_depth = filter_shape[filter_dim_count - 1];
+  const int accum_depth = filter_shape[0];
   for (int b = 0; b < batches; ++b) {
     for (int out_c = 0; out_c < output_depth; ++out_c) {
       int32_t acc = 0;
       for (int d = 0; d < accum_depth; ++d) {
         // TODO write this in tensor form
-        int32_t input_val = static_cast<int8_t>(input(b * accum_depth + d));
-        int32_t filter_val =
-            static_cast<int8_t>(filter(out_c * accum_depth + d));
+        int32_t input_val = static_cast<int8_t>(input(b, d, 0, 0));
+        int32_t filter_val = static_cast<int8_t>(filter(d, out_c, 0, 0));
         acc += (filter_val + filter_offset) * (input_val + input_offset);
       }
       acc += static_cast<int8_t>(bias(out_c));
