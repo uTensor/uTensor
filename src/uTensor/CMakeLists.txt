@@ -29,6 +29,7 @@ set(src_utensor_sq_ops
     ops/symmetric_quantization/depthwise_separable_convolution.cpp
     ops/symmetric_quantization/depthwise_separable_convolution_kernels.cpp
     ops/symmetric_quantization/symmetric_quantization_utils.cpp
+    ops/symmetric_quantization/gemmlowp.cpp
    )
 
 if(X86_PROJECT)
