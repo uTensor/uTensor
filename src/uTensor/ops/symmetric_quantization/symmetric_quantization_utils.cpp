@@ -61,7 +61,8 @@ int64_t IntegerFrExp(double input, int* shift) {
 
 void QuantizeMultiplier(double double_multiplier, int32_t* quantized_multiplier,
                         int* shift) {
-  if (double_multiplier == 0.) {
+  // https://github.com/tensorflow/tensorflow/blob/114b8ef31ac66155ec9b0590bc7115125f7fe61e/tensorflow/lite/kernels/internal/quantization_util.cc#L53-L91
+  if (double_multiplier == 0.0) {
     *quantized_multiplier = 0;
     *shift = 0;
     return;
@@ -76,7 +77,7 @@ void QuantizeMultiplier(double double_multiplier, int32_t* quantized_multiplier,
   const double q = std::frexp(double_multiplier, shift);
   auto q_fixed = static_cast<int64_t>(std::round(q * (1ll << 31)));
 #endif  // TFLITE_EMULATE_FLOAT
-  if (!(q_fixed <= (1ll << 31))) {
+  if (q_fixed > (1ll << 31)) {
     Context::get_default_context()->throwError(
         new SymmetricQuantizationFixedPointError);
   }
@@ -84,7 +85,7 @@ void QuantizeMultiplier(double double_multiplier, int32_t* quantized_multiplier,
     q_fixed /= 2;
     ++*shift;
   }
-  if (!(q_fixed < std::numeric_limits<int32_t>::max())) {
+  if (q_fixed > std::numeric_limits<int32_t>::max()) {
     Context::get_default_context()->throwError(
         new SymmetricQuantizationFixedPointRangeError);
   }
@@ -109,9 +110,7 @@ void CalculateActivationRangeQuantizedImpl(TfLiteFusedActivation activation,
                                            int32_t qmin, int32_t qmax,
                                            Tensor& output, int32_t* act_min,
                                            int32_t* act_max) {
-  // const auto scale = output->params.scale;
   const auto scale = output->get_quantization_params().get_scale_for_channel(0);
-  // const auto zero_point = output->params.zero_point;
   const auto zero_point =
       output->get_quantization_params().get_zeroP_for_channel(0);
 
@@ -137,27 +136,28 @@ void CalculateActivationRangeQuantizedImpl(TfLiteFusedActivation activation,
 void CalculateActivationRangeQuantized(TfLiteFusedActivation activation,
                                        Tensor& output, int32_t* act_min,
                                        int32_t* act_max) {
+  // https://github.com/tensorflow/tensorflow/blob/114b8ef31ac66155ec9b0590bc7115125f7fe61e/tensorflow/lite/kernels/kernel_util.cc#L180
   int32_t qmin = 0;
   int32_t qmax = 0;
-  // if (output->type == kTfLiteUInt8) {
-  //   qmin = std::numeric_limits<uint8_t>::min();
-  //   qmax = std::numeric_limits<uint8_t>::max();
-  // } else if (output->type == kTfLiteInt8) {
-  qmin = std::numeric_limits<int8_t>::min();
-  qmax = std::numeric_limits<int8_t>::max();
-  // } else if (output->type == kTfLiteInt16) {
-  //   qmin = std::numeric_limits<int16_t>::min();
-  //   qmax = std::numeric_limits<int16_t>::max();
-  // } else {
-  //   assert();
-  // }
+  if (output->get_type() == u8) {
+    qmin = std::numeric_limits<uint8_t>::min();
+    qmax = std::numeric_limits<uint8_t>::max();
+  } else if (output->get_type() == i8) {
+    qmin = std::numeric_limits<int8_t>::min();
+    qmax = std::numeric_limits<int8_t>::max();
+  } else if (output->get_type() == i16) {
+    qmin = std::numeric_limits<int16_t>::min();
+    qmax = std::numeric_limits<int16_t>::max();
+  } else {
+    Context::get_default_context()->throwError(new InvalidTensorDataTypeError);
+  }
 
   CalculateActivationRangeQuantizedImpl(activation, qmin, qmax, output, act_min,
                                         act_max);
 }
 
 // Following two functions are borrowed from
-// https://github.com/tensorflow/tensorflow/blob/master/tensorflow/lite/micro/kernels/fully_connected.cc
+// https://github.com/tensorflow/tensorflow/blob/114b8ef31ac66155ec9b0590bc7115125f7fe61e/tensorflow/lite/kernels/kernel_util.cc#L117-L137
 // for operator compatibility
 void GetQuantizedConvolutionMultipler(const Tensor& input, const Tensor& filter,
                                       const Tensor& bias, Tensor& output,
@@ -172,8 +172,7 @@ void GetQuantizedConvolutionMultipler(const Tensor& input, const Tensor& filter,
   if (bias) {
     const double bias_scale = static_cast<double>(
         bias->get_quantization_params().get_scale_for_channel(0));
-    if (!(std::abs(input_product_scale - bias_scale) <=
-          1e-6 * std::min(input_product_scale, bias_scale))) {
+    if (std::abs(input_product_scale - bias_scale) > 2e-6) {
       Context::get_default_context()->throwError(
           new InvalidFCQuantizationScalesError);
     }
@@ -186,7 +185,7 @@ void GetQuantizedConvolutionMultipler(const Tensor& input, const Tensor& filter,
   const double input_product_scale = static_cast<double>(
       input->get_quantization_params().get_scale_for_channel(0) *
       filter->get_quantization_params().get_scale_for_channel(0));
-  if (!(input_product_scale >= 0)) {
+  if (input_product_scale < 0) {
     Context::get_default_context()->throwError(
         new FCQuantizationScaleMultipleLTzeroError);
   }
