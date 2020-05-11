@@ -9,6 +9,11 @@ using namespace std;
 namespace uTensor {
 namespace gemmlowp {
 
+// I copied them from
+// https://github.com/google/gemmlowp/blob/master/fixedpoint/fixedpoint.h
+// To be honet, I don't exactly know what they do.
+// I copied them just for compatibility.
+
 DEFINE_ERROR(InvalidExponentError)
 
 int32_t MaskIfNonZero(int32_t a) {
