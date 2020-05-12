@@ -20,6 +20,11 @@ void quantized_matrix_mult_kernel(Tensor& output, const Tensor& input,
                                   int32_t output_activation_max);
 
 }  // namespace TFLM
+
+void quantized_matrix_mult_kernel(Tensor& output, const Tensor& input,
+                                  const Tensor& filter, const Tensor& bias,
+                                  int32_t output_activation_min,
+                                  int32_t output_activation_max);
 }  // namespace uTensor
 
 #endif

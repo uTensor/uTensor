@@ -66,6 +66,10 @@ class QuantizedMatrixMultiplyOperator<int8_t> : public OperatorInterface<3, 1> {
           outputs[output].tensor(), inputs[input].tensor(),
           inputs[filter].tensor(), inputs[bias].tensor(), output_multiplier,
           output_shift, output_activation_min, output_activation_max);
+      // quantized_matrix_mult_kernel(
+      //     outputs[output].tensor(), inputs[input].tensor(),
+      //     inputs[filter].tensor(), inputs[bias].tensor(),
+      //     output_activation_min, output_activation_max);
     } else {
       TFLM::quantized_matrix_mult_kernel(
           outputs[output].tensor(), inputs[input].tensor(),

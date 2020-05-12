@@ -1,5 +1,7 @@
 #include "symmetric_quantization_utils.hpp"
 
+#include <stdio.h>
+
 #include "gemmlowp.hpp"
 
 namespace uTensor {
@@ -59,6 +61,31 @@ int64_t IntegerFrExp(double input, int* shift) {
       }
     }
   }
+  // The shift is fairly easy to extract from the high bits of the double value,
+  // just by masking it out and applying a bias. The std::frexp() implementation
+  // always returns values between 0.5 and 1.0 though, whereas the exponent
+  // assumes 1.0 to 2.0 is the standard range, so I add on one to match that
+  // interface.
+  *shift = (exponent_part - kExponentBias) + 1;
+
+  // There's an implicit high bit in the double format definition, so make sure
+  // we include that at the top, and then reconstruct the rest of the fractional
+  // value from the remaining fragments.
+  int64_t fraction = 0x40000000 + ((u & kFractionMask) >> kFractionShift);
+
+  // We're cutting off some bits at the bottom, so to exactly match the standard
+  // frexp implementation here we'll apply rounding by adding one to the least
+  // significant bit of the result if the discarded portion is over half of the
+  // maximum.
+  if ((u & kFractionRoundingMask) > kFractionRoundingThreshold) {
+    fraction += 1;
+  }
+  // Negate the fraction if the sign bit was set.
+  if (u & kSignMask) {
+    fraction *= -1;
+  }
+
+  return fraction;
 }
 
 void QuantizeMultiplier(double double_multiplier, int32_t* quantized_multiplier,
