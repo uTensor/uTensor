@@ -89,7 +89,7 @@ void quantized_matrix_mult_kernel(Tensor& output, const Tensor& input,
             static_cast<int8_t>(filter(out_c * accum_depth + d));
         acc += (filter_val + filter_offset) * (input_val + input_offset);
       }
-      acc += static_cast<int8_t>(bias(out_c));
+      acc += static_cast<int32_t>(bias(out_c));
       acc = MultiplyByQuantizedMultiplier(acc, output_multiplier, output_shift);
       acc += output_offset;
       acc = std::max(acc, output_activation_min);

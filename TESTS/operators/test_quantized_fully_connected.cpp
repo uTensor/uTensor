@@ -48,7 +48,7 @@ TEST(Quantized, reference_3_fully_connected) {
       .eval();
 
   for (int i = 0; i < out->num_elems(); ++i) {
-    int8_t out_value = out(i);
+    int8_t out_value = (int8_t) out(i);
     EXPECT_NEAR(out_value, s_ref_output_ref[i], 5);
   }
 }
