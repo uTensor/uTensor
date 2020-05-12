@@ -18,7 +18,7 @@ TEST(Quantization, QuantFullyConnectOp_1) {
   PerTensorQuantizationParams filter_params(filter_zp_1, filter_scale_1);
   filter->set_quantization_params(filter_params);
 
-  Tensor bias = new RomTensor({128}, i8, arr_bias_1);
+  Tensor bias = new RomTensor({128}, i32, arr_bias_1);
   PerTensorQuantizationParams bias_params(bias_zp_1, bias_scale_1);
   bias->set_quantization_params(bias_params);
 
