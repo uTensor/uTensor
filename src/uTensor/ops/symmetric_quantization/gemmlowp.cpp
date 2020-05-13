@@ -1,6 +1,6 @@
 #include "gemmlowp.hpp"
 
-#include <numeric>
+#include <limits>
 
 #include "context.hpp"
 
