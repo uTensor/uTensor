@@ -101,6 +101,17 @@ void quantized_matrix_mult_kernel(Tensor& output, const Tensor& input,
 
 }  // namespace TFLM
 
+void get_quantize_multiplier(double real_multiplier, int32_t* quant_multiplier,
+                             int* exponent) {
+  if (real_multiplier > 1 || real_multiplier < 0) {
+    Context::get_default_context()->throwError(
+        new InvalidFCQuantizationScalesError);
+    return;
+  }
+  const double sig = std::frexp(real_multiplier, exponent);
+  *quant_multiplier = static_cast<int32_t>(std::round(sig * (1ll << 31)));
+}
+
 void quantized_matrix_mult_kernel(Tensor& output, const Tensor& input,
                                   const Tensor& filter, const Tensor& bias,
                                   int32_t output_activation_min,
@@ -121,45 +132,33 @@ void quantized_matrix_mult_kernel(Tensor& output, const Tensor& input,
       output->get_quantization_params().get_zeroP_for_channel(0);
   const float output_scale =
       output->get_quantization_params().get_scale_for_channel(0);
+  const double real_outupt_multiplier =
+      static_cast<double>(filter_scale * input_scale / output_scale);
 
   const TensorShape& input_shape = input->get_shape();
   const TensorShape& filter_shape = filter->get_shape();
   const uint16_t num_batches = input_shape[0];
   const uint16_t accum_depth = input_shape[1];
   const uint16_t output_depth = filter_shape[1];
-  auto AsFloat8 = [](int8_t value, const int32_t zp, const float scale) {
-    return static_cast<float>((static_cast<int32_t>(value) - zp)) * scale;
-  };
-  auto AsFloat32 = [](int32_t value, const int32_t zp, const float scale) {
-    return static_cast<float>(value - zp) * scale;
-  };
-  auto QuatizeOutput = [output_zp, output_scale](float value_f) {
-    const int32_t minVal =
-        static_cast<int32_t>(std::numeric_limits<int8_t>::min());
-    const int32_t maxVal =
-        static_cast<int32_t>(std::numeric_limits<int8_t>::max());
-    int32_t unclamped =
-        static_cast<int32_t>(std::round(value_f / output_scale)) + output_zp;
-    int32_t clamped = std::min(std::max(unclamped, minVal), maxVal);
-    return clamped;
-  };
+  int output_shift;
+  int32_t quant_output_mult;
+  get_quantize_multiplier(real_outupt_multiplier, &quant_output_mult,
+                          &output_shift);
   for (int b = 0; b < num_batches; ++b) {
     for (int out_c = 0; out_c < output_depth; ++out_c) {
-      float acc = 0;
+      int64_t acc = 0;
       for (int d = 0; d < accum_depth; ++d) {
-        float input_f = AsFloat8(static_cast<int8_t>(input(b, d, 0, 0)),
-                                 input_zp, input_scale);
-        float filter_f = AsFloat8(static_cast<int8_t>(filter(d, out_c, 0, 0)),
-                                  filter_zp, filter_scale);
-        acc += input_f * filter_f;
+        int64_t in_value = static_cast<int8_t>(input(b, d, 0, 0));
+        int64_t filter_value = static_cast<int8_t>(filter(d, out_c, 0, 0));
+        acc += (in_value - input_zp) * (filter_value - filter_zp);
       }
-      float bias_f =
-          AsFloat32(static_cast<int32_t>(bias(out_c)), bias_zp, bias_scale);
-      acc += bias_f;
-      int32_t acc_quant = QuatizeOutput(acc);
-      acc_quant = std::max(acc_quant, output_activation_min);
-      acc_quant = std::min(acc_quant, output_activation_max);
-      output(b, out_c, 0, 0) = static_cast<int8_t>(acc_quant);
+      acc += static_cast<int32_t>(bias(out_c, 0, 0, 0));
+      acc *= quant_output_mult;
+      acc >>= (31 + output_shift);
+      acc += output_zp;
+      acc = std::max(static_cast<int32_t>(acc), output_activation_min);
+      acc = std::min(static_cast<int32_t>(acc), output_activation_max);
+      output(b, out_c, 0, 0) = static_cast<int8_t>(acc);
     }
   }
 }
