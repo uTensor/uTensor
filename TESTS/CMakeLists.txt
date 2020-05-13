@@ -52,6 +52,7 @@ package_add_test_with_libraries(test_quant_dws_conv operators/test_quantized_dws
 package_add_test_with_libraries(test_quant_fully_connect_0 operators/test_quantized_fully_connected utensor operators "${PROJECT_DIR}/test-data/")
 package_add_test_with_libraries(test_quant_fully_connect_1 operators/test_quant_fully_connect_1 utensor operators "${PROJECT_DIR}/test-data/")
 package_add_test_with_libraries(test_quant_fully_connect_2 operators/test_quant_fully_connect_2 utensor operators "${PROJECT_DIR}/test-data/")
+package_add_test_with_libraries(test_quant_fully_connect_2x2 operators/test_quantized_fully_connected_2x2 utensor operators "${PROJECT_DIR}/test-data/")
 
 package_add_test_with_libraries(test_top_include library/test_top_include utensor library "${PROJECT_DIR}/test-data/")
 
