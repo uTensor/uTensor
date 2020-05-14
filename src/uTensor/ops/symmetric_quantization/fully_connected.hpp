@@ -51,16 +51,15 @@ class QuantizedMatrixMultiplyOperator<int8_t> : public OperatorInterface<3, 1> {
     int32_t output_activation_max;
     double real_multiplier = 0.0;
     int exponent;
-
     TFLM::GetQuantizedConvolutionMultipler(
         inputs[input].tensor(), inputs[filter].tensor(), inputs[bias].tensor(),
         outputs[output].tensor(), &real_multiplier);
     TFLM::QuantizeMultiplier(real_multiplier, &output_multiplier, &exponent);
-    output_shift = -exponent;
     TFLM::CalculateActivationRangeQuantized(
         _activation, outputs[output].tensor(), &output_activation_min,
         &output_activation_max);
 
+    output_shift = -exponent;
     // gets rid of IF case in mult loop
     if (have_bias) {
       TFLM::quantized_matrix_mult_kernel(
