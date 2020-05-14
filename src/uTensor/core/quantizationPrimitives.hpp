@@ -60,7 +60,7 @@ class PerChannelQuantizationParams : public QuantizationParams {
   // Smarter compile time thing might be
   template <int num_channels>
   PerChannelQuantizationParams(const int32_t (&zp)[num_channels],
-                               const int32_t (&scale)[num_channels])
+                               const float (&scale)[num_channels])
       : QuantizationParams(zp, scale, num_channels) {}
 
   virtual int32_t get_zeroP_for_channel(int i) const override;
