@@ -23,6 +23,7 @@ void Tensor::free() {
         Context::get_default_context()->get_metadata_allocator();
     if (alloc->is_bound(_ptr, this)) {
       alloc->unbind(_ptr, this);
+      alloc->deallocate(_ptr);
     }
 
     delete reinterpret_cast<TensorInterface*>(_ptr);
