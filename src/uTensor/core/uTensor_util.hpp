@@ -9,7 +9,7 @@
 
 #define ENABLE_PRINTING 1
 
-#ifdef ENABLE_PRINTING
+#if ENABLE_PRINTING
 #define uTensor_printf(...) printf(__VA_ARGS__)
 #else
 #define uTensor_printf(...) /*DUMMY*/
@@ -102,7 +102,7 @@ void utensor_exit(void);
 #elif defined(_POSIX_VERSION)
 // POSIX
 #elif ARM_PROJECT
-//ARM Project
+// ARM Project
 #else
 #if ARDUINO
 #include "Arduino.h"
