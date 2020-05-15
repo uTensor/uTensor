@@ -125,3 +125,35 @@ TEST(Rom_Tensor, read_write_i16) {
   cout << "uint16 Sizeof IntegralValue " << sizeof(IntegralValue(5)) << endl;
   delete[] buffer;
 }
+
+TEST(ScalarRom_Tensor, read_write_i8) {
+  ///setup_context();
+  localCircularArenaAllocator<256> meta_allocator;
+  localCircularArenaAllocator<256> ram_allocator;
+  Context::get_default_context()->set_metadata_allocator(&meta_allocator);
+  Context::get_default_context()->set_ram_data_allocator(&ram_allocator);
+  int8_t* buffer = new int8_t[1];
+  buffer[0] = 5;
+  ScalarRomTensor r({1}, i8, buffer);
+  int8_t read = r(2,2);
+  EXPECT_EQ(read, 5);
+  cout << "i8 Sizeof IntegralValue " << sizeof(IntegralValue(5)) << endl;
+  cout << "Sizeof RomTensor " << sizeof(r) << endl;
+  delete[] buffer;
+}
+
+TEST(ScalarRom_Tensor, read_write_flt) {
+  ///setup_context();
+  localCircularArenaAllocator<256> meta_allocator;
+  localCircularArenaAllocator<256> ram_allocator;
+  Context::get_default_context()->set_metadata_allocator(&meta_allocator);
+  Context::get_default_context()->set_ram_data_allocator(&ram_allocator);
+  float* buffer = new float[1];
+  buffer[0] = 5.0;
+  ScalarRomTensor r({1}, flt, buffer);
+  float read = r(2,2);
+  EXPECT_NEAR(read, 5.0, 0.0001);
+  cout << "float Sizeof IntegralValue " << sizeof(IntegralValue(5)) << endl;
+  cout << "Sizeof RomTensor " << sizeof(r) << endl;
+  delete[] buffer;
+}

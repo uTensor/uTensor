@@ -22,6 +22,33 @@ class AddOperator : public OperatorInterface<2, 1> {
   }
 };
 
+template <typename T>
+class SubOperator : public OperatorInterface<2, 1> {
+ public:
+  enum names_in : uint8_t { a, b };
+  enum names_out : uint8_t { c };
+  // AddOperator(FixedTensorMap<2> inputs, FixedTensorMap<1> outputs) :
+  // OperatorBase(inputs, outputs) {}
+
+ protected:
+  virtual void compute() {
+    sub_kernel<T>(outputs[c].tensor(), inputs[a].tensor(), inputs[b].tensor());
+  }
+};
+
+template <typename T>
+class MulOperator : public OperatorInterface<2, 1> {
+ public:
+  enum names_in : uint8_t { a, b };
+  enum names_out : uint8_t { c };
+  // AddOperator(FixedTensorMap<2> inputs, FixedTensorMap<1> outputs) :
+  // OperatorBase(inputs, outputs) {}
+
+ protected:
+  virtual void compute() {
+    mul_kernel<T>(outputs[c].tensor(), inputs[a].tensor(), inputs[b].tensor());
+  }
+};
 
 }  // namespace uTensor
 #endif

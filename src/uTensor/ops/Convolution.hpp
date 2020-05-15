@@ -199,5 +199,79 @@ using MaxPoolOperator = GenericPoolOperator<T, MaxFilter<T>>;
 template <typename T>
 using AvgPoolOperator = GenericPoolOperator<T, AvgFilter<T>>;
 
+template <typename Tout>
+class DepthwiseSeparableConvOperatorV2 : public OperatorInterface<3, 1> {
+ public:
+  enum names_in : uint8_t { in, filter, bias };
+  enum names_out : uint8_t { out };
+
+ public:
+  DepthwiseSeparableConvOperatorV2();
+  // TODO allow 4D bits later
+  //DepthwiseSeparableConvOperatorV2(
+  //    const uint16_t (&strides)[4], Padding padding,
+  //    const int depth_multiplier = 1, const uint16_t (&dialation)[2] = {1, 1});
+  DepthwiseSeparableConvOperatorV2(
+      const uint16_t (&strides)[2], Padding padding,
+      const int depth_multiplier = 1, const uint16_t (&dialation)[2] = {1, 1});
+
+ protected:
+  virtual void compute();
+
+ private:
+  // TfLiteDepthwiseConvParams
+  // Set by constructors
+  uint16_t _stride[4];
+  Padding _padding;
+  int depth_multiplier;
+  uint16_t _dialation[2];
+};
+
+template <typename Tout>
+DepthwiseSeparableConvOperatorV2<
+    Tout>::DepthwiseSeparableConvOperatorV2()
+    : _stride{1, 1},
+      _padding(SAME),
+      depth_multiplier(1),
+      _dialation{1, 1} {}
+
+template <typename Tout>
+DepthwiseSeparableConvOperatorV2<Tout>::
+    DepthwiseSeparableConvOperatorV2(
+        const uint16_t (&strides)[2], Padding padding,
+        const int depth_multiplier, const uint16_t (&dialation)[2])
+    : _stride{1, strides[0], strides[1], 1}, _padding(padding),
+      depth_multiplier(depth_multiplier),
+      _dialation{dialation[0], dialation[1]}
+{
+}
+
+template <typename Tout>
+void DepthwiseSeparableConvOperatorV2<Tout>::compute() {
+  AllocatorInterface* ram_allocator =
+      Context::get_default_context()->get_ram_data_allocator();
+  const TensorShape& in_shape = inputs[in].tensor()->get_shape();
+  const TensorShape& df_shape = inputs[filter].tensor()->get_shape();
+  const TensorShape& bias_shape = inputs[bias].tensor()->get_shape();
+  const TensorShape& out_shape = outputs[out].tensor()->get_shape();
+
+  if (in_shape[3] != df_shape[2]) {
+    Context::get_default_context()->throwError(
+        new InvalidTensorDimensionsError);
+  }
+  if (bias_shape[0] != 1 || bias_shape[1] != 1) {
+    Context::get_default_context()->throwError(
+        new InvalidTensorDimensionsError);
+  }
+
+
+  depthwise_separable_convolution_kernel_v2<Tout>(
+      outputs[out].tensor(),
+      inputs[in].tensor(), inputs[filter].tensor(), inputs[bias].tensor(),
+      _padding, _stride, depth_multiplier, _dialation);
+
+}
+
+
 }  // namespace uTensor
 #endif

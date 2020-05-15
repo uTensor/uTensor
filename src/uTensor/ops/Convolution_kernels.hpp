@@ -425,5 +425,118 @@ void depthwise_separable_convolution_kernel(Tensor& out, const Tensor& in,
   }
 }
 
+
+void uComputePaddingHeightWidth(int stride_height, int stride_width,
+                               int dilation_rate_height,
+                               int dilation_rate_width, int in_height,
+                               int in_width, int filter_height,
+                               int filter_width, int* padding_height,
+                               int* padding_width, Padding padding,
+                               int* out_height, int* out_width);
+
+template <typename T>
+void depthwise_separable_convolution_kernel_v2(Tensor& output, const Tensor& input,
+                                            const Tensor& filter,
+                                            const Tensor& bias,
+                                            const Padding padding,
+                                            const uint16_t (&strides)[4],
+                                            const int depth_multiplier,
+                                            const uint16_t (&dialation)[2]
+                                            ) {
+  
+  // Check dimensions of the tensors.
+  const TensorShape& input_shape = input->get_shape();
+  const TensorShape& filter_shape = filter->get_shape();
+  const TensorShape& output_shape = output->get_shape();
+  
+  const int channels_out = filter_shape[3];
+  const int batches = input_shape[0];
+  const int output_depth = output_shape[3]; // This should be the same as filter_shape[3]
+  const int output_height = output_shape[1];
+  const int output_width = output_shape[2];
+  const int input_width = input_shape[2];
+  const int input_height = input_shape[1];
+  const int input_depth = input_shape[3];
+  const int filter_width = filter_shape[2];
+  const int filter_height = filter_shape[1];
+  const int stride_width = strides[2];
+  const int stride_height = strides[1];
+  const int dialation_width_factor = dialation[1];
+  const int dialation_height_factor = dialation[0];
+
+  int unused_output_height, unused_output_width;
+  int32_t pad_width, pad_height;
+
+  uComputePaddingHeightWidth(stride_height, stride_width, 1, 1, input_height,
+                                  input_width, filter_height, filter_width,
+                                  &pad_height, &pad_width,
+                                  padding,
+                                  &unused_output_height, &unused_output_width);
+  
+  if (!(input_shape.num_dims() == 4)) {
+    Context::get_default_context()->throwError(
+        new InvalidTensorDimensionsError);
+  }
+  if (!(filter_shape.num_dims() == 4)) {
+    Context::get_default_context()->throwError(
+        new InvalidTensorDimensionsError);
+  }
+  if (!(output_shape.num_dims() == 4)) {
+    Context::get_default_context()->throwError(
+        new InvalidTensorDimensionsError);
+  }
+  if (!(output_depth == filter_shape[3])) {
+    Context::get_default_context()->throwError(
+        new InvalidTensorDimensionsError);
+  }
+  if (!(batches == output_shape[0])) {
+    Context::get_default_context()->throwError(
+        new InvalidTensorDimensionsError);
+  }
+
+  for (int batch = 0; batch < batches; ++batch) {
+    for (int out_y = 0; out_y < output_height; ++out_y) {
+      for (int out_x = 0; out_x < output_width; ++out_x) {
+        for (int in_channel = 0; in_channel < input_depth; ++in_channel) {
+          for (int m = 0; m < depth_multiplier; ++m) {
+            const int output_channel = m + in_channel * depth_multiplier;
+            const int in_x_origin = (out_x * stride_width) - pad_width;
+            const int in_y_origin = (out_y * stride_height) - pad_height;
+            int32_t acc = 0;
+            for (int filter_y = 0; filter_y < filter_height; ++filter_y) {
+              for (int filter_x = 0; filter_x < filter_width; ++filter_x) {
+                const int in_x = in_x_origin + dialation_width_factor * filter_x;
+                const int in_y =
+                    in_y_origin + dialation_height_factor * filter_y;
+                // Zero padding by omitting the areas outside the image.
+                const bool is_point_inside_image =
+                    (in_x >= 0) && (in_x < input_width) && (in_y >= 0) &&
+                    (in_y < input_height);
+                if (is_point_inside_image) {
+                  // int32_t input_val = input_data[Offset(input_shape, batch,
+                  // in_y,
+                  //                                     in_x, in_channel)];
+                  T input_val =
+                      static_cast<T>(input(batch, in_y, in_x, in_channel));
+                  // int32_t filter_val = filter_data[Offset(
+                  //     filter_shape, 0, filter_y, filter_x, output_channel)];
+                  T filter_val = static_cast<T>(
+                      filter(filter_y, filter_x, output_channel));
+                  acc += filter_val * (input_val);
+                }
+              }
+            }
+            // assuming bias data will always be provided
+            acc += static_cast<T>(bias(output_channel));
+
+            output(batch, out_y, out_x, output_channel) =
+                static_cast<T>(acc);
+          }
+        }
+      }
+    }
+  }
+}
+
 }  // namespace uTensor
 #endif
