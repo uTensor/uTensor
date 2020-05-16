@@ -14,26 +14,8 @@ namespace TFLM {
 
 // Keep this outside the Operator since we can include this file in the
 // Optimized Ops and get option data.
-static const int kMaxChannels = 128;  // was 256
 constexpr int kDepthwiseConvQuantizedDimension = 3;
 
-struct DWSConvOpData {
-  TfLitePaddingValues padding;
-  // The scaling factor from input to output (aka the 'real multiplier') can
-  // be represented as a fixed point multiplier plus a left shift.
-  int32_t output_multiplier;
-  int output_shift;
-
-  // Per channel output multiplier and shift.
-  // TODO(b/141139247): Allocate these dynamically when possible.
-  int32_t per_channel_output_multiplier[kMaxChannels];
-  int32_t per_channel_output_shift[kMaxChannels];
-
-  // The range of the fused activation layer. For example for kNone and
-  // uint8_t these would be 0 and 255.
-  int32_t output_activation_min;
-  int32_t output_activation_max;
-};
 }  // namespace TFLM
 
 template <typename Tout>
@@ -84,7 +66,7 @@ class QuantizedDepthwiseSeparableConvOperator : public OperatorInterface<3, 1> {
   Padding _padding;
   int depth_multiplier;
   uint16_t _dialation[2];
-  // DWSConvOpData (check the previous commit)
+
   int32_t output_multiplier;
   int output_shift;
   int32_t* per_channel_output_multiplier;
