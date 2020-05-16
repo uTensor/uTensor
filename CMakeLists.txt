@@ -12,6 +12,11 @@ if(ENABLE_COVERAGE)
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fprofile-arcs -ftest-coverage -ggdb -fPIC")
 endif()
 
+option(ENABLE_PRINTING "Enable debug printing" OFF)
+if(ENABLE_PRINTING)
+  add_definitions(-DENABLE_PRINTING)
+endif()
+
 ### Require out-of-source builds
 file(TO_CMAKE_PATH "${PROJECT_BINARY_DIR}/CMakeLists.txt" LOC_PATH)
 if(EXISTS "${LOC_PATH}")

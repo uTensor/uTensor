@@ -230,10 +230,10 @@ class localCircularArenaAllocator : public AllocatorInterface {
   virtual void _deallocate(void* ptr) {
     if (ptr) {
       MetaHeader& hdr = _read_header(ptr);
-      hdr.set_inactive();
       if (hdr.is_bound()) {
         _unbind(ptr, hdr.hndl);
       }
+      hdr.set_inactive();
       hdr.set_hndl(nullptr);  // cleanup
       capacity += hdr.get_len();
       // Do not update the size of the header

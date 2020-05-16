@@ -56,4 +56,66 @@ float PerChannelQuantizationParams::get_scale_for_channel(int i) const {
   return _scale[i];
 }
 
+QuantizationParams* QuantizationParamsHandle::operator->() {
+  return reinterpret_cast<QuantizationParams*>(_ptr);
+}
+const QuantizationParams* QuantizationParamsHandle::operator->() const {
+  return reinterpret_cast<const QuantizationParams*>(_ptr);
+}
+const QuantizationParams* QuantizationParamsHandle::operator*() const {
+  return reinterpret_cast<QuantizationParams*>(_ptr);
+}
+QuantizationParamsHandle::~QuantizationParamsHandle() { free(); }
+void QuantizationParamsHandle::free() {
+  void* ptr_t = _ptr; //unbind invalidates this handle so store a copy
+  if (_ptr) {
+    AllocatorInterface* alloc =
+        Context::get_default_context()->get_metadata_allocator();
+    if (alloc->is_bound(_ptr, this)) {
+      alloc->unbind(_ptr, this);
+
+    }
+    delete reinterpret_cast<QuantizationParams*>(ptr_t);
+    alloc->deallocate(ptr_t);
+  }
+  _ptr = nullptr;
+}
+QuantizationParamsHandle::QuantizationParamsHandle() : Handle() {}
+QuantizationParamsHandle::QuantizationParamsHandle(QuantizationParams* ptr) : Handle((void*)ptr) {
+  // Context::get_default_context()->get_metadata_allocator()->bind(_ptr, this);
+  bind(*this, *Context::get_default_context()->get_metadata_allocator());
+}
+QuantizationParamsHandle& QuantizationParamsHandle::operator=(QuantizationParams* ptr) {
+  _ptr = (void*)ptr;
+  bind(*this, *Context::get_default_context()->get_metadata_allocator());
+  // Context::get_metadata_allocator()->bind(_ptr, this);
+  return *this;
+}
+
+QuantizationParamsHandle::QuantizationParamsHandle(QuantizationParamsHandle&& that) {
+  _ptr = that._ptr;
+  AllocatorInterface* alloc =
+      Context::get_default_context()->get_metadata_allocator();
+  if (alloc->is_bound(_ptr, &that)) {
+    alloc->unbind(_ptr, &that);
+    alloc->bind(_ptr, this);
+  }
+  that._ptr = nullptr;
+}
+QuantizationParamsHandle& QuantizationParamsHandle::operator=(QuantizationParamsHandle&& that) {
+  if (this != &that) {
+    _ptr = that._ptr;
+    AllocatorInterface* alloc =
+        Context::get_default_context()->get_metadata_allocator();
+    if (alloc->is_bound(_ptr, &that)) {
+      alloc->unbind(_ptr, &that);
+      alloc->bind(_ptr, this);
+    }
+    that._ptr = nullptr;
+  }
+  return *this;
+}
+// Add some bits to make the interface nicer to the user
+
+
 }  // namespace uTensor

@@ -106,6 +106,19 @@ void AllocatorInterface::deallocate(void* ptr) {
   ptr = nullptr;
 }
 
+void AllocatorInterface::unbind_and_deallocate(Handle* hndl){
+  void* ptr_t = hndl->_ptr;
+  if (hndl->_ptr) {
+    if (this->is_bound(hndl->_ptr, hndl)) {
+      this->unbind(hndl->_ptr, hndl);
+    } else {
+      ERR_EXIT("Cannot unbind unbound Handles");
+    }
+    this->deallocate(ptr_t);
+  }
+
+}
+
 bool bind(Handle& hndl, AllocatorInterface& allocator) {
   if (!hndl) {
     return false;
@@ -123,4 +136,5 @@ bool unbind(Handle& hndl, AllocatorInterface& allocator) {
 bool is_bound(Handle& hndl, AllocatorInterface& allocator) {
   return allocator.is_bound(*hndl, &hndl);
 }
+
 };  // namespace uTensor

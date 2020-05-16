@@ -5,6 +5,9 @@
 #include "uTensor_util.hpp"
 
 namespace uTensor {
+
+DEFINE_ERROR(NullTensorDeleteError);
+
 TensorBase::TensorBase() {
   Context::get_default_context()->register_tensor(this);
 }
@@ -20,6 +23,9 @@ void* TensorBase::operator new(size_t sz) {
 }
 
 void TensorBase::operator delete(void* p) {
+  if(p == nullptr){
+    Context::get_default_context()->throwError(new NullTensorDeleteError);
+  }
   Context::get_default_context()->get_metadata_allocator()->deallocate(p);
 }
 
@@ -39,8 +45,6 @@ TensorInterface::TensorInterface(TensorShape _shape, ttype _type)
   _type_size = type_size(_type);
 }
 TensorInterface::~TensorInterface(){
-  if(_qnt_params)
-    delete _qnt_params;
 };
 
 // Can access Tensors like
@@ -65,7 +69,7 @@ IntegralValue TensorInterface::operator()(uint32_t linear_index) {
 }
 
 const QuantizationParams& TensorInterface::get_quantization_params() const {
-  return *_qnt_params;
+  return *(_qnt_params.operator*());
 }
 
 size_t TensorInterface::_get_readable_block(void* buffer,

@@ -1,4 +1,5 @@
 #include "context.hpp"
+#include "uTensor_util.hpp"
 namespace uTensor {
 
 // AllocatorInterface* Context::_metadata_allocator = nullptr;
@@ -19,6 +20,7 @@ Context* __attribute__((weak)) Context::get_default_context() {
 AllocatorInterface* Context::get_metadata_allocator() {
   // TODO Throw error if this is null
   if (!_metadata_allocator) {
+    uTensor_printf("[ERROR] Metadata allocator not set in context before it was read\n");
     throwError(new MemoryAllocatorUnsetError);
   }
   return _metadata_allocator;
@@ -26,6 +28,7 @@ AllocatorInterface* Context::get_metadata_allocator() {
 AllocatorInterface* Context::get_ram_data_allocator() {
   // TODO Throw error if this is null
   if (!_ram_data_allocator) {
+    uTensor_printf("[ERROR] Ramdata allocator not set in context before it was read\n");
     throwError(new MemoryAllocatorUnsetError);
   }
   return _ram_data_allocator;
@@ -41,7 +44,12 @@ void Context::set_ram_data_allocator(AllocatorInterface* al) {
 void Context::register_tensor(TensorBase* tb) {}
 
 void Context::throwError(Error* err) {
-  if (_error_handler) get_default_error_handler()->uThrow(err);
+  if (_error_handler){
+    get_default_error_handler()->uThrow(err);
+    return;
+  }
+  uTensor_printf("[ERROR] an Error has occurred but no handler was set\n");
+  //while(true) {}
 }
 void Context::notifyEvent(const Event& evt) {
   if (_error_handler) get_default_error_handler()->notify(evt);

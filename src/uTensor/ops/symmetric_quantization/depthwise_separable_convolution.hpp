@@ -163,9 +163,7 @@ void QuantizedDepthwiseSeparableConvOperator<Tout>::calculateOpData(
           new qDwsConvPerChannelMismatchError);
     }
     if (!(num_channels ==
-          filter->get_shape()
-              [affine_quantization
-                   .num_channels()])) {  // FIXME:
+          filter->get_shape()[3])) {  // FIXME:
                                          // affine_quantization.num_channels()-1?
       Context::get_default_context()->throwError(
           new qDwsConvPerChannelMismatchError);
@@ -211,6 +209,7 @@ void QuantizedDepthwiseSeparableConvOperator<Tout>::compute() {
   const TensorShape& bias_shape = inputs[bias].tensor()->get_shape();
   const TensorShape& out_shape = outputs[out].tensor()->get_shape();
 
+  /* These are not correct 
   if (in_shape[3] != df_shape[2]) {
     Context::get_default_context()->throwError(
         new InvalidTensorDimensionsError);
@@ -219,6 +218,7 @@ void QuantizedDepthwiseSeparableConvOperator<Tout>::compute() {
     Context::get_default_context()->throwError(
         new InvalidTensorDimensionsError);
   }
+  */
 
   TFLM::DepthwiseParams op_params;
   TFLM::TfLitePaddingValues paddingVals;
@@ -226,17 +226,16 @@ void QuantizedDepthwiseSeparableConvOperator<Tout>::compute() {
   int num_channels = inputs[filter]
                          .tensor()
                          ->get_shape()[TFLM::kDepthwiseConvQuantizedDimension];
-  per_channel_output_multiplier = reinterpret_cast<int32_t*>(
-      ram_allocator->allocate(sizeof(int32_t) * num_channels));
-  per_channel_output_shift = reinterpret_cast<int32_t*>(
-      ram_allocator->allocate(sizeof(int32_t) * num_channels));
-
   // Bind these params to a Handle so they dont accidentally get thrown away on
   // possible rebalance
+  per_channel_output_multiplier = reinterpret_cast<int32_t*>(
+      ram_allocator->allocate(sizeof(int32_t) * num_channels));
   Handle per_channel_output_multiplier_h(per_channel_output_multiplier);
-  Handle per_channel_output_shift_h(per_channel_output_shift);
   ram_allocator->bind(per_channel_output_multiplier,
                       &per_channel_output_multiplier_h);
+  per_channel_output_shift = reinterpret_cast<int32_t*>(
+      ram_allocator->allocate(sizeof(int32_t) * num_channels));
+  Handle per_channel_output_shift_h(per_channel_output_shift);
   ram_allocator->bind(per_channel_output_shift, &per_channel_output_shift_h);
 
   calculateOpData(inputs[in].tensor(), inputs[filter].tensor(),

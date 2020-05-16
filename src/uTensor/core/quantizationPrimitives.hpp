@@ -2,6 +2,7 @@
 #define UTENSOR_QUANT_PRIM_H
 #include "types.hpp"
 #include "errorHandler.hpp"
+#include "memoryManagementInterface.hpp"
 
 namespace uTensor {
 
@@ -65,6 +66,32 @@ class PerChannelQuantizationParams : public QuantizationParams {
 
   virtual int32_t get_zeroP_for_channel(int i) const override;
   virtual float get_scale_for_channel(int i) const override;
+};
+
+class alignas(alignof(uint8_t*)) QuantizationParamsHandle : public Handle {
+ public:
+  QuantizationParams* operator->();
+  const QuantizationParams* operator->() const;
+  // As long as operating on instantiations of this class and not pointers this
+  // function will work
+  const QuantizationParams* operator*() const;
+
+  QuantizationParamsHandle();
+  QuantizationParamsHandle(QuantizationParams* ptr);
+  QuantizationParamsHandle& operator=(QuantizationParams* ptr);
+  QuantizationParamsHandle(QuantizationParamsHandle&& that);
+  QuantizationParamsHandle& operator=(QuantizationParamsHandle&& that);
+  ~QuantizationParamsHandle();
+
+  void free();
+
+  //// Force everything to be on the utensor allocator
+  //void* operator new(size_t sz);
+  //void operator delete(void* p);
+
+  // KEY BIT
+  friend class AllocatorInterface;
+  friend class TensorInterface;
 };
 
 }  // namespace uTensor
