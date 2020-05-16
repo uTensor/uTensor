@@ -210,7 +210,7 @@ void DepthwiseConvPerChannel(const DepthwiseParams& params,
                       static_cast<int8_t>(input(batch, in_y, in_x, in_channel));
                   // int32_t filter_val = filter_data[Offset(
                   //     filter_shape, 0, filter_y, filter_x, output_channel)];
-                  int32_t filter_val = static_cast<int32_t>(
+                  int32_t filter_val = static_cast<int8_t>(
                       filter(filter_y, filter_x, output_channel));
                   // Accumulate with 32 bits accumulator.
                   // In the nudging process during model quantization, we force
@@ -233,24 +233,10 @@ void DepthwiseConvPerChannel(const DepthwiseParams& params,
               }
             }
             // assuming bias data will always be provided
-            acc += (int32_t)bias(output_channel);
+            acc += static_cast<int32_t>(bias(output_channel));
             acc = MultiplyByQuantizedMultiplier(
                 acc, output_multiplier[output_channel],
                 output_shift[output_channel]);
-
-            // // simplified MultiplyByQuantizedMultiplier, may introduce
-            // rounding
-            // // error
-            // int left_shift = output_shift[output_channel] > 0
-            //                      ? output_shift[output_channel]
-            //                      : 0;
-            // int right_shift = output_shift[output_channel] > 0
-            //                       ? 0
-            //                       : -output_shift[output_channel];
-            // acc = ((acc * (1 << left_shift)) *
-            //        output_multiplier[output_channel]) >>
-            //       right_shift;
-
             acc += output_offset;
             acc = std::max(acc, output_activation_min);
             acc = std::min(acc, output_activation_max);

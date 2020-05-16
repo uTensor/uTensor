@@ -8,12 +8,13 @@
 
 namespace uTensor {
 DECLARE_ERROR(qDwsConvPerChannelMismatchError);
+DECLARE_ERROR(InvalidQuantizationSchemeError);
 
 namespace TFLM {
 
 // Keep this outside the Operator since we can include this file in the
 // Optimized Ops and get option data.
-static const int kMaxChannels = 32;  // was 256
+static const int kMaxChannels = 128;  // was 256
 constexpr int kDepthwiseConvQuantizedDimension = 3;
 
 struct DWSConvOpData {
@@ -57,7 +58,7 @@ class QuantizedDepthwiseSeparableConvOperator : public OperatorInterface<3, 1> {
       const int depth_multiplier = 1, const uint16_t (&dialation)[2] = {1, 1},
       const TFLM::TfLiteFusedActivation activation = TFLM::kTfLiteActNone);
   //// activation basically only used for TESTING, USE AT YOUR OWN RISK
-  //QuantizedDepthwiseSeparableConvOperator(
+  // QuantizedDepthwiseSeparableConvOperator(
   //    std::initializer_list<uint16_t> strides, Padding padding,
   //    const int depth_multiplier = 1, const uint16_t (&dialation)[2] = {1, 1},
   //    const TFLM::TfLiteFusedActivation activation = TFLM::kTfLiteActNone);
@@ -65,10 +66,9 @@ class QuantizedDepthwiseSeparableConvOperator : public OperatorInterface<3, 1> {
   static void calculateOpData(
       const Tensor& input, const Tensor& filter, const Tensor& bias,
       Tensor& output, const uint16_t (&strides)[4], const Padding padding,
-      const int depth_multiplier, const uint16_t (&dialations)[2],
-      int output_shift, int32_t* per_channel_output_multiplier,
-      int32_t* per_channel_output_shift, int& padding_height,
-      int& padding_width, int32_t& output_multiplier,
+      const uint16_t (&dialations)[2], int output_shift,
+      int32_t* per_channel_output_multiplier, int32_t* per_channel_output_shift,
+      int& padding_height, int& padding_width, int32_t& output_multiplier,
       int32_t& output_activation_min, int32_t& output_activation_max,
       TFLM::TfLiteFusedActivation =
           TFLM::kTfLiteActNone  // Make this param basically not required
@@ -116,20 +116,19 @@ QuantizedDepthwiseSeparableConvOperator<Tout>::
         const uint16_t (&strides)[2], Padding padding,
         const int depth_multiplier, const uint16_t (&dialation)[2],
         TFLM::TfLiteFusedActivation activation)
-    : _stride{1, strides[0], strides[1], 1}, _padding(padding),
+    : _stride{1, strides[0], strides[1], 1},
+      _padding(padding),
       depth_multiplier(depth_multiplier),
       _dialation{dialation[0], dialation[1]},
-      activation(activation) {
-}
+      activation(activation) {}
 
 template <typename Tout>
 void QuantizedDepthwiseSeparableConvOperator<Tout>::calculateOpData(
     const Tensor& input, const Tensor& filter, const Tensor& bias,
     Tensor& output, const uint16_t (&strides)[4], const Padding padding,
-    const int depth_multiplier, const uint16_t (&dialations)[2],
-    int output_shift, int32_t* per_channel_output_multiplier,
-    int32_t* per_channel_output_shift, int32_t& padding_height,
-    int32_t& padding_width, int32_t& output_multiplier,
+    const uint16_t (&dialations)[2], int output_shift,
+    int32_t* per_channel_output_multiplier, int32_t* per_channel_output_shift,
+    int32_t& padding_height, int32_t& padding_width, int32_t& output_multiplier,
     int32_t& output_activation_min, int32_t& output_activation_max,
     TFLM::TfLiteFusedActivation activation) {
   const int channels_out = filter->get_shape()[3];
@@ -153,26 +152,25 @@ void QuantizedDepthwiseSeparableConvOperator<Tout>::calculateOpData(
       filter->get_shape()[TFLM::kDepthwiseConvQuantizedDimension];
   QuantizationParams affine_quantization = filter->get_quantization_params();
   const bool is_per_channel = affine_quantization.num_channels() > 1;
-
-  if (is_per_channel) {
-    //  Currently only Int8 is supported for per channel quantization.
-    // TF_LITE_ENSURE_EQ(context, input->type, kTfLiteInt8);
-    // TF_LITE_ENSURE_EQ(context, filter->type, kTfLiteInt8);
-    if (!(affine_quantization.num_channels() == num_channels)) {
-      Context::get_default_context()->throwError(
-          new qDwsConvPerChannelMismatchError);
-    }
-    if (!(num_channels ==
-          filter->get_shape()[3])) {  // FIXME:
-                                         // affine_quantization.num_channels()-1?
-      Context::get_default_context()->throwError(
-          new qDwsConvPerChannelMismatchError);
-    }
+  // dws conv should be per channel quantized
+  if (!is_per_channel) {
+    Context::get_default_context()->throwError(
+        new InvalidQuantizationSchemeError);
+  }
+  // check the types are correctly following the spec
+  if (input->get_type() != i8 || filter->get_type() != i8 ||
+      bias->get_type() != i32) {
+    Context::get_default_context()->throwError(new InvalidTensorDataTypeError);
+  }
+  if (!(affine_quantization.num_channels() == num_channels)) {
+    Context::get_default_context()->throwError(
+        new qDwsConvPerChannelMismatchError);
   }
 
+  // PopulateConvolutionQuantizationParams
+  // https://github.com/tensorflow/tensorflow/blob/fb4ec5cbde3973050e7350f0aca7f07ab7757bac/tensorflow/lite/kernels/kernel_util.cc#L42
   const float input_scale =
       input->get_quantization_params().get_scale_for_channel(0);
-  // const float output_scale = output->params.scale;
   const float output_scale =
       output->get_quantization_params().get_scale_for_channel(0);
 
@@ -209,7 +207,7 @@ void QuantizedDepthwiseSeparableConvOperator<Tout>::compute() {
   const TensorShape& bias_shape = inputs[bias].tensor()->get_shape();
   const TensorShape& out_shape = outputs[out].tensor()->get_shape();
 
-  /* These are not correct 
+  /* These are not correct
   if (in_shape[3] != df_shape[2]) {
     Context::get_default_context()->throwError(
         new InvalidTensorDimensionsError);
@@ -240,14 +238,14 @@ void QuantizedDepthwiseSeparableConvOperator<Tout>::compute() {
 
   calculateOpData(inputs[in].tensor(), inputs[filter].tensor(),
                   inputs[bias].tensor(), outputs[out].tensor(), _stride,
-                  _padding, depth_multiplier, _dialation, output_shift,
+                  _padding, _dialation, output_shift,
                   per_channel_output_multiplier, per_channel_output_shift,
                   paddingVals.width, paddingVals.height, output_multiplier,
                   output_activation_min, output_activation_max,
                   activation  // Basically only used for test
   );
 
-  //op_params.padding_type = TFLM::PaddingType::kSame;
+  // op_params.padding_type = TFLM::PaddingType::kSame;
   op_params.padding_type = static_cast<TFLM::PaddingType>(_padding);
   op_params.padding_values.width = paddingVals.width;
   op_params.padding_values.height = paddingVals.height;
@@ -261,9 +259,7 @@ void QuantizedDepthwiseSeparableConvOperator<Tout>::compute() {
   ;
   op_params.weights_offset = 0;
   op_params.output_offset =
-      outputs[out].tensor()->get_quantization_params().get_zeroP_for_channel(
-          0);  // output->params.zero_point;
-  // TODO(b/130439627): Use calculated value for clamping.
+      outputs[out].tensor()->get_quantization_params().get_zeroP_for_channel(0);
   op_params.quantized_activation_min = std::numeric_limits<int8_t>::min();
   op_params.quantized_activation_max = std::numeric_limits<int8_t>::max();
 
