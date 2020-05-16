@@ -56,6 +56,8 @@ package_add_test_with_libraries(test_top_include library/test_top_include utenso
 package_add_test_with_libraries(test_model1 model/test_model1 utensor model "${PROJECT_DIR}/test-data/")
 package_add_test_with_libraries(test_model2 model/test_model2 utensor model "${PROJECT_DIR}/test-data/")
 package_add_test_with_libraries(test_layer_1_quantize model/test_layer_1_quantize utensor model "${PROJECT_DIR}/test-data/")
+package_add_test_with_libraries(test_layer_2_dws_conv2d model/test_layer_2_dws_conv2d utensor model "${PROJECT_DIR}/test-data/")
+package_add_test_with_libraries(test_layer_5_qFC model/test_layer_5_qFC utensor model "${PROJECT_DIR}/test-data/")
 package_add_test_with_libraries(integration_test model/integration_test utensor model "${PROJECT_DIR}/test-data/")
 
 package_add_test_with_libraries(test_simple_error_handler error_handlers/test_errorhandler utensor error_handlers "${PROJECT_DIR}/test-data/")
