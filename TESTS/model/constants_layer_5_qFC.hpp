@@ -15,7 +15,7 @@ const int8_t arr_input[128] = {
     -128, -128, -118, -128, -128,  -23, -106, -128, -108, -105, -128,
     -7, -128,    7, -128, -128, -128, -127
 };
-const int8_t in_zp = -128;
+const int32_t in_zp = -128;
 const float in_scale = 0.02810824289917946;
 
 const int8_t arr_filter[1280] = { 
@@ -79,7 +79,7 @@ const int8_t arr_filter[1280] = {
     -22,-29,43,-45,-20,31,26,-42,-63,48,-15,57,24,56,-38,-66,29,-29,-83,67,58,30,17,
     51,-30,21,48,-52,-42,-82 
 };
-const int8_t filter_zp = 0;
+const int32_t filter_zp = 0;
 const float filter_scale = 0.00319267;
 
 const int32_t arr_bias[10] = { -40,  521,  413, -211,  -99,  153,  -39,  476, -537, -410 };
@@ -87,6 +87,6 @@ const int32_t bias_zp = 0;
 const float bias_scale = 8.974045e-05;
 
 const int8_t ref_output[10] = { -11, -23, 9, 9, -27, -43, -75, 97, -20, -4 };
-const int8_t out_zp = 0;
+const int32_t out_zp = 0;
 const float out_scale = 0.11596817;
 // clang-format on
