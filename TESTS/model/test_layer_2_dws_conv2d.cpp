@@ -38,6 +38,9 @@ TEST(LayerByLayer, DWSConv2D_2) {
       .eval();
   for (int i = 0; i < 21632; ++i) {
     int8_t got = static_cast<int8_t>(output(i));
-    EXPECT_NEAR(got, ref_output[i], 1) << "Output: " << static_cast<int16_t>(got) << ", Reference: " << static_cast<int16_t>(ref_output[i]) << ", Difference: " << got - ref_output[i];
+    EXPECT_NEAR(got, ref_output[i], 1)
+        << "Output: " << static_cast<int16_t>(got)
+        << ", Reference: " << static_cast<int16_t>(ref_output[i])
+        << ", Difference: " << got - ref_output[i];
   }
 }
