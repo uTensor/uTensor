@@ -65,7 +65,7 @@ void QuantizedAdd<uint8_t, uint8_t, int>(
     y_in_output_64 = std::min(y_in_output_64, quant_highest);
     const int y_in_output_range = static_cast<int>(y_in_output_64);
 
-    output(off) = x_in_output_range + y_in_output_range;
+    output(off) = static_cast<int32_t>(x_in_output_range + y_in_output_range);
   }
 }
 /*

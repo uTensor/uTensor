@@ -68,7 +68,7 @@ class QuantizedDepthwiseSeparableConvOperator : public OperatorInterface<3, 1> {
       Tensor& output, const uint16_t (&strides)[4], const Padding padding,
       const uint16_t (&dialations)[2], int output_shift,
       int32_t* per_channel_output_multiplier, int32_t* per_channel_output_shift,
-      int& padding_height, int& padding_width, int32_t& output_multiplier,
+      int32_t& padding_height, int32_t& padding_width, int32_t& output_multiplier,
       int32_t& output_activation_min, int32_t& output_activation_max,
       TFLM::TfLiteFusedActivation =
           TFLM::kTfLiteActNone  // Make this param basically not required

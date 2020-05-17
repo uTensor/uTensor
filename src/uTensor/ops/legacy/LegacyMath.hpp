@@ -13,7 +13,7 @@
 namespace uTensor {
 namespace legacy {
 
-template<class T1>
+template<class T1=int32_t>
 void CalculateUsedRange(const Tensor& input, int32_t* used_min_quan,
                         int32_t* used_max_quan) {
   int32_t minimum = INT_MAX;
@@ -61,7 +61,7 @@ class Requantization_RangeOp : public OperatorInterface<1,0> {
 
   protected:
     virtual void compute() override {
-      Requantization_Range<int, float>(inputs[in].tensor(), 
+      Requantization_Range<int32_t, float>(inputs[in].tensor(), 
         i_min, i_max,
         out_min, out_max);
     }
