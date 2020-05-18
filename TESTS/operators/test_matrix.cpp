@@ -1,8 +1,8 @@
 #include <cstring>
 #include <iostream>
 
-#include "Matrix.hpp"
 #include "BufferTensor.hpp"
+#include "Matrix.hpp"
 #include "RamTensor.hpp"
 #include "RomTensor.hpp"
 #include "arenaAllocator.hpp"
@@ -29,9 +29,11 @@ TEST(Matrix, MultSquareOp) {
 
   MatrixMultOperator<uint8_t> mult_AB;
   // add_AB.set_inputs(FixedTensorMap<2>({{MatrixMultOperator<uint8_t>::a, a},
-  // {MatrixMultOperator<uint8_t>::b, b}})).set_outputs({{MatrixMultOperator<uint8_t>::c, c}});
+  // {MatrixMultOperator<uint8_t>::b,
+  // b}})).set_outputs({{MatrixMultOperator<uint8_t>::c, c}});
   mult_AB
-      .set_inputs({{MatrixMultOperator<uint8_t>::a, a}, {MatrixMultOperator<uint8_t>::b, b}})
+      .set_inputs({{MatrixMultOperator<uint8_t>::a, a},
+                   {MatrixMultOperator<uint8_t>::b, b}})
       .set_outputs({{MatrixMultOperator<uint8_t>::c, c}})
       .eval();
 

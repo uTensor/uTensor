@@ -211,7 +211,7 @@ void DepthwiseConvPerChannel(const DepthwiseParams& params,
                   // int32_t filter_val = filter_data[Offset(
                   //     filter_shape, 0, filter_y, filter_x, output_channel)];
                   int32_t filter_val = static_cast<int8_t>(
-                      filter(filter_y, filter_x, output_channel));
+                      filter(0, filter_y, filter_x, output_channel));
                   // Accumulate with 32 bits accumulator.
                   // In the nudging process during model quantization, we force
                   // real value of 0.0 be represented by a quantized value. This
