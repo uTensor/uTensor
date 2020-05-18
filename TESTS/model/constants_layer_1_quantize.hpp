@@ -3,7 +3,7 @@
 using std::int8_t;
 
 const float scale = 0.003921568859368563;
-const int8_t zp = -128;
+const int32_t zp = -128;
 // clang-format off
 const float arr_image[784] = { 
     0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,
