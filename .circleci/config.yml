@@ -18,12 +18,17 @@ jobs:
         #      - run: find TESTS -type f -exec sed -e 's/\/fs\//TESTS\//g' -i {} \;
         #      - run: find src/uTensor/core/ -type f -exec sed -e 's/\/fs\//\//g' -i {} \;
       - run:
-          name: "Build and test"
+          name: "Build"
           command: |
             mkdir build && cd build
             cmake -DPACKAGE_TESTS=ON -DENABLE_COVERAGE=ON ..
             make -j
+      - run:
+          name: "Test"
+          command: |
+            cd build
             ctest -VV -o /tmp/test_results/test-results.txt
+
       - run:
           name: Generate code coverage
           command: |

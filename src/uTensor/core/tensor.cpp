@@ -18,15 +18,16 @@ TensorInterface* Tensor::operator*() {
 }
 Tensor::~Tensor() { free(); }
 void Tensor::free() {
+  void* ptr_t = _ptr; //unbind invalidates this handle so store a copy
   if (_ptr) {
     AllocatorInterface* alloc =
         Context::get_default_context()->get_metadata_allocator();
     if (alloc->is_bound(_ptr, this)) {
       alloc->unbind(_ptr, this);
-      alloc->deallocate(_ptr);
-    }
 
-    delete reinterpret_cast<TensorInterface*>(_ptr);
+    }
+    delete reinterpret_cast<TensorInterface*>(ptr_t);
+    alloc->deallocate(ptr_t);
   }
   _ptr = nullptr;
 }

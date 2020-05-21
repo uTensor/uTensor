@@ -58,7 +58,7 @@ void QuantizeV2(const Tensor& input, const float& _min_range, const float& _max_
     ///NT: need error checking at some point...
     uint32_t num_elems = input->get_shape().num_elems();
     for(uint32_t i = 0; i < num_elems; i++) {
-        float val = ::round(static_cast<float>(input_ptr(i)) * f2q.range_scale);
+        float val = ::round(static_cast<float>(input(i)) * f2q.range_scale);
         val -= f2q.range_min_scaled - f2q.lowest_quantized();
         val = std::max(val, f2q.lower_bound_float());
         val = std::min(val, f2q.upper_bound_float());
@@ -72,6 +72,11 @@ void QuantizeV2(const Tensor& input, const float& _min_range, const float& _max_
 }
 
 class QuantizeV2Op : public OperatorInterface<1,1> {
+  private:
+    const float& input_min;
+    const float& input_max;
+    float& output_min;
+    float& output_max;
   public:
     enum names_in : uint8_t { input };
     enum names_out : uint8_t { output };
@@ -79,12 +84,12 @@ class QuantizeV2Op : public OperatorInterface<1,1> {
       const float& input_min,
       const float& input_max,
       float& output_min,
-      float& output_max,
+      float& output_max
         ) :
       input_min(input_min),
       input_max(input_max),
       output_min(output_min),
-      output_max(output_max),
+      output_max(output_max)
     {
     }
 
@@ -93,11 +98,6 @@ class QuantizeV2Op : public OperatorInterface<1,1> {
       QuantizeV2<unsigned char>(inputs[input].tensor(), input_min, input_max,
               outputs[output].tensor(), output_min, output_max);
     }
-  private:
-    const float& input_min;
-    const float& input_max;
-    float& output_min;
-    float& output_max;
 }; 
 
 //mode = MIN_FIRST

@@ -113,6 +113,11 @@ class AllocatorInterface {
    * Deallocate all data associated with pointer
    */
   void deallocate(void* ptr);
+
+  /** Unbind invalidates a handle, so rather than forcing users to store a temporary, 
+   * this conveniece function does it for them,
+   */
+  void unbind_and_deallocate(Handle* hndl);
 };
 
 bool bind(Handle& hndl, AllocatorInterface& allocator);

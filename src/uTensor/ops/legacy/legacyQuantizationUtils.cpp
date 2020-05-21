@@ -34,7 +34,7 @@ void RequantizeManyInNewRangeReference(const Tensor& input, int32_t count,
       // possible to perform all the calculations in 32-bit rather than 64, but
       // that's not been implemented yet.
       for (int32_t index = 0; index < count; ++index) {
-        const int64_t input_value = static_cast<int64_t>(static_cast<int>(input(index)));
+        const int64_t input_value = static_cast<int64_t>(static_cast<int32_t>(input(index)));
         const int64_t fp_value =
         ((input_value * range_scale_fp) >> 32) + input_offset_fp;
         const int64_t offset_intermediate = fp_value - output_offset_fp;

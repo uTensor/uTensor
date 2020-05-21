@@ -1,10 +1,12 @@
 #ifndef UTENSOR_TENSOR_BASE_H
 #define UTENSOR_TENSOR_BASE_H
 #include "quantizationPrimitives.hpp"
+#include "errorHandler.hpp"
 #include "types.hpp"
 
 namespace uTensor {
 
+DECLARE_ERROR(NullTensorDeleteError);
 /** TensorBase is the low level memory interface into tensors
  * It's only job is to place all tensor metadata (vtables, member data, etc)
  * into a known memory location in the Context class
@@ -79,7 +81,7 @@ class TensorInterface : public TensorBase {
   TensorShape _shape;
   ttype _type;  // Maybe make this const
   uint8_t _type_size;
-  QuantizationParams* _qnt_params;
+  QuantizationParamsHandle _qnt_params;
 };
   
 template<typename QType>
@@ -88,7 +90,8 @@ TensorInterface& TensorInterface::set_quantization_params(const QType& params){
     _qnt_params = new QType(params);
   }
   else {
-    *_qnt_params = params;
+   // _qnt_params = params;
+   // ERROR
   }
   return *this;
 

@@ -60,16 +60,24 @@ RamTensor::RamTensor(TensorShape _shape, ttype _type)
 }
 
 RamTensor::~RamTensor() {
-  Context::get_default_context()->get_ram_data_allocator()->deallocate(
-      *_ram_region);
+  AllocatorInterface* alloc = Context::get_default_context()->get_ram_data_allocator();
+  //alloc->unbind_and_deallocate(&_ram_region);
+  void* ptr_t = *_ram_region;
+    if (alloc->is_bound(*_ram_region, &_ram_region)) {
+      alloc->unbind(*_ram_region, &_ram_region);
+    }
+    alloc->deallocate(ptr_t);
 }
 
 void RamTensor::resize(TensorShape new_shape) {
   AllocatorInterface* allocator = Context::get_default_context()->get_ram_data_allocator();
   // unbind handle before reallocate memory
+  void* old_ptr = *_ram_region;
   if (is_bound(_ram_region, *allocator)) {
     allocator->unbind(*_ram_region, &_ram_region);
   }
+  if(old_ptr)
+    allocator->deallocate(old_ptr);
   void* ptr = allocator->allocate(new_shape.get_linear_size()*_type_size);
   if (!ptr) {
     uTensor_printf("OOM when resizing\n");

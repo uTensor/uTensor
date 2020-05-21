@@ -7,9 +7,8 @@
 
 // #define MAX(A, B) ((A > B)? A:B)
 
-#define ENABLE_PRINTING 1
 
-#if ENABLE_PRINTING
+#ifdef ENABLE_PRINTING
 #define uTensor_printf(...) printf(__VA_ARGS__)
 #else
 #define uTensor_printf(...) /*DUMMY*/

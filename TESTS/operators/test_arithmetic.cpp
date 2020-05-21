@@ -32,7 +32,8 @@ TEST(Arithmetic, AddOp) {
 
   AddOperator<uint8_t> add_AB;
   // add_AB.set_inputs(FixedTensorMap<2>({{AddOperator<uint8_t>::a, a},
-  // {AddOperator<uint8_t>::b, b}})).set_outputs({{AddOperator<uint8_t>::c, c}});
+  // {AddOperator<uint8_t>::b, b}})).set_outputs({{AddOperator<uint8_t>::c,
+  // c}});
   add_AB
       .set_inputs({{AddOperator<uint8_t>::a, a}, {AddOperator<uint8_t>::b, b}})
       .set_outputs({{AddOperator<uint8_t>::c, c}})

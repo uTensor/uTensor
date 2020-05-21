@@ -69,4 +69,5 @@ void utensor_exit(void) {
 #ifndef __EMSCRIPTEN__
   exit(-1);
 #endif
+  while(true){}
 }
