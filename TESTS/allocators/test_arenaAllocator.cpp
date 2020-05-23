@@ -166,7 +166,7 @@ TEST(ArenaAllocator, circle_back_with_handle) {
   Context::get_default_context()->set_ErrorHandler(&errH);
   localCircularArenaAllocator<256> _allocator;
   void* ptr1 = _allocator.allocate(96);
-  for(int i = 0 ; i < 100; i++){
+  for(int i = 0 ; i < 96; i++){
     reinterpret_cast<uint8_t*>(ptr1)[i] = 0x01;
   }
   cout << "Avaliable " << _allocator.available() << endl;
@@ -189,7 +189,7 @@ TEST(ArenaAllocator, circle_back_with_handle) {
   EXPECT_EQ(_allocator.contains(ptr3), true);
   //EXPECT_EQ(_allocator.contains(ptr1), true); Ptr1 is invalidated but basically just ptr3 in this mem manageer
   //Check to make sure data is correct
-  for(int i = 0 ; i < 100; i++){
+  for(int i = 0 ; i < 96; i++){
     EXPECT_NE(reinterpret_cast<uint8_t*>(ptr1)[i], 0x01);
   }
   // Dereference the handle instead
