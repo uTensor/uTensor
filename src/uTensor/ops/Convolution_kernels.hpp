@@ -521,7 +521,7 @@ void depthwise_separable_convolution_kernel_v2(Tensor& output, const Tensor& inp
                   // int32_t filter_val = filter_data[Offset(
                   //     filter_shape, 0, filter_y, filter_x, output_channel)];
                   T filter_val = static_cast<T>(
-                      filter(filter_y, filter_x, output_channel));
+                      filter(0, filter_y, filter_x, output_channel));
                   acc += filter_val * (input_val);
                 }
               }
