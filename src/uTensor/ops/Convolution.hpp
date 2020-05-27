@@ -93,11 +93,11 @@ class AvgFilter {
 };
 
 template <typename T>
-class ConvOperator : public OperatorInterface<2, 1> {
+class Conv2dOperator : public OperatorInterface<2, 1> {
  public:
   enum names_in : uint8_t { in, filter };
   enum names_out : uint8_t { out };
-  ConvOperator(std::initializer_list<uint16_t> strides, Padding padding)
+  Conv2dOperator(std::initializer_list<uint16_t> strides, Padding padding)
       : _padding(padding) {
     int i = 0;
     for (auto s : strides) {
@@ -167,7 +167,7 @@ class GenericPoolOperator : public OperatorInterface<1, 1> {
 
   // TODO Add dialations
   GenericPoolOperator(std::initializer_list<uint16_t> k_size,
-                std::initializer_list<uint16_t> strides, Padding padding)
+                      std::initializer_list<uint16_t> strides, Padding padding)
       : _padding(padding) {
     int i = 0;
     for (auto s : strides) {
