@@ -23,9 +23,9 @@ class RamTensor : public TensorInterface {
   const void* get_address() { return *_ram_region; }
 
  protected:
-  virtual size_t _get_readable_block(void* buffer, uint16_t req_read_size,
+  virtual size_t _get_readable_block(const void*& buffer, uint16_t req_read_size,
                                      uint32_t linear_index) const override;
-  virtual size_t _get_writeable_block(void* buffer, uint16_t req_write_size,
+  virtual size_t _get_writeable_block(void*& buffer, uint16_t req_write_size,
                                       uint32_t linear_index) override;
 
  protected:
