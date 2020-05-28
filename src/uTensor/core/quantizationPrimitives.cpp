@@ -83,11 +83,15 @@ void QuantizationParamsHandle::free() {
 QuantizationParamsHandle::QuantizationParamsHandle() : Handle() {}
 QuantizationParamsHandle::QuantizationParamsHandle(QuantizationParams* ptr) : Handle((void*)ptr) {
   // Context::get_default_context()->get_metadata_allocator()->bind(_ptr, this);
-  bind(*this, *Context::get_default_context()->get_metadata_allocator());
+  if(ptr){
+    bind(*this, *Context::get_default_context()->get_metadata_allocator());
+  }
 }
 QuantizationParamsHandle& QuantizationParamsHandle::operator=(QuantizationParams* ptr) {
   _ptr = (void*)ptr;
-  bind(*this, *Context::get_default_context()->get_metadata_allocator());
+  if(ptr){
+    bind(*this, *Context::get_default_context()->get_metadata_allocator());
+  }
   // Context::get_metadata_allocator()->bind(_ptr, this);
   return *this;
 }

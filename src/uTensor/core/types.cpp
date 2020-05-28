@@ -102,11 +102,12 @@ bool TensorShape::operator==(const TensorShape& other) {
 bool TensorShape::operator!=(const TensorShape& other){
   return !(*this == other);
 }
-uint16_t TensorShape::get_linear_size() const {
-  uint16_t sum = 1;
+uint32_t TensorShape::get_linear_size() const {
+  uint32_t sum = 1;
   for (int i = 0; i < _num_dims; i++) {
     if (_shape[i] == 0) break;
-    sum *= _shape[i];
+    const uint32_t s = _shape[i];
+    sum *= s;
   }
   return sum;
 }
