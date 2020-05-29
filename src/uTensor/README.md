@@ -34,7 +34,7 @@ It is better to thing about `uTensor::string` as an identifier rather than a str
 
 #### Quantization Primitives
 
-TODO
+The Quantization primitives represent per-channel and per-tensor symmetric quantization schemes shared with https://www.tensorflow.org/lite/performance/quantization_spec. This generally involves allocating some small buffer in the ram allocator so we can compute and maintain scaling factors and arithmetic shifts. Choosing when to allocate, compute, and deallocate can directly impact performance. For example, allocating once and computing these values on model setup and deallocating on tear down trades RAM for improves inference times. Whereas allocating, computing, and deallocating on each inference trades inference speed for lower peak RAM footprints.
 
 ### Memory Allocator Interfaces
 
