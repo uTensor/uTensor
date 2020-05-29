@@ -203,8 +203,7 @@ void QuantizedDepthwiseSeparableConvOperator<Tout>::compute() {
 
   TFLM::DepthwiseParams op_params;
   // This silly shit is just a width and height
-  // TFLM::TfLitePaddingValues paddingVals;
-  int32_t padding_width, padding_height;
+  TFLM::TfLitePaddingValues paddingVals;
 
   int num_channels = inputs[filter]
                          .tensor()
