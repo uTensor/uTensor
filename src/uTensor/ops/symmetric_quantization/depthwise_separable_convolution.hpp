@@ -50,8 +50,9 @@ class QuantizedDepthwiseSeparableConvOperator : public OperatorInterface<3, 1> {
       Tensor& output, const uint16_t (&strides)[4], const Padding padding,
       const uint16_t (&dialations)[2], int output_shift,
       int32_t* per_channel_output_multiplier, int32_t* per_channel_output_shift,
-      int32_t& padding_height, int32_t& padding_width, int32_t& output_multiplier,
-      int32_t& output_activation_min, int32_t& output_activation_max,
+      int32_t& padding_height, int32_t& padding_width,
+      int32_t& output_multiplier, int32_t& output_activation_min,
+      int32_t& output_activation_max,
       TFLM::TfLiteFusedActivation =
           TFLM::kTfLiteActNone  // Make this param basically not required
   );
@@ -202,6 +203,8 @@ void QuantizedDepthwiseSeparableConvOperator<Tout>::compute() {
 
   TFLM::DepthwiseParams op_params;
   TFLM::TfLitePaddingValues paddingVals;
+  paddingVals.width = 0;
+  paddingVals.height = 0;
 
   int num_channels = inputs[filter]
                          .tensor()
@@ -222,7 +225,7 @@ void QuantizedDepthwiseSeparableConvOperator<Tout>::compute() {
                   inputs[bias].tensor(), outputs[out].tensor(), _stride,
                   _padding, _dialation, output_shift,
                   per_channel_output_multiplier, per_channel_output_shift,
-                  paddingVals.width, paddingVals.height, output_multiplier,
+                  paddingVals.height, paddingVals.width, output_multiplier,
                   output_activation_min, output_activation_max,
                   activation  // Basically only used for test
   );
