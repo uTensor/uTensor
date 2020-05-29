@@ -231,8 +231,8 @@ void QuantizedDepthwiseSeparableConvOperator<Tout>::compute() {
 
   // op_params.padding_type = TFLM::PaddingType::kSame;
   op_params.padding_type = static_cast<TFLM::PaddingType>(_padding);
-  op_params.padding_values.width = padding_width;
-  op_params.padding_values.height = padding_height;
+  op_params.padding_values.width = paddingVals.width;
+  op_params.padding_values.height = paddingVals.height;
   op_params.stride_width = _stride[1];
   op_params.stride_height = _stride[2];
   op_params.dilation_width_factor = _dialation[1];
