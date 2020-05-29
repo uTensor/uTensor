@@ -70,7 +70,30 @@ Like `Handles`, when a `Tensor` goes out of scope, or more generally when it's d
 `TensorMap`s are nothing more than an ordered map of `uTensor::string`s to `Tensor` references. Tensors can be looked up by "name", or more accurately ID. These are used heavily in the operators to map named inputs to tensors. Seeing `mOperator.setInputs({{mOperator::a, tensor1}, {mOperator::filter, f_tensor_891293}, {mOperator::bias, cowsay_tensor}}))` it's much clearer which tensor is being used for what purpose in the operator without having to jump to the operator class declaration.
 
 ### OperatorInterface
-TODO
+
+The `OperatorInterface`, in all its glory, is nothing more than a fixed-size TensorMap for inputs and another for outputs, the setters for these two maps, plus a pure virtual `compute()` method that gets called whenever a user `evals` an operator. Although, writing a custom operator just involves implementing this `compute()` method in a child class, we find it helpful to make the names of the expected inputs/outputs additionally available as public enums in the child classes. This way we can clearly describe which `Tensor`s get mapped to which operator parameter, and also `ctag` jump around in the models more easily.
+
+```cpp
+class MyOperator : public OperatorInterface<num_inputs, num_outputs> {
+ public:
+  enum names_in : uint8_t { in, filter }; // these are named IDs for the inputs
+  enum names_out : uint8_t { out };   // these are named IDs for the outputs
+
+  // Optional constructor
+
+ protected:
+  virtual void compute() {
+    // Operator interface maintains a 2 maps of tensor names to tensors, one for inputs, and one for outputs 
+    my_kernel(outputs[out].tensor(), inputs[in].tensor(), inputs[filter].tensor());
+  }
+};
+...
+MyOperator myOp;
+myOp
+  .setInputs({{myOp::in, tensor1}, {myOp::filter, tensor2}}) //Bind tensors to input names in op
+  .setOutputs({{myOp::out, tensor_tardis_392}})              //Bind tensors to output names in op
+  .eval();                                                   //Evaluate operator given inputs/outputs
+```
 
 ## uTensor Lib
 
@@ -90,7 +113,7 @@ The uTensor Library serves as a series of reasonable default implementations bui
 
 The `SimpleErrorHandler` is literally just that, it maintains a fixed sized queue for events and allows users to override the default `spin-wait` behavior of `onError` by passing an `ErrorHandler` callback functor. Although simple, this error handler is used heavily in the uTensor tests both in verifying error conditions and in checking partial ordering of various events notified by the uTensor components.
 
-```
+```cpp
 SimpleErrorHandler errH(50); // Maintain a history of 50 events
 Context::get_default_context()->set_ErrorHandler(&errH);
 ...
@@ -144,7 +167,7 @@ General ops must use the tensor read/write interface for clarity, which does hav
 
 Generically operators look like the following:
 
-```
+```cpp
 class MyOperator : public OperatorInterface<num_inputs, num_outputs> {
  public:
   enum names_in : uint8_t { a, b }; // these are named IDs for the inputs
@@ -168,7 +191,7 @@ myOp
 
 Note the tensors are referenced by these keys, so order does not matter. The following is equivalent.
 
-```
+```cpp
 MyOperator myOp;
 myOp
   .setInputs({{myOp::b, tensor2}, {myOp::a, tensor1}}) //Bind tensors to input names in op
@@ -223,7 +246,7 @@ There are many potentially useful tensors to solve a variety of tasks not includ
 
 For performance reasons, the various Tensors read/write interfaces behave more like buffers than full-fledged C++ typed objects, even though the high level interface looks very Pythonic in nature. The actual reading and writing depends on how the user casts this buffer, for example:
 
-```
+```cpp
 uint8_t myBuffer[4] = { 0xde, 0xad, 0xbe, 0xef };
 Tensor mTensor = new BufferTensor({2,2}, u8, myBuffer); // define a 2x2 tensor of uint8_ts
 
