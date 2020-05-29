@@ -201,7 +201,9 @@ void QuantizedDepthwiseSeparableConvOperator<Tout>::compute() {
   */
 
   TFLM::DepthwiseParams op_params;
-  TFLM::TfLitePaddingValues paddingVals;
+  // This silly shit is just a width and height
+  //TFLM::TfLitePaddingValues paddingVals;
+  int32_t padding_width, padding_height;
 
   int num_channels = inputs[filter]
                          .tensor()
@@ -222,15 +224,15 @@ void QuantizedDepthwiseSeparableConvOperator<Tout>::compute() {
                   inputs[bias].tensor(), outputs[out].tensor(), _stride,
                   _padding, _dialation, output_shift,
                   per_channel_output_multiplier, per_channel_output_shift,
-                  paddingVals.width, paddingVals.height, output_multiplier,
+                  padding_width, padding_height, output_multiplier,
                   output_activation_min, output_activation_max,
                   activation  // Basically only used for test
   );
 
   // op_params.padding_type = TFLM::PaddingType::kSame;
   op_params.padding_type = static_cast<TFLM::PaddingType>(_padding);
-  op_params.padding_values.width = paddingVals.width;
-  op_params.padding_values.height = paddingVals.height;
+  op_params.padding_values.width = padding_width;
+  op_params.padding_values.height = padding_height;
   op_params.stride_width = _stride[1];
   op_params.stride_height = _stride[2];
   op_params.dilation_width_factor = _dialation[1];
