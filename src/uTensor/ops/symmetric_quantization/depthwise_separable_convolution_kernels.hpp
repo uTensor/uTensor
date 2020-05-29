@@ -79,8 +79,8 @@ struct DepthwiseParams {
 };
 
 struct TfLitePaddingValues {
-  int width;
-  int height;
+  int32_t width;
+  int32_t height;
   int width_offset;
   int height_offset;
 };
