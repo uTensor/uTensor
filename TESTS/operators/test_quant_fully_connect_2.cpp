@@ -3,7 +3,7 @@
 #include "uTensor.h"
 
 using namespace uTensor;
-using TflmSymQuantOps::QuantizedFullyConnectedOperator;
+using TflmSymQuantOps::FullyConnectedOperator;
 
 TEST(Quantization, QuantFullyConnectOp_2) {
   localCircularArenaAllocator<2048> meta_allocator;
@@ -27,12 +27,12 @@ TEST(Quantization, QuantFullyConnectOp_2) {
   PerTensorQuantizationParams out_params(out_zp_2, out_scale_2);
   output->set_quantization_params(out_params);
 
-  QuantizedFullyConnectedOperator<int8_t> op(
+  FullyConnectedOperator<int8_t> op(
       TFLM::TfLiteFusedActivation::kTfLiteActNone);
-  op.set_inputs({{QuantizedFullyConnectedOperator<int8_t>::input, input},
-                 {QuantizedFullyConnectedOperator<int8_t>::filter, filter},
-                 {QuantizedFullyConnectedOperator<int8_t>::bias, bias}})
-      .set_outputs({{QuantizedFullyConnectedOperator<int8_t>::output, output}})
+  op.set_inputs({{FullyConnectedOperator<int8_t>::input, input},
+                 {FullyConnectedOperator<int8_t>::filter, filter},
+                 {FullyConnectedOperator<int8_t>::bias, bias}})
+      .set_outputs({{FullyConnectedOperator<int8_t>::output, output}})
       .eval();
 
   for (int i = 0; i < output->num_elems(); ++i) {
