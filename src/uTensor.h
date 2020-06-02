@@ -14,6 +14,8 @@
 /*
  * Operators
  */
+#include "uTensor/ops/ActivationFncs.hpp"
+#include "uTensor/ops/ArgMinMax.hpp"
 #include "uTensor/ops/Arithmetic.hpp"
 #include "uTensor/ops/Functional.hpp"
 #include "uTensor/ops/Convolution.hpp"
