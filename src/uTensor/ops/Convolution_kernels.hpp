@@ -9,8 +9,9 @@ namespace uTensor {
 
 enum Padding : uint8_t { UNKNOWN = 0, VALID = 1, SAME = 2 };
 
-template <typename T, typename Filter>
+template <typename T, typename Filter, typename Bias>
 void generic_convolution_kernel(Tensor& out, const Tensor& in, Filter filter,
+                                Bias bias,
                                 const Padding padding,
                                 const uint16_t (&strides)[4]) {
   const TensorShape& in_shape = in->get_shape();
@@ -100,7 +101,7 @@ void generic_convolution_kernel(Tensor& out, const Tensor& in, Filter filter,
                       (out_y * out_cols * filter_count) +
                       (out_x * filter_count) + out_channel) = output_val;
           */
-          out(batch, out_y, out_x, out_channel) = filter.finalize();
+          out(batch, out_y, out_x, out_channel) = filter.finalize() + bias(out_channel);
         }
       }
     }
