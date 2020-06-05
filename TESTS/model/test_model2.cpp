@@ -8,6 +8,7 @@ using std::cout;
 using std::endl;
 
 using namespace uTensor;
+using namespace uTensor::ReferenceOperators;
 
 const uint8_t s_a[4] = {1, 2, 3, 4};
 const uint8_t s_b[4] = {5, 6, 7, 8};

@@ -6,6 +6,13 @@
 #include "uTensor.h"
 
 using namespace uTensor;
+using TflmSymQuantOps::QuantizeOperator;
+using TflmSymQuantOps::DequantizeOperator;
+using TflmSymQuantOps::FullyConnectedOperator;
+using TflmSymQuantOps::DepthwiseSeparableConvOperator;
+using uTensor::TFLM::TfLiteFusedActivation;
+using ReferenceOperators::MaxPoolOperator;
+using ReferenceOperators::ReshapeOperator;
 
 void compute_model(Tensor& input_10, Tensor& Identity0);
 
@@ -84,22 +91,22 @@ TEST(Integration, run_10x_mem_check) {
 
 void compute_model(Tensor& input_10, Tensor& Identity0) {
   // start rendering local declare snippets
-  TFLM::QuantizeOperator<int8_t, float> op_000;
+  QuantizeOperator<int8_t, float> op_000;
 
-  QuantizedFullyConnectedOperator<int8_t> op_001(
-      TFLM::TfLiteFusedActivation::kTfLiteActRelu);
+  FullyConnectedOperator<int8_t> op_001(
+      TfLiteFusedActivation::kTfLiteActRelu);
 
-  QuantizedDepthwiseSeparableConvOperator<int8_t> op_002(
-      {1, 1}, VALID, 32, {1, 1}, TFLM::TfLiteFusedActivation::kTfLiteActRelu);
+  DepthwiseSeparableConvOperator<int8_t> op_002(
+      {1, 1}, VALID, 32, {1, 1}, TfLiteFusedActivation::kTfLiteActRelu);
 
   MaxPoolOperator<int8_t> op_003({2, 2}, {1, 2, 2, 1}, VALID);
 
   ReshapeOperator<int8_t> op_004({1, 5408});
 
-  TFLM::DequantizeOperator<float, int8_t> op_005;
+  DequantizeOperator<float, int8_t> op_005;
 
-  QuantizedFullyConnectedOperator<int8_t> op_006(
-      TFLM::TfLiteFusedActivation::kTfLiteActNone);
+  FullyConnectedOperator<int8_t> op_006(
+      TfLiteFusedActivation::kTfLiteActNone);
 
   Tensor input_1_int80 = new RamTensor({1, 28, 28, 1}, i8);
   int input_1_int80_zp = -128;
@@ -267,21 +274,21 @@ void compute_model(Tensor& input_10, Tensor& Identity0) {
   // start rendering eval snippets
   op_000
       .set_inputs({
-          {TFLM::QuantizeOperator<int8_t, float>::input, input_10},
+          {QuantizeOperator<int8_t, float>::input, input_10},
       })
       .set_outputs(
-          {{TFLM::QuantizeOperator<int8_t, float>::output, input_1_int80}})
+          {{QuantizeOperator<int8_t, float>::output, input_1_int80}})
       .eval();
 
   op_002
       .set_inputs({
-          {QuantizedDepthwiseSeparableConvOperator<int8_t>::in, input_1_int80},
-          {QuantizedDepthwiseSeparableConvOperator<int8_t>::filter,
+          {DepthwiseSeparableConvOperator<int8_t>::in, input_1_int80},
+          {DepthwiseSeparableConvOperator<int8_t>::filter,
            StatefulPartitionedCallmy_modelconv2dConv2DReadVariableOp0},
-          {QuantizedDepthwiseSeparableConvOperator<int8_t>::bias,
+          {DepthwiseSeparableConvOperator<int8_t>::bias,
            StatefulPartitionedCallmy_modelconv2dConv2D_bias0},
       })
-      .set_outputs({{QuantizedDepthwiseSeparableConvOperator<int8_t>::out,
+      .set_outputs({{DepthwiseSeparableConvOperator<int8_t>::out,
                      StatefulPartitionedCallmy_modelconv2dRelu0}})
       .eval();
 
@@ -306,35 +313,35 @@ void compute_model(Tensor& input_10, Tensor& Identity0) {
 
   op_001
       .set_inputs({
-          {QuantizedFullyConnectedOperator<int8_t>::input,
+          {FullyConnectedOperator<int8_t>::input,
            StatefulPartitionedCallmy_modelmax_pooling2dMaxPool_0_Reshape00},
-          {QuantizedFullyConnectedOperator<int8_t>::filter,
+          {FullyConnectedOperator<int8_t>::filter,
            StatefulPartitionedCallmy_modeldenseMatMulReadVariableOptranspose0},
-          {QuantizedFullyConnectedOperator<int8_t>::bias,
+          {FullyConnectedOperator<int8_t>::bias,
            StatefulPartitionedCallmy_modeldenseMatMul_bias0},
       })
-      .set_outputs({{QuantizedFullyConnectedOperator<int8_t>::output,
+      .set_outputs({{FullyConnectedOperator<int8_t>::output,
                      StatefulPartitionedCallmy_modeldenseRelu0}})
       .eval();
 
   op_006
       .set_inputs({
-          {QuantizedFullyConnectedOperator<int8_t>::input,
+          {FullyConnectedOperator<int8_t>::input,
            StatefulPartitionedCallmy_modeldenseRelu0},
-          {QuantizedFullyConnectedOperator<int8_t>::filter,
+          {FullyConnectedOperator<int8_t>::filter,
            StatefulPartitionedCallmy_modeldense_1MatMulReadVariableOptranspose0},
-          {QuantizedFullyConnectedOperator<int8_t>::bias,
+          {FullyConnectedOperator<int8_t>::bias,
            StatefulPartitionedCallmy_modeldense_1MatMul_bias0},
       })
       .set_outputs(
-          {{QuantizedFullyConnectedOperator<int8_t>::output, Identity_int80}})
+          {{FullyConnectedOperator<int8_t>::output, Identity_int80}})
       .eval();
 
   op_005
       .set_inputs({
-          {TFLM::DequantizeOperator<float, int8_t>::a, Identity_int80},
+          {DequantizeOperator<float, int8_t>::a, Identity_int80},
       })
-      .set_outputs({{TFLM::DequantizeOperator<float, int8_t>::b, Identity0}})
+      .set_outputs({{DequantizeOperator<float, int8_t>::b, Identity0}})
       .eval();
   // end of rendering eval snippets
 }

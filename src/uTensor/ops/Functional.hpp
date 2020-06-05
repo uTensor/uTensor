@@ -8,6 +8,7 @@
 #include "functional_kernels.hpp"
 #include "operatorBase.hpp"
 namespace uTensor {
+namespace ReferenceOperators {
 
 class InPlaceFnc : public OperatorInterface<1, 0> {
  public:
@@ -53,7 +54,7 @@ class SqueezeOperator : public InPlaceFnc {
  private:
   std::vector<uint8_t> _axis;
 };
-
+}
 }
 
 #endif

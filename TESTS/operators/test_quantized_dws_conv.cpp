@@ -9,6 +9,7 @@ using std::cout;
 using std::endl;
 
 using namespace uTensor;
+using namespace TflmSymQuantOps;
 
 TEST(Quantized, reference_1_dws_conv) {
   localCircularArenaAllocator<1024> meta_allocator;
@@ -43,16 +44,11 @@ TEST(Quantized, reference_1_dws_conv) {
   'DilationHFactor': 1}
   */
 
-  QuantizedDepthwiseSeparableConvOperator<int8_t> dw_conv_Aw(
-      {1, 1}, SAME, 32, {1, 1}, TFLM::TfLiteFusedActivation::kTfLiteActRelu);
+  DepthwiseSeparableConvOperator<int8_t> dw_conv_Aw({1,1}, SAME, 32, {1, 1}, TFLM::TfLiteFusedActivation::kTfLiteActRelu );
   dw_conv_Aw
-      .set_inputs(
-          {{QuantizedDepthwiseSeparableConvOperator<int8_t>::in, A},
-           {QuantizedDepthwiseSeparableConvOperator<int8_t>::filter, filter},
-           {QuantizedDepthwiseSeparableConvOperator<int8_t>::bias, bias}})
-      .set_outputs(
-          {{QuantizedDepthwiseSeparableConvOperator<int8_t>::out, out}})
-      .eval();
+    .set_inputs({ {DepthwiseSeparableConvOperator<int8_t>::in, A}, {DepthwiseSeparableConvOperator<int8_t>::filter, filter}, {DepthwiseSeparableConvOperator<int8_t>::bias, bias} })
+    .set_outputs({ {DepthwiseSeparableConvOperator<int8_t>::out, out} })
+    .eval();
 
   //  for(int i = 0; i < out->get_shape().get_linear_size(); i++) {
   // 21632

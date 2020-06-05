@@ -7,6 +7,7 @@
 #include "operatorBase.hpp"
 
 namespace uTensor {
+namespace ReferenceOperators {
 
 // Can use these intermediate types to make the convolution operator more
 // generic. Maxpool, conv, average pool, median etc. are all basically the same
@@ -199,5 +200,6 @@ using MaxPoolOperator = GenericPoolOperator<T, MaxFilter<T>>;
 template <typename T>
 using AvgPoolOperator = GenericPoolOperator<T, AvgFilter<T>>;
 
+}
 }  // namespace uTensor
 #endif
