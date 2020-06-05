@@ -25,10 +25,10 @@ class ConvFilter {
     tmp += (input_value * filter_value);
   }
   inline T finalize() const { return tmp; }
-  inline const int16_t height() const { return filter->get_shape()[0]; }
-  inline const int16_t width() const { return filter->get_shape()[1]; }
-  inline const int16_t in_channels() const { return filter->get_shape()[2]; }
-  inline const int16_t out_channels() const { return filter->get_shape()[3]; }
+  inline const int16_t height() const { return filter->get_shape()[1]; }
+  inline const int16_t width() const { return filter->get_shape()[2]; }
+  inline const int16_t in_channels() const { return filter->get_shape()[3]; }
+  inline const int16_t out_channels() const { return filter->get_shape()[0]; }
 };
 
 template <typename T>

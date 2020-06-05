@@ -90,8 +90,8 @@ void generic_convolution_kernel(Tensor& out, const Tensor& in, Filter filter,
                 //    filter_x * input_depth * filter_count +
                 //    in_channel * filter_count + out_channel;
                 // const T filter_value = filter(filter_index);
-                filter.PartialCompute(input_value, filter_y, filter_x,
-                                      in_channel, out_channel);
+                filter.PartialCompute(input_value, out_channel, filter_y, filter_x,
+                                      in_channel);
               }
             }
           }
