@@ -1,0 +1,2 @@
+add_executable(custom_operator custom_operator.cpp)
+target_link_libraries(custom_operator PUBLIC utensor_core utensor)
