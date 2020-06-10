@@ -72,7 +72,7 @@ const QuantizationParams& TensorInterface::get_quantization_params() const {
   return *(_qnt_params.operator*());
 }
 
-size_t TensorInterface::_get_readable_block(void* buffer,
+size_t TensorInterface::_get_readable_block(const void*& buffer,
                                             uint16_t req_read_size,
                                             uint32_t linear_index) const {
   uTensor_printf(
@@ -81,7 +81,7 @@ size_t TensorInterface::_get_readable_block(void* buffer,
       new InvalidOptimizableTensorError());
   return -1;
 }
-size_t TensorInterface::_get_writeable_block(void* buffer,
+size_t TensorInterface::_get_writeable_block(void*& buffer,
                                              uint16_t req_write_size,
                                              uint32_t linear_index) {
   uTensor_printf(
@@ -90,14 +90,14 @@ size_t TensorInterface::_get_writeable_block(void* buffer,
       new InvalidOptimizableTensorError());
   return -1;
 }
-size_t TensorInterface::get_readable_block(void* buffer, uint16_t req_read_size,
+size_t TensorInterface::get_readable_block(const void*& buffer, uint16_t req_read_size,
                                            uint32_t linear_index) const {
   if (req_read_size > _type_size * _shape.get_linear_size()) {
     return -1;
   }
   return _get_readable_block(buffer, req_read_size, linear_index);
 }
-size_t TensorInterface::get_writeable_block(void* buffer,
+size_t TensorInterface::get_writeable_block(void*& buffer,
                                             uint16_t req_write_size,
                                             uint32_t linear_index) {
   if (req_write_size > _type_size * _shape.get_linear_size()) {

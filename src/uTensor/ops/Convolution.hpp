@@ -7,6 +7,7 @@
 #include "operatorBase.hpp"
 
 namespace uTensor {
+namespace ReferenceOperators {
 
 // Can use these intermediate types to make the convolution operator more
 // generic. Maxpool, conv, average pool, median etc. are all basically the same
@@ -24,10 +25,10 @@ class ConvFilter {
     tmp += (input_value * filter_value);
   }
   inline T finalize() const { return tmp; }
-  inline const int16_t height() const { return filter->get_shape()[0]; }
-  inline const int16_t width() const { return filter->get_shape()[1]; }
-  inline const int16_t in_channels() const { return filter->get_shape()[2]; }
-  inline const int16_t out_channels() const { return filter->get_shape()[3]; }
+  inline const int16_t height() const { return filter->get_shape()[1]; }
+  inline const int16_t width() const { return filter->get_shape()[2]; }
+  inline const int16_t in_channels() const { return filter->get_shape()[3]; }
+  inline const int16_t out_channels() const { return filter->get_shape()[0]; }
 };
 
 template <typename T>
@@ -92,12 +93,28 @@ class AvgFilter {
   inline const int16_t out_channels() const { return c; }
 };
 
+template<typename T>
+class NoBias {
+  public:
+    T operator()(int32_t i) { return 0; }
+};
+
+template<typename T>
+class wBias {
+  public:
+    wBias(const Tensor& t) : t(t) {}
+    T operator()(int32_t i) { return static_cast<T>(t(i)); }
+
+  private:
+    const Tensor& t;
+};
+
 template <typename T>
-class ConvOperator : public OperatorInterface<2, 1> {
+class Conv2dOperator : public OperatorInterface<3, 1> {
  public:
-  enum names_in : uint8_t { in, filter };
+  enum names_in : uint8_t { in, filter, bias };
   enum names_out : uint8_t { out };
-  ConvOperator(std::initializer_list<uint16_t> strides, Padding padding)
+  Conv2dOperator(std::initializer_list<uint16_t> strides, Padding padding)
       : _padding(padding) {
     int i = 0;
     for (auto s : strides) {
@@ -107,9 +124,18 @@ class ConvOperator : public OperatorInterface<2, 1> {
 
  protected:
   virtual void compute() {
+    bool have_bias = inputs.has(bias);
     ConvFilter<T> conv(inputs[filter].tensor());
-    generic_convolution_kernel<T, ConvFilter<T>>(
-        outputs[out].tensor(), inputs[in].tensor(), conv, _padding, _stride);
+    if(have_bias) {
+      wBias<T> w_bias(inputs[bias].tensor());
+      generic_convolution_kernel<T, ConvFilter<T>>(
+        outputs[out].tensor(), inputs[in].tensor(), conv, w_bias, _padding, _stride);
+    } else {
+      NoBias<T> no_bias;
+      generic_convolution_kernel<T, ConvFilter<T>>(
+        outputs[out].tensor(), inputs[in].tensor(), conv, no_bias, _padding, _stride);
+
+    }
   }
 
  private:
@@ -167,7 +193,7 @@ class GenericPoolOperator : public OperatorInterface<1, 1> {
 
   // TODO Add dialations
   GenericPoolOperator(std::initializer_list<uint16_t> k_size,
-                std::initializer_list<uint16_t> strides, Padding padding)
+                      std::initializer_list<uint16_t> strides, Padding padding)
       : _padding(padding) {
     int i = 0;
     for (auto s : strides) {
@@ -273,5 +299,6 @@ void DepthwiseSeparableConvOperatorV2<Tout>::compute() {
 }
 
 
+}
 }  // namespace uTensor
 #endif

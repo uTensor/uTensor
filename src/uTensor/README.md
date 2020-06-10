@@ -12,9 +12,55 @@ For the rest of the discussion on the uTensor core, we will explain what each pa
 
 ### Events and Errors and their Handlers
 
-In general RTTI, run time type information, is expensive for tiny systems. Rather than forcing users to compile their code with RTTI enabled and eat that cost, we found a neat way to give uTensor the ability to identify events dynamically at runtime with configurable cost! Basically using only C++11 language features, we just hash the signature of an event type at compile time and store this as a, mostly, unique ID inside the `Event` objects. A nice byproduct is these IDs remain the same across builds, unless someone explicitly changes the signature of an `Event`, and the user doesnt need to manually specify some magic number associated with each event. The size of this ID is configurable, and can be 1 byte, 2 bytes, or 4 bytes depending on how many unique event types you need, even though the 4 byte version is probably way overkill for small devices.
+In general RTTI, run time type information, is expensive for tiny systems. Rather than forcing users to compile their code with RTTI enabled and eat that cost, we found a neat way to give uTensor the ability to identify events dynamically at runtime with configurable cost! Basically using only C++11 language features, we just hash the signature of an event type at compile time and store this as a, mostly, unique ID inside the `Event` objects. A nice byproduct is these IDs remain the same across builds and machines, unless someone explicitly changes the signature of an `Event`, and the user doesnt need to manually specify some magic number associated with each event. The size of this ID is configurable, and can be 1 byte, 2 bytes, or 4 bytes depending on how many unique event types you need, even though the 4 byte version is probably way overkill for small devices.
 
 This IDs are pretty useful when debugging remote deployments. All you have to do is `grep` your source code for `DECLARE_EVENT({EVENT_NAME})` or `DECLARE_ERROR({ERROR_NAME})`, run the same hash function on the `{EVENT_NAME}`s, and store this in a simple `map(hash({EVENT_NAME}) => {EVENT_NAME})`. Then if an `Event` or `Error` occurs you just have to query this map.
+
+Alternatively, this Python snippet will scrape codebases for all basically defined `Event`s and `Error`s and store them in a Python dictionary:
+
+```python
+import numpy as np
+import glob
+import re
+
+from collections import defaultdict
+from pprint import pprint
+
+
+def mHash_fnv1a(mStr):
+  np.seterr(over='ignore')
+  val_32_const = np.uint32(0x811c9dc5)
+  prime_32_const = np.uint32(0x1000193)
+  value = val_32_const
+  for c in mStr:
+      value = (value ^ np.uint32(ord(c))) * prime_32_const
+  return value
+
+def get_target_files():
+  x = glob.glob('**/*.[ch]pp', recursive=True)
+  return x
+
+def get_event_map():
+  tgts = get_target_files()
+  event_names = []
+  event_map = defaultdict(list)
+  for f in tgts:
+    with open(f) as fp:
+      for line in fp:
+        m = re.match("\s*DECLARE_\w+\((\w+)\)", line)
+        if m:
+          #print(m)
+          event_names.append(m.group(1))
+
+  for evt in event_names:
+    x = mHash_fnv1a(evt)
+    event_map[x].append(evt)
+  pprint(event_map)
+  return event_map
+
+if __name__ == "__main__":
+  x = get_event_map()
+```
 
 ### Basic Types
 #### IntegralType
@@ -30,11 +76,14 @@ We get it, C-strings are extremely useful for user interfaces and early debuggin
 It is better to thing about `uTensor::string` as an identifier rather than a string.
 
 #### TensorShape
-`TensorShape` is exactly that, it describes the shape of a tensor as well as some basic helper functions like how many elements represented by this shape. `TensorShape` is **a fixed size object**, at the moment it always has exactly 4 stored dimensions even when some are not used, and furthermore it does not have any virtual functions. 
+
+`TensorShape` is exactly that, it describes the shape of a tensor as well as some basic helper functions like how many elements represented by this shape. `TensorShape` is **a fixed size object**, at the moment it always has exactly 4 stored dimensions even when some are not used, and furthermore it does not have any virtual functions.
+
+`TensorShape` also as the ability to transform 2D, 3D, and 4D, indices into a linear index based on it's shape. This is super helpful when writing `FastOperators` as it is simple low-cost syntactic sugar that keeps pointer arithmetic clean.
 
 #### Quantization Primitives
 
-TODO
+The Quantization primitives represent per-channel and per-tensor symmetric quantization schemes shared with https://www.tensorflow.org/lite/performance/quantization_spec. This generally involves allocating some small buffer in the ram allocator so we can compute and maintain scaling factors and arithmetic shifts. Choosing when to allocate, compute, and deallocate can directly impact performance. For example, allocating once and computing these values on model setup and deallocating on tear down trades RAM for improves inference times. Whereas allocating, computing, and deallocating on each inference trades inference speed for lower peak RAM footprints.
 
 ### Memory Allocator Interfaces
 
@@ -45,7 +94,7 @@ From the name classes that extend the `AllocatorInterface` can do really anythin
 In uTensor, `Handle`s are basically unique (non-copyable) pointer-like proxy reference **bound** to some allocated region in the memory manager. Under the hood, this is just a void pointer, but the user cannot access it directly. Instead, you must you must dereference the `Handle` object to get access to the underlying pointer to data (automatically a double dereference). This is important because the memory manger keeps track of `Handle`s internally and can move the underlying data blocks around without breaking the user code! Making the `Handle`s non-copyable means the memory manager only needs to record one instance per bound region which saves a good chunk of space and speeds up the query. Likewise in user-land, if `Handles` are passed around by reference then if the Allocator moved the underlying data, all user-land references effectively get *notified*. 
 
 The most important part about handles:
-`Handle`s bound to an allocated region in a memory manager are guaranteed to be valid until expressly unbound. In other words the allocator is **not-allowed** to deallocate a bound region, but it is allowed to move it around as long as it updates the associated `Handle`. We eventually plan on adding a `Scheduler` which has the ability to move around bound data in the memory allocator given some memory optimal *plan*, and the `Handle`s let us do that as well as minimize fragmentation without breaking user-space coherency. *Note*, `Handle`s will automatically deallocate their data when they go out of scope or more generally if the destructor is called.
+`Handle`s bound to an allocated region in a memory manager are guaranteed to be valid until expressly unbound. In other words the allocator is **not-allowed** to deallocate a bound region, but it is allowed to move it around as long as it updates the associated `Handle`. We eventually plan on adding a `Scheduler` which has the ability to move around bound data in the memory allocator given some memory optimal *plan*, and the `Handle`s let us do that as well as minimize fragmentation without breaking user-space coherency. 
 
 ### TensorInterface and the tensor lifecycle
 
@@ -70,7 +119,30 @@ Like `Handles`, when a `Tensor` goes out of scope, or more generally when it's d
 `TensorMap`s are nothing more than an ordered map of `uTensor::string`s to `Tensor` references. Tensors can be looked up by "name", or more accurately ID. These are used heavily in the operators to map named inputs to tensors. Seeing `mOperator.setInputs({{mOperator::a, tensor1}, {mOperator::filter, f_tensor_891293}, {mOperator::bias, cowsay_tensor}}))` it's much clearer which tensor is being used for what purpose in the operator without having to jump to the operator class declaration.
 
 ### OperatorInterface
-TODO
+
+The `OperatorInterface`, in all its glory, is nothing more than a fixed-size TensorMap for inputs and another for outputs, the setters for these two maps, plus a pure virtual `compute()` method that gets called whenever a user `evals` an operator. Although, writing a custom operator just involves implementing this `compute()` method in a child class, we find it helpful to make the names of the expected inputs/outputs additionally available as public enums in the child classes. This way we can clearly describe which `Tensor`s get mapped to which operator parameter, and also `ctag` jump around in the models more easily.
+
+```cpp
+class MyOperator : public OperatorInterface<num_inputs, num_outputs> {
+ public:
+  enum names_in : uint8_t { in, filter }; // these are named IDs for the inputs
+  enum names_out : uint8_t { out };   // these are named IDs for the outputs
+
+  // Optional constructor
+
+ protected:
+  virtual void compute() {
+    // Operator interface maintains a 2 maps of tensor names to tensors, one for inputs, and one for outputs 
+    my_kernel(outputs[out].tensor(), inputs[in].tensor(), inputs[filter].tensor());
+  }
+};
+...
+MyOperator myOp;
+myOp
+  .setInputs({{myOp::in, tensor1}, {myOp::filter, tensor2}}) //Bind tensors to input names in op
+  .setOutputs({{myOp::out, tensor_tardis_392}})              //Bind tensors to output names in op
+  .eval();                                                   //Evaluate operator given inputs/outputs
+```
 
 ## uTensor Lib
 
@@ -90,7 +162,7 @@ The uTensor Library serves as a series of reasonable default implementations bui
 
 The `SimpleErrorHandler` is literally just that, it maintains a fixed sized queue for events and allows users to override the default `spin-wait` behavior of `onError` by passing an `ErrorHandler` callback functor. Although simple, this error handler is used heavily in the uTensor tests both in verifying error conditions and in checking partial ordering of various events notified by the uTensor components.
 
-```
+```cpp
 SimpleErrorHandler errH(50); // Maintain a history of 50 events
 Context::get_default_context()->set_ErrorHandler(&errH);
 ...
@@ -144,7 +216,7 @@ General ops must use the tensor read/write interface for clarity, which does hav
 
 Generically operators look like the following:
 
-```
+```cpp
 class MyOperator : public OperatorInterface<num_inputs, num_outputs> {
  public:
   enum names_in : uint8_t { a, b }; // these are named IDs for the inputs
@@ -168,7 +240,7 @@ myOp
 
 Note the tensors are referenced by these keys, so order does not matter. The following is equivalent.
 
-```
+```cpp
 MyOperator myOp;
 myOp
   .setInputs({{myOp::b, tensor2}, {myOp::a, tensor1}}) //Bind tensors to input names in op
@@ -223,7 +295,7 @@ There are many potentially useful tensors to solve a variety of tasks not includ
 
 For performance reasons, the various Tensors read/write interfaces behave more like buffers than full-fledged C++ typed objects, even though the high level interface looks very Pythonic in nature. The actual reading and writing depends on how the user casts this buffer, for example:
 
-```
+```cpp
 uint8_t myBuffer[4] = { 0xde, 0xad, 0xbe, 0xef };
 Tensor mTensor = new BufferTensor({2,2}, u8, myBuffer); // define a 2x2 tensor of uint8_ts
 

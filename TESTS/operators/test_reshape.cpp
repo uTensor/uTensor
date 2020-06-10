@@ -10,7 +10,7 @@
 #include "gtest/gtest.h"
 
 using namespace uTensor;
-
+using namespace uTensor::ReferenceOperators;
 TEST(Reshape, reshape_test) {
   localCircularArenaAllocator<1024> meta_allocator;
   localCircularArenaAllocator<15 * 2 * sizeof(float), uint32_t> ram_allocator;
@@ -30,3 +30,4 @@ TEST(Reshape, reshape_test) {
   TensorShape output_shape = output_tensor->get_shape();
   EXPECT_TRUE(target_shape == output_shape);
 }
+

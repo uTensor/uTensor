@@ -14,6 +14,7 @@ using std::cout;
 using std::endl;
 
 using namespace uTensor;
+using namespace uTensor::ReferenceOperators;
 
 #define DO_STRIDE_TESTS 1
 /*********************************************
@@ -31,11 +32,11 @@ TEST(Convolution, random_inputs_0_stride_1) {
   Tensor w = new RomTensor({5, 5, 1, 32}, flt, s_w_0_stride_1);
   Tensor out = new RamTensor({1, 28, 28, 32}, flt);
 
-  ConvOperator<float> conv_Aw({1, 1, 1, 1}, SAME);
+  Conv2dOperator<float> conv_Aw({1, 1, 1, 1}, SAME);
   conv_Aw
       .set_inputs(
-          {{ConvOperator<float>::in, in}, {ConvOperator<float>::filter, w}})
-      .set_outputs({{ConvOperator<float>::out, out}})
+          {{Conv2dOperator<float>::in, in}, {Conv2dOperator<float>::filter, w}})
+      .set_outputs({{Conv2dOperator<float>::out, out}})
       .eval();
 
   for (int i = 0; i < 25088; i++) {
@@ -58,11 +59,11 @@ TEST(Convolution, random_inputs_1_stride_1) {
   Tensor w = new RomTensor({5, 5, 1, 32}, flt, s_w_1_stride_1);
   Tensor out = new RamTensor({1, 28, 28, 32}, flt);
 
-  ConvOperator<float> conv_Aw({1, 1, 1, 1}, SAME);
+  Conv2dOperator<float> conv_Aw({1, 1, 1, 1}, SAME);
   conv_Aw
       .set_inputs(
-          {{ConvOperator<float>::in, in}, {ConvOperator<float>::filter, w}})
-      .set_outputs({{ConvOperator<float>::out, out}})
+          {{Conv2dOperator<float>::in, in}, {Conv2dOperator<float>::filter, w}})
+      .set_outputs({{Conv2dOperator<float>::out, out}})
       .eval();
 
   for (int i = 0; i < 25088; i++) {
@@ -85,11 +86,11 @@ TEST(Convolution, random_inputs_2_stride_1) {
   Tensor w = new RomTensor({5, 5, 1, 32}, flt, s_w_2_stride_1);
   Tensor out = new RamTensor({1, 28, 28, 32}, flt);
 
-  ConvOperator<float> conv_Aw({1, 1, 1, 1}, SAME);
+  Conv2dOperator<float> conv_Aw({1, 1, 1, 1}, SAME);
   conv_Aw
       .set_inputs(
-          {{ConvOperator<float>::in, in}, {ConvOperator<float>::filter, w}})
-      .set_outputs({{ConvOperator<float>::out, out}})
+          {{Conv2dOperator<float>::in, in}, {Conv2dOperator<float>::filter, w}})
+      .set_outputs({{Conv2dOperator<float>::out, out}})
       .eval();
 
   for (int i = 0; i < 25088; i++) {
@@ -112,11 +113,11 @@ TEST(Convolution, random_inputs_3_stride_1) {
   Tensor w = new RomTensor({5, 5, 1, 32}, flt, s_w_3_stride_1);
   Tensor out = new RamTensor({1, 28, 28, 32}, flt);
 
-  ConvOperator<float> conv_Aw({1, 1, 1, 1}, SAME);
+  Conv2dOperator<float> conv_Aw({1, 1, 1, 1}, SAME);
   conv_Aw
       .set_inputs(
-          {{ConvOperator<float>::in, in}, {ConvOperator<float>::filter, w}})
-      .set_outputs({{ConvOperator<float>::out, out}})
+          {{Conv2dOperator<float>::in, in}, {Conv2dOperator<float>::filter, w}})
+      .set_outputs({{Conv2dOperator<float>::out, out}})
       .eval();
 
   for (int i = 0; i < 25088; i++) {
@@ -139,11 +140,11 @@ TEST(Convolution, random_inputs_4_stride_1) {
   Tensor w = new RomTensor({5, 5, 1, 32}, flt, s_w_4_stride_1);
   Tensor out = new RamTensor({1, 28, 28, 32}, flt);
 
-  ConvOperator<float> conv_Aw({1, 1, 1, 1}, SAME);
+  Conv2dOperator<float> conv_Aw({1, 1, 1, 1}, SAME);
   conv_Aw
       .set_inputs(
-          {{ConvOperator<float>::in, in}, {ConvOperator<float>::filter, w}})
-      .set_outputs({{ConvOperator<float>::out, out}})
+          {{Conv2dOperator<float>::in, in}, {Conv2dOperator<float>::filter, w}})
+      .set_outputs({{Conv2dOperator<float>::out, out}})
       .eval();
 
   for (int i = 0; i < 25088; i++) {
@@ -167,11 +168,11 @@ TEST(Convolution, random_inputs_0_stride_2) {
   Tensor w = new RomTensor({5, 5, 1, 32}, flt, s_w_0_stride_2);
   Tensor out = new RamTensor({1, 14, 14, 32}, flt);
 
-  ConvOperator<float> conv_Aw({1, 2, 2, 1}, SAME);
+  Conv2dOperator<float> conv_Aw({1, 2, 2, 1}, SAME);
   conv_Aw
       .set_inputs(
-          {{ConvOperator<float>::in, in}, {ConvOperator<float>::filter, w}})
-      .set_outputs({{ConvOperator<float>::out, out}})
+          {{Conv2dOperator<float>::in, in}, {Conv2dOperator<float>::filter, w}})
+      .set_outputs({{Conv2dOperator<float>::out, out}})
       .eval();
 
   for (int i = 0; i < 6272; i++) {
@@ -193,11 +194,11 @@ TEST(Convolution, random_inputs_1_stride_2) {
   Tensor w = new RomTensor({5, 5, 1, 32}, flt, s_w_1_stride_2);
   Tensor out = new RamTensor({1, 14, 14, 32}, flt);
 
-  ConvOperator<float> conv_Aw({1, 2, 2, 1}, SAME);
+  Conv2dOperator<float> conv_Aw({1, 2, 2, 1}, SAME);
   conv_Aw
       .set_inputs(
-          {{ConvOperator<float>::in, in}, {ConvOperator<float>::filter, w}})
-      .set_outputs({{ConvOperator<float>::out, out}})
+          {{Conv2dOperator<float>::in, in}, {Conv2dOperator<float>::filter, w}})
+      .set_outputs({{Conv2dOperator<float>::out, out}})
       .eval();
 
   for (int i = 0; i < 6272; i++) {
@@ -218,11 +219,11 @@ TEST(Convolution, random_inputs_2_stride_2) {
   Tensor w = new RomTensor({5, 5, 1, 32}, flt, s_w_2_stride_2);
   Tensor out = new RamTensor({1, 14, 14, 32}, flt);
 
-  ConvOperator<float> conv_Aw({1, 2, 2, 1}, SAME);
+  Conv2dOperator<float> conv_Aw({1, 2, 2, 1}, SAME);
   conv_Aw
       .set_inputs(
-          {{ConvOperator<float>::in, in}, {ConvOperator<float>::filter, w}})
-      .set_outputs({{ConvOperator<float>::out, out}})
+          {{Conv2dOperator<float>::in, in}, {Conv2dOperator<float>::filter, w}})
+      .set_outputs({{Conv2dOperator<float>::out, out}})
       .eval();
 
   for (int i = 0; i < 6272; i++) {
@@ -243,11 +244,11 @@ TEST(Convolution, random_inputs_3_stride_2) {
   Tensor w = new RomTensor({5, 5, 1, 32}, flt, s_w_3_stride_2);
   Tensor out = new RamTensor({1, 14, 14, 32}, flt);
 
-  ConvOperator<float> conv_Aw({1, 2, 2, 1}, SAME);
+  Conv2dOperator<float> conv_Aw({1, 2, 2, 1}, SAME);
   conv_Aw
       .set_inputs(
-          {{ConvOperator<float>::in, in}, {ConvOperator<float>::filter, w}})
-      .set_outputs({{ConvOperator<float>::out, out}})
+          {{Conv2dOperator<float>::in, in}, {Conv2dOperator<float>::filter, w}})
+      .set_outputs({{Conv2dOperator<float>::out, out}})
       .eval();
 
   for (int i = 0; i < 6272; i++) {
@@ -269,11 +270,11 @@ TEST(Convolution, random_inputs_4_stride_2) {
   Tensor w = new RomTensor({5, 5, 1, 32}, flt, s_w_4_stride_2);
   Tensor out = new RamTensor({1, 14, 14, 32}, flt);
 
-  ConvOperator<float> conv_Aw({1, 2, 2, 1}, SAME);
+  Conv2dOperator<float> conv_Aw({1, 2, 2, 1}, SAME);
   conv_Aw
       .set_inputs(
-          {{ConvOperator<float>::in, in}, {ConvOperator<float>::filter, w}})
-      .set_outputs({{ConvOperator<float>::out, out}})
+          {{Conv2dOperator<float>::in, in}, {Conv2dOperator<float>::filter, w}})
+      .set_outputs({{Conv2dOperator<float>::out, out}})
       .eval();
 
   for (int i = 0; i < 6272; i++) {
@@ -298,11 +299,11 @@ TEST(Convolution, random_inputs_VALID_0_stride_1) {
   Tensor w = new RomTensor({5, 5, 1, 32}, flt, s_w_VALID_0_stride_1);
   Tensor out = new RamTensor({1, 24, 24, 32}, flt);
 
-  ConvOperator<float> conv_Aw({1, 1, 1, 1}, VALID);
+  Conv2dOperator<float> conv_Aw({1, 1, 1, 1}, VALID);
   conv_Aw
       .set_inputs(
-          {{ConvOperator<float>::in, in}, {ConvOperator<float>::filter, w}})
-      .set_outputs({{ConvOperator<float>::out, out}})
+          {{Conv2dOperator<float>::in, in}, {Conv2dOperator<float>::filter, w}})
+      .set_outputs({{Conv2dOperator<float>::out, out}})
       .eval();
 
   for (int i = 0; i < 18432; i++) {
@@ -324,11 +325,11 @@ TEST(Convolution, random_inputs_VALID_0_stride_2) {
   Tensor w = new RomTensor({5, 5, 1, 32}, flt, s_w_VALID_0_stride_2);
   Tensor out = new RamTensor({1, 12, 12, 32}, flt);
 
-  ConvOperator<float> conv_Aw({1, 2, 2, 1}, VALID);
+  Conv2dOperator<float> conv_Aw({1, 2, 2, 1}, VALID);
   conv_Aw
       .set_inputs(
-          {{ConvOperator<float>::in, in}, {ConvOperator<float>::filter, w}})
-      .set_outputs({{ConvOperator<float>::out, out}})
+          {{Conv2dOperator<float>::in, in}, {Conv2dOperator<float>::filter, w}})
+      .set_outputs({{Conv2dOperator<float>::out, out}})
       .eval();
 
   for (int i = 0; i < 4608; i++) {
@@ -351,11 +352,11 @@ TEST(Convolution, random_inputs_VALID_1_stride_1) {
   Tensor w = new RomTensor({5, 5, 1, 32}, flt, s_w_VALID_1_stride_1);
   Tensor out = new RamTensor({1, 24, 24, 32}, flt);
 
-  ConvOperator<float> conv_Aw({1, 1, 1, 1}, VALID);
+  Conv2dOperator<float> conv_Aw({1, 1, 1, 1}, VALID);
   conv_Aw
       .set_inputs(
-          {{ConvOperator<float>::in, in}, {ConvOperator<float>::filter, w}})
-      .set_outputs({{ConvOperator<float>::out, out}})
+          {{Conv2dOperator<float>::in, in}, {Conv2dOperator<float>::filter, w}})
+      .set_outputs({{Conv2dOperator<float>::out, out}})
       .eval();
 
   for (int i = 0; i < 18432; i++) {
@@ -377,11 +378,11 @@ TEST(Convolution, random_inputs_VALID_1_stride_2) {
   Tensor w = new RomTensor({5, 5, 1, 32}, flt, s_w_VALID_1_stride_2);
   Tensor out = new RamTensor({1, 12, 12, 32}, flt);
 
-  ConvOperator<float> conv_Aw({1, 2, 2, 1}, VALID);
+  Conv2dOperator<float> conv_Aw({1, 2, 2, 1}, VALID);
   conv_Aw
       .set_inputs(
-          {{ConvOperator<float>::in, in}, {ConvOperator<float>::filter, w}})
-      .set_outputs({{ConvOperator<float>::out, out}})
+          {{Conv2dOperator<float>::in, in}, {Conv2dOperator<float>::filter, w}})
+      .set_outputs({{Conv2dOperator<float>::out, out}})
       .eval();
 
   for (int i = 0; i < 4608; i++) {
@@ -404,11 +405,11 @@ TEST(Convolution, random_inputs_VALID_2_stride_1) {
   Tensor w = new RomTensor({5, 5, 1, 32}, flt, s_w_VALID_2_stride_1);
   Tensor out = new RamTensor({1, 24, 24, 32}, flt);
 
-  ConvOperator<float> conv_Aw({1, 1, 1, 1}, VALID);
+  Conv2dOperator<float> conv_Aw({1, 1, 1, 1}, VALID);
   conv_Aw
       .set_inputs(
-          {{ConvOperator<float>::in, in}, {ConvOperator<float>::filter, w}})
-      .set_outputs({{ConvOperator<float>::out, out}})
+          {{Conv2dOperator<float>::in, in}, {Conv2dOperator<float>::filter, w}})
+      .set_outputs({{Conv2dOperator<float>::out, out}})
       .eval();
 
   for (int i = 0; i < 18432; i++) {
@@ -430,11 +431,11 @@ TEST(Convolution, random_inputs_VALID_2_stride_2) {
   Tensor w = new RomTensor({5, 5, 1, 32}, flt, s_w_VALID_2_stride_2);
   Tensor out = new RamTensor({1, 12, 12, 32}, flt);
 
-  ConvOperator<float> conv_Aw({1, 2, 2, 1}, VALID);
+  Conv2dOperator<float> conv_Aw({1, 2, 2, 1}, VALID);
   conv_Aw
       .set_inputs(
-          {{ConvOperator<float>::in, in}, {ConvOperator<float>::filter, w}})
-      .set_outputs({{ConvOperator<float>::out, out}})
+          {{Conv2dOperator<float>::in, in}, {Conv2dOperator<float>::filter, w}})
+      .set_outputs({{Conv2dOperator<float>::out, out}})
       .eval();
 
   for (int i = 0; i < 4608; i++) {
@@ -457,11 +458,11 @@ TEST(Convolution, random_inputs_VALID_3_stride_1) {
   Tensor w = new RomTensor({5, 5, 1, 32}, flt, s_w_VALID_3_stride_1);
   Tensor out = new RamTensor({1, 24, 24, 32}, flt);
 
-  ConvOperator<float> conv_Aw({1, 1, 1, 1}, VALID);
+  Conv2dOperator<float> conv_Aw({1, 1, 1, 1}, VALID);
   conv_Aw
       .set_inputs(
-          {{ConvOperator<float>::in, in}, {ConvOperator<float>::filter, w}})
-      .set_outputs({{ConvOperator<float>::out, out}})
+          {{Conv2dOperator<float>::in, in}, {Conv2dOperator<float>::filter, w}})
+      .set_outputs({{Conv2dOperator<float>::out, out}})
       .eval();
 
   for (int i = 0; i < 18432; i++) {
@@ -483,11 +484,11 @@ TEST(Convolution, random_inputs_VALID_3_stride_2) {
   Tensor w = new RomTensor({5, 5, 1, 32}, flt, s_w_VALID_3_stride_2);
   Tensor out = new RamTensor({1, 12, 12, 32}, flt);
 
-  ConvOperator<float> conv_Aw({1, 2, 2, 1}, VALID);
+  Conv2dOperator<float> conv_Aw({1, 2, 2, 1}, VALID);
   conv_Aw
       .set_inputs(
-          {{ConvOperator<float>::in, in}, {ConvOperator<float>::filter, w}})
-      .set_outputs({{ConvOperator<float>::out, out}})
+          {{Conv2dOperator<float>::in, in}, {Conv2dOperator<float>::filter, w}})
+      .set_outputs({{Conv2dOperator<float>::out, out}})
       .eval();
 
   for (int i = 0; i < 4608; i++) {
@@ -510,11 +511,11 @@ TEST(Convolution, random_inputs_VALID_4_stride_1) {
   Tensor w = new RomTensor({5, 5, 1, 32}, flt, s_w_VALID_4_stride_1);
   Tensor out = new RamTensor({1, 24, 24, 32}, flt);
 
-  ConvOperator<float> conv_Aw({1, 1, 1, 1}, VALID);
+  Conv2dOperator<float> conv_Aw({1, 1, 1, 1}, VALID);
   conv_Aw
       .set_inputs(
-          {{ConvOperator<float>::in, in}, {ConvOperator<float>::filter, w}})
-      .set_outputs({{ConvOperator<float>::out, out}})
+          {{Conv2dOperator<float>::in, in}, {Conv2dOperator<float>::filter, w}})
+      .set_outputs({{Conv2dOperator<float>::out, out}})
       .eval();
 
   for (int i = 0; i < 18432; i++) {
@@ -536,11 +537,11 @@ TEST(Convolution, random_inputs_VALID_4_stride_2) {
   Tensor w = new RomTensor({5, 5, 1, 32}, flt, s_w_VALID_4_stride_2);
   Tensor out = new RamTensor({1, 12, 12, 32}, flt);
 
-  ConvOperator<float> conv_Aw({1, 2, 2, 1}, VALID);
+  Conv2dOperator<float> conv_Aw({1, 2, 2, 1}, VALID);
   conv_Aw
       .set_inputs(
-          {{ConvOperator<float>::in, in}, {ConvOperator<float>::filter, w}})
-      .set_outputs({{ConvOperator<float>::out, out}})
+          {{Conv2dOperator<float>::in, in}, {Conv2dOperator<float>::filter, w}})
+      .set_outputs({{Conv2dOperator<float>::out, out}})
       .eval();
 
   for (int i = 0; i < 4608; i++) {

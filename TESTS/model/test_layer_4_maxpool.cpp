@@ -3,6 +3,7 @@
 #include "uTensor.h"
 
 using namespace uTensor;
+using ReferenceOperators::MaxPoolOperator;
 
 static localCircularArenaAllocator<2048> ram_allocator;
 static localCircularArenaAllocator<2048> meta_allocator;

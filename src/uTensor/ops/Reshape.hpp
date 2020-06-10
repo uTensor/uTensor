@@ -10,6 +10,7 @@
 using std::array;
 
 namespace uTensor {
+namespace ReferenceOperators {
 
 template <typename Tin>
 class ReshapeOperator : public OperatorInterface<1, 1> {
@@ -59,6 +60,7 @@ private:
   }
 };
 
+}
 }
 
 #endif // UTENSOR_RESHAPE_H

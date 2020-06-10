@@ -128,12 +128,20 @@ make test
 
 ## Building and running on Arm systems
 TODO
+Note: CMake Support for Arm is currently experimental
 https://stackoverflow.com/questions/46916611/cross-compiling-googletest-for-arm64
+
+Default build
+```
+mkdir build && cd build
+cmake -DCMAKE_BUILD_TYPE=Debug -DCMAKE_TOOLCHAIN_FILE=../extern/CMSIS_5/CMSIS/DSP/gcc.cmake  ..
+```
+
+With CMSIS optimized kernels
 ```
 mkdir build && cd build
 cmake -DARM_PROJECT=1 -DCMAKE_BUILD_TYPE=Debug -DCMAKE_TOOLCHAIN_FILE=../extern/CMSIS_5/CMSIS/DSP/gcc.cmake  ..
 ```
-
 
 ## Further Reading
 - [Why Edge Computing](https://towardsdatascience.com/why-machine-learning-on-the-edge-92fac32105e6)

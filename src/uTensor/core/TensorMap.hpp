@@ -17,6 +17,7 @@ class TensorMapInterface {
   virtual SimpleNamedTensor& operator[](const uTensor::string& name) = 0;
   virtual const SimpleNamedTensor& operator[](
       const uTensor::string& name) const = 0;
+  virtual bool has(const uTensor::string& name) const = 0;
   /*
   virtual SimpleNamedTensor& operator[](uint8_t i) = 0;
   virtual const SimpleNamedTensor& operator[](uint8_t i) const = 0;
@@ -35,14 +36,14 @@ class FixedTensorMap : public TensorMapInterface {
   FixedTensorMap(initializer_list<SimpleNamedTensor> l) {
     if (size != l.size()) {
       // TODO THROW ERROR
-      uTensor_printf("Element number mismatch in TensorMap construction\n");
+      uTensor_printf("[Warning] Element number mismatch in TensorMap construction\n");
     }
     int i = 0;
     for (auto thing = l.begin(); thing != l.end(); thing++) {
-      _map[i] = *thing;
-      i++;
+      _map[thing->name->get_value()] = *thing;
+      //i++;
     }
-    std::sort(std::begin(_map), std::end(_map), compare_named_tensors);
+    //std::sort(std::begin(_map), std::end(_map), compare_named_tensors);
   }
   FixedTensorMap() {
     //_map = {not_found};
@@ -57,17 +58,17 @@ class FixedTensorMap : public TensorMapInterface {
   }
   */
   virtual SimpleNamedTensor& operator[](const uTensor::string& name) override {
-    for (int i = 0; i < size; i++) {
-      if (name == *(_map[i].name)) return _map[i];
+    if (!has(name)) {
+      return TensorMapInterface::not_found;
     }
-    return TensorMapInterface::not_found;
+    return _map[name.get_value()];
   }
   virtual const SimpleNamedTensor& operator[](
       const uTensor::string& name) const override {
-    for (int i = 0; i < size; i++) {
-      if (name == *(_map[i].name)) return _map[i];
+    if (!has(name)){
+      return TensorMapInterface::not_found;
     }
-    return TensorMapInterface::not_found;
+    return _map[name.get_value()];
   }
   FixedTensorMap(FixedTensorMap<size>&& that) {
     _map = that._map;
@@ -86,7 +87,10 @@ class FixedTensorMap : public TensorMapInterface {
     for (int i = 0; i < size; i++) _map[i] = that._map[i];
     return *this;
   }
-
+  virtual bool has(const uTensor::string& name) const override {
+    const SimpleNamedTensor& x = _map[name.get_value()];
+    return x.name != nullptr;
+  }
  private:
   SimpleNamedTensor _map[size];
 };

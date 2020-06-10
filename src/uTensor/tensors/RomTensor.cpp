@@ -17,7 +17,7 @@ void* RomTensor::write(uint32_t linear_index) {
   // const\n"); return nullptr;
   return BufferTensor::write(linear_index);
 }
-size_t RomTensor::_get_readable_block(void* buffer, uint16_t req_read_size,
+size_t RomTensor::_get_readable_block(const void*& buffer, uint16_t req_read_size,
                                       uint32_t linear_index) const {
   if (req_read_size + linear_index > _type_size * _shape.get_linear_size()) {
     Context::get_default_context()->throwError(new InvalidMemAccessError());
@@ -26,7 +26,7 @@ size_t RomTensor::_get_readable_block(void* buffer, uint16_t req_read_size,
   buffer = reinterpret_cast<void*>(_buffer + linear_index * _type_size);
   return req_read_size;
 }
-size_t RomTensor::_get_writeable_block(void* buffer, uint16_t req_write_size,
+size_t RomTensor::_get_writeable_block(void*& buffer, uint16_t req_write_size,
                                        uint32_t linear_index) {
   Context::get_default_context()->throwError(
       new InvalidOptimizableTensorError());

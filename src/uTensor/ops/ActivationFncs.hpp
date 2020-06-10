@@ -6,6 +6,7 @@
 #include "operatorBase.hpp"
 
 namespace uTensor {
+namespace ReferenceOperators {
 class InPlaceActivationFnc : public OperatorInterface<1, 0> {
  public:
   enum names_in : uint8_t { x };
@@ -162,6 +163,7 @@ class SigmoidOperator : public OperatorInterface<1, 1> {
   }
 };
 
+}  // ReferenceOperators 
 }  // namespace uTensor
 
 #endif
