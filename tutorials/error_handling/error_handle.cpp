@@ -17,7 +17,7 @@ DEFINE_EVENT(EventDontCatch);
 DECLARE_ERROR(MyError);
 DEFINE_ERROR(MyError);
 
-class MyHandler : public ErrorHandler {
+class MyEventHandler : public ErrorHandler {
  public:
   // uThrow: normally invoked when a error occurs during op evaluation
   // you can override this method and do what ever you want with the error.
@@ -25,7 +25,7 @@ class MyHandler : public ErrorHandler {
   // can debug the error easily in a debugger such as lldb or gdb.
   virtual void uThrow(Error* err) override {
     if (err->event_id == MyError::uid) {
-      printf("MyError throwed! Spinning\n");
+      printf("MyError thrown. Spinning...\n");
       while (true) {
       }
     }
@@ -37,7 +37,7 @@ class MyHandler : public ErrorHandler {
   // Each event is identified by a static uid.
   virtual void notify(const Event& evt) override {
     if (evt.event_id == MyEvent::uid) {
-      printf("MyEvent detected!\n");
+      printf("MyEvent detected\n");
     } else {
       printf("Unknown Event detected\n");
     }
@@ -45,7 +45,7 @@ class MyHandler : public ErrorHandler {
 };
 
 int main(int argc, const char** argv) {
-  MyHandler handler;
+  MyEventHandler handler;
   Context* ptrDefaultContext = Context::get_default_context();
   // setup handler
   ptrDefaultContext->set_ErrorHandler(&handler);

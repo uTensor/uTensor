@@ -11,7 +11,8 @@ Make sure `cmake` is available on your system and run following commands:
 ```bash
 $ mkdir build
 $ cd build
-$ cmake -DPACKAGE_TUTORIALS=ON ..; make
+$ cmake -DPACKAGE_TUTORIALS=ON ..
+$ make
 ```
 
 After the building process finish, you should find the tutorial executables under `build/tutorials/` directory.
