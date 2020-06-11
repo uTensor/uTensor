@@ -120,7 +120,7 @@ Like `Handles`, when a `Tensor` goes out of scope, or more generally when it's d
 
 ### OperatorInterface
 
-The `OperatorInterface`, in all its glory, is nothing more than a fixed-size TensorMap for inputs and another for outputs, the setters for these two maps, plus a pure virtual `compute()` method that gets called whenever a user `evals` an operator. Although, writing a custom operator just involves implementing this `compute()` method in a child class, we find it helpful to make the names of the expected inputs/outputs additionally available as public enums in the child classes. This way we can clearly describe which `Tensor`s get mapped to which operator parameter, and also `ctag` jump around in the models more easily.
+The `OperatorInterface`, in all its glory, is nothing more than a fixed-size `TensorMap` for inputs and another for outputs, the setters for these two maps, plus a pure virtual `compute()` method that gets called whenever a user `eval`s an operator. Although, writing a custom operator just involves implementing this `compute()` method in a child class, we find it helpful to make the names of the expected inputs/outputs additionally available as public enums in the child classes. This way we can clearly describe which `Tensor`s get mapped to which operator parameter, and also `ctag` jump around in the models more easily.
 
 ```cpp
 class MyOperator : public OperatorInterface<num_inputs, num_outputs> {

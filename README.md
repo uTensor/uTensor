@@ -2,6 +2,28 @@
 [![CircleCI](https://circleci.com/gh/uTensor/uTensor.svg?style=svg)](https://circleci.com/gh/uTensor/uTensor)
 Note: If you are looking for stable releases, checkout master.
 
+## Tutorials
+
+### Building Tutorial Examples
+
+Make sure `cmake` is available on your system and run following commands:
+
+```bash
+$ mkdir build
+$ cd build
+$ cmake -DPACKAGE_TUTORIALS=ON ..
+$ make
+```
+
+After the building process finish, you should find the tutorial executables under `build/tutorials/` directory.
+
+Follow instructions in the `README.md` in each tutorial directories to learn how to use `uTensor`.
+
+Here are the links to the tutorials:
+
+1. [Error Handling with `uTensor`](tutorials/error_handling)
+2. [Custom Operator](tutorials/custom_operator)
+
 ## Introduction
 
 ### What is it?
