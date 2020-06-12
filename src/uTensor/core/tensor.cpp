@@ -18,13 +18,12 @@ TensorInterface* Tensor::operator*() {
 }
 Tensor::~Tensor() { free(); }
 void Tensor::free() {
-  void* ptr_t = _ptr; //unbind invalidates this handle so store a copy
+  void* ptr_t = _ptr;  // unbind invalidates this handle so store a copy
   if (_ptr) {
     AllocatorInterface* alloc =
         Context::get_default_context()->get_metadata_allocator();
     if (alloc->is_bound(_ptr, this)) {
       alloc->unbind(_ptr, this);
-
     }
     delete reinterpret_cast<TensorInterface*>(ptr_t);
     alloc->deallocate(ptr_t);
@@ -34,7 +33,9 @@ void Tensor::free() {
 Tensor::Tensor() : Handle() {}
 Tensor::Tensor(TensorInterface* ptr) : Handle((void*)ptr) {
   // Context::get_default_context()->get_metadata_allocator()->bind(_ptr, this);
-  bind(*this, *Context::get_default_context()->get_metadata_allocator());
+  if (ptr != nullptr) {
+    bind(*this, *Context::get_default_context()->get_metadata_allocator());
+  }
 }
 Tensor& Tensor::operator=(TensorInterface* ptr) {
   _ptr = (void*)ptr;
