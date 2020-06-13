@@ -18,7 +18,7 @@ class ConvFilter {
   const Tensor& filter;
 
  public:
-  ConvFilter(const Tensor& filter) : filter(filter) {}
+  ConvFilter(const Tensor& filter) : tmp(0), filter(filter) {}
   inline void reset() { tmp = 0; }
   inline void PartialCompute(const T& input_value, int i, int j, int k, int l) {
     const T filter_value = filter(i, j, k, l);
