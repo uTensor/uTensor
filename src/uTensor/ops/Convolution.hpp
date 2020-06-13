@@ -25,6 +25,7 @@ class ConvFilter {
     tmp += (input_value * filter_value);
   }
   inline T finalize() const { return tmp; }
+  // https://github.com/tensorflow/tensorflow/blob/28d1ad34bb59e3e1631b5807eebc46563ef3382c/tensorflow/lite/kernels/internal/reference/conv.h#L56-L57
   inline const int16_t height() const { return filter->get_shape()[1]; }
   inline const int16_t width() const { return filter->get_shape()[2]; }
   inline const int16_t in_channels() const { return filter->get_shape()[3]; }
