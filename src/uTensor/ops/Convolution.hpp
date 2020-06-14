@@ -18,17 +18,18 @@ class ConvFilter {
   const Tensor& filter;
 
  public:
-  ConvFilter(const Tensor& filter) : filter(filter) {}
+  ConvFilter(const Tensor& filter) : tmp(0), filter(filter) {}
   inline void reset() { tmp = 0; }
   inline void PartialCompute(const T& input_value, int i, int j, int k, int l) {
     const T filter_value = filter(i, j, k, l);
     tmp += (input_value * filter_value);
   }
   inline T finalize() const { return tmp; }
-  inline const int16_t height() const { return filter->get_shape()[0]; }
-  inline const int16_t width() const { return filter->get_shape()[1]; }
-  inline const int16_t in_channels() const { return filter->get_shape()[2]; }
-  inline const int16_t out_channels() const { return filter->get_shape()[3]; }
+  // https://github.com/tensorflow/tensorflow/blob/28d1ad34bb59e3e1631b5807eebc46563ef3382c/tensorflow/lite/kernels/internal/reference/conv.h#L56-L57
+  inline const int16_t height() const { return filter->get_shape()[1]; }
+  inline const int16_t width() const { return filter->get_shape()[2]; }
+  inline const int16_t in_channels() const { return filter->get_shape()[3]; }
+  inline const int16_t out_channels() const { return filter->get_shape()[0]; }
 };
 
 template <typename T>
@@ -93,10 +94,26 @@ class AvgFilter {
   inline const int16_t out_channels() const { return c; }
 };
 
+template<typename T>
+class NoBias {
+  public:
+    T operator()(int32_t i) { return 0; }
+};
+
+template<typename T>
+class wBias {
+  public:
+    wBias(const Tensor& t) : t(t) {}
+    T operator()(int32_t i) { return static_cast<T>(t(i)); }
+
+  private:
+    const Tensor& t;
+};
+
 template <typename T>
-class Conv2dOperator : public OperatorInterface<2, 1> {
+class Conv2dOperator : public OperatorInterface<3, 1> {
  public:
-  enum names_in : uint8_t { in, filter };
+  enum names_in : uint8_t { in, filter, bias };
   enum names_out : uint8_t { out };
   Conv2dOperator(std::initializer_list<uint16_t> strides, Padding padding)
       : _padding(padding) {
@@ -108,9 +125,18 @@ class Conv2dOperator : public OperatorInterface<2, 1> {
 
  protected:
   virtual void compute() {
+    bool have_bias = inputs.has(bias);
     ConvFilter<T> conv(inputs[filter].tensor());
-    generic_convolution_kernel<T, ConvFilter<T>>(
-        outputs[out].tensor(), inputs[in].tensor(), conv, _padding, _stride);
+    if(have_bias) {
+      wBias<T> w_bias(inputs[bias].tensor());
+      generic_convolution_kernel<T, ConvFilter<T>>(
+        outputs[out].tensor(), inputs[in].tensor(), conv, w_bias, _padding, _stride);
+    } else {
+      NoBias<T> no_bias;
+      generic_convolution_kernel<T, ConvFilter<T>>(
+        outputs[out].tensor(), inputs[in].tensor(), conv, no_bias, _padding, _stride);
+
+    }
   }
 
  private:
