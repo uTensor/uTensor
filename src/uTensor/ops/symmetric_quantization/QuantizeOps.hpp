@@ -8,7 +8,8 @@
 #include "operatorBase.hpp"
 
 namespace uTensor {
-namespace TFLM {
+namespace TflmSymQuantOps {
+
 // https://github.com/tensorflow/tensorflow/blob/fb4ec5cbde3973050e7350f0aca7f07ab7757bac/tensorflow/lite/kernels/internal/reference/dequantize.h#L30-L44
 template <typename OutputT, typename InputT>
 void dequantize_kernel(Tensor& b, const Tensor& a) {

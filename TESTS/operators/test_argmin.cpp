@@ -10,7 +10,8 @@
 #include "gtest/gtest.h"
 
 using namespace uTensor;
-
+using  uTensor::ReferenceOperators::ArgMinOperator;
+ 
 TEST(ArgMin, random_argmin_test) {
   localCircularArenaAllocator<1024> meta_allocator;
   localCircularArenaAllocator<10 * 2 * sizeof(float), uint32_t> ram_allocator;

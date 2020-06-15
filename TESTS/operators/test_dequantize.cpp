@@ -13,6 +13,7 @@ using std::cout;
 using std::endl;
 
 using namespace uTensor;
+using namespace TflmSymQuantOps;
 
 const int8_t s_a[10] = {-33, -38, -5, -5, -49, -41, -95, 98, -36, 0};
 float s_b[10] = {0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f};
@@ -33,10 +34,11 @@ TEST(Quantization, DequantizeOp) {
 
   Tensor b = new /*const*/ BufferTensor({10}, flt, s_b);
 
-  TFLM::DequantizeOperator<float, int8_t> deq_A;
-
-  deq_A.set_inputs({{TFLM::DequantizeOperator<float, uint8_t>::a, a}})
-      .set_outputs({{TFLM::DequantizeOperator<float, uint8_t>::b, b}})
+  DequantizeOperator<float, int8_t> deq_A;
+  
+  deq_A
+      .set_inputs({{DequantizeOperator<float,uint8_t>::a, a}})
+      .set_outputs({{DequantizeOperator<float,uint8_t>::b, b}})
       .eval();
 
   // Compare results

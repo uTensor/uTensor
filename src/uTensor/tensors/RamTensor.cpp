@@ -25,7 +25,7 @@ void* RamTensor::write(uint32_t linear_index) {
   return nullptr;
 }
 
-size_t RamTensor::_get_readable_block(void* buffer, uint16_t req_read_size,
+size_t RamTensor::_get_readable_block(const void*& buffer, uint16_t req_read_size,
                                       uint32_t linear_index) const {
   if (req_read_size + linear_index > _type_size * _shape.get_linear_size()) {
     Context::get_default_context()->throwError(new InvalidMemAccessError());
@@ -35,7 +35,7 @@ size_t RamTensor::_get_readable_block(void* buffer, uint16_t req_read_size,
   buffer = reinterpret_cast<void*>(d + linear_index * _type_size);
   return req_read_size;
 }
-size_t RamTensor::_get_writeable_block(void* buffer, uint16_t req_write_size,
+size_t RamTensor::_get_writeable_block(void*& buffer, uint16_t req_write_size,
                                        uint32_t linear_index) {
   if (req_write_size + linear_index > _type_size * _shape.get_linear_size()) {
     Context::get_default_context()->throwError(new InvalidMemAccessError());

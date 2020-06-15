@@ -40,7 +40,7 @@ package_add_test_with_libraries(test_romtensor tensors/test_romtensor utensor te
 # Operators
 package_add_test_with_libraries(test_arith operators/test_arithmetic utensor operators "${PROJECT_DIR}/test-data/")
 package_add_test_with_libraries(test_matrix_ops operators/test_matrix utensor operators "${PROJECT_DIR}/test-data/")
-package_add_test_with_libraries(test_convolution operators/test_convolution utensor operators "${PROJECT_DIR}/test-data/")
+#package_add_test_with_libraries(test_convolution operators/test_convolution utensor operators "${PROJECT_DIR}/test-data/")
 package_add_test_with_libraries(test_dws_convolution operators/test_dws_convolution utensor operators "${PROJECT_DIR}/test-data/")
 package_add_test_with_libraries(test_relu operators/test_relu utensor operators "${PROJECT_DIR}/test-data/")
 package_add_test_with_libraries(test_maxpool operators/test_maxpool utensor operators "${PROJECT_DIR}/test-data/")

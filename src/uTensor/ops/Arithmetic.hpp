@@ -7,6 +7,7 @@
 #include "operatorBase.hpp"
 
 namespace uTensor {
+namespace ReferenceOperators {
 
 template <typename T>
 class AddOperator : public OperatorInterface<2, 1> {
@@ -50,5 +51,6 @@ class MulOperator : public OperatorInterface<2, 1> {
   }
 };
 
+}
 }  // namespace uTensor
 #endif

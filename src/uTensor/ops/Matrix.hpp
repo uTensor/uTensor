@@ -6,6 +6,7 @@
 #include "Matrix_kernels.hpp"
 
 namespace uTensor {
+namespace ReferenceOperators {
 
 template <typename T>
 class MatrixMultOperator : public OperatorInterface<2, 1> {
@@ -67,5 +68,6 @@ class MatrixMultOperatorV2<float> : public OperatorInterface<3, 1> {
 template <typename Tout>
 using FullyConnectedOperator = MatrixMultOperatorV2<Tout>;
 
+}
 }  // namespace uTensor
 #endif
