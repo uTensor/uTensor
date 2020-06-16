@@ -39,6 +39,7 @@ sd-driver
 #Project generated test files
 python/test_scripts/testData
 python/.venv
+__pycache__
 
 #Vim stuff
 *.swp

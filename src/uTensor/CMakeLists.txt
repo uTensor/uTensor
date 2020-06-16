@@ -14,6 +14,8 @@ set(src_utensor_tensors
    )
 set(src_utensor_ops
     ops/Matrix.cpp
+    ops/Matrix_kernels.cpp
+    ops/Convolution_kernels.cpp
    )
 set(src_utensor_errhndl
   errorHandlers/SimpleErrorHandler.cpp

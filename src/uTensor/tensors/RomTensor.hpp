@@ -34,6 +34,16 @@ class RomTensor : public BufferTensor {
                                       uint32_t linear_index) override;
 };
 
+class ScalarRomTensor : public RomTensor {
+ protected:
+  virtual void* read(uint32_t linear_index) const override;
+  virtual void* write(uint32_t linear_index) override;
+
+ public:
+  ScalarRomTensor(TensorShape _shape, ttype _type, const void* buffer);
+  virtual ~ScalarRomTensor();
+};
+
 class DiagonalRomTensor : public RomTensor {
  protected:
   virtual void* read(uint32_t linear_index) const override;

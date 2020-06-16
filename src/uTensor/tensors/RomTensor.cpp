@@ -3,6 +3,7 @@
 #include <cstdio>
 
 #include "context.hpp"
+#include "uTensor_util.hpp"
 namespace uTensor {
 
 // EVENTS
@@ -12,7 +13,7 @@ RomTensor::RomTensor(TensorShape _shape, ttype _type, const void* buffer)
 
 // TODO Need to fix the write/read selection functions in Handle
 void* RomTensor::write(uint32_t linear_index) {
-  // printf("[ERROR] Attempted write to ROM tensor, make sure it's declared
+  // uTensor_printf("[ERROR] Attempted write to ROM tensor, make sure it's declared
   // const\n"); return nullptr;
   return BufferTensor::write(linear_index);
 }
@@ -29,15 +30,41 @@ size_t RomTensor::_get_writeable_block(void*& buffer, uint16_t req_write_size,
                                        uint32_t linear_index) {
   Context::get_default_context()->throwError(
       new InvalidOptimizableTensorError());
-  printf(
+  uTensor_printf(
       "ERROR, Optimized op attempted to write access non-optimizable tensor\n");
   return -1;
 }
 
 RomTensor::~RomTensor() {}
 void RomTensor::resize(TensorShape new_shape) {
-  printf("[ERROR] Attempted resize of ROM tensor\n");
+  uTensor_printf("[ERROR] Attempted resize of ROM tensor\n");
   Context::get_default_context()->throwError(new InvalidResizeError());
+}
+
+ScalarRomTensor::ScalarRomTensor(TensorShape _shape, ttype _type,
+                                     const void* buffer)
+    : RomTensor(_shape, _type, buffer) {
+  if (_shape.num_dims() != 1) {
+    uTensor_printf(
+        "[ERROR] Attempted to create scalar Tensor with more than one "
+        "dimension\n");
+    Context::get_default_context()->throwError(
+        new InvalidTensorDimensionsError());
+  }
+  if (_shape[0] != 1) {
+    uTensor_printf("[ERROR] Scalar Tensor size not 1\n");
+    Context::get_default_context()->throwError(
+        new InvalidTensorDimensionsError());
+  }
+}
+
+ScalarRomTensor::~ScalarRomTensor() {}
+void* ScalarRomTensor::read(uint32_t linear_index) const {
+    return RomTensor::read(0);
+}
+// HACK TODO, REMOVE THIS after getting Handles to work with const pointers
+void* ScalarRomTensor::write(uint32_t linear_index) {
+    return RomTensor::write(0);
 }
 
 // Returns floor of square root of x
@@ -66,7 +93,7 @@ DiagonalRomTensor::DiagonalRomTensor(TensorShape _shape, ttype _type,
                                      const void* buffer, size_t buffer_len)
     : RomTensor(_shape, _type, buffer) {
   if (_shape.num_dims() != 2) {
-    printf(
+    uTensor_printf(
         "[ERROR] Attempted to create diagonal Tensor with wrong number of "
         "dimensions\n");
     Context::get_default_context()->throwError(
@@ -74,7 +101,7 @@ DiagonalRomTensor::DiagonalRomTensor(TensorShape _shape, ttype _type,
   }
   uint16_t smaller_dim = (_shape[0] < _shape[1]) ? _shape[0] : _shape[1];
   if (buffer_len < smaller_dim) {
-    printf("[ERROR] Diagnoal Tensor size mismatch with buffer\n");
+    uTensor_printf("[ERROR] Diagnoal Tensor size mismatch with buffer\n");
     Context::get_default_context()->throwError(
         new InvalidTensorDimensionsError());
   }
