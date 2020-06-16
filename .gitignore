@@ -51,3 +51,4 @@ build
 *.dSYM
 main.cpp
 a.out
+*.orig

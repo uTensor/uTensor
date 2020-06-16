@@ -22,7 +22,7 @@ jobs:
           command: |
             mkdir build && cd build
             cmake -DPACKAGE_TESTS=ON -DENABLE_COVERAGE=ON ..
-            make -j
+            make
       - run:
           name: "Test"
           command: |
