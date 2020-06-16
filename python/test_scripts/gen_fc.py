@@ -1,15 +1,26 @@
 from jinja_env import env2, Operator, Tensor, SingleOpTest
 import tensorflow as tf
+import numpy as np
 
 test_group = "ReferenceFC"
+num_tests = 5;
+output_file = "test_fully_connected.cpp"
+const_file = "constants_fully_connected.hpp"
 
 def gen_test(test_number):
     test_name = "random_gen_fc__%d" % ( test_number)
-    in1 = tf.constant(tf.random.uniform([1,2,2,64])).numpy()
+    in0 = tf.constant(tf.random.uniform([1,2,2,64])).numpy()
     w = tf.constant(tf.random.uniform([512,256])).numpy()
-    b = tf.constant(tf.random.uniform([512,1])).numpy()
+    if test_number == 0:
+        b = np.zeros([1,512], dtype=np.float32).flatten()
+    else:
+        b = tf.constant(tf.random.uniform([1,512])).numpy().flatten()
     # Combine ops to behave like final kernel
-    out_1 = tf.math.add(tf.linalg.matmul(w, tf.reshape(in1, (-1,1))), b).numpy()
+    in1 = tf.reshape(in0, (1,-1)).numpy()
+    m = tf.linalg.matmul(in1, w, transpose_b=True)
+    print(m.shape)
+    out_1 = tf.math.add(m, b).numpy()
+    w = np.transpose(w)
 
     in_ref_name = "s_ref_in_%d" % test_number
     w_ref_name = "s_ref_w_%d" % test_number
@@ -30,3 +41,18 @@ def gen_test(test_number):
     test.add_tensor_comparison(out_t, out_ref)
     test_rendered, const_snippets = test.render()
     return test_rendered, const_snippets
+
+
+if __name__ == '__main__':
+    tests = []
+    const_snippets =[]
+    for i in range(num_tests):
+        tr, cs = gen_test(i)
+        tests.append(tr)
+        const_snippets.extend(cs)
+    with open(const_file, "w") as fp:
+        c_r = env2.get_template("const_container.hpp").render(constants=const_snippets, constants_header=const_file)
+        fp.write(c_r)
+    with open(output_file, "w") as fp:
+        gt_r = env2.get_template("gtest_container.cpp").render(constants_header=const_file, using_directives=["using namespace uTensor::ReferenceOperators"], tests=tests)
+        fp.write(gt_r)

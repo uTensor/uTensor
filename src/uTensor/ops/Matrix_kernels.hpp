@@ -49,6 +49,7 @@ void matrix_mult_kernel_v2(Tensor& output, const Tensor& input,
   const int batches = output_shape[0];
   const int output_depth = output_shape[1];
   if (!(output_depth <= filter_shape[filter_dim_count - 1])) {
+    uTensor_printf("[Error] Invalid matrix multiple shape mismatch\n");
     Context::get_default_context()->throwError(
         new InvalidMatrixMultIndicesError);
   }
