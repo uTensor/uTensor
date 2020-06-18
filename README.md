@@ -90,17 +90,15 @@ const uint8_t s_a[4] = {1, 2, 3, 4};
 const uint8_t s_b[4] = {5, 6, 7, 8};
 const uint8_t s_c_ref[4] = {19, 22, 43, 50};
 
-// This function  name doesnt matter, it should just be called before instantiating a model
-void uTensor_init() {
-  // Tell the uTensor context which allocators to use
-  localCircularArenaAllocator<256> meta_allocator; // All tensor metadata gets stored here automatically, even when new is called
-  localCircularArenaAllocator<256> ram_allocator;  // All temporary storage gets allocated here
-  Context::get_default_context()->set_metadata_allocator(&meta_allocator);
-  Context::get_default_context()->set_ram_data_allocator(&ram_allocator);
-
-}
+// These can also be embedded in models
+// Recommend, not putting these on the heap or stack directly as they can be large
+localCircularArenaAllocator<256> meta_allocator; // All tensor metadata gets stored here automatically, even when new is called
+localCircularArenaAllocator<256> ram_allocator;  // All temporary storage gets allocated here
 
 void foo() {
+  // Tell the uTensor context which allocators to use
+  Context::get_default_context()->set_metadata_allocator(&meta_allocator);
+  Context::get_default_context()->set_ram_data_allocator(&ram_allocator);
 
   // Tensors are simply handles for accessing data as necessary, they are no larger than a pointer
   // RomTensor(TensorShape, data_type, data*);
