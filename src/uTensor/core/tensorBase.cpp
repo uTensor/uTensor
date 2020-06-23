@@ -40,7 +40,7 @@ TensorInterface::TensorInterface(ttype _type)
     : TensorBase(), _shape(0), _type(_type), _qnt_params(nullptr) {
   _type_size = type_size(_type);
 }
-TensorInterface::TensorInterface(TensorShape _shape, ttype _type)
+TensorInterface::TensorInterface(const TensorShape& _shape, ttype _type)
     : TensorBase(), _shape(_shape), _type(_type), _qnt_params(nullptr) {
   _type_size = type_size(_type);
 }

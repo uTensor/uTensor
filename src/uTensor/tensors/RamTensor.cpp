@@ -48,7 +48,7 @@ size_t RamTensor::_get_writeable_block(void*& buffer, uint16_t req_write_size,
 
 RamTensor::RamTensor(ttype _type) : TensorInterface(_type) {}
 
-RamTensor::RamTensor(TensorShape _shape, ttype _type)
+RamTensor::RamTensor(const TensorShape& _shape, ttype _type)
     : TensorInterface(_shape, _type),
       _ram_region(
           Context::get_default_context()->get_ram_data_allocator()->allocate(
@@ -69,7 +69,7 @@ RamTensor::~RamTensor() {
     alloc->deallocate(ptr_t);
 }
 
-void RamTensor::resize(TensorShape new_shape) {
+void RamTensor::resize(const TensorShape& new_shape) {
   AllocatorInterface* allocator = Context::get_default_context()->get_ram_data_allocator();
   // unbind handle before reallocate memory
   void* old_ptr = *_ram_region;
@@ -90,12 +90,12 @@ void RamTensor::resize(TensorShape new_shape) {
 
 FutureMaxSizeRamTensor::FutureMaxSizeRamTensor(ttype _type)
     : RamTensor(_type), max_initial_size(0) {}
-FutureMaxSizeRamTensor::FutureMaxSizeRamTensor(TensorShape _shape, ttype _type)
+FutureMaxSizeRamTensor::FutureMaxSizeRamTensor(const TensorShape& _shape, ttype _type)
     : RamTensor(_shape, _type) {
   max_initial_size = calc_required_space(_shape, _type_size);
 }
 FutureMaxSizeRamTensor::~FutureMaxSizeRamTensor() {}
-void FutureMaxSizeRamTensor::resize(TensorShape new_shape) {
+void FutureMaxSizeRamTensor::resize(const TensorShape& new_shape) {
   if (max_initial_size == 0) {
     _shape = new_shape;
     build();
