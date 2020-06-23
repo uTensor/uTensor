@@ -26,8 +26,7 @@ class QuantizedMatrixMultiplyOperator<int8_t> : public OperatorInterface<3, 1> {
 
  protected:
   virtual void compute() {
-    bool have_bias =
-        *(inputs[bias].name) != *(TensorMapInterface::not_found.name);
+    bool have_bias = inputs.has(bias);
     // Decide on c shape
     TensorShape& a_shape = inputs[input].tensor()->get_shape();
     TensorShape& b_shape = inputs[filter].tensor()->get_shape();
@@ -63,14 +62,15 @@ class QuantizedMatrixMultiplyOperator<int8_t> : public OperatorInterface<3, 1> {
     output_shift = -exponent;
     // gets rid of IF case in mult loop
     if (have_bias) {
+      const Tensor& b = inputs[bias].tensor();
       TFLM::quantized_matrix_mult_kernel(
           outputs[output].tensor(), inputs[input].tensor(),
-          inputs[filter].tensor(), inputs[bias].tensor(), output_multiplier,
+          inputs[filter].tensor(), [&b](int32_t i){ return static_cast<int32_t>(b(i)); }, output_multiplier,
           output_shift, output_activation_min, output_activation_max);
     } else {
       TFLM::quantized_matrix_mult_kernel(
           outputs[output].tensor(), inputs[input].tensor(),
-          inputs[filter].tensor(), output_multiplier, output_shift,
+          inputs[filter].tensor(), [](int32_t i){ return 0; }, output_multiplier, output_shift,
           output_activation_min, output_activation_max);
     }
   }
