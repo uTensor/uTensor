@@ -3,6 +3,7 @@
 #include "errorHandler.hpp"
 #include "memoryManagementInterface.hpp"
 #include "tensorBase.hpp"
+#include "uTensor_util.hpp"
 
 namespace uTensor {
 

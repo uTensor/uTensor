@@ -6,14 +6,14 @@
 
 namespace uTensor {
 
-void BufferTensor::resize(TensorShape new_shape) {
-  printf("[ERROR] Cannot resize a BufferTensor\n");
+void BufferTensor::resize(const TensorShape& new_shape) {
+  uTensor_printf("[ERROR] Cannot resize a BufferTensor\n");
   Context::get_default_context()->throwError(new InvalidResizeError());
 }
 
-BufferTensor::BufferTensor(TensorShape _shape, ttype _type)
+BufferTensor::BufferTensor(const TensorShape& _shape, ttype _type)
     : TensorInterface(_shape, _type), _buffer(nullptr) {}
-BufferTensor::BufferTensor(TensorShape _shape, ttype _type, void* buffer)
+BufferTensor::BufferTensor(const TensorShape& _shape, ttype _type, void* buffer)
     : TensorInterface(_shape, _type),
       _buffer(reinterpret_cast<uint8_t*>(buffer)) {}
 BufferTensor::~BufferTensor() { _buffer = nullptr; }

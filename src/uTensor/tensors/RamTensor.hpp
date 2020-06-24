@@ -16,9 +16,9 @@ class RamTensor : public TensorInterface {
 
  public:
   RamTensor(ttype _type);
-  RamTensor(TensorShape _shape, ttype _type);
+  RamTensor(const TensorShape& _shape, ttype _type);
   virtual ~RamTensor();
-  virtual void resize(TensorShape new_shape) override;
+  virtual void resize(const TensorShape& new_shape) override;
   // USE AT YOUR OWN RISK, this function is meant for testing purposes and should not be called elsewhere. It is likely to be removed or migrated to a test helper framework
   const void* get_address() { return *_ram_region; }
 
@@ -38,11 +38,11 @@ class RamTensor : public TensorInterface {
 class FutureMaxSizeRamTensor : public RamTensor {
  public:
   FutureMaxSizeRamTensor(ttype _type);
-  FutureMaxSizeRamTensor(TensorShape _shape, ttype _type);
+  FutureMaxSizeRamTensor(const TensorShape& _shape, ttype _type);
   virtual ~FutureMaxSizeRamTensor();
   // Resizing to something smaller only
   // Invalidates data
-  virtual void resize(TensorShape new_shape) override;
+  virtual void resize(const TensorShape& new_shape) override;
 
  private:
   void build();

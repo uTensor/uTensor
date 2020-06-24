@@ -7,12 +7,12 @@
 
 void return_error(int ret_val) {
   if (ret_val) {
-    printf(" [**Failure**] %d\r\n", ret_val);
-    printf("Exiting...\r\n");
+    uTensor_printf(" [**Failure**] %d\r\n", ret_val);
+    uTensor_printf("Exiting...\r\n");
     fflush(stdout);
     exit(-1);
   } else {
-    printf("  [DONE]\r\n");
+    uTensor_printf("  [DONE]\r\n");
   }
 }
 /*

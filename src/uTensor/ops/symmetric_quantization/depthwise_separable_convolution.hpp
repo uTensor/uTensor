@@ -245,7 +245,7 @@ void DepthwiseSeparableConvOperator<Tout>::compute() {
   op_params.quantized_activation_min = std::numeric_limits<int8_t>::min();
   op_params.quantized_activation_max = std::numeric_limits<int8_t>::max();
 
-  TFLM::DepthwiseConvPerChannel<Tout>(
+  TFLM::DepthwiseConvPerChannel(
       op_params, per_channel_output_multiplier, per_channel_output_shift,
       inputs[in].tensor(), inputs[filter].tensor(), inputs[bias].tensor(),
       outputs[out].tensor());

@@ -1,3 +1,5 @@
+#ifndef __UTENSOR_H
+#define __UTENSOR_H
 /*
  * Core bits
  */
@@ -38,3 +40,4 @@
  */
 #include "uTensor/errorHandlers/SimpleErrorHandler.hpp"
 
+#endif

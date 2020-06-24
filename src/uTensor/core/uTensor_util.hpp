@@ -30,14 +30,14 @@ void return_error(int ret_val);
 
 #define ON_ERR(FUNC, MSG) \
   {                       \
-    printf(" * ");        \
-    printf(MSG);          \
+    uTensor_printf(" * ");        \
+    uTensor_printf(MSG);          \
     return_error(FUNC);   \
   }
 
 #define DEBUG(MSG, ...)         \
   {                             \
-    printf(MSG, ##__VA_ARGS__); \
+    uTensor_printf(MSG, ##__VA_ARGS__); \
     fflush(stdout);             \
   }
 
@@ -55,8 +55,8 @@ void utensor_exit(void);
 
 #define ERR_EXIT(MSG, ...)                                      \
   {                                                             \
-    printf("[Error] %s:%d @%s ", __FILE__, __LINE__, __func__); \
-    printf(MSG, ##__VA_ARGS__);                                 \
+    uTensor_printf("[Error] %s:%d @%s ", __FILE__, __LINE__, __func__); \
+    uTensor_printf(MSG, ##__VA_ARGS__);                                 \
     fflush(stdout);                                             \
     utensor_exit();                                             \
   }

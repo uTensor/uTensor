@@ -38,7 +38,7 @@ class TensorInterface : public TensorBase {
   TensorShape& get_shape();
   const TensorShape& get_shape() const;
   TensorInterface();
-  TensorInterface(TensorShape _shape, ttype _type);
+  TensorInterface(const TensorShape& _shape, ttype _type);
   TensorInterface(ttype _type);
   virtual ~TensorInterface();
 
@@ -51,7 +51,7 @@ class TensorInterface : public TensorBase {
   const IntegralValue operator()(uint32_t linear_index) const;
   IntegralValue operator()(uint32_t linear_index);
 
-  virtual void resize(TensorShape new_shape) = 0;
+  virtual void resize(const TensorShape& new_shape) = 0;
   template<typename QType>
   TensorInterface& set_quantization_params(const QType& params);
   const QuantizationParams& get_quantization_params() const;
