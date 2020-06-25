@@ -8,7 +8,6 @@
 
 namespace uTensor {
 DECLARE_ERROR(qDwsConvPerChannelMismatchError);
-DECLARE_ERROR(InvalidQuantizationSchemeError);
 
 namespace TflmSymQuantOps {
 
@@ -242,8 +241,9 @@ void DepthwiseSeparableConvOperator<Tout>::compute() {
   op_params.weights_offset = 0;
   op_params.output_offset =
       outputs[out].tensor()->get_quantization_params().get_zeroP_for_channel(0);
-  op_params.quantized_activation_min = std::numeric_limits<int8_t>::min();
-  op_params.quantized_activation_max = std::numeric_limits<int8_t>::max();
+
+  op_params.quantized_activation_min = output_activation_min;
+  op_params.quantized_activation_max = output_activation_max;
 
   TFLM::DepthwiseConvPerChannel<Tout>(
       op_params, per_channel_output_multiplier, per_channel_output_shift,

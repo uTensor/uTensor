@@ -81,9 +81,9 @@ void DepthwiseConvPerChannel(const DepthwiseParams& params,
   const int32_t output_activation_max = params.quantized_activation_max;
 
   // Check dimensions of the tensors.
-  TensorShape input_shape = input->get_shape();
-  TensorShape filter_shape = filter->get_shape();
-  TensorShape output_shape = output->get_shape();
+  const TensorShape& input_shape = input->get_shape();
+  const TensorShape& filter_shape = filter->get_shape();
+  TensorShape& output_shape = output->get_shape();
 
   if (!(input_shape.num_dims() == 4)) {
     Context::get_default_context()->throwError(
