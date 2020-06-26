@@ -9,6 +9,21 @@
 namespace uTensor {
 namespace ReferenceOperators {
 
+namespace Conv2dConstants {
+  constexpr int input_batch_dim         = 0;
+  constexpr int input_height_dim        = 0;
+  constexpr int input_witdh_dim         = 0;
+  constexpr int input_channel_dim       = 0;
+
+  constexpr int filter_height_dim       = 1;
+  constexpr int filter_width_dim        = 2;
+  constexpr int filter_in_channels_dim  = 3;
+  constexpr int filter_out_channels_dim = 0;
+
+  constexpr int output_height_dim       = 1;
+  constexpr int output_width_dim        = 2;
+}
+
 // Can use these intermediate types to make the convolution operator more
 // generic. Maxpool, conv, average pool, median etc. are all basically the same
 // operation with target functions.
@@ -26,10 +41,10 @@ class ConvFilter {
   }
   inline T finalize() const { return tmp; }
   // https://github.com/tensorflow/tensorflow/blob/28d1ad34bb59e3e1631b5807eebc46563ef3382c/tensorflow/lite/kernels/internal/reference/conv.h#L56-L57
-  inline const int16_t height() const { return filter->get_shape()[1]; }
-  inline const int16_t width() const { return filter->get_shape()[2]; }
-  inline const int16_t in_channels() const { return filter->get_shape()[3]; }
-  inline const int16_t out_channels() const { return filter->get_shape()[0]; }
+  inline const int16_t height() const { return filter->get_shape()[Conv2dConstants::filter_height_dim]; }
+  inline const int16_t width() const { return filter->get_shape()[Conv2dConstants::filter_width_dim]; }
+  inline const int16_t in_channels() const { return filter->get_shape()[Conv2dConstants::filter_in_channels_dim]; }
+  inline const int16_t out_channels() const { return filter->get_shape()[Conv2dConstants::filter_out_channels_dim]; }
 };
 
 template <typename T>
