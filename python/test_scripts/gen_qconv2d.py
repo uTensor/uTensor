@@ -40,7 +40,8 @@ def gen_test(test_number):
     #param_str = "Fuseable::NoActivation<float>"
     param_str = "{1,1,1,1}, SAME"
     op = Operator("Conv2dOperator", "convOp", dtypes=[in_t.get_dtype], param_str=param_str)
-    op.set_inputs({"input": in_t, "filter": w_t, "bias": b_t}).set_outputs({"output": out_t})
+    op.set_inputs({"in": in_t, "filter": w_t, "bias": b_t}).set_outputs({"out": out_t})
+    op.set_namespace("uTensor::ReferenceOperators::")
     
     test = SingleOpTest(test_group, test_name + "_f", op)
     test.add_tensor_comparison(out_t, out_ref)
@@ -53,6 +54,8 @@ def gen_test(test_number):
     b_ref_name = "s_ref_b_%d_%s"     % (test_number, "q")
     out_ref_name = "s_ref_out_%d_%s" % (test_number, "q")
     out_name = "s_out_%d_%s" % (test_number, "q")
+    param_str = "{1,1}, SAME"
+    op.param_str = param_str
     in_t.ref_name = in_ref_name
     w_t.ref_name = w_ref_name
     b_t.ref_name = b_ref_name
@@ -66,6 +69,7 @@ def gen_test(test_number):
     b_t.quantize()
     out_t.quantize()
     out_ref.quantize()
+    op.set_namespace("uTensor::TflmSymQuantOps::")
     
     test = SingleOpTest(test_group, test_name + "_q", op)
     test.add_tensor_comparison(out_t, out_ref)
@@ -86,5 +90,5 @@ if __name__ == '__main__':
         c_r = env2.get_template("const_container.hpp").render(constants=const_snippets, constants_header=const_file)
         fp.write(c_r)
     with open(output_file, "w") as fp:
-        gt_r = env2.get_template("gtest_container.cpp").render(constants_header=const_file, using_directives=["using namespace uTensor::ReferenceOperators"], tests=tests)
+        gt_r = env2.get_template("gtest_container.cpp").render(constants_header=const_file, using_directives=[], tests=tests)
         fp.write(gt_r)

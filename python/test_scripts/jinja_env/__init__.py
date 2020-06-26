@@ -241,11 +241,15 @@ class Operator:
     self.array_template = env2.get_template('array_template.cpp')
     self.input_map = {}
     self.output_map = {}
-    self.type_signature = env2.get_template('op_type_signature.cpp').render(op=self)
+    self.ns = ""
+    self.type_signature = ""
 
   @property
-  def dtype(self):
+  def dtypes(self):
     return [dt() for dt in self._dtypes]
+
+  def set_namespace(self, namespace_str):
+    self.ns = namespace_str
 
   def set_inputs(self, input_map):
     self.input_map = input_map
@@ -256,9 +260,11 @@ class Operator:
     return self
 
   def render_declaration(self):
+    self.type_signature = env2.get_template('op_type_signature.cpp').render(op=self)
     return env2.get_template('declare_operator.cpp').render(op=self)
 
   def render_eval(self):
+    self.type_signature = env2.get_template('op_type_signature.cpp').render(op=self)
     return env2.get_template('eval_operator.cpp').render(op=self)
   def quantize(self):
     for thing in self.input_map:
