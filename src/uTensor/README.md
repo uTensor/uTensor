@@ -6,13 +6,13 @@ For the rest of this document we will use the lowercase form of *tensor* to desc
 
 ## uTensor Core
 
-The uTensor Core is exactly that, it is the heart, definition, and ruthless contractual obligations that let's the runtime guarantee things like memory safety and model updateability, as well as a consistent user experience. Despite appearing like a high level language, the uTensor core compiles to an extremely small footprint somewhere between 1 kB and 2 KB (plus ~1KB for the rest uTensor library).
+The uTensor Core is exactly that, it is the heart, definition, and ruthless contractual obligations that lets the runtime guarantee things like memory safety and model updateability, as well as a consistent user experience. Despite appearing like a high level language, the uTensor core compiles to an extremely small footprint somewhere between 1 kB and 2 KB (plus ~1KB for the rest uTensor library).
 
 For the rest of the discussion on the uTensor core, we will explain what each part does under the hood, and what is expected of the user if they want to extend any implementations.
 
 ### Events and Errors and their Handlers
 
-In general RTTI, run time type information, is expensive for tiny systems. Rather than forcing users to compile their code with RTTI enabled and eat that cost, we found a neat way to give uTensor the ability to identify events dynamically at runtime with configurable cost! Basically using only C++11 language features, we just hash the signature of an event type at compile time and store this as a, mostly, unique ID inside the `Event` objects. A nice byproduct is these IDs remain the same across builds and machines, unless someone explicitly changes the signature of an `Event`, and the user doesnt need to manually specify some magic number associated with each event. The size of this ID is configurable, and can be 1 byte, 2 bytes, or 4 bytes depending on how many unique event types you need, even though the 4 byte version is probably way overkill for small devices.
+In general, runtime type information (RTTI) is expensive for tiny systems. Rather than forcing users to compile their code with RTTI enabled and bear the cost, we found a neat way to give uTensor the ability to identify events dynamically at runtime with configurable cost! Basically using only C++11 language features, we just hash the signature of an event type at compile time and store this as a, mostly, unique ID inside the `Event` objects. A nice byproduct is these IDs remain the same across builds and machines: unless someone explicitly changes the signature of an `Event`, the user doesnt need to manually specify some magic number associated with each event. The size of this ID is configurable, and can be 1 byte, 2 bytes, or 4 bytes depending on how many unique event types you need, even though the 4 byte version is probably way overkill for small devices.
 
 This IDs are pretty useful when debugging remote deployments. All you have to do is `grep` your source code for `DECLARE_EVENT({EVENT_NAME})` or `DECLARE_ERROR({ERROR_NAME})`, run the same hash function on the `{EVENT_NAME}`s, and store this in a simple `map(hash({EVENT_NAME}) => {EVENT_NAME})`. Then if an `Event` or `Error` occurs you just have to query this map.
 
@@ -83,7 +83,7 @@ It is better to thing about `uTensor::string` as an identifier rather than a str
 
 #### Quantization Primitives
 
-The Quantization primitives represent per-channel and per-tensor symmetric quantization schemes shared with https://www.tensorflow.org/lite/performance/quantization_spec. This generally involves allocating some small buffer in the ram allocator so we can compute and maintain scaling factors and arithmetic shifts. Choosing when to allocate, compute, and deallocate can directly impact performance. For example, allocating once and computing these values on model setup and deallocating on tear down trades RAM for improves inference times. Whereas allocating, computing, and deallocating on each inference trades inference speed for lower peak RAM footprints.
+The Quantization primitives represent per-channel and per-tensor symmetric quantization schemes shared with https://www.tensorflow.org/lite/performance/quantization_spec. This generally involves allocating some small buffer in the RAM allocator so we can compute and maintain scaling factors and arithmetic shifts. Choosing when to allocate, compute, and deallocate can directly impact performance. For example, allocating once and computing these values on model setup and deallocating on tear down trades RAM for improved inference times. Whereas allocating, computing, and deallocating on each inference trades inference speed for lower peak RAM footprints.
 
 ### Memory Allocator Interfaces
 
@@ -91,7 +91,7 @@ Probably the **two most important concepts in uTensor** are those of the Memory 
 
 From the name classes that extend the `AllocatorInterface` can do really anything a normal memory manager can, such as allocating and deallocating raw data and querying the amount of space left. However, they way this differs from standard implementations is the uTensor notion of `Handles` and how they allow the allocator to do things not normally permitted in systems without virtual memory. 
 
-In uTensor, `Handle`s are basically unique (non-copyable) pointer-like proxy reference **bound** to some allocated region in the memory manager. Under the hood, this is just a void pointer, but the user cannot access it directly. Instead, you must you must dereference the `Handle` object to get access to the underlying pointer to data (automatically a double dereference). This is important because the memory manger keeps track of `Handle`s internally and can move the underlying data blocks around without breaking the user code! Making the `Handle`s non-copyable means the memory manager only needs to record one instance per bound region which saves a good chunk of space and speeds up the query. Likewise in user-land, if `Handles` are passed around by reference then if the Allocator moved the underlying data, all user-land references effectively get *notified*. 
+In uTensor, `Handle`s are basically unique (non-copyable) pointer-like proxy reference **bound** to some allocated region in the memory manager. Under the hood, this is just a void pointer, but the user cannot access it directly. Instead, you must you must dereference the `Handle` object to get access to the underlying pointer to data (automatically a double dereference). This is important because the memory manager keeps track of `Handle`s internally and can move the underlying data blocks around without breaking the user code! Making the `Handle`s non-copyable means the memory manager only needs to record one instance per bound region which saves a good chunk of space and speeds up the query. Likewise in user-land, if `Handles` are passed around by reference then if the Allocator moved the underlying data, all user-land references effectively get *notified*. 
 
 The most important part about handles:
 `Handle`s bound to an allocated region in a memory manager are guaranteed to be valid until expressly unbound. In other words the allocator is **not-allowed** to deallocate a bound region, but it is allowed to move it around as long as it updates the associated `Handle`. We eventually plan on adding a `Scheduler` which has the ability to move around bound data in the memory allocator given some memory optimal *plan*, and the `Handle`s let us do that as well as minimize fragmentation without breaking user-space coherency. 
@@ -100,9 +100,9 @@ The most important part about handles:
 
 In uTensor, tensor-like objects that implement `TensorInterface` get two things 1) automatic uTensor-internal lifecycle management and 2) a consistent user interface. `new` and `delete` are overwritten such that child classes of `TensorInterface` are automatically placed in a uTensor managed allocator with all associated behavior intact. Furthermore, on construction these objects get automatically registered in the uTensor runtime context, which is useful for profiling, debugging, and building scheduling systems. 
 
-The default user interface provides various operations expected of ALL tensor-like objects, such as shape queries, and reading/writing values. This R/W interface defaults to passing around `IntegralValue`s which can be roughly controlled via static casting of values (described in the `IntegralValue` section. 
+The default user interface provides various operations expected of ALL tensor-like objects, such as shape queries, and reading/writing values. This R/W interface defaults to passing around `IntegralValue`s which can be roughly controlled via static casting of values (described in the `IntegralValue` section). 
 
-Although the default R/W interface is super clear and compiles to somewhat efficient code, it does not allow for the knuckle-bleeding rip-your-face-off drag-race speeds of accessing the underlying blocks of data directly often needed in latency optimized models. For that, we provide a protected interface for querying a span of the underlying data directly for reading/writing. This interface is meant for advanced capabilities and can only be accessed by friend tags like `FastOperator`. All the optimized operators use this interface plus pointer indexing, whereas the reference operators use the N-D tensor indexing with default R/W for clarity.
+Although the default R/W interface is super clear and compiles to somewhat efficient code, it does not allow for the knuckle-bleeding rip-your-face-off drag-race speeds of accessing the underlying blocks of data directly which is often needed in latency optimized models. For that, we provide a protected interface for querying a span of the underlying data directly for reading/writing. This interface is meant for advanced capabilities and can only be accessed by friend tags like `FastOperator`. All the optimized operators use this interface plus pointer indexing, whereas the reference operators use the N-D tensor indexing with default R/W for clarity.
 
 
 ### Tensors, just Handles bound to objects implementing TensorInteface
@@ -110,7 +110,7 @@ Although the default R/W interface is super clear and compiles to somewhat effic
 Up until now we have described tensors as "tensor-like objects" that implement `TensorInterface`, but given our newfound knowledge of the memory allocator system we can extend the concept of `Handle`s to specialize on these tensor-like objects and make them fully *managed* by the uTensor runtime. 
 `Tensors` are exactly that, they are `Handles` that exclusively bind to `TensorInterface` objects managed in the allocators, and therefore get all the benefits of being a bound region. 
 
-Furthermore, `Tensors` provide some extra helper functions that make it feel more like we are operating on general tensor-like objects, rather than some externally referenced object in some magical memory manager. For example, constructing/assigning a `Tensor` to a dynamically allocated `TensorInterface*` will automatically bind it in the memory manager! Also, dereferencing a `Tensor` handle will automatically cast the referenced data to `TensorInterface*` so you don't have to worry about polymophism corner cases. 
+Furthermore, `Tensors` provide some extra helper functions that make it feel more like we are operating on general tensor-like objects, rather than some externally referenced object in some magical memory manager. For example, constructing/assigning a `Tensor` to a dynamically allocated `TensorInterface*` will automatically bind it in the memory manager! Also, dereferencing a `Tensor` handle will automatically cast the referenced data to `TensorInterface*` so you don't have to worry about polymorphism corner cases. 
 
 Like `Handles`, when a `Tensor` goes out of scope, or more generally when it's destructor gets called, the underlying tensor object is unbound and deallocated in the associated memory allocator.
 
@@ -183,10 +183,10 @@ Allocated blocks that are **unbound** (not associated with a handle) are not gua
 
 #### Events and Errors
 
-- `OutOfMemBoundsError`: [Error], thrown if user attempts to access non managed region of mem, e.x. Handle is corrupted
+- `OutOfMemBoundsError`: [Error], thrown if user attempts to access non managed region of memory, e.x. Handle is corrupted
 - `MetaHeaderNotFound`: [Event], notification that region is not found inside the data structure, used in Testing
 - `InvalidBoundRegionState`: [Error], thrown if attempted to bind handle with unallocated region
-- `OutOfMemError`: [Error], thrown if memory manager doesnt have enough space to allocate allocation request
+- `OutOfMemError`: [Error], thrown if memory manager doesnt have enough space to fulfill the allocation request
 - `localCircularArenaAllocatorConstructed`: [Event], notification that allocator has been constructed
 - `localCircularArenaAllocatorRebalancing`: [Event], notification that allocator rebalancing has occured
 
@@ -205,10 +205,10 @@ The two allocators are of particular importance here as they help guarantee that
 
 The operators are grouped by functionality and are **tensor agnostic**, that is all the inputs and outputs to `Operators` are just `Handle`s with syntactic sugar called `Tensor`s bound to objects that implement the `TensorInterface` like `RomTensor` or `RamTensor`:
 
-- legacy: contains the old asymmetric quantized reference operators which have high RAM requirements in practice
+- legacy: contains the old asymmetric quantized reference operators which have high RAM requirements in practice.
 - optimized: contains optimized forms of the reference operators, for example with Arm targets this will use the CMSIS-NN and CMSIS-DSP optimized libraries under the hood.
 - symmetric_quantization: Reference operators based on the relatively new standard symmetric quantization schemes.
-- reference operators are contained in the root of the operator directory and is meant as an easy to read/understand version of the operators. These should not be used in performance critical applications
+- reference operators are contained in the root of the operator directory and is meant as an easy to read/understand version of the operators. These should not be used in performance critical applications.
 
 uTensor aims to be a strong research vehicle which enables quick development cycles in the various components. Consequently, we adopt an interoperability specification with Googles Tensorflow Lite Micro's operators; our operators provide the same inputs, outputs, parameters, and generate bit accurate results against the various TLFu operators. This means we can quickly transfer learnings from one system to another with minimal friction, and without forcing our users to think about tiny differences in behavior between frameworks. 
 
@@ -253,7 +253,7 @@ myOp
 
 Fully supported operators:
 
-| Operator                    | Optimized form (Y/N)  | Internal Temporary buffer allocation |
+| Operator                    | Optimized Form (Y/N)  | Internal Temporary Buffer Allocation |
 | --------------------------- | --------------------- | ------------------------------------ |
 | ReLU                        | N                     | 0                                    |
 | ReLU In place               | N                     | 0                                    |
@@ -279,7 +279,7 @@ Fully supported operators:
 | QuantizedFullyConnected     | N                     | 0                                    |
 | Reshape                     | N                     | 0                                    |
 
-This list is not complete, as there are a handful of operators that are in the repo, but not fully tested. Note, this does table also does not include legacy operators
+This list is not complete, as there are a handful of operators that are in the repo, but not fully tested. Note, this does table also does not include legacy operators.
 
 #### References:
 
