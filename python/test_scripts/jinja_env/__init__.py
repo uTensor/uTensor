@@ -282,15 +282,17 @@ class SingleOpTest:
     self.target_op = target_op
     self.compare_tensors = []
     self.tensor_set = set()
+    self.thresholds = []
     for tensor in target_op.input_map:
       self.tensor_set.add(target_op.input_map[tensor])
     for tensor in target_op.output_map:
       self.tensor_set.add(target_op.output_map[tensor])
   
-  def add_tensor_comparison(self, a, b):
+  def add_tensor_comparison(self, a, b, threshold):
     self.compare_tensors.append((a,b))
     self.tensor_set.add(a)
     self.tensor_set.add(b)
+    self.thresholds.append(threshold)
 
   def quantize(self):
     self.target_op.quantize()
@@ -311,8 +313,8 @@ class SingleOpTest:
     op_eval = self.target_op.render_eval()
 
     compare_snippets = []
-    for a, b in self.compare_tensors:
-      compare_snippets.append(env2.get_template('compare_outputs.cpp').render(a=a, b=b))
+    for (a, b), threshold in zip(self.compare_tensors, self.thresholds):
+      compare_snippets.append(env2.get_template('compare_outputs.cpp').render(a=a, b=b, threshold=threshold))
 
     TestTemplate = env2.get_template('test_container.cpp')
     test_rendered = TestTemplate.render(test_group= self.test_group, 

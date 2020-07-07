@@ -83,6 +83,59 @@ class ReLU6Operator : public OperatorInterface<1, 1> {
   }
 };
 
+template <typename T>
+class InPlaceSoftmax : public InPlaceActivationFnc {
+  // ReLU only makes sense if there is a notion of negative
+  static_assert(std::is_signed<T>::value,
+                "Error attempted to construct Softmax on non-signed types");
+
+ public:
+  InPlaceSoftmax() : beta(1) {}
+  InPlaceSoftmax(T beta) : beta(beta) {}
+ protected:
+  virtual void compute() { inplace_softmax_k<T>(inputs[x].tensor(), beta); }
+
+ private:
+  T beta;
+};
+
+template <typename T>
+class SoftmaxOperator : public OperatorInterface<1, 1> {
+  // ReLU only makes sense if there is a notion of negative
+  static_assert(std::is_signed<T>::value,
+                "Error attempted to construct softmax on non-signed types");
+
+ public:
+  enum names_in : uint8_t { in };
+  enum names_out : uint8_t { out };
+
+ public:
+  SoftmaxOperator() : beta(1) {}
+  SoftmaxOperator(T beta) : beta(beta) {}
+ protected:
+  virtual void compute();
+
+ private:
+  T beta;
+};
+
+template <typename T>
+void SoftmaxOperator<T>::compute() {
+  const Tensor& inT = inputs[in].tensor();
+  Tensor& outT = outputs[out].tensor();
+  // TODO Check sizes here and throw mismatch
+  uint32_t in_size = inT->get_shape().get_linear_size();
+  uint32_t out_size = outT->get_shape().get_linear_size();
+  if (in_size != out_size)
+    Context::get_default_context()->throwError(
+        new OperatorIOSizeMismatchError);
+  softmax_k<T>(outT, inT, beta);
+}
+
+// Symmetric Quantized reference
+template <>
+void SoftmaxOperator<int8_t>::compute();
+
 } 
 }  // namespace uTensor
 

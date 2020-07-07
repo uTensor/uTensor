@@ -38,13 +38,13 @@ def gen_test(test_number):
     #conv_param_str = "{%s}, %s" % (str(strides).lstrip('[').rstrip(']'), padding)
     #convOp = Operator("Conv2dOperator", "op_0", dtypes=["float"], param_str=conv_param_str)
     #param_str = "Fuseable::NoActivation<float>"
-    param_str = "{1,1,1,1}, SAME"
+    param_str = "{1,1,1,1}, VALID"
     op = Operator("Conv2dOperator", "convOp", dtypes=[in_t.get_dtype], param_str=param_str)
     op.set_inputs({"in": in_t, "filter": w_t, "bias": b_t}).set_outputs({"out": out_t})
     op.set_namespace("uTensor::ReferenceOperators::")
     
     test = SingleOpTest(test_group, test_name + "_f", op)
-    test.add_tensor_comparison(out_t, out_ref)
+    test.add_tensor_comparison(out_t, out_ref, threshold=0.0001)
     test_rendered_f, const_snippets_f = test.render()
     
     # Quantize!
@@ -54,7 +54,7 @@ def gen_test(test_number):
     b_ref_name = "s_ref_b_%d_%s"     % (test_number, "q")
     out_ref_name = "s_ref_out_%d_%s" % (test_number, "q")
     out_name = "s_out_%d_%s" % (test_number, "q")
-    param_str = "{1,1}, SAME"
+    param_str = "{1,1}, VALID"
     op.param_str = param_str
     in_t.ref_name = in_ref_name
     w_t.ref_name = w_ref_name
@@ -69,10 +69,11 @@ def gen_test(test_number):
     b_t.quantize()
     out_t.quantize()
     out_ref.quantize()
-    op.set_namespace("uTensor::TflmSymQuantOps::")
+    #op.set_namespace("uTensor::TflmSymQuantOps::")
+    op.set_namespace("uTensor::ReferenceOperators::")
     
     test = SingleOpTest(test_group, test_name + "_q", op)
-    test.add_tensor_comparison(out_t, out_ref)
+    test.add_tensor_comparison(out_t, out_ref, threshold=2)
     test_rendered_q, const_snippets_q = test.render()
     
     return [(test_rendered_f, const_snippets_f),(test_rendered_q, const_snippets_q)]

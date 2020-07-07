@@ -95,5 +95,69 @@ void relu6_k(Tensor& out, const Tensor& in) {
   }
 }
 
+template <typename T>
+void inplace_softmax_k(Tensor& in, T beta = 1) {
+  T tmp;
+  T mSum = 0;
+  const TensorShape& inShape = in->get_shape();
+  int outer_dim = inShape.num_dims() -1;
+  int depth = inShape[outer_dim];
+  int out_side_numelems = 1;
+  for(int i = 0; i < inShape.num_dims(); i++){
+    out_side_numelems *= (i == outer_dim) ? 1: inShape[i];
+  }
+
+  for (int i = 0; i < out_side_numelems; i++) {
+    // exp(x[i])/sum(exp(x[i])) == exp(x[i]+C)/sum(exp(x[i]+C))
+    T max = std::numeric_limits<T>::lowest();
+    for(int j = 0; j < depth; j++){
+      max = std::max(max, static_cast<T>(in(i, j)));
+    }
+
+    T mSum = 0;
+    for(int j = 0; j < depth; j++){
+      T tmp = exp((static_cast<T>(in(i,j)) - max) * beta);
+      mSum += tmp;
+      in(i,j) = tmp;
+    }
+    for(int j = 0; j < depth; j++){
+      in(i, j)  = static_cast<T>(in(i, j)) / mSum;
+    }
+  }
+}
+template <typename T>
+void softmax_k(Tensor& out, const Tensor& in, T beta=1) {
+  T tmp;
+  T mSum = 0;
+  const TensorShape& inShape = in->get_shape();
+  int outer_dim = inShape.num_dims() -1;
+  int depth = inShape[outer_dim];
+  int out_side_numelems = 1;
+  for(int i = 0; i < inShape.num_dims(); i++){
+    out_side_numelems *= (i == outer_dim) ? 1: inShape[i];
+  }
+
+  for (int i = 0; i < out_side_numelems; i++) {
+    // exp(x[i])/sum(exp(x[i])) == exp(x[i]+C)/sum(exp(x[i]+C))
+    T max = std::numeric_limits<T>::lowest();
+    for(int j = 0; j < depth; j++){
+      max = std::max(max, static_cast<T>(in(i, j)));
+    }
+
+    T mSum = 0;
+    for(int j = 0; j < depth; j++){
+      T tmp = exp((static_cast<T>(in(i,j)) - max) * beta);
+      mSum += tmp;
+      out(i,j) = tmp;
+    }
+    for(int j = 0; j < depth; j++){
+      out(i, j)  = static_cast<T>(out(i, j)) / mSum;
+    }
+  }
+
+}
+
+void sq_softmax_k(Tensor& out, const Tensor& in, int8_t beta=1);
+
 }  // namespace uTensor
 #endif

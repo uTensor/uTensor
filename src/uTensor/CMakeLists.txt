@@ -13,7 +13,10 @@ set(src_utensor_tensors
   tensors/RomTensor.cpp
    )
 set(src_utensor_ops
+    ops/ActivationFncs.cpp
+    ops/ActivationFncs_kernels.cpp
     ops/Matrix.cpp
+    ops/Convolution.cpp
     ops/Matrix_kernels.cpp
    )
 set(src_utensor_errhndl
