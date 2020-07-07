@@ -48,4 +48,22 @@ void sq_softmax_k(Tensor& out, const Tensor& in, int8_t beta) {
 
 }
 
+template <>
+void sigmoid_k<int8_t>::operator()(Tensor& out, const Tensor& in) const {
+  const float one = 1;
+  uint32_t t_size = in->get_shape().get_linear_size();
+  for (uint32_t i = 0; i < t_size; i++) {
+    const int32_t in32 =  static_cast<int8_t>(in(i));
+    const float in_scale = in->get_quantization_params().get_scale_for_channel(0);
+    const int32_t in_zp = in->get_quantization_params().get_zeroP_for_channel(0);
+    const float in_f = (in32 - in_zp)*in_scale;
+    const float out_val = one / (one + exp( -in_f ));
+    const float oscale = out->get_quantization_params().get_scale_for_channel(0);
+    const int32_t ozp = out->get_quantization_params().get_zeroP_for_channel(0);
+    const int32_t otmp = static_cast<int32_t>(out_val/oscale) + ozp;
+    const int8_t out8 = (otmp < -127 ) ? -128 : (otmp > 127) ? 127 : static_cast<int8_t>(otmp);  
+    out(i) = out8;
+  }
+}
+
 }

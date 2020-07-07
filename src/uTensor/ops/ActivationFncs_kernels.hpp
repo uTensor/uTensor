@@ -159,5 +159,41 @@ void softmax_k(Tensor& out, const Tensor& in, T beta=1) {
 
 void sq_softmax_k(Tensor& out, const Tensor& in, int8_t beta=1);
 
+template <typename T>
+class inplace_sigmoid_k {
+  public:
+    void operator()(Tensor& t) const;
+};
+
+template <typename T>
+void inplace_sigmoid_k<T>::operator()(Tensor& t) const {
+  const T one = 1;
+  uint32_t t_size = t->get_shape().get_linear_size();
+  for (uint32_t i = 0; i < t_size; i++) {
+    const T tmp = one / (one + exp(- static_cast<T>(t(i))));
+    t(i) = tmp;
+  }
+}
+
+template <typename T>
+class sigmoid_k {
+  public:
+    void operator()(Tensor& out, const Tensor& in) const;
+
+};
+
+template <typename T>
+void sigmoid_k<T>::operator()(Tensor& out, const Tensor& in) const {
+  const T one = 1;
+  uint32_t t_size = in->get_shape().get_linear_size();
+  for (uint32_t i = 0; i < t_size; i++) {
+    const T tmp = one / (one + exp(- static_cast<T>(in(i))));
+    out(i) = tmp;
+  }
+}
+
+template <>
+void sigmoid_k<int8_t>::operator()(Tensor& out, const Tensor& in) const;
+
 }  // namespace uTensor
 #endif
