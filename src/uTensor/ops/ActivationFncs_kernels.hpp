@@ -40,7 +40,14 @@ namespace Fuseable {
 } // namespace Fuseable
 
 template <typename T>
-void inplace_relu_k(Tensor& t) {
+class inplace_relu_k_impl {
+  public:
+    inplace_relu_k_impl() {}
+    void operator()(Tensor& t) const;
+};
+
+template <typename T>
+void inplace_relu_k_impl<T>::operator()(Tensor& t) const {
   T tmp;
   uint32_t t_size = t->get_shape().get_linear_size();
   for (uint32_t i = 0; i < t_size; i++) {
@@ -52,7 +59,13 @@ void inplace_relu_k(Tensor& t) {
 }
 
 template <typename T>
-void relu_k(Tensor& out, const Tensor& in) {
+class relu_k_impl{
+  public:
+    void operator()(Tensor& out, const Tensor& in) const;
+};
+
+template <typename T>
+void relu_k_impl<T>::operator()(Tensor& out, const Tensor& in) const {
   T tmp;
   uint32_t in_size = in->get_shape().get_linear_size();
   for (uint32_t i = 0; i < in_size; i++) {
@@ -65,7 +78,14 @@ void relu_k(Tensor& out, const Tensor& in) {
 }
 
 template <typename T>
-void inplace_relu6_k(Tensor& t) {
+class inplace_relu6_k_impl {
+  public:
+    void operator()(Tensor& t) const;
+
+};
+
+template <typename T>
+void inplace_relu6_k_impl<T>::operator()(Tensor& t) const {
   T tmp;
   uint32_t t_size = t->get_shape().get_linear_size();
   for (uint32_t i = 0; i < t_size; i++) {
@@ -80,7 +100,13 @@ void inplace_relu6_k(Tensor& t) {
 }
 
 template <typename T>
-void relu6_k(Tensor& out, const Tensor& in) {
+class relu6_k_impl {
+  public:
+    void operator()(Tensor& out, const Tensor& in) const;
+};
+
+template <typename T>
+void relu6_k_impl<T>::operator()(Tensor& out, const Tensor& in) const {
   T tmp;
   uint32_t in_size = in->get_shape().get_linear_size();
   for (uint32_t i = 0; i < in_size; i++) {
@@ -176,14 +202,14 @@ void inplace_sigmoid_k<T>::operator()(Tensor& t) const {
 }
 
 template <typename T>
-class sigmoid_k {
+class sigmoid_k_impl {
   public:
     void operator()(Tensor& out, const Tensor& in) const;
 
 };
 
 template <typename T>
-void sigmoid_k<T>::operator()(Tensor& out, const Tensor& in) const {
+void sigmoid_k_impl<T>::operator()(Tensor& out, const Tensor& in) const {
   const T one = 1;
   uint32_t t_size = in->get_shape().get_linear_size();
   for (uint32_t i = 0; i < t_size; i++) {
@@ -193,7 +219,21 @@ void sigmoid_k<T>::operator()(Tensor& out, const Tensor& in) const {
 }
 
 template <>
-void sigmoid_k<int8_t>::operator()(Tensor& out, const Tensor& in) const;
+void sigmoid_k_impl<int8_t>::operator()(Tensor& out, const Tensor& in) const;
+
+// Set defaults
+template <typename T>
+using sigmoid_k = sigmoid_k_impl<T>();
+
+template <typename T>
+using inplace_relu_k = inplace_relu_k_impl<T>;
+template <typename T>
+using relu_k = relu_k_impl<T>();
+template <typename T>
+using inplace_relu6_k = inplace_relu6_k_impl<T>();
+template <typename T>
+using relu6_k = relu6_k_impl<T>();
+
 
 }  // namespace uTensor
 #endif

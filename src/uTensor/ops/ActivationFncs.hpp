@@ -22,7 +22,7 @@ class InPlaceReLU : public InPlaceActivationFnc {
                 "Error attempted to construct ReLU on non-signed types");
 
  protected:
-  virtual void compute() { inplace_relu_k<T>(inputs[x].tensor()); }
+  virtual void compute() { inplace_relu_k<T>()(inputs[x].tensor()); }
 };
 
 template <typename T>
@@ -56,7 +56,7 @@ class InPlaceReLU6 : public InPlaceActivationFnc {
                 "Error attempted to construct ReLU on non-signed types");
 
  protected:
-  virtual void compute() { inplace_relu6_k<T>(inputs[x].tensor()); }
+  virtual void compute() { inplace_relu6_k<T>()(inputs[x].tensor()); }
 };
 
 template <typename T>
