@@ -243,7 +243,7 @@ using sigmoid_k = sigmoid_k_impl<T>();
 template <typename T>
 using inplace_relu_k = inplace_relu_k_impl<T>;
 template <typename T>
-using relu_k = relu_k_impl<T>();
+using relu_k = relu_k_impl<T>;
 template <typename T>
 using inplace_relu6_k = inplace_relu6_k_impl<T>();
 template <typename T>

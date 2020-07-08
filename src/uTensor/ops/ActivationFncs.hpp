@@ -45,7 +45,7 @@ class ReLUOperator : public OperatorInterface<1, 1> {
     if (in_size != out_size)
       Context::get_default_context()->throwError(
           new OperatorIOSizeMismatchError);
-    relu_k<T>(outT, inT);
+    relu_k<T>()(outT, inT);
   }
 };
 
