@@ -49,6 +49,21 @@ void sq_softmax_k(Tensor& out, const Tensor& in, int8_t beta) {
 }
 
 template <>
+void relu_k_impl<float>::operator()(Tensor& out, const Tensor& in) const {
+  using T = float;
+  T tmp;
+  uint32_t in_size = in->get_shape().get_linear_size();
+  for (uint32_t i = 0; i < in_size; i++) {
+    tmp = in(i);
+    if (tmp < 0) {
+      tmp = static_cast<T>(0);
+    }
+    out(i) = tmp;
+  }
+}
+
+
+template <>
 void sigmoid_k_impl<int8_t>::operator()(Tensor& out, const Tensor& in) const {
   const float one = 1;
   uint32_t t_size = in->get_shape().get_linear_size();

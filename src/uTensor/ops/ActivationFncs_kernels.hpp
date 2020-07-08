@@ -4,6 +4,7 @@
 #include <cmath>
 #include <limits>
 #include <functional>
+#include <type_traits>
 
 using std::exp;
 
@@ -64,16 +65,30 @@ class relu_k_impl{
     void operator()(Tensor& out, const Tensor& in) const;
 };
 
+template <>
+void relu_k_impl<float>::operator()(Tensor& out, const Tensor& in) const;
+
+// For all quantized forms
 template <typename T>
 void relu_k_impl<T>::operator()(Tensor& out, const Tensor& in) const {
-  T tmp;
+  static_assert(std::is_integral<T>::value, "Quantized ReLU expects integral type");
+  constexpr T min = std::numeric_limits<T>::lowest();
+  constexpr T max = std::numeric_limits<T>::max();
+  float tmp;
   uint32_t in_size = in->get_shape().get_linear_size();
   for (uint32_t i = 0; i < in_size; i++) {
-    tmp = in(i);
+    const int32_t iv8 = static_cast<T>(in(i));
+    const float scale = in->get_quantization_params().get_scale_for_channel(0);
+    const int32_t zp = in->get_quantization_params().get_zeroP_for_channel(0);
+    tmp = (iv8 - zp)*scale;
     if (tmp < 0) {
-      tmp = static_cast<T>(0);
+      tmp = 0;
     }
-    out(i) = tmp;
+    const float oscale = out->get_quantization_params().get_scale_for_channel(0);
+    const int32_t ozp = out->get_quantization_params().get_zeroP_for_channel(0);
+    const int32_t otmp = static_cast<int32_t>(tmp/oscale) + ozp;
+    const T outT= (otmp <= min ) ? min : (otmp > max) ? max : static_cast<T>(otmp);
+    out(i) = outT;
   }
 }
 
