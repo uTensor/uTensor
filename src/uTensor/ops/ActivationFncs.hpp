@@ -173,7 +173,7 @@ void LogisticOperator<T>::compute() {
   if (in_size != out_size)
     Context::get_default_context()->throwError(
         new OperatorIOSizeMismatchError);
-  sigmoid_k<T>(outT, inT);
+  sigmoid_k<T>()(outT, inT);
 }
 
 } 

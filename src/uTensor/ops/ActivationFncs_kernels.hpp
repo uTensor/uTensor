@@ -238,7 +238,7 @@ void sigmoid_k_impl<int8_t>::operator()(Tensor& out, const Tensor& in) const;
 
 // Set defaults
 template <typename T>
-using sigmoid_k = sigmoid_k_impl<T>();
+using sigmoid_k = sigmoid_k_impl<T>;
 
 template <typename T>
 using inplace_relu_k = inplace_relu_k_impl<T>;
