@@ -1,7 +1,7 @@
 #ifndef UTENSOR_ROM_TENSOR_H
 #define UTENSOR_ROM_TENSOR_H
 #include "BufferTensor.hpp"
-#include "context.hpp"
+#include "uTensor/core/context.hpp"
 
 namespace uTensor {
 

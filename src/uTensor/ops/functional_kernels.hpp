@@ -4,7 +4,7 @@
 #include <limits>
 #include <vector>
 
-#include "operatorBase.hpp"
+#include "uTensor/core/operatorBase.hpp"
 namespace uTensor {
 
 template <typename T>

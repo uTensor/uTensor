@@ -5,7 +5,7 @@
 #include <cstdlib>
 #include <limits>
 
-#include "operatorBase.hpp"
+#include "uTensor/core/operatorBase.hpp"
 
 namespace uTensor {
 namespace TflmSymQuantOps {

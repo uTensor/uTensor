@@ -1,6 +1,6 @@
 #ifndef UTENSOR_ARITH_KERNELS_H
 #define UTENSOR_ARITH_KERNELS_H
-#include "operatorBase.hpp"
+#include "uTensor/core/operatorBase.hpp"
 
 namespace uTensor {
 template <typename T>

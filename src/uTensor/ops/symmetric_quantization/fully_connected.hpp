@@ -1,9 +1,9 @@
 #ifndef UTENSOR_S_QUANTIZED_FC_OPS_H
 #define UTENSOR_S_QUANTIZED_FC_OPS_H
-#include "Matrix.hpp"
-#include "context.hpp"
+#include "uTensor/core/context.hpp"
+#include "uTensor/core/operatorBase.hpp"
+#include "uTensor/ops/Matrix.hpp"
 #include "fully_connected_kernel.hpp"
-#include "operatorBase.hpp"
 #include "symmetric_quantization_utils.hpp"
 
 namespace uTensor {

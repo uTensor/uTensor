@@ -1,9 +1,9 @@
 #ifndef UTENSOR_S_QUANTIZED_DWS_OPS_H
 #define UTENSOR_S_QUANTIZED_DWS_OPS_H
-#include "Convolution.hpp"
-#include "context.hpp"
+#include "uTensor/ops/Convolution.hpp"
+#include "uTensor/core/context.hpp"
+#include "uTensor/core/operatorBase.hpp"
 #include "depthwise_separable_convolution_kernels.hpp"
-#include "operatorBase.hpp"
 #include "symmetric_quantization_utils.hpp"
 
 namespace uTensor {

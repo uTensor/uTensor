@@ -6,9 +6,9 @@
 #include <memory>
 #include <vector>
 
-#include "context.hpp"
-#include "memoryManagementInterface.hpp"
-#include "tensor.hpp"
+#include "uTensor/core/context.hpp"
+#include "uTensor/core/memoryManagementInterface.hpp"
+#include "uTensor/core/tensor.hpp"
 
 namespace uTensor {
 

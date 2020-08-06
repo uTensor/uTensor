@@ -1,6 +1,6 @@
 #ifndef UTENSOR_ARG_MIN_MAX_H
 #define UTENSOR_ARG_MIN_MAX_H
-#include "operatorBase.hpp"
+#include "uTensor/core/operatorBase.hpp"
 #include "ArgMinMax_kernel.hpp"
 
 namespace uTensor {

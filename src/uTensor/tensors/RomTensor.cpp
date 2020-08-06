@@ -1,8 +1,6 @@
-#include "RomTensor.hpp"
-
 #include <cstdio>
-
-#include "context.hpp"
+#include "RomTensor.hpp"
+#include "uTensor/core/context.hpp"
 namespace uTensor {
 
 // EVENTS

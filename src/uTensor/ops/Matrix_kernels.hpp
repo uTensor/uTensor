@@ -1,7 +1,7 @@
 #ifndef UTENSOR_MATRIX_KERNELS
 #define UTENSOR_MATRIX_KERNELS
-#include "context.hpp"
-#include "operatorBase.hpp"
+#include "uTensor/core/context.hpp"
+#include "uTensor/core/operatorBase.hpp"
 #include "ActivationFncs.hpp"
 
 namespace uTensor {

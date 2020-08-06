@@ -1,5 +1,4 @@
 #include "fully_connected_kernel.hpp"
-
 #include "symmetric_quantization_utils.hpp"
 
 namespace uTensor {

@@ -4,7 +4,7 @@
 #include <limits>
 
 #include "Arithmetic_kernels.hpp"
-#include "operatorBase.hpp"
+#include "uTensor/core/operatorBase.hpp"
 
 namespace uTensor {
 namespace ReferenceOperators {
