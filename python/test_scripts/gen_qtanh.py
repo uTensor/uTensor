@@ -6,6 +6,7 @@ import numpy as np
 import tensorflow as tf
 
 from jinja_env import Operator, QuantizationType, SingleOpTest, Tensor, env2
+from jinja_env.quantization_util import quantize
 
 
 class ModelBase:
@@ -54,35 +55,50 @@ class QuantTanhModel(ModelBase):
             self._model_content = fid.read()
 
     def generate_test_case(self, test_case_name):
-        self._interpretor = tf.lite.Interpreter(model_content=self._model_content)
-        self._interpretor.allocate_tensors()
+        self.interpreter = tf.lite.Interpreter(model_content=self._model_content)
+        self.interpreter.allocate_tensors()
         in_values = np.random.rand(*self.in_dim).astype("float32")
-        self._interpretor.set_tensor(self.input_idx, in_values)
-        self._interpretor.invoke()
-        out_values = self._interpretor.tensor(self.output_idx)()
+        self.interpreter.set_tensor(self.input_idx, in_values)
+        self.interpreter.invoke()
+        out_values = self.interpreter.tensor(self.output_idx)()
+        quant_in_values = quantize(
+            in_values,
+            zp=self.quant_input_info["quantization"][1],
+            scale=self.quant_input_info["quantization"][0],
+            symmetric=True,
+        )
+        quant_out_values = quantize(
+            out_values,
+            zp=self.quant_output_info["quantization"][1],
+            scale=self.quant_output_info["quantization"][0],
+            symmetric=True,
+        )
         in_ref_name = f"s_ref_input_{test_case_name}"
         out_ref_name = f"s_ref_output_{test_case_name}"
         in_tensor = Tensor(
             "input",
-            in_values,
+            quant_in_values,
             ref_name=in_ref_name,
             quantization_type=QuantizationType.PER_TENSOR_SYMMETRIC,
         )
-        in_tensor.quantize()
+        in_tensor.quantize_params.zp = [self.quant_input_info["quantization"][1]]
+        in_tensor.quantize_params.scale = [self.quant_input_info["quantization"][0]]
+        in_tensor.quantized = True
         ref_out_tensor = Tensor(
             "ref_output",
-            out_values,
+            quant_out_values,
             ref_name=out_ref_name,
             quantization_type=QuantizationType.PER_TENSOR_SYMMETRIC,
         )
         out_tensor = Tensor(
             "output",
-            out_values,
+            quant_out_values,
             quantization_type=QuantizationType.PER_TENSOR_SYMMETRIC,
         )
-        ref_out_tensor.quantize_params.scale = [1.0 / 128.0]
-        ref_out_tensor.quantize_params.zp = [0]
-        ref_out_tensor.quantize()
+        out_tensor.quantize_params.zp = [self.quant_output_info["quantization"][1]]
+        out_tensor.quantize_params.scale = [self.quant_output_info["quantization"][0]]
+        out_tensor.quantize_params.ref_name = out_ref_name
+        out_tensor.quantized = True
         op = Operator(
             "TanhOperator", "tanh_op", dtypes=[lambda: "int8_t", lambda: "int8_t"],
         )
@@ -93,18 +109,48 @@ class QuantTanhModel(ModelBase):
         return test.render()
 
     @property
+    def interpreter(self):
+        return self._interpreter
+
+    @interpreter.setter
+    def interpreter(self, it):
+        self._interpreter = it
+        node_idx = 0
+        for i in range(it._interpreter.NumNodes()):
+            if it._interpreter.NodeName(i) == "TANH":
+                node_idx = i
+                break
+        else:
+            raise ValueError("TANH node not found")
+        input_idx = it._interpreter.NodeInputs(node_idx)[0]
+        output_idx = it._interpreter.NodeOutputs(node_idx)[0]
+        for info in it.get_tensor_details():
+            if info["index"] == input_idx:
+                self._quant_input_info = deepcopy(info)
+            elif info["index"] == output_idx:
+                self._quant_output_info = deepcopy(info)
+
+    @property
     def in_dim(self):
-        return self._interpretor.get_input_details()[0]["shape"].tolist()
+        return self._interpreter.get_input_details()[0]["shape"].tolist()
 
     @property
     def input_idx(self):
-        input_info = self._interpretor.get_input_details()[0]
+        input_info = self._interpreter.get_input_details()[0]
         return input_info["index"]
 
     @property
     def output_idx(self):
-        out_info = self._interpretor.get_output_details()[0]
+        out_info = self._interpreter.get_output_details()[0]
         return out_info["index"]
+
+    @property
+    def quant_input_info(self):
+        return self._quant_input_info
+
+    @property
+    def quant_output_info(self):
+        return self._quant_output_info
 
 
 def main(model_path, num_tests=5):

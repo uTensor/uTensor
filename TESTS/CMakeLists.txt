@@ -1,4 +1,5 @@
 add_subdirectory("${PROJECT_SOURCE_DIR}/extern/googletest" "extern/googletest")
+
 macro(package_add_test TESTNAME)
     # create an exectuable in which the tests will be stored
     add_executable(${TESTNAME} ${ARGN})

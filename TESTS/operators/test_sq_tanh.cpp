@@ -29,11 +29,11 @@ TEST(QuantTanhTest, sq_tanh_0) {
   Context::get_default_context()->set_ram_data_allocator(&ram_allocator);
   Context::get_default_context()->set_ErrorHandler(&mErrHandler);
 
-  Tensor ref_output = new RomTensor({ 128 }, i8, s_ref_output_sq_tanh_0);
-  ref_output->set_quantization_params(PerTensorQuantizationParams(s_ref_output_sq_tanh_0_zp, s_ref_output_sq_tanh_0_scale));
-  Tensor output = new RamTensor({ 128 }, flt);
   Tensor input = new RomTensor({ 128 }, i8, s_ref_input_sq_tanh_0);
   input->set_quantization_params(PerTensorQuantizationParams(s_ref_input_sq_tanh_0_zp, s_ref_input_sq_tanh_0_scale));
+  Tensor output = new RamTensor({ 128 }, i8);
+  output->set_quantization_params(PerTensorQuantizationParams(s_ref_output_sq_tanh_0_zp, s_ref_output_sq_tanh_0_scale));
+  Tensor ref_output = new RomTensor({ 128 }, i8, s_ref_output_sq_tanh_0);
 
   uTensor::ReferenceOperators::TanhOperator<int8_t,int8_t> tanh_op;
   tanh_op
@@ -47,7 +47,7 @@ TEST(QuantTanhTest, sq_tanh_0) {
   ASSERT_EQ(got_error, false);
 
   for(int i = 0; i < 128; i++) {
-  EXPECT_NEAR(static_cast<float>( output(i) ), static_cast<int8_t>( ref_output(i) ), 2);
+  EXPECT_NEAR(static_cast<int8_t>( output(i) ), static_cast<int8_t>( ref_output(i) ), 2);
 }
 }
 
@@ -68,11 +68,11 @@ TEST(QuantTanhTest, sq_tanh_1) {
   Context::get_default_context()->set_ram_data_allocator(&ram_allocator);
   Context::get_default_context()->set_ErrorHandler(&mErrHandler);
 
-  Tensor output = new RamTensor({ 128 }, flt);
-  Tensor ref_output = new RomTensor({ 128 }, i8, s_ref_output_sq_tanh_1);
-  ref_output->set_quantization_params(PerTensorQuantizationParams(s_ref_output_sq_tanh_1_zp, s_ref_output_sq_tanh_1_scale));
+  Tensor output = new RamTensor({ 128 }, i8);
+  output->set_quantization_params(PerTensorQuantizationParams(s_ref_output_sq_tanh_1_zp, s_ref_output_sq_tanh_1_scale));
   Tensor input = new RomTensor({ 128 }, i8, s_ref_input_sq_tanh_1);
   input->set_quantization_params(PerTensorQuantizationParams(s_ref_input_sq_tanh_1_zp, s_ref_input_sq_tanh_1_scale));
+  Tensor ref_output = new RomTensor({ 128 }, i8, s_ref_output_sq_tanh_1);
 
   uTensor::ReferenceOperators::TanhOperator<int8_t,int8_t> tanh_op;
   tanh_op
@@ -86,7 +86,7 @@ TEST(QuantTanhTest, sq_tanh_1) {
   ASSERT_EQ(got_error, false);
 
   for(int i = 0; i < 128; i++) {
-  EXPECT_NEAR(static_cast<float>( output(i) ), static_cast<int8_t>( ref_output(i) ), 2);
+  EXPECT_NEAR(static_cast<int8_t>( output(i) ), static_cast<int8_t>( ref_output(i) ), 2);
 }
 }
 
@@ -110,8 +110,8 @@ TEST(QuantTanhTest, sq_tanh_2) {
   Tensor input = new RomTensor({ 128 }, i8, s_ref_input_sq_tanh_2);
   input->set_quantization_params(PerTensorQuantizationParams(s_ref_input_sq_tanh_2_zp, s_ref_input_sq_tanh_2_scale));
   Tensor ref_output = new RomTensor({ 128 }, i8, s_ref_output_sq_tanh_2);
-  ref_output->set_quantization_params(PerTensorQuantizationParams(s_ref_output_sq_tanh_2_zp, s_ref_output_sq_tanh_2_scale));
-  Tensor output = new RamTensor({ 128 }, flt);
+  Tensor output = new RamTensor({ 128 }, i8);
+  output->set_quantization_params(PerTensorQuantizationParams(s_ref_output_sq_tanh_2_zp, s_ref_output_sq_tanh_2_scale));
 
   uTensor::ReferenceOperators::TanhOperator<int8_t,int8_t> tanh_op;
   tanh_op
@@ -125,7 +125,7 @@ TEST(QuantTanhTest, sq_tanh_2) {
   ASSERT_EQ(got_error, false);
 
   for(int i = 0; i < 128; i++) {
-  EXPECT_NEAR(static_cast<float>( output(i) ), static_cast<int8_t>( ref_output(i) ), 2);
+  EXPECT_NEAR(static_cast<int8_t>( output(i) ), static_cast<int8_t>( ref_output(i) ), 2);
 }
 }
 
@@ -146,11 +146,11 @@ TEST(QuantTanhTest, sq_tanh_3) {
   Context::get_default_context()->set_ram_data_allocator(&ram_allocator);
   Context::get_default_context()->set_ErrorHandler(&mErrHandler);
 
+  Tensor output = new RamTensor({ 128 }, i8);
+  output->set_quantization_params(PerTensorQuantizationParams(s_ref_output_sq_tanh_3_zp, s_ref_output_sq_tanh_3_scale));
+  Tensor ref_output = new RomTensor({ 128 }, i8, s_ref_output_sq_tanh_3);
   Tensor input = new RomTensor({ 128 }, i8, s_ref_input_sq_tanh_3);
   input->set_quantization_params(PerTensorQuantizationParams(s_ref_input_sq_tanh_3_zp, s_ref_input_sq_tanh_3_scale));
-  Tensor output = new RamTensor({ 128 }, flt);
-  Tensor ref_output = new RomTensor({ 128 }, i8, s_ref_output_sq_tanh_3);
-  ref_output->set_quantization_params(PerTensorQuantizationParams(s_ref_output_sq_tanh_3_zp, s_ref_output_sq_tanh_3_scale));
 
   uTensor::ReferenceOperators::TanhOperator<int8_t,int8_t> tanh_op;
   tanh_op
@@ -164,7 +164,7 @@ TEST(QuantTanhTest, sq_tanh_3) {
   ASSERT_EQ(got_error, false);
 
   for(int i = 0; i < 128; i++) {
-  EXPECT_NEAR(static_cast<float>( output(i) ), static_cast<int8_t>( ref_output(i) ), 2);
+  EXPECT_NEAR(static_cast<int8_t>( output(i) ), static_cast<int8_t>( ref_output(i) ), 2);
 }
 }
 
@@ -185,11 +185,11 @@ TEST(QuantTanhTest, sq_tanh_4) {
   Context::get_default_context()->set_ram_data_allocator(&ram_allocator);
   Context::get_default_context()->set_ErrorHandler(&mErrHandler);
 
-  Tensor output = new RamTensor({ 128 }, flt);
   Tensor ref_output = new RomTensor({ 128 }, i8, s_ref_output_sq_tanh_4);
-  ref_output->set_quantization_params(PerTensorQuantizationParams(s_ref_output_sq_tanh_4_zp, s_ref_output_sq_tanh_4_scale));
   Tensor input = new RomTensor({ 128 }, i8, s_ref_input_sq_tanh_4);
   input->set_quantization_params(PerTensorQuantizationParams(s_ref_input_sq_tanh_4_zp, s_ref_input_sq_tanh_4_scale));
+  Tensor output = new RamTensor({ 128 }, i8);
+  output->set_quantization_params(PerTensorQuantizationParams(s_ref_output_sq_tanh_4_zp, s_ref_output_sq_tanh_4_scale));
 
   uTensor::ReferenceOperators::TanhOperator<int8_t,int8_t> tanh_op;
   tanh_op
@@ -203,7 +203,7 @@ TEST(QuantTanhTest, sq_tanh_4) {
   ASSERT_EQ(got_error, false);
 
   for(int i = 0; i < 128; i++) {
-  EXPECT_NEAR(static_cast<float>( output(i) ), static_cast<int8_t>( ref_output(i) ), 2);
+  EXPECT_NEAR(static_cast<int8_t>( output(i) ), static_cast<int8_t>( ref_output(i) ), 2);
 }
 }
 
