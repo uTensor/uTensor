@@ -1,4 +1,5 @@
 add_subdirectory("${PROJECT_SOURCE_DIR}/extern/googletest" "extern/googletest")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g")
 macro(package_add_test TESTNAME)
     # create an exectuable in which the tests will be stored
     add_executable(${TESTNAME} ${ARGN})
