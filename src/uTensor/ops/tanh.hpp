@@ -20,7 +20,7 @@ class TanhOperator : public OperatorInterface<1, 1> {
  protected:
   virtual void compute() {
     Tensor& in = inputs[act_in].tensor();
-    Tensor& out = inputs[act_out].tensor();
+    Tensor& out = outputs[act_out].tensor();
 
     const int flat_size = in->get_shape().get_linear_size();
 
