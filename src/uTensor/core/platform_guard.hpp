@@ -1,6 +1,9 @@
 #ifndef PLATFORM_GUARD_H
 #define PLATFORM_GUARD_H
 
+// TODO: use macros to register platforms and bit operators to combine flags
+// TODO: use bitwise operators for multi-target check, e.g. `#if (UTENSOR_PLATFORM_ARDUINO & __AVR__) == UTENSOR_PLATFORM`
+
 #define UTENSOR_PLATFORM_MBED 0
 #ifdef MBED
 #define UTENSOR_PLATFORM 0
