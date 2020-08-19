@@ -8,7 +8,9 @@
  * configurable via the event_handle_type.
  */
 
-#include <cstdint>
+// check if the follow modificiation affect other builds
+//#include <cstdint>
+#include <stdint.h>
 
 namespace uTensor {
 
