@@ -18,7 +18,7 @@ using event_handle_type = uint16_t;
 
 // Compile time hash borrowed from
 // https://gist.github.com/underscorediscovery/81308642d0325fd386237cfa3b44785c
-#define STRINGIFY(x) #x
+#define uT_STRINGIFY(x) #x
 // FNV1a c++11 constexpr compile time hash functions, 32 and 64 bit
 // str should be a null terminated string literal, value should be left out
 // e.g hash_32_fnv1a_const("example")
@@ -61,7 +61,7 @@ class ErrorHandler {
 #define DECLARE_EVENT(EVT)                                   \
   struct EVT : public Event {                                \
     static constexpr uint16_t uid =                          \
-        u32toEventType(hash_32_fnv1a_const(STRINGIFY(EVT))); \
+        u32toEventType(hash_32_fnv1a_const(uT_STRINGIFY(EVT))); \
     EVT();                                                   \
   }
 #define DEFINE_EVENT(EVT) \
@@ -69,7 +69,7 @@ class ErrorHandler {
 #define DECLARE_ERROR(EVT)                                   \
   struct EVT : public Error {                                \
     static constexpr uint16_t uid =                          \
-        u32toEventType(hash_32_fnv1a_const(STRINGIFY(EVT))); \
+        u32toEventType(hash_32_fnv1a_const(uT_STRINGIFY(EVT))); \
     EVT();                                                   \
   }
 #define DEFINE_ERROR(EVT) \

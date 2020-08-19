@@ -3,6 +3,9 @@
 
 // Don't see where cstring is used here
 //#include <cstring>
+
+#include <cstddef>
+using std::size_t;
 namespace uTensor {
 
 class AllocatorInterface;

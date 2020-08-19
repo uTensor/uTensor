@@ -12,7 +12,7 @@ PowerSpectrum::~PowerSpectrum() {
   delete rfft;
 }
 void PowerSpectrum::compute() {
-  power_spectrum_kernel(*outputs[power].tensor, *inputs[input].tensor, N);
+  power_spectrum_kernel(outputs[power].tensor(), inputs[input].tensor(), N);
 }
 
 // TODO move the plan bits out

@@ -1,12 +1,12 @@
 #ifndef __UTENSOR_TYPES_H
 #define __UTENSOR_TYPES_H
 
-// #include <array>
+#include <array>
 // check if the follow modificiation affect other builds
 //#include <cstdint>
 #include <stdint.h>
 
-// using std::array;
+using std::array;
 
 class TensorShape {
  public:
@@ -15,10 +15,12 @@ class TensorShape {
   TensorShape(uint16_t shape1, uint16_t shape2, uint16_t shape3);
   TensorShape(uint16_t shape1, uint16_t shape2, uint16_t shape3,
               uint16_t shape4);
-  // TensorShape(array<uint16_t, 1> shape);
-  // TensorShape(array<uint16_t, 2> shape);
-  // TensorShape(array<uint16_t, 3> shape);
-  // TensorShape(array<uint16_t, 4> shape);
+
+  //FIXME:   array isn't avaliable on all embedded platforms
+  TensorShape(array<uint16_t, 1> shape);
+  TensorShape(array<uint16_t, 2> shape);
+  TensorShape(array<uint16_t, 3> shape);
+  TensorShape(array<uint16_t, 4> shape);
 
   uint16_t operator[](int i) const;
   uint16_t& operator[](int i);
