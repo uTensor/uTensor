@@ -1,7 +1,8 @@
 #ifndef UTENSOR_TENSOR_MAP
 #define UTENSOR_TENSOR_MAP
 
-#include <algorithm>
+// #include <algorithm>
+// https://github.com/mike-matera/ArduinoSTL/issues/15
 #include <initializer_list>
 
 #include "tensor.hpp"

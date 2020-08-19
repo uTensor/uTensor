@@ -1,6 +1,9 @@
 #ifndef UTENSOR_FFT_HPP
 #define UTENSOR_FFT_HPP
 
+#include "uTensor/core/platform_guard.hpp"
+#if UTENSOR_PLATFORM == UTENSOR_PLATFORM_X86
+
 #include "fftw3.h"
 #include "operatorBase.hpp"
 
@@ -21,4 +24,5 @@ class PowerSpectrum : public OperatorInterface<1, 1>, FastOperator {
   int N;
 };
 }  // namespace uTensor
+#endif //platform guard
 #endif
