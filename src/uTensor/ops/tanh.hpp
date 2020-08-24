@@ -1,6 +1,5 @@
 #ifndef UTENSOR_TANH_H
 #define UTENSOR_TANH_H
-#include <math.h>
 
 #include "context.hpp"
 #include "operatorBase.hpp"
@@ -32,15 +31,12 @@ class TanhOperator : public OperatorInterface<1, 1> {
         out->get_quantization_params().get_zeroP_for_channel(0);
     float out_scale = out->get_quantization_params().get_scale_for_channel(0);
 
-    for (uint32_t i = 0; i < flat_size; i++) {
-      const int32_t in_val = static_cast<InputT>(in(i));
-      float float_in_val = static_cast<float>(
-          in_scale * static_cast<float>((in_val - in_zero_point)));
-      float element_activation = tanh(float_in_val);
-      OutputT result =
-          static_cast<OutputT>(element_activation / out_scale + out_zero_point);
-      out(i) = result;
-    }
+  // Insert your code here
+  // Iterate through elements in the input tensor
+  // Convert each element to from quantized fix-point to float
+  // Apply tanh to each element
+  // Quantize the elements and write them to the output tensor
+
   }
 };
 
