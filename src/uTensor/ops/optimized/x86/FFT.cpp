@@ -1,5 +1,5 @@
-#include "uTensor/core/platform_guard.hpp"
-#if UTENSOR_PLATFORM == UTENSOR_PLATFORM_X86
+#include "uTensor/util/platform_guard.hpp"
+#if UT_PLATFORM(UT_PLATFORM_X86)
 
 #include "FFT.hpp"
 #include "context.hpp"
