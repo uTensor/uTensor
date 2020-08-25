@@ -26,10 +26,10 @@ class ConvFilter {
   }
   inline T finalize() const { return tmp; }
   // https://github.com/tensorflow/tensorflow/blob/28d1ad34bb59e3e1631b5807eebc46563ef3382c/tensorflow/lite/kernels/internal/reference/conv.h#L56-L57
-  inline const int16_t height() const { return filter->get_shape()[1]; }
-  inline const int16_t width() const { return filter->get_shape()[2]; }
-  inline const int16_t in_channels() const { return filter->get_shape()[3]; }
-  inline const int16_t out_channels() const { return filter->get_shape()[0]; }
+  inline int16_t height() const { return filter->get_shape()[1]; }
+  inline int16_t width() const { return filter->get_shape()[2]; }
+  inline int16_t in_channels() const { return filter->get_shape()[3]; }
+  inline int16_t out_channels() const { return filter->get_shape()[0]; }
 };
 
 template <typename T>
@@ -46,10 +46,10 @@ class MaxFilter {
     tmp = std::max(tmp, input_value);
   }
   inline T finalize() const { return tmp; }
-  inline const int16_t height() const { return h; }
-  inline const int16_t width() const { return w; }
-  inline const int16_t in_channels() const { return 1; }
-  inline const int16_t out_channels() const { return c; }
+  inline int16_t height() const { return h; }
+  inline int16_t width() const { return w; }
+  inline int16_t in_channels() const { return 1; }
+  inline int16_t out_channels() const { return c; }
 };
 
 template <typename T>
@@ -66,10 +66,10 @@ class MinFilter {
     tmp = std::min(tmp, input_value);
   }
   inline T finalize() const { return tmp; }
-  inline const int16_t height() const { return h; }
-  inline const int16_t width() const { return w; }
-  inline const int16_t in_channels() const { return 1; }
-  inline const int16_t out_channels() const { return c; }
+  inline int16_t height() const { return h; }
+  inline int16_t width() const { return w; }
+  inline int16_t in_channels() const { return 1; }
+  inline int16_t out_channels() const { return c; }
 };
 
 template <typename T>
@@ -88,10 +88,10 @@ class AvgFilter {
   inline T finalize() const {
     return tmp / (w * h);
   }  //(static_cast<T>(w*h)); }
-  inline const int16_t height() const { return h; }
-  inline const int16_t width() const { return w; }
-  inline const int16_t in_channels() const { return 1; }
-  inline const int16_t out_channels() const { return c; }
+  inline int16_t height() const { return h; }
+  inline int16_t width() const { return w; }
+  inline int16_t in_channels() const { return 1; }
+  inline int16_t out_channels() const { return c; }
 };
 
 template<typename T>

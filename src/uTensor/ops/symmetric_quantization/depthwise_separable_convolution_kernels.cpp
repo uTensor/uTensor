@@ -41,7 +41,7 @@ void ComputePaddingHeightWidth(int stride_height, int stride_width,
   *out_height = ComputeOutSize(padding, in_height, filter_height, stride_height,
                                dilation_rate_height);
 
-  TfLitePaddingValues padding_values;
+  //TfLitePaddingValues padding_values;
   int offset = 0;
   *padding_height =
       ComputePaddingWithOffset(stride_height, dilation_rate_height, in_height,

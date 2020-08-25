@@ -82,7 +82,7 @@ DiagonalRomTensor::~DiagonalRomTensor() {}
 void* DiagonalRomTensor::read(uint32_t linear_index) const {
   static const uint32_t zero = 0;
   int sqr = floorPerfSqrt(linear_index);
-  if (sqr == linear_index / sqr) {
+  if (static_cast<size_t>(sqr) == linear_index / sqr) {
     return RomTensor::read(sqr);
   } else {
     return (void*)&zero;
@@ -92,7 +92,7 @@ void* DiagonalRomTensor::read(uint32_t linear_index) const {
 void* DiagonalRomTensor::write(uint32_t linear_index) {
   static uint32_t zero = 0;
   int sqr = floorPerfSqrt(linear_index);
-  if (sqr == linear_index / sqr) {
+  if (static_cast<size_t>(sqr) == linear_index / sqr) {
     return RomTensor::read(sqr);
   } else {
     return (void*)&zero;

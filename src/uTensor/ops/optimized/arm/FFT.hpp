@@ -16,7 +16,7 @@ class PowerSpectrum : public OperatorInterface<1, 1>, FastOperator {
 
  protected:
   virtual void compute();
-  void power_spectrum_kernel(Tensor& power, const Tensor& input, int N);
+  void power_spectrum_kernel(Tensor& power, const Tensor& input, uint32_t N);
 
  private:
   int N;

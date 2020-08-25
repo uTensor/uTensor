@@ -19,7 +19,7 @@ void quantized_matrix_mult_kernel(Tensor& output, const Tensor& input,
   // quantized_activation_min = data->output_activation_min;
   // quantized_activation_max = data->output_activation_max;
 
-  const TensorShape& input_shape = input->get_shape();
+  // const TensorShape& input_shape = input->get_shape();
   const TensorShape& filter_shape = filter->get_shape();
   TensorShape& output_shape = output->get_shape();
 

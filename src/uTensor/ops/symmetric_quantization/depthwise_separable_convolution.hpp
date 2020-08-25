@@ -112,7 +112,7 @@ void DepthwiseSeparableConvOperator<Tout>::calculateOpData(
     int32_t& padding_height, int32_t& padding_width, int32_t& output_multiplier,
     int32_t& output_activation_min, int32_t& output_activation_max,
     TFLM::TfLiteFusedActivation activation) {
-  const int channels_out = filter->get_shape()[3];
+//   const int channels_out = filter->get_shape()[3];
   const int width = input->get_shape()[2];
   const int height = input->get_shape()[1];
   const int filter_width = filter->get_shape()[2];
@@ -183,10 +183,10 @@ template <typename Tout>
 void DepthwiseSeparableConvOperator<Tout>::compute() {
   AllocatorInterface* ram_allocator =
       Context::get_default_context()->get_ram_data_allocator();
-  const TensorShape& in_shape = inputs[in].tensor()->get_shape();
-  const TensorShape& df_shape = inputs[filter].tensor()->get_shape();
-  const TensorShape& bias_shape = inputs[bias].tensor()->get_shape();
-  const TensorShape& out_shape = outputs[out].tensor()->get_shape();
+//   const TensorShape& in_shape = inputs[in].tensor()->get_shape();
+//   const TensorShape& df_shape = inputs[filter].tensor()->get_shape();
+//   const TensorShape& bias_shape = inputs[bias].tensor()->get_shape();
+//   const TensorShape& out_shape = outputs[out].tensor()->get_shape();
 
   /* These are not correct
   if (in_shape[3] != df_shape[2]) {
