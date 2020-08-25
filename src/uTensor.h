@@ -12,7 +12,7 @@
 #include "uTensor/core/quantizationPrimitives.hpp"
 #include "uTensor/core/tensor.hpp"
 #include "uTensor/core/tensorBase.hpp"
-#include "uTensor/core/tensorMap.hpp"
+#include "uTensor/core/TensorMap.hpp"
 #include "uTensor/core/types.hpp"
 #include "uTensor/core/utensor_string.hpp"
 #include "uTensor/core/uTensor_util.hpp"
