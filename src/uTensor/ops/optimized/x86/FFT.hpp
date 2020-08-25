@@ -1,7 +1,7 @@
 #ifndef UTENSOR_FFT_HPP
 #define UTENSOR_FFT_HPP
 
-#include "uTensor/util/platform_guard.hpp"
+#include "uTensor/core/uPAL.hpp"
 #if UT_PLATFORM(UT_PLATFORM_X86)
 
 #include "fftw3.h"

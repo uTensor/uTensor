@@ -1,4 +1,4 @@
-#include "uTensor/util/platform_guard.hpp"
+#include "uTensor/core/uPAL.hpp"
 #if UT_PLATFORM(UT_PLATFORM_X86)
 
 #include "FFT.hpp"
