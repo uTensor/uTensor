@@ -19,8 +19,8 @@ class TensorShape {
 
   uint16_t operator[](int i) const;
   uint16_t& operator[](int i);
-  bool operator == (const TensorShape& other);
-  bool operator != (const TensorShape& other);
+  bool operator==(const TensorShape& other);
+  bool operator!=(const TensorShape& other);
   void update_dims();
   uint32_t get_linear_size() const;
   uint8_t num_dims() const;
@@ -29,6 +29,18 @@ class TensorShape {
 
  private:
   uint16_t _shape[4];
+  uint8_t _num_dims;
+};
+
+class TensorStrides {
+ public:
+  TensorStrides(TensorShape& shape);
+  uint8_t num_dims();
+  uint32_t operator[](size_t i) const;
+  uint32_t& operator[](size_t i);
+
+ private:
+  uint32_t _strides[4];
   uint8_t _num_dims;
 };
 // Do something to remember current type
