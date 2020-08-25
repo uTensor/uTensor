@@ -20,10 +20,6 @@ set(src_utensor_errhndl
   errorHandlers/SimpleErrorHandler.cpp
    )
 
-set(src_utensor_legacy_ops
-    ops/legacy/LegacyMath.cpp
-    ops/legacy/legacyQuantizationUtils.cpp
-    )
 set(src_utensor_sq_ops
     ops/symmetric_quantization/fully_connected.cpp
     ops/symmetric_quantization/fully_connected_kernel.cpp
