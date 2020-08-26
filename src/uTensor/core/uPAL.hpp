@@ -23,7 +23,7 @@
 #define UT_PLATFORM_CODE 2
 #endif
 
-#ifdef ARDUINO | MBED_PROJECT
+#if defined(ARDUINO) || defined(MBED_PROJECT)
 #define EMBEDDED_PROJECT
 #else
 #define OS_PROJECT

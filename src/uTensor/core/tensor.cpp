@@ -158,10 +158,11 @@ void print(const Tensor& t) {
           uTensor_printf("Unknown data type");
           return;
       }
-      if (i != (t_shape[0] - 1))
+      if (i != (t_shape[0] - 1)) {
         uTensor_printf(", ");
-      else
+      } else {
         uTensor_printf(" ");
+      }
     }
     uTensor_printf("]\n");
   }

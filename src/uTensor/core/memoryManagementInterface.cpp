@@ -72,8 +72,9 @@ void AllocatorInterface::update_hndl(Handle* h, void* new_ptr) {
 }
 
 void AllocatorInterface::bind(void* ptr, Handle* hndl) {
-  if (!_has_handle(hndl))
+  if (!_has_handle(hndl)) {
     DEBUG("Allocator does not contain reference to handle");
+  }
 
   if (is_bound(ptr, hndl)) {
     ERR_EXIT("Cannot rebind Handles without unbinding");
@@ -93,7 +94,7 @@ bool AllocatorInterface::is_bound(void* ptr, Handle* hndl) {
   return _is_bound(ptr, hndl);
 }
 void* AllocatorInterface::allocate(size_t sz) {
-  if (sz > (1 << 31)) {
+  if (sz > (size_t)(1 << 31)) {
     // TODO ERROR invalid allocation size
     uTensor_printf("[ERROR] Attempted to allocator > 2**32 bytes\n");
     return nullptr;
