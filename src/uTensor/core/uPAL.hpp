@@ -6,10 +6,10 @@
 // TODO: use bitwise operators for multi-target check, e.g. `#if (UTENSOR_PLATFORM_ARDUINO & __AVR__) == UTENSOR_PLATFORM`
 
 #define UT_ARCH(arch) \
-    (UT_ARCH_CODE == (arch)) || (UT_PLATFORM_ANY == (arch))
+    (defined(UT_ARCH_CODE) && UT_ARCH_CODE == (arch))
 
 #define UT_PLATFORM(pltform) \
-    (UT_PLATFORM_CODE == (pltform)) || (UT_PLATFORM_ANY == (pltform))
+    ((defined(UT_PLATFORM_CODE) && (UT_PLATFORM_CODE == (pltform)))
 
 ///////// Platform Code
 
@@ -26,7 +26,7 @@
 //////// Arch Code
 
 #define UT_ARCH_ARM 0
-#if !defined(X86) || !defined(__AVR__)  //arch check condition
+#if !(defined(X86) || defined(__AVR__)) //arch check condition
 #define UT_ARCH_CODE 0
 #endif
 
