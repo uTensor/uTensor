@@ -1,3 +1,6 @@
+#include "uTensor/core/uPAL.hpp"
+#if UT_ARCH(UT_ARCH_ARM)
+
 #include "FFT.hpp"
 #include "uTensor/core/context.hpp"
 
@@ -65,3 +68,5 @@ void PowerSpectrum::power_spectrum_kernel(Tensor& power, const Tensor& input,
 }
 
 }  // namespace uTensor
+
+#endif //platform guard

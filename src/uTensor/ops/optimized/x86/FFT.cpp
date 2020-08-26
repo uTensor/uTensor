@@ -1,5 +1,5 @@
 #include "uTensor/core/uPAL.hpp"
-#if UT_PLATFORM(UT_PLATFORM_X86)
+#if UT_ARCH(UT_ARCH_X86)
 
 #include "FFT.hpp"
 #include "context.hpp"

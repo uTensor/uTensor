@@ -2,7 +2,7 @@
 #define UTENSOR_FFT_HPP
 
 #include "uTensor/core/uPAL.hpp"
-#if UT_PLATFORM(UT_PLATFORM_X86)
+#if UT_ARCH(UT_ARCH_X86)
 
 #include "fftw3.h"
 #include "operatorBase.hpp"

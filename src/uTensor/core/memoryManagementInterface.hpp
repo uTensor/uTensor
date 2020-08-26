@@ -5,6 +5,7 @@
 //#include <cstring>
 
 #include <cstddef>
+//#include "stdint.h" //avr
 using std::size_t;
 namespace uTensor {
 

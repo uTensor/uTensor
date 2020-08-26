@@ -1,3 +1,6 @@
+#include "uTensor/core/uPAL.hpp"
+#if UT_ARCH(UT_PLATFORM_ARM)
+
 #ifndef UTENSOR_FFT_HPP
 #define UTENSOR_FFT_HPP
 
@@ -24,3 +27,4 @@ class PowerSpectrum : public OperatorInterface<1, 1>, FastOperator {
 };
 }  // namespace uTensor
 #endif
+#endif //platform guard
