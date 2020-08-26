@@ -4,9 +4,12 @@
 // Don't see where cstring is used here
 //#include <cstring>
 
-#include <cstddef>
-//#include "stdint.h" //avr
-using std::size_t;
+// #include <cstddef>
+// using std::size_t;
+
+#include "stdint.h" //avr
+using namespace std;
+
 namespace uTensor {
 
 class AllocatorInterface;
