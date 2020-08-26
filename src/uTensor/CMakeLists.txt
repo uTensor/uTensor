@@ -36,6 +36,7 @@ set(src_utensor_sq_ops
     ops/symmetric_quantization/gemmlowp.cpp
     ops/symmetric_quantization/convolution_helper.cpp
     ops/symmetric_quantization/convolution2d.cpp
+    ops/ReduceFunc.cpp
    )
 
 if(X86_PROJECT)

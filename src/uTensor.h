@@ -20,6 +20,7 @@
 #include "uTensor/ops/Convolution.hpp"
 #include "uTensor/ops/Functional.hpp"
 #include "uTensor/ops/Matrix.hpp"
+#include "uTensor/ops/ReduceFunc.hpp"
 #include "uTensor/ops/Reshape.hpp"
 #include "uTensor/ops/symmetric_quantization/QuantizeOps.hpp"
 #include "uTensor/ops/symmetric_quantization/convolution2d.hpp"

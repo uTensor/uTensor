@@ -34,15 +34,15 @@ class QuantReduceMeanModel(ModelBase):
         self.axis = axis
 
     def generate_test_case(self, test_case_name):
-        interpretor = tf.lite.Interpreter(model_content=self._model_content)
-        interpretor.allocate_tensors()
-        input_info = interpretor.get_input_details()[0]
-        output_info = interpretor.get_output_details()[0]
+        interpreter = tf.lite.Interpreter(model_content=self._model_content)
+        interpreter.allocate_tensors()
+        input_info = interpreter.get_input_details()[0]
+        output_info = interpreter.get_output_details()[0]
         in_values = np.random.randn(1, *self._shape).astype("float32")
-        interpretor.set_tensor(input_info["index"], in_values)
-        interpretor.invoke()
-        out_values = interpretor.tensor(output_info["index"])()
-        quant_input_info, quant_output_info = self.get_quant_infos(interpretor)
+        interpreter.set_tensor(input_info["index"], in_values)
+        interpreter.invoke()
+        out_values = np.atleast_1d(interpreter.tensor(output_info["index"])())
+        quant_input_info, quant_output_info = self.get_quant_infos(interpreter)
         quant_in_values = quantize(
             in_values,
             zp=quant_input_info["quantization"][1],
@@ -83,9 +83,9 @@ class QuantReduceMeanModel(ModelBase):
         out_tensor.quantized = True
         rank = len(self._shape) + 1
         if self.axis is None:
-            param_str = "{" + ", ".join([i for i in range(rank)]) + "}"
+            param_str = "{" + ", ".join([str(i) for i in range(rank)]) + "}"
         else:
-            param_str = "{" + ", ".join(self.axis) + "}"
+            param_str = "{" + ", ".join(map(str, self.axis)) + "}"
         op = Operator(
             "ReduceMeanOperator",
             "mean_op",
@@ -93,24 +93,25 @@ class QuantReduceMeanModel(ModelBase):
             param_str=param_str,
         )
         op.set_inputs({"input": in_tensor}).set_outputs({"output": out_tensor})
+        op.set_namespace("uTensor::ReferenceOperators::")
         test = SingleOpTest(self.TEST_GROUP, test_case_name, op)
         test.add_tensor_comparison(out_tensor, ref_out_tensor, 2)
         return test.render()
 
     @staticmethod
-    def get_quant_infos(interpretor):
+    def get_quant_infos(interpreter):
         node_idx = None
-        for i in range(interpretor._interpretor.NumNodes()):
-            if interpretor._interpretor.NodeName(i) == "MEAN":
+        for i in range(interpreter._interpreter.NumNodes()):
+            if interpreter._interpreter.NodeName(i) == "MEAN":
                 node_idx = i
                 break
         else:
             raise ValueError("MEAN node not found")
-        input_idx = interpretor._interpretor.NodeInputs(node_idx)[0]
-        output_idx = interpretor._interpretor.NodeOutputs(node_idx)[0]
+        input_idx = interpreter._interpreter.NodeInputs(node_idx)[0]
+        output_idx = interpreter._interpreter.NodeOutputs(node_idx)[0]
         quant_input_info = None
         quant_output_info = None
-        for info in interpretor.get_tensor_details():
+        for info in interpreter.get_tensor_details():
             if info["index"] == input_idx:
                 quant_input_info = deepcopy(info)
             elif info["index"] == output_idx:
@@ -127,15 +128,19 @@ class QuantReduceMeanModel(ModelBase):
 
 
 def main():
-    shape = (3, 5, 7, 11)
+    shape = (3, 5, 7)
     model = QuantReduceMeanModel(shape)
-    model.render_files("Mean: No axis")
-    model.axis = [0]
-    model.render_files("Mean: axis first")
-    model.axis = [3]
-    model.render_files("Mean: axis last")
-    model.axis = [2]
-    model.render_files("Mean: axis 2")
+    model.render_files("reduce_mean_no_axis")
+    model = QuantReduceMeanModel(shape, [0])
+    model.render_files("reduce_mean_axis_first")
+    model = QuantReduceMeanModel(shape, [3])
+    model.render_files("reduce_mean_axis_last")
+    model = QuantReduceMeanModel(shape, [2])
+    model.render_files("reduce_mean_axis_2")
+    model = QuantReduceMeanModel(shape, [0, 2])
+    model.render_files("reduce_mean_axis_0_2")
+    model = QuantReduceMeanModel(shape, [2, 3])
+    model.render_files("reduce_mean_axis_2_3")
 
 
 if __name__ == "__main__":
