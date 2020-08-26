@@ -58,6 +58,7 @@ package_add_test_with_libraries(test_fully_connect operators/test_fully_connecte
 package_add_test_with_libraries(test_sq_conv2d operators/test_sq_conv2d utensor operators "${PROJECT_DIR}/test-data/")
 package_add_test_with_libraries(test_sq_softmax operators/test_sq_softmax utensor operators "${PROJECT_DIR}/test-data/")
 package_add_test_with_libraries(test_sq_logistic operators/test_sq_logistic utensor operators "${PROJECT_DIR}/test-data/")
+package_add_test_with_libraries(test_sq_tanh operators/test_sq_tanh.cpp utensor operators "${PROJECT_DIR}/test-data/")
 
 # Includes
 package_add_test_with_libraries(test_top_include library/test_top_include utensor library "${PROJECT_DIR}/test-data/")
