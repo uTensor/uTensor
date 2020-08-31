@@ -1,6 +1,8 @@
 #ifndef UTENSOR_UPAL_H
 #define UTENSOR_UPAL_H
 #include "uTensor_util.hpp"
+#include <limits>
+#include <float.h>
 
 // TODO: use macros to register platforms and bit operators to combine flags
 // TODO: use bitwise operators for multi-target check, e.g. `#if (UTENSOR_PLATFORM_ARDUINO & __AVR__) == UTENSOR_PLATFORM`
@@ -60,5 +62,22 @@ namespace std {
     };
 }
 #endif  // AVR Arduino Hack
+
+namespace uTensor {
+namespace uPAL {
+    template<typename T>
+    T lowest() {
+        T val;
+        if (std::numeric_limits<T>::has_infinity) {
+            if((val = -LDBL_MIN) == -LDBL_MIN) return val;
+            if((val = -DBL_MIN) == -DBL_MIN) return val;
+            if((val = -FLT_MIN) == -FLT_MIN) return val;
+        } else {
+            return std::numeric_limits<T>::min();
+        }
+    }
+}
+}
+
 
 #endif

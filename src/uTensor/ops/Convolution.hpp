@@ -1,5 +1,7 @@
 #ifndef UTENSOR_CONVOLUTION_OPS_H
 #define UTENSOR_CONVOLUTION_OPS_H
+#include "uTensor/core/uPAL.hpp"
+
 #include <algorithm>
 #include <limits>
 
@@ -41,7 +43,8 @@ class MaxFilter {
 
  public:
   MaxFilter(int16_t h, int16_t w, int16_t c) : h(h), w(w), c(c) {}
-  inline void reset() { tmp = std::numeric_limits<T>::lowest(); }
+  // inline void reset() { tmp = std::numeric_limits<T>::lowest(); }
+  inline void reset() { tmp = uPAL::lowest<T>(); }
   inline void PartialCompute(const T& input_value, int i, int j, int k, int l) {
     tmp = std::max(tmp, input_value);
   }
