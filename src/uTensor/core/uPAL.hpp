@@ -9,7 +9,7 @@
     (defined(UT_ARCH_CODE) && UT_ARCH_CODE == (arch))
 
 #define UT_PLATFORM(pltform) \
-    ((defined(UT_PLATFORM_CODE) && (UT_PLATFORM_CODE == (pltform)))
+    (defined(UT_PLATFORM_CODE) && (UT_PLATFORM_CODE == (pltform)))
 
 ///////// Platform Code
 
@@ -36,6 +36,11 @@
 #define UT_ARCH_CODE 1
 #endif
 
+#define UT_ARCH_AVR 2
+#ifdef __AVR__
+#define UT_ARCH_CODE 2
+#endif
+
 
 
 ////////
@@ -44,5 +49,16 @@
 #else
 #define OS_PROJECT
 #endif
+
+/////// AVR Arduino Hack
+#if UT_ARCH(UT_ARCH_AVR) && UT_PLATFORM(UT_PLATFORM_ARDUINO)
+namespace std {
+    template<typename _Tp>
+    struct is_signed
+    {
+    static bool const value = _Tp(-1) < _Tp(0);
+    };
+}
+#endif  // AVR Arduino Hack
 
 #endif

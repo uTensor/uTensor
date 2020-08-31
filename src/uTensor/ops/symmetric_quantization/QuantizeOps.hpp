@@ -65,7 +65,7 @@ void affine_quantize_kernel(Tensor& output, const Tensor& input) {
   for (uint32_t i = 0; i < input->num_elems(); i++) {
     const Tin inVal = input(i);
     const float inVal_f = static_cast<float>(inVal);
-    int32_t unclamped = static_cast<int32_t>(std::round(inVal_f / scale)) + zp;
+    int32_t unclamped = static_cast<int32_t>(round(inVal_f / scale)) + zp;
     int32_t clamped = std::min(std::max(unclamped, minVal), maxVal);
     output(i) = static_cast<Tout>(clamped);
   }

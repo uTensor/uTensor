@@ -1,5 +1,6 @@
 #ifndef UTENSOR_ACTIVATIONS_OPS_H
 #define UTENSOR_ACTIVATIONS_OPS_H
+#include "uTensor/core/uPAL.hpp"
 #include <type_traits>
 
 #include "ActivationFncs_kernels.hpp"
