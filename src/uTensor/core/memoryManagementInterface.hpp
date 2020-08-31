@@ -1,14 +1,17 @@
 #ifndef __UTENSOR_MEMORY_MANAGEMENT_IFC_H
 #define __UTENSOR_MEMORY_MANAGEMENT_IFC_H
-
 // Don't see where cstring is used here
 //#include <cstring>
 
-// #include <cstddef>
-// using std::size_t;
+#include "uPAL.hpp"
 
+#if UT_ARCH(UT_ARCH_AVR) && UT_PLATFORM(UT_PLATFORM_ARDUINO)
 #include "stdint.h" //avr
 using namespace std;
+#else
+#include <cstddef>
+using std::size_t;
+#endif
 
 namespace uTensor {
 
