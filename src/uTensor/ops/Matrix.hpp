@@ -32,7 +32,7 @@ class MatrixMultOperatorV2<float> : public OperatorInterface<3, 1> {
   enum names_in : uint8_t { input, filter, bias };
   enum names_out : uint8_t { output };
 
-  MatrixMultOperatorV2(Fuseable::Activation<float> activation = Fuseable::NoActivation<float>)
+  MatrixMultOperatorV2(Fuseable::Activation<float> activation = static_cast<Fuseable::Activation<float>>(Fuseable::NoActivation<float>))
       : _activation(activation) {}
 
  private:
