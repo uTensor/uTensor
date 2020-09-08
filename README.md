@@ -145,6 +145,18 @@ make
 make test
 ```
 
+## Building and running on Arm Mbed OS
+
+The uTensor core library is configured as a mbed library out of the box, so we just need to import it into our project and build as normal.
+
+```
+mbed new my_project
+cd my_project
+mbed import https://github.com/uTensor/uTensor.git
+# Create main file
+# Run uTensor-cli workflow and copy model directory here
+mbed compile # as normal
+```
 
 ## Building and running on Arm systems
 TODO
