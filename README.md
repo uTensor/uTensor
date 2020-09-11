@@ -41,7 +41,7 @@ uTensor is an extremely light-weight machine learning inference framework built 
 A model is constructed and trained in Tensorflow. uTensor takes the model and produces a .cpp and .hpp file. These files contains the generated C++11 code needed for inferencing. Working with uTensor on the embedded side is as easy as copy-and-paste.
 
 ### How does the uTensor runtime work?
-TODO
+[Check out the detailed description here](src/uTensor/README.md)
 
 
 ## Release Note
@@ -90,17 +90,15 @@ const uint8_t s_a[4] = {1, 2, 3, 4};
 const uint8_t s_b[4] = {5, 6, 7, 8};
 const uint8_t s_c_ref[4] = {19, 22, 43, 50};
 
-// This function  name doesnt matter, it should just be called before instantiating a model
-void uTensor_init() {
-  // Tell the uTensor context which allocators to use
-  localCircularArenaAllocator<256> meta_allocator; // All tensor metadata gets stored here automatically, even when new is called
-  localCircularArenaAllocator<256> ram_allocator;  // All temporary storage gets allocated here
-  Context::get_default_context()->set_metadata_allocator(&meta_allocator);
-  Context::get_default_context()->set_ram_data_allocator(&ram_allocator);
-
-}
+// These can also be embedded in models
+// Recommend, not putting these on the heap or stack directly as they can be large
+localCircularArenaAllocator<256> meta_allocator; // All tensor metadata gets stored here automatically, even when new is called
+localCircularArenaAllocator<256> ram_allocator;  // All temporary storage gets allocated here
 
 void foo() {
+  // Tell the uTensor context which allocators to use
+  Context::get_default_context()->set_metadata_allocator(&meta_allocator);
+  Context::get_default_context()->set_ram_data_allocator(&ram_allocator);
 
   // Tensors are simply handles for accessing data as necessary, they are no larger than a pointer
   // RomTensor(TensorShape, data_type, data*);
@@ -147,6 +145,18 @@ make
 make test
 ```
 
+## Building and running on Arm Mbed OS
+
+The uTensor core library is configured as a mbed library out of the box, so we just need to import it into our project and build as normal.
+
+```
+mbed new my_project
+cd my_project
+mbed import https://github.com/uTensor/uTensor.git
+# Create main file
+# Run uTensor-cli workflow and copy model directory here
+mbed compile # as normal
+```
 
 ## Building and running on Arm systems
 TODO
