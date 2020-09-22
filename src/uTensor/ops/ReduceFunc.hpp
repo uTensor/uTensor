@@ -22,19 +22,19 @@ class ReduceMeanOperator : ReduceOperator {
 
  protected:
   void compute() {
-    Tensor& input = inputs[input].tensor();
-    Tensor& output = outputs[output].tensor();
-    for (uint32_t i = 0; i < output->num_elems(); ++i) {
-      output(i) = static_cast<T>(0);
+    Tensor& inputT = inputs[input].tensor();
+    Tensor& outputT = outputs[output].tensor();
+    for (uint32_t i = 0; i < outputT->num_elems(); ++i) {
+      outputT(i) = static_cast<T>(0);
     }
     T denum = 1;
     for (auto d : _dims) {
-      denum *= input->get_shape()[d];
+      denum *= inputT->get_shape()[d];
     }
-    for (uint32_t offset = 0; offset < input->num_elems(); ++offset) {
+    for (uint32_t offset = 0; offset < inputT->num_elems(); ++offset) {
       uint32_t new_offset = adjust_linear_idx(input, offset);
-      T value = input(offset) / denum;
-      output[new_offset] += value;
+      T value = inputT(offset) / denum;
+      outputT(new_offset) += value;
     }
   }
 };
