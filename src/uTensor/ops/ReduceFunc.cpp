@@ -52,5 +52,36 @@ uint32_t ReduceOperator::adjust_linear_idx(Tensor& tensor, uint32_t idx) {
   }
   return new_idx;
 }
+
+template <>
+void ReduceMeanOperator<int8_t>::compute() {
+  Tensor& inputT = inputs[input].tensor();
+  Tensor& outputT = outputs[output].tensor();
+  for (uint32_t i = 0; i < outputT->num_elems(); ++i) {
+    outputT(i) = static_cast<int8_t>(0);
+  }
+  float denum = 1;
+  for (auto d : _dims) {
+    denum *= inputT->get_shape()[d];
+  }
+  const float iscale = inputT->get_quantization_params().get_scale_for_channel(0);
+  const int32_t izp = inputT->get_quantization_params().get_zeroP_for_channel(0);
+  const float oscale = outputT->get_quantization_params().get_scale_for_channel(0);
+  const int32_t ozp = outputT->get_quantization_params().get_zeroP_for_channel(0);
+  for (uint32_t offset = 0; offset < inputT->num_elems(); ++offset) {
+    uint32_t new_offset = adjust_linear_idx(input, offset);
+    //outputT(new_offset) += inputT(offset) / denum
+    const int32_t iv8 = static_cast<int8_t>(inputT(offset));
+    const int32_t ov8 = static_cast<int8_t>(outputT(new_offset));
+    const float input_value = (iv8 - izp)*iscale / denum;
+    const float out_val = (ov8 - ozp)*oscale + input_value;
+    
+    const int32_t otmp = static_cast<int32_t>(out_val/oscale) + ozp;
+    const int8_t out8 = (otmp < -127 ) ? -128 : (otmp > 127) ? 127 : static_cast<int8_t>(otmp);
+    outputT(new_offset) = out8;
+  }
+}
+
+
 }  // namespace ReferenceOperators
 }  // namespace uTensor

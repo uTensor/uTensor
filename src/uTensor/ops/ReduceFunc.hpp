@@ -21,22 +21,29 @@ class ReduceMeanOperator : ReduceOperator {
   ReduceMeanOperator(initializer_list<uint32_t> dims) : ReduceOperator(dims) {}
 
  protected:
-  void compute() {
-    Tensor& inputT = inputs[input].tensor();
-    Tensor& outputT = outputs[output].tensor();
-    for (uint32_t i = 0; i < outputT->num_elems(); ++i) {
-      outputT(i) = static_cast<T>(0);
-    }
-    T denum = 1;
-    for (auto d : _dims) {
-      denum *= inputT->get_shape()[d];
-    }
-    for (uint32_t offset = 0; offset < inputT->num_elems(); ++offset) {
-      uint32_t new_offset = adjust_linear_idx(input, offset);
-      T value = inputT(offset) / denum;
-      outputT(new_offset) += value;
-    }
-  }
+  void compute();
 };
+
+template<typename T>
+void ReduceMeanOperator<T>::compute() {
+  Tensor& inputT = inputs[input].tensor();
+  Tensor& outputT = outputs[output].tensor();
+  for (uint32_t i = 0; i < outputT->num_elems(); ++i) {
+    outputT(i) = static_cast<T>(0);
+  }
+  T denum = 1;
+  for (auto d : _dims) {
+    denum *= inputT->get_shape()[d];
+  }
+  for (uint32_t offset = 0; offset < inputT->num_elems(); ++offset) {
+    uint32_t new_offset = adjust_linear_idx(input, offset);
+    T value = inputT(offset) / denum;
+    outputT(new_offset) += value;
+  }
+}
+
+template <>
+void ReduceMeanOperator<int8_t>::compute();
+
 }  // namespace ReferenceOperators
 }  // namespace uTensor
