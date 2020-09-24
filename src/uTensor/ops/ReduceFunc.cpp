@@ -69,7 +69,7 @@ void ReduceMeanOperator<int8_t>::compute() {
   const float oscale = outputT->get_quantization_params().get_scale_for_channel(0);
   const int32_t ozp = outputT->get_quantization_params().get_zeroP_for_channel(0);
   for (uint32_t offset = 0; offset < inputT->num_elems(); ++offset) {
-    uint32_t new_offset = adjust_linear_idx(input, offset);
+    uint32_t new_offset = adjust_linear_idx(inputT, offset);
     //outputT(new_offset) += inputT(offset) / denum
     const int32_t iv8 = static_cast<int8_t>(inputT(offset));
     const int32_t ov8 = static_cast<int8_t>(outputT(new_offset));

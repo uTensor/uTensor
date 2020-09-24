@@ -9,16 +9,16 @@ class ReduceOperator : public OperatorInterface<2, 1> {
   ReduceOperator(initializer_list<uint16_t> dims);
   uint32_t adjust_linear_idx(Tensor& tensor, uint32_t idx);
 
- private:
+ protected:
   uint16_t _dims[4];
 };
 
 template <typename T>
-class ReduceMeanOperator : ReduceOperator {
+class ReduceMeanOperator : public ReduceOperator {
  public:
   enum names_in : uint8_t { input };
   enum names_out : uint8_t { output };
-  ReduceMeanOperator(initializer_list<uint32_t> dims) : ReduceOperator(dims) {}
+  ReduceMeanOperator(initializer_list<uint16_t> dims) : ReduceOperator(dims) {}
 
  protected:
   void compute();
@@ -36,9 +36,9 @@ void ReduceMeanOperator<T>::compute() {
     denum *= inputT->get_shape()[d];
   }
   for (uint32_t offset = 0; offset < inputT->num_elems(); ++offset) {
-    uint32_t new_offset = adjust_linear_idx(input, offset);
-    T value = inputT(offset) / denum;
-    outputT(new_offset) += value;
+    uint32_t new_offset = adjust_linear_idx(inputT, offset);
+    T value = static_cast<T>(inputT(offset)) / denum;
+    outputT(new_offset) = static_cast<T>(outputT(new_offset)) + value;
   }
 }
 
