@@ -27,7 +27,7 @@
 #include "uTensor/ops/symmetric_quantization/convolution2d.hpp"
 #include "uTensor/ops/symmetric_quantization/depthwise_separable_convolution.hpp"
 #include "uTensor/ops/symmetric_quantization/fully_connected.hpp"
-#include "uTensor/ops/tanh.hpp"
+#include "uTensor/ops/trigonometric.hpp"
 
 /*
  * Tensors
