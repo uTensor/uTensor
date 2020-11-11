@@ -3,8 +3,8 @@
 #include "BufferTensor.hpp"
 #include "RomTensor.hpp"
 #include "arenaAllocator.hpp"
-#include "context.hpp"
-#include "operatorBase.hpp"
+#include "uTensor/core/context.hpp"
+ #include "uTensor/core/operatorBase.hpp"
 
 using namespace std;
 using namespace uTensor;

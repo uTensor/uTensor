@@ -1,6 +1,6 @@
 #include "modelBase.hpp"
 
-#include "context.hpp"
+#include "uTensor/core/context.hpp"
 
 namespace uTensor {
 

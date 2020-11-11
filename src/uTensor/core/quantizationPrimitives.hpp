@@ -1,6 +1,6 @@
 #ifndef UTENSOR_QUANT_PRIM_H
 #define UTENSOR_QUANT_PRIM_H
-#include "types.hpp"
+#include "uTensor/core/types.hpp"
 #include "errorHandler.hpp"
 #include "memoryManagementInterface.hpp"
 

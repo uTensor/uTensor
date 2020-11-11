@@ -5,8 +5,8 @@
 // https://github.com/mike-matera/ArduinoSTL/issues/15
 #include <initializer_list>
 
-#include "tensor.hpp"
-#include "uTensor_util.hpp"
+#include "uTensor/core/tensor.hpp"
+#include "uTensor/core/uTensor_util.hpp"
 #include "utensor_string.hpp"
 
 using std::initializer_list;

@@ -9,6 +9,22 @@
 namespace uTensor {
 namespace ReferenceOperators {
 
+namespace Conv2dConstants {
+  // https://github.com/tensorflow/tensorflow/blob/28d1ad34bb59e3e1631b5807eebc46563ef3382c/tensorflow/lite/kernels/internal/reference/conv.h#L56-L57
+  constexpr int input_batch_dim         = 0;
+  constexpr int input_height_dim        = 0;
+  constexpr int input_witdh_dim         = 0;
+  constexpr int input_channel_dim       = 0;
+
+  constexpr int filter_height_dim       = 1;
+  constexpr int filter_width_dim        = 2;
+  constexpr int filter_in_channels_dim  = 3;
+  constexpr int filter_out_channels_dim = 0;
+
+  constexpr int output_height_dim       = 1;
+  constexpr int output_width_dim        = 2;
+}
+
 // Can use these intermediate types to make the convolution operator more
 // generic. Maxpool, conv, average pool, median etc. are all basically the same
 // operation with target functions.
@@ -26,10 +42,32 @@ class ConvFilter {
   }
   inline T finalize() const { return tmp; }
   // https://github.com/tensorflow/tensorflow/blob/28d1ad34bb59e3e1631b5807eebc46563ef3382c/tensorflow/lite/kernels/internal/reference/conv.h#L56-L57
-  inline int16_t height() const { return filter->get_shape()[1]; }
-  inline int16_t width() const { return filter->get_shape()[2]; }
-  inline int16_t in_channels() const { return filter->get_shape()[3]; }
-  inline int16_t out_channels() const { return filter->get_shape()[0]; }
+  inline int16_t height() const { return filter->get_shape()[Conv2dConstants::filter_height_dim]; }
+  inline int16_t width() const { return filter->get_shape()[Conv2dConstants::filter_width_dim]; }
+  inline int16_t in_channels() const { return filter->get_shape()[Conv2dConstants::filter_in_channels_dim]; }
+  inline int16_t out_channels() const { return filter->get_shape()[Conv2dConstants::filter_out_channels_dim]; }
+};
+// Specialization for quantization
+template <>
+class ConvFilter<int8_t> {
+  float tmp;
+  const Tensor& filter;
+
+ public:
+  ConvFilter(const Tensor& filter) : tmp(0), filter(filter) {}
+  inline void reset() { tmp = 0; }
+  inline void PartialCompute(const float& input_value, int i, int j, int k, int l) {
+    const int32_t fv32 = static_cast<int32_t>(static_cast<int8_t>(filter(i, j, k, l)));
+    const int32_t zp = filter->get_quantization_params().get_zeroP_for_channel(i);
+    const float scale = filter->get_quantization_params().get_scale_for_channel(i);
+    const float filter_value = (fv32 - zp)*scale;
+    tmp += (input_value * filter_value);
+  }
+  inline float finalize() const { return tmp; }
+  inline int16_t height() const { return filter->get_shape()[Conv2dConstants::filter_height_dim]; }
+  inline int16_t width() const { return filter->get_shape()[Conv2dConstants::filter_width_dim]; }
+  inline int16_t in_channels() const { return filter->get_shape()[Conv2dConstants::filter_in_channels_dim]; }
+  inline int16_t out_channels() const { return filter->get_shape()[Conv2dConstants::filter_out_channels_dim]; }
 };
 
 template <typename T>
@@ -109,6 +147,20 @@ class wBias {
   private:
     const Tensor& t;
 };
+template<>
+class wBias<int8_t> {
+  public:
+    wBias(const Tensor& t) : t(t) {}
+    float operator()(int32_t i) { 
+      const int32_t b32 = static_cast<int32_t>(t(i));
+      const float scale = t->get_quantization_params().get_scale_for_channel(i);
+      const int32_t zp = t->get_quantization_params().get_zeroP_for_channel(i);
+      return (b32 - zp)*scale;
+    }
+
+  private:
+    const Tensor& t;
+};
 
 template <typename T>
 class Conv2dOperator : public OperatorInterface<3, 1> {
@@ -117,32 +169,45 @@ class Conv2dOperator : public OperatorInterface<3, 1> {
   enum names_out : uint8_t { out };
   Conv2dOperator(std::initializer_list<uint16_t> strides, Padding padding)
       : _padding(padding) {
+    for(int j = 0; j < 4; j++){
+      _stride[j] = 1;
+    }
     int i = 0;
+    if(strides.size() == 2){
+      i = 1; // Offset the stride loc
+    }
     for (auto s : strides) {
       _stride[i++] = s;
     }
   }
 
  protected:
-  virtual void compute() {
-    bool have_bias = inputs.has(bias);
-    ConvFilter<T> conv(inputs[filter].tensor());
-    if(have_bias) {
-      wBias<T> w_bias(inputs[bias].tensor());
-      generic_convolution_kernel<T, ConvFilter<T>>(
-        outputs[out].tensor(), inputs[in].tensor(), conv, w_bias, _padding, _stride);
-    } else {
-      NoBias<T> no_bias;
-      generic_convolution_kernel<T, ConvFilter<T>>(
-        outputs[out].tensor(), inputs[in].tensor(), conv, no_bias, _padding, _stride);
-
-    }
-  }
+  virtual void compute();
 
  private:
   uint16_t _stride[4];
   Padding _padding;
 };
+
+template <typename T>
+void Conv2dOperator<T>::compute() {
+  bool have_bias = inputs.has(bias);
+  ConvFilter<T> conv(inputs[filter].tensor());
+  if(have_bias) {
+    wBias<T> w_bias(inputs[bias].tensor());
+    generic_convolution_kernel<T, ConvFilter<T>>(
+      outputs[out].tensor(), inputs[in].tensor(), conv, w_bias, _padding, _stride);
+  } else {
+    NoBias<T> no_bias;
+    generic_convolution_kernel<T, ConvFilter<T>>(
+      outputs[out].tensor(), inputs[in].tensor(), conv, no_bias, _padding, _stride);
+
+  }
+}
+
+// Specialization for symmetric quantization
+template <>
+void Conv2dOperator<int8_t>::compute();
 
 template <typename T>
 class DepthwiseSeparableConvOperator : public OperatorInterface<3, 1> {

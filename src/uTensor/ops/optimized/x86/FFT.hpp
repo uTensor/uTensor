@@ -5,7 +5,7 @@
 #if UT_ARCH(UT_ARCH_X86)
 
 #include "fftw3.h"
-#include "operatorBase.hpp"
+ #include "uTensor/core/operatorBase.hpp"
 
 namespace uTensor {
 // fftw_plan fftw_plan_dft_r2c_1d(int n, double *in, fftw_complex *out, unsigned

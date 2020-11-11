@@ -42,3 +42,4 @@ if(PACKAGE_TUTORIALS)
   add_subdirectory(tutorials/custom_operator)
 endif()
 
+add_subdirectory(tanh_model)

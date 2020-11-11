@@ -1,7 +1,7 @@
-#include "tensor.hpp"
+#include "uTensor/core/tensor.hpp"
 
-#include "context.hpp"
-#include "uTensor_util.hpp"
+#include "uTensor/core/context.hpp"
+#include "uTensor/core/uTensor_util.hpp"
 
 namespace uTensor {
 // Tensor::Tensor(const Tensor& that) {} // Cannot copy Tensors, must pass by

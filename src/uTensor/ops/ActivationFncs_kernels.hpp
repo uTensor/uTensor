@@ -4,6 +4,7 @@
 #include <cmath>
 #include <limits>
 #include <functional>
+#include <type_traits>
 
 using std::exp;
 
@@ -40,7 +41,14 @@ namespace Fuseable {
 } // namespace Fuseable
 
 template <typename T>
-void inplace_relu_k(Tensor& t) {
+class inplace_relu_k_impl {
+  public:
+    inplace_relu_k_impl() {}
+    void operator()(Tensor& t) const;
+};
+
+template <typename T>
+void inplace_relu_k_impl<T>::operator()(Tensor& t) const {
   T tmp;
   uint32_t t_size = t->get_shape().get_linear_size();
   for (uint32_t i = 0; i < t_size; i++) {
@@ -52,20 +60,47 @@ void inplace_relu_k(Tensor& t) {
 }
 
 template <typename T>
-void relu_k(Tensor& out, const Tensor& in) {
-  T tmp;
+class relu_k_impl{
+  public:
+    void operator()(Tensor& out, const Tensor& in) const;
+};
+
+template <>
+void relu_k_impl<float>::operator()(Tensor& out, const Tensor& in) const;
+
+// For all quantized forms
+template <typename T>
+void relu_k_impl<T>::operator()(Tensor& out, const Tensor& in) const {
+  static_assert(std::is_integral<T>::value, "Quantized ReLU expects integral type");
+  constexpr T min = std::numeric_limits<T>::lowest();
+  constexpr T max = std::numeric_limits<T>::max();
+  float tmp;
   uint32_t in_size = in->get_shape().get_linear_size();
   for (uint32_t i = 0; i < in_size; i++) {
-    tmp = in(i);
+    const int32_t iv8 = static_cast<T>(in(i));
+    const float scale = in->get_quantization_params().get_scale_for_channel(0);
+    const int32_t zp = in->get_quantization_params().get_zeroP_for_channel(0);
+    tmp = (iv8 - zp)*scale;
     if (tmp < 0) {
-      tmp = static_cast<T>(0);
+      tmp = 0;
     }
-    out(i) = tmp;
+    const float oscale = out->get_quantization_params().get_scale_for_channel(0);
+    const int32_t ozp = out->get_quantization_params().get_zeroP_for_channel(0);
+    const int32_t otmp = static_cast<int32_t>(tmp/oscale) + ozp;
+    const T outT= (otmp <= min ) ? min : (otmp > max) ? max : static_cast<T>(otmp);
+    out(i) = outT;
   }
 }
 
 template <typename T>
-void inplace_relu6_k(Tensor& t) {
+class inplace_relu6_k_impl {
+  public:
+    void operator()(Tensor& t) const;
+
+};
+
+template <typename T>
+void inplace_relu6_k_impl<T>::operator()(Tensor& t) const {
   T tmp;
   uint32_t t_size = t->get_shape().get_linear_size();
   for (uint32_t i = 0; i < t_size; i++) {
@@ -80,7 +115,13 @@ void inplace_relu6_k(Tensor& t) {
 }
 
 template <typename T>
-void relu6_k(Tensor& out, const Tensor& in) {
+class relu6_k_impl {
+  public:
+    void operator()(Tensor& out, const Tensor& in) const;
+};
+
+template <typename T>
+void relu6_k_impl<T>::operator()(Tensor& out, const Tensor& in) const {
   T tmp;
   uint32_t in_size = in->get_shape().get_linear_size();
   for (uint32_t i = 0; i < in_size; i++) {
@@ -94,6 +135,120 @@ void relu6_k(Tensor& out, const Tensor& in) {
     out(i) = tmp;
   }
 }
+
+template <typename T>
+void inplace_softmax_k(Tensor& in, T beta = 1) {
+  T tmp;
+  T mSum = 0;
+  const TensorShape& inShape = in->get_shape();
+  int outer_dim = inShape.num_dims() -1;
+  int depth = inShape[outer_dim];
+  int out_side_numelems = 1;
+  for(int i = 0; i < inShape.num_dims(); i++){
+    out_side_numelems *= (i == outer_dim) ? 1: inShape[i];
+  }
+
+  for (int i = 0; i < out_side_numelems; i++) {
+    // exp(x[i])/sum(exp(x[i])) == exp(x[i]+C)/sum(exp(x[i]+C))
+    T max = std::numeric_limits<T>::lowest();
+    for(int j = 0; j < depth; j++){
+      max = std::max(max, static_cast<T>(in(i, j)));
+    }
+
+    T mSum = 0;
+    for(int j = 0; j < depth; j++){
+      T tmp = exp((static_cast<T>(in(i,j)) - max) * beta);
+      mSum += tmp;
+      in(i,j) = tmp;
+    }
+    for(int j = 0; j < depth; j++){
+      in(i, j)  = static_cast<T>(in(i, j)) / mSum;
+    }
+  }
+}
+template <typename T>
+void softmax_k(Tensor& out, const Tensor& in, T beta=1) {
+  T tmp;
+  T mSum = 0;
+  const TensorShape& inShape = in->get_shape();
+  int outer_dim = inShape.num_dims() -1;
+  int depth = inShape[outer_dim];
+  int out_side_numelems = 1;
+  for(int i = 0; i < inShape.num_dims(); i++){
+    out_side_numelems *= (i == outer_dim) ? 1: inShape[i];
+  }
+
+  for (int i = 0; i < out_side_numelems; i++) {
+    // exp(x[i])/sum(exp(x[i])) == exp(x[i]+C)/sum(exp(x[i]+C))
+    T max = std::numeric_limits<T>::lowest();
+    for(int j = 0; j < depth; j++){
+      max = std::max(max, static_cast<T>(in(i, j)));
+    }
+
+    T mSum = 0;
+    for(int j = 0; j < depth; j++){
+      T tmp = exp((static_cast<T>(in(i,j)) - max) * beta);
+      mSum += tmp;
+      out(i,j) = tmp;
+    }
+    for(int j = 0; j < depth; j++){
+      out(i, j)  = static_cast<T>(out(i, j)) / mSum;
+    }
+  }
+
+}
+
+void sq_softmax_k(Tensor& out, const Tensor& in, int8_t beta=1);
+
+template <typename T>
+class inplace_sigmoid_k {
+  public:
+    void operator()(Tensor& t) const;
+};
+
+template <typename T>
+void inplace_sigmoid_k<T>::operator()(Tensor& t) const {
+  const T one = 1;
+  uint32_t t_size = t->get_shape().get_linear_size();
+  for (uint32_t i = 0; i < t_size; i++) {
+    const T tmp = one / (one + exp(- static_cast<T>(t(i))));
+    t(i) = tmp;
+  }
+}
+
+template <typename T>
+class sigmoid_k_impl {
+  public:
+    void operator()(Tensor& out, const Tensor& in) const;
+
+};
+
+template <typename T>
+void sigmoid_k_impl<T>::operator()(Tensor& out, const Tensor& in) const {
+  const T one = 1;
+  uint32_t t_size = in->get_shape().get_linear_size();
+  for (uint32_t i = 0; i < t_size; i++) {
+    const T tmp = one / (one + exp(- static_cast<T>(in(i))));
+    out(i) = tmp;
+  }
+}
+
+template <>
+void sigmoid_k_impl<int8_t>::operator()(Tensor& out, const Tensor& in) const;
+
+// Set defaults
+template <typename T>
+using sigmoid_k = sigmoid_k_impl<T>;
+
+template <typename T>
+using inplace_relu_k = inplace_relu_k_impl<T>;
+template <typename T>
+using relu_k = relu_k_impl<T>;
+template <typename T>
+using inplace_relu6_k = inplace_relu6_k_impl<T>();
+template <typename T>
+using relu6_k = relu6_k_impl<T>();
+
 
 }  // namespace uTensor
 #endif

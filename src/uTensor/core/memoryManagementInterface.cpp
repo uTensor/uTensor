@@ -1,6 +1,6 @@
 #include "memoryManagementInterface.hpp"
 
-#include "uTensor_util.hpp"
+#include "uTensor/core/uTensor_util.hpp"
 
 namespace uTensor {
 

@@ -38,12 +38,12 @@ container_str = """
 #include <cstring>
 #include <iostream>
 
-#include "Convolution.hpp"
+#include "uTensor/ops/Convolution.hpp"
 #include "BufferTensor.hpp"
 #include "RamTensor.hpp"
 #include "RomTensor.hpp"
 #include "arenaAllocator.hpp"
-#include "context.hpp"
+#include "uTensor/core/context.hpp"
 #include "gtest/gtest.h"
 
 #include "{{ constants_header }}"

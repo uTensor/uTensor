@@ -13,7 +13,10 @@ set(src_utensor_tensors
   tensors/RomTensor.cpp
    )
 set(src_utensor_ops
+    ops/ActivationFncs.cpp
+    ops/ActivationFncs_kernels.cpp
     ops/Matrix.cpp
+    ops/Convolution.cpp
     ops/Matrix_kernels.cpp
    )
 set(src_utensor_errhndl
@@ -27,6 +30,8 @@ set(src_utensor_sq_ops
     ops/symmetric_quantization/depthwise_separable_convolution_kernels.cpp
     ops/symmetric_quantization/symmetric_quantization_utils.cpp
     ops/symmetric_quantization/gemmlowp.cpp
+    ops/symmetric_quantization/convolution_helper.cpp
+    ops/symmetric_quantization/convolution2d.cpp
    )
 
 if(X86_PROJECT)

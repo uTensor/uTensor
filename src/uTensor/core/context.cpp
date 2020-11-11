@@ -1,5 +1,5 @@
-#include "context.hpp"
-#include "uTensor_util.hpp"
+#include "uTensor/core/context.hpp"
+#include "uTensor/core/uTensor_util.hpp"
 namespace uTensor {
 
 // AllocatorInterface* Context::_metadata_allocator = nullptr;

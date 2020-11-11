@@ -1,4 +1,4 @@
-#include "types.hpp"
+#include "uTensor/core/types.hpp"
 
 #include <cstring>
 
@@ -82,11 +82,9 @@ uint16_t& TensorShape::operator[](int i) {
   return _shape[i];
 }  // Maybe handle update case
 void TensorShape::update_dims() {
+  // implicit assuming the last positive dim is the num_dims
   for (int i = 0; i < 4; i++) {
-    if (_shape[i] && (i + 1) < _num_dims)
-      _num_dims = i + 1;
-    else if (!_shape[i] && (i + 1) > _num_dims)
-      _num_dims = i + 1;
+    if (_shape[i] > 0) _num_dims = i + 1;
   }
 }
 bool TensorShape::operator==(const TensorShape& other) {
@@ -94,12 +92,12 @@ bool TensorShape::operator==(const TensorShape& other) {
     return false;
   }
   bool all_eq = true;
-  for (int i = 0; i < _num_dims; ++i){
+  for (int i = 0; i < _num_dims; ++i) {
     all_eq = all_eq && (_shape[i] == other[i]);
   }
   return all_eq;
 }
-bool TensorShape::operator!=(const TensorShape& other){
+bool TensorShape::operator!=(const TensorShape& other) {
   return !(*this == other);
 }
 uint32_t TensorShape::get_linear_size() const {
@@ -146,6 +144,23 @@ uint32_t TensorShape::num_elems() const {
   }
   return num;
 }
+
+TensorStrides::TensorStrides(TensorShape& shape) {
+  _num_dims = shape.num_dims();
+  size_t last_idx = _num_dims - 1;
+  for (size_t i = last_idx + 1; i < 3; ++i) {
+    _strides[i] = 0;
+  }
+  _strides[last_idx] = 1;
+  uint32_t s = 1;
+  for (size_t i = last_idx - 1; i >= 0; --i) {
+    s *= shape[i + 1];
+    _strides[i] = s;
+  }
+}
+uint8_t TensorStrides::num_dims() { return _num_dims; }
+uint32_t TensorStrides::operator[](size_t i) const { return _strides[i]; }
+uint32_t& TensorStrides::operator[](size_t i) { return _strides[i]; }
 
 IntegralValue::IntegralValue(void* p) : p(p), num_bytes(0) {}
 

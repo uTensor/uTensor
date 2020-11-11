@@ -3,12 +3,12 @@
 #include <iostream>
 
 #include "BufferTensor.hpp"
-#include "Convolution.hpp"
+#include "uTensor/ops/Convolution.hpp"
 #include "RamTensor.hpp"
 #include "RomTensor.hpp"
 #include "arenaAllocator.hpp"
 #include "constants_avgpool.hpp"
-#include "context.hpp"
+#include "uTensor/core/context.hpp"
 #include "gtest/gtest.h"
 using std::cout;
 using std::endl;

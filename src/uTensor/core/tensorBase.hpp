@@ -2,7 +2,7 @@
 #define UTENSOR_TENSOR_BASE_H
 #include "quantizationPrimitives.hpp"
 #include "errorHandler.hpp"
-#include "types.hpp"
+#include "uTensor/core/types.hpp"
 
 namespace uTensor {
 

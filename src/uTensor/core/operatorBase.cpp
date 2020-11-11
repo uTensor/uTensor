@@ -1,6 +1,6 @@
-#include "operatorBase.hpp"
+ #include "uTensor/core/operatorBase.hpp"
 
-#include "context.hpp"
+#include "uTensor/core/context.hpp"
 
 namespace uTensor {
 
