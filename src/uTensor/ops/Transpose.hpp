@@ -1,0 +1,119 @@
+#ifndef UTENSOR_TRANSPOSE_H
+#define UTENSOR_TRANSPOSE_H
+
+#include "context.hpp"
+#include "types.hpp"
+#include "tensor.hpp"
+#include "uTensor_util.hpp"
+#include "operatorBase.hpp"
+
+using std::array;
+
+namespace uTensor {
+namespace ReferenceOperators {
+
+template <typename Tin>
+class TransposeOperator : public OperatorInterface<1, 1> {
+/* reshape input as the shape of output*/
+public:
+  TransposeOperator(const Tensor&& axes) : _axes(axes) {}
+  TransposeOperator(const Tensor& axes) : _axes(axes) {}
+  
+  enum names_in : uint8_t { input };
+  enum names_out : uint8_t { output };
+
+  virtual void compute(){
+    const Tensor& input_tensor = inputs[input].tensor();
+    Tensor& output_tensor = outputs[output].tensor();
+
+    TensorShape& axes_shape = _axes.get_shape();
+    TensorShape& input_shape = input_tensor.get_shape();
+
+    // Strides are used to iterate over the dataset, and transfer
+    // the input tensor data, into the output tensor
+    TensorStrides* input_strides = new TensorStrides(input_shape);
+
+    TensorShape output_shape = new TensorShape(input_shape);
+    TensorStrides* output_strides = new TensorStrides(input_strides);
+        
+    TensorShape offsets = new TensorShape(input_shape.num_dims());
+
+    for (uint32_t i = 0; i < input_shape->num_dims(); ++i) { 
+      // output_shape is derived from input_shape and axes
+      output_shape[_axes[i]] = input_shape[i];
+
+      // output_strides(i) is derived from axes and input_strides
+      output_strides[_axes[i]] = input_strides[i];
+
+      // Offsets are used to avoid multiple for loops
+      offsets[i] = 0;
+    }
+
+    // Output shape can be asserted once the transform 
+    // effect has been determined
+    output_tensor->resize(output_shape);
+
+    // Perform some basic checks
+    if (input_tensor->num_elems() != output_tensor->num_elems()){
+        uTensor_printf("inconsistent input and output shape for reshape\n");
+        Context::get_default_context()->throwError(new InvalidReshapeError);
+        return;
+    }
+    if (input_tensor->get_type() != output_tensor->get_type()){
+        uTensor_printf("inconsistent input and output data type for reshape\n");
+        Context::get_default_context()->throwError(new InvalidTensorDataTypeError);
+        return;
+    }
+    if (!_check_input_shape()){
+        Context::get_default_context()->throwError(new InvalidTensorDataTypeError);
+        return;
+    }
+
+    // copy data
+    for (uint32_t i = 0; i < input_tensor->num_elems(); ++i) { 
+
+        // Index of the source value, must be calculated
+        // using the output strides and output shape
+        idx = 0;
+        for (uint32_t j = 0; j < axes_shape.num_dims(); j++) {
+            idx += output_shape[j] * output_strides[i];
+        }
+
+        // this is not copy: `output_tensor(i) = input_tensor(i);`
+        output_tensor(i) = static_cast<Tin>(input_tensor(idx));
+        
+        for (uint32_t j = axes_shape.num_dims() - 1; i >= 0; i--) {
+            offsets[j] = (offsets[j] + 1) % output_shape[j];
+            
+            if(offsets[j] > 0) {
+                break;
+            }
+        }
+    }
+
+    delete input_strides;
+    delete output_shape;
+    delete output_strides;
+    delete offsets;
+  }
+private:
+  Tensor _axes;
+
+  bool _check_input_shape(){
+    const Tensor& input_tensor = inputs[input].tensor();
+    const TensorShape& shape = input_tensor->get_shape();
+    uint8_t num_dims = shape.num_dims();
+    for (int i = 0; i < num_dims; ++i){
+      if (shape[i] < 0) {
+        uTensor_printf("the output shape must be all positive\n");
+        return false;
+      }
+    }
+    return true;
+  }
+};
+
+}
+}
+
+#endif // UTENSOR_TRANSPOSE_H
