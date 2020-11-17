@@ -33,6 +33,7 @@ jobs:
           name: Generate code coverage
           command: |
             cd build
+            rm -rf TESTS/extern
             lcov -c --directory TESTS --output-file main_coverage.info > /tmp/test_results/coverage_summary.txt
             genhtml main_coverage.info --output-directory /tmp/coverage
             # TODO Fix coveralls
