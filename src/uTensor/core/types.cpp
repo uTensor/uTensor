@@ -147,13 +147,13 @@ uint32_t TensorShape::num_elems() const {
 
 TensorStrides::TensorStrides(TensorShape& shape) {
   _num_dims = shape.num_dims();
-  size_t last_idx = _num_dims - 1;
+    size_t last_idx = _num_dims - 1;
   for (size_t i = last_idx + 1; i < 3; ++i) {
     _strides[i] = 0;
   }
   _strides[last_idx] = 1;
   uint32_t s = 1;
-  for (size_t i = last_idx - 1; i >= 0; --i) {
+  for (int32_t i = last_idx - 1; i >= 0; --i) {
     s *= shape[i + 1];
     _strides[i] = s;
   }
