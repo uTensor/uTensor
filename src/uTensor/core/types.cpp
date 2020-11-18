@@ -153,7 +153,7 @@ TensorStrides::TensorStrides(TensorShape& shape) {
   }
   _strides[last_idx] = 1;
   uint32_t s = 1;
-  for (size_t i = last_idx - 1; i >= 0; --i) {
+  for (int32_t i = last_idx - 1; i >= 0; --i) {
     s *= shape[i + 1];
     _strides[i] = s;
   }
