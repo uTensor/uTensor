@@ -53,12 +53,12 @@ public:
       output_shape[_axes[i]] = input_shape[i];
 
       // output_strides(i) is derived from axes and input_strides
-      output_strides[_axes[i]] = (*input_strides)[i];
+      output_strides[_axes[i]] = input_strides[i];
     }
     
     // Output shape can be asserted once the transform 
     // effect has been determined
-    output_shape->update_dims();
+    output_shape.update_dims();
     output_tensor->resize(output_shape);
 
     // Perform some basic checks
@@ -82,7 +82,7 @@ public:
         // Index of the source value, must be calculated
         // using the output strides and output shape
         uint32_t idx = 0;
-        for (uint32_t j = 0; j < output_shape->num_dims(); j++) {
+        for (uint32_t j = 0; j < output_shape.num_dims(); j++) {
             idx += offsets[j] * output_strides[j];
         }
 
@@ -91,7 +91,7 @@ public:
 
         // Update offsets, to iterate sequentially along strides
         // in the order of axes
-        for (int32_t j = output_shape->num_dims() - 1; j >= 0; j--) {
+        for (int32_t j = output_shape.num_dims() - 1; j >= 0; j--) {
             offsets[j] = (offsets[j] + 1) % (output_shape[j]);
             if( offsets[j] > 0 ) {
                 break;
