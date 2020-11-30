@@ -290,6 +290,9 @@ using MaxPoolOperator = GenericPoolOperator<T, MaxFilter<T>>;
 template <typename T>
 using AvgPoolOperator = GenericPoolOperator<T, AvgFilter<T>>;
 
+template<typename T>
+using MinPoolOperator = GenericPoolOperator<T, MinFilter<T>>;
+
 }
 }  // namespace uTensor
 #endif
