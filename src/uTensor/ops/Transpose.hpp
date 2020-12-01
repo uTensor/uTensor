@@ -22,7 +22,7 @@ class TransposeOperator : public OperatorInterface<2, 1> {
   enum names_out : uint8_t { output };
 
   virtual void compute() {
-    Tensor& perm_tensor = inputs[perm].tensor();
+    const Tensor& perm_tensor = inputs[perm].tensor();
     if (perm_tensor.get_shape().num_dims() > 1) {
       uTensor_printf(
           "the input tensor perm should be a vector (dimension should be 1)\n");
