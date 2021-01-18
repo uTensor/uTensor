@@ -21,7 +21,7 @@ Follow instructions in the `README.md` in each tutorial directories to learn how
 
 Here are the links to the tutorials:
 
-1. [Error Handling with `uTensor`](tutorials/error_handling)
+1. [Error Handling with uTensor](tutorials/error_handling)
 2. [Custom Operator](tutorials/custom_operator)
 
 ## Introduction
