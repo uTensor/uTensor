@@ -94,7 +94,7 @@ bool AllocatorInterface::is_bound(void* ptr, Handle* hndl) {
   return _is_bound(ptr, hndl);
 }
 void* AllocatorInterface::allocate(size_t sz) {
-  if (sz > (size_t)(1 << 31)) {
+  if (sz > static_cast<size_t>(1 << 31)) {
     // TODO ERROR invalid allocation size
     uTensor_printf("[ERROR] Attempted to allocator > 2**32 bytes\n");
     return nullptr;
