@@ -2,6 +2,10 @@
 #define UTENSOR_UPAL_H
 #include "uTensor/core/uTensor_util.hpp"
 
+#ifndef USE_OPTIMIZED
+#define USE_OPTIMIZED 0
+#endif
+
 // TODO: use macros to register platforms and bit operators to combine flags
 // TODO: use bitwise operators for multi-target check, e.g. `#if (UTENSOR_PLATFORM_ARDUINO & __AVR__) == UTENSOR_PLATFORM`
 
