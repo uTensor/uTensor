@@ -1,5 +1,5 @@
 #include "uTensor/core/uPAL.hpp"
-#if UT_ARCH(UT_ARCH_ARM) && USE_OPTIMIZED
+#if UT_ARCH(UT_ARCH_ARM) && USE_CMSIS_NN
 
 #ifndef UTENSOR_FFT_HPP
 #define UTENSOR_FFT_HPP
