@@ -28,6 +28,8 @@ jobs:
           command: |
             cd build
             ctest -VV -o /tmp/test_results/test-results.txt
+          environment:
+            GTEST_OUTPUT: xml:/tmp/test_results/
 
       - run:
           name: Generate code coverage
