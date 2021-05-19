@@ -1,6 +1,6 @@
 #ifndef UTENSOR_QUANT_PRIM_H
 #define UTENSOR_QUANT_PRIM_H
-#include "types.hpp"
+#include "uTensor/core/types.hpp"
 #include "errorHandler.hpp"
 #include "memoryManagementInterface.hpp"
 
@@ -21,7 +21,7 @@ class QuantizationParams {
   virtual ~QuantizationParams();
   virtual int32_t get_zeroP_for_channel(int i) const;
   virtual float get_scale_for_channel(int i) const;
-  inline const int num_channels() const { return _num_channels; };
+  inline int num_channels() const { return _num_channels; };
   
   // Allocate the tensor metadata on a different heap from the data scratch pads
   // Note: as long as derived classes dont override new and delete, these will

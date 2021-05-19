@@ -1,10 +1,10 @@
 #ifndef UTENSOR_S_QUANTIZED_CONV2D_OPS_H
 #define UTENSOR_S_QUANTIZED_CONV2D_OPS_H
-#include "Convolution.hpp"
-#include "context.hpp"
-#include "s_quantized_convolution_kernels.hpp"
-#include "operatorBase.hpp"
-#include "symmetric_quantization_utils.hpp"
+#include "uTensor/ops/Convolution.hpp"
+#include "uTensor/core/context.hpp"
+#include "uTensor/ops/symmetric_quantization/s_quantized_convolution_kernels.hpp"
+#include "uTensor/core/operatorBase.hpp"
+#include "uTensor/ops/symmetric_quantization/symmetric_quantization_utils.hpp"
 
 namespace uTensor {
 DECLARE_ERROR(qConvPerChannelMismatchError);

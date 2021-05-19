@@ -1,6 +1,12 @@
 #ifndef __UTENSOR_MEMORY_MANAGEMENT_IFC_H
 #define __UTENSOR_MEMORY_MANAGEMENT_IFC_H
-#include <cstring>
+
+// Don't see where cstring is used here
+//#include <cstring>
+
+#include <cstddef>
+//#include "stdint.h" //avr
+using std::size_t;
 namespace uTensor {
 
 class AllocatorInterface;

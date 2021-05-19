@@ -6,7 +6,7 @@
 #include "RomTensor.hpp"
 #include "arenaAllocator.hpp"
 #include "constants_reshape.hpp"
-#include "context.hpp"
+#include "uTensor/core/context.hpp"
 #include "gtest/gtest.h"
 
 using namespace uTensor;

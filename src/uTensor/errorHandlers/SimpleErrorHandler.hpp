@@ -3,7 +3,7 @@
 #include <deque>
 #include <functional>
 
-#include "errorHandler.hpp"
+#include "uTensor/core/errorHandler.hpp"
 
 namespace uTensor {
 

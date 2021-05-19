@@ -1,6 +1,6 @@
 #ifndef UTENSOR_S_QUANTIZED_CONV_OPS_HELPER_H
 #define UTENSOR_S_QUANTIZED_CONV_OPS_HELPER_H
-#include "context.hpp"
+#include "uTensor/core/context.hpp"
 #include "symmetric_quantization_utils.hpp"
 
 namespace uTensor {

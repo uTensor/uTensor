@@ -1,6 +1,6 @@
 #include "gtest/gtest.h"
 #include "arenaAllocator.hpp"
-#include "context.hpp"
+#include "uTensor/core/context.hpp"
 #include <iostream>
 using std::cout;
 using std::endl;

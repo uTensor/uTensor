@@ -3,7 +3,7 @@
 #include <iostream>
 
 #include "arenaAllocator.hpp"
-#include "context.hpp"
+#include "uTensor/core/context.hpp"
 {%for header in utensor_headers%}
 #include "{{header}}"
 {%endfor%}

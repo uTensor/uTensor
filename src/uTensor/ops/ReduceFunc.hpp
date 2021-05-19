@@ -1,5 +1,5 @@
-#include "operatorBase.hpp"
-#include "tensor.hpp"
+ #include "uTensor/core/operatorBase.hpp"
+#include "uTensor/core/tensor.hpp"
 
 namespace uTensor {
 namespace ReferenceOperators {

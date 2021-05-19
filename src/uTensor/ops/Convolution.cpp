@@ -1,4 +1,4 @@
-#include "Convolution.hpp"
+#include "uTensor/ops/Convolution.hpp"
 
 namespace uTensor {
 namespace ReferenceOperators {

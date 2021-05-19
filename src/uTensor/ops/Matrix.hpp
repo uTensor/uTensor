@@ -1,7 +1,7 @@
 #ifndef UTENSOR_MATRIX_OPS_H
 #define UTENSOR_MATRIX_OPS_H
-#include "context.hpp"
-#include "operatorBase.hpp"
+#include "uTensor/core/context.hpp"
+#include "uTensor/core/operatorBase.hpp"
 #include "ActivationFncs.hpp"
 #include "Matrix_kernels.hpp"
 

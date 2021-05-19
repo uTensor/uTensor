@@ -269,7 +269,7 @@ localCircularArenaAllocatorBase::localCircularArenaAllocatorBase(uint8_t* buffer
     }
 
     // Shift the data
-    for (int i = 0; i < hdr_i->get_len(); i++) {
+    for (size_t i = 0; i < hdr_i->get_len(); i++) {
       tmp = hdr_i->_d[i];
       reinterpret_cast<uint8_t*>(aligned_loc)[i] = tmp;
     }

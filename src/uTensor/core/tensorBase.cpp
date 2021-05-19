@@ -1,8 +1,8 @@
 #include "tensorBase.hpp"
 
-#include "context.hpp"
+#include "uTensor/core/context.hpp"
 #include "memoryManagementInterface.hpp"
-#include "uTensor_util.hpp"
+#include "uTensor/core/uTensor_util.hpp"
 
 namespace uTensor {
 

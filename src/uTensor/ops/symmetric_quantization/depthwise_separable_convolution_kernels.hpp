@@ -1,10 +1,13 @@
 #ifndef UTENSOR_S_QUANTIZED_DWS_OPS_KERNELS_H
 #define UTENSOR_S_QUANTIZED_DWS_OPS_KERNELS_H
-#include "context.hpp"
+#include "uTensor/core/context.hpp"
+#include "uTensor/core/tensor.hpp"
+#include "uTensor/core/types.hpp"
+#include "uTensor/core/uTensor_util.hpp"
 #include "symmetric_quantization_utils.hpp"
-#include "tensor.hpp"
-#include "types.hpp"
-#include "uTensor_util.hpp"
+#include "uTensor/core/tensor.hpp"
+#include "uTensor/core/types.hpp"
+#include "uTensor/core/uTensor_util.hpp"
 #include "convolution_helper.hpp"
 
 namespace uTensor {

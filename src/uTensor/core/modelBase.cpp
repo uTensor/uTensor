@@ -1,6 +1,6 @@
 #include "modelBase.hpp"
 
-#include "context.hpp"
+#include "uTensor/core/context.hpp"
 
 namespace uTensor {
 
@@ -16,7 +16,7 @@ ModelBase::ModelBase(uTensor::string _name) : _name(_name) {}
 void ModelBase::set_name(uTensor::string _name) { this->_name = _name; }
 
 ModelBase::~ModelBase() {
-  Context* ctx = Context::get_default_context();
+  // Context* ctx = Context::get_default_context();
   // ctx.pop_op_tensors(*this, inputs); // Inputs are no longer needed
 }
 void ModelBase::eval() { compute(); }

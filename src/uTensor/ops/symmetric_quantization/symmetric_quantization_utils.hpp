@@ -3,8 +3,8 @@
 #include <cmath>
 #include <limits>
 
-#include "context.hpp"
-#include "tensor.hpp"
+#include "uTensor/core/context.hpp"
+#include "uTensor/core/tensor.hpp"
 #include "tflm_defs.hpp"
 
 namespace uTensor {

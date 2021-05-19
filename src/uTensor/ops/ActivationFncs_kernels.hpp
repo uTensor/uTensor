@@ -1,6 +1,6 @@
 #ifndef UTENSOR_ACTIVATIONS_KERNELS_H
 #define UTENSOR_ACTIVATIONS_KERNELS_H
-#include "operatorBase.hpp"
+#include "uTensor/core/operatorBase.hpp"
 #include <cmath>
 #include <limits>
 #include <functional>

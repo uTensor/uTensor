@@ -1,9 +1,9 @@
 #ifndef UTENSOR_S_QUANTIZED_FC_KERNELS_H
 #define UTENSOR_S_QUANTIZED_FC_KERNELS_H
-#include "Matrix.hpp"
-#include "context.hpp"
-#include "operatorBase.hpp"
 #include <functional>
+#include "uTensor/core/context.hpp"
+#include "uTensor/core/operatorBase.hpp"
+#include "uTensor/ops/Matrix.hpp"
 
 namespace uTensor {
 namespace TFLM {

@@ -1,10 +1,10 @@
 #ifndef UTENSOR_ARG_MIN_MAX_KERNEL_H
 #define UTENSOR_ARG_MIN_MAX_KERNEL_H
 
-#include "context.hpp"
-#include "types.hpp"
-#include "tensor.hpp"
-#include "uTensor_util.hpp"
+#include "uTensor/core/context.hpp"
+#include "uTensor/core/types.hpp"
+#include "uTensor/core/tensor.hpp"
+#include "uTensor/core/uTensor_util.hpp"
 
 namespace uTensor {
 enum ArgMinMaxCompareFlag {

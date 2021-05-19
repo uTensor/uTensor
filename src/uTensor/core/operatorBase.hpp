@@ -1,7 +1,7 @@
 #ifndef UTENSOR_OPERATOR_BASE_H
 #define UTENSOR_OPERATOR_BASE_H
 #include "TensorMap.hpp"
-#include "context.hpp"
+#include "uTensor/core/context.hpp"
 namespace uTensor {
 
 // EVENTS AND ERRORS

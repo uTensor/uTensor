@@ -1,7 +1,7 @@
 #ifndef UTENSOR_MATRIX_KERNELS
 #define UTENSOR_MATRIX_KERNELS
-#include "context.hpp"
-#include "operatorBase.hpp"
+#include "uTensor/core/context.hpp"
+#include "uTensor/core/operatorBase.hpp"
 #include "ActivationFncs.hpp"
 
 namespace uTensor {
@@ -41,7 +41,7 @@ template <typename T, typename Bias>
 void matrix_mult_kernel_v2(Tensor& output, const Tensor& input,
                                   const Tensor& filter, Bias bias,
                                   Fuseable::Activation<T> activation){
-  const TensorShape& input_shape = input->get_shape();
+  //const TensorShape& input_shape = input->get_shape();
   const TensorShape& filter_shape = filter->get_shape();
   TensorShape& output_shape = output->get_shape();
 

@@ -1,7 +1,7 @@
-#include "tensor.hpp"
+#include "uTensor/core/tensor.hpp"
 
-#include "context.hpp"
-#include "uTensor_util.hpp"
+#include "uTensor/core/context.hpp"
+#include "uTensor/core/uTensor_util.hpp"
 
 namespace uTensor {
 // Tensor::Tensor(const Tensor& that) {} // Cannot copy Tensors, must pass by
@@ -158,10 +158,11 @@ void print(const Tensor& t) {
           uTensor_printf("Unknown data type");
           return;
       }
-      if (i != (t_shape[0] - 1))
+      if (i != (t_shape[0] - 1)) {
         uTensor_printf(", ");
-      else
+      } else {
         uTensor_printf(" ");
+      }
     }
     uTensor_printf("]\n");
   }

@@ -3,7 +3,7 @@
 #include <type_traits>
 
 #include "ActivationFncs_kernels.hpp"
-#include "operatorBase.hpp"
+#include "uTensor/core/operatorBase.hpp"
 
 namespace uTensor {
 namespace ReferenceOperators {

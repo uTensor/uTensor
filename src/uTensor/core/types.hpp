@@ -1,7 +1,11 @@
 #ifndef __UTENSOR_TYPES_H
 #define __UTENSOR_TYPES_H
+
+// https://www.arduinolibraries.info/libraries/avr_stl
 #include <array>
-#include <cstdint>
+// check if the follow modificiation affect other builds
+//#include <cstdint>
+#include <stdint.h>
 
 using std::array;
 
@@ -12,6 +16,8 @@ class TensorShape {
   TensorShape(uint16_t shape1, uint16_t shape2, uint16_t shape3);
   TensorShape(uint16_t shape1, uint16_t shape2, uint16_t shape3,
               uint16_t shape4);
+
+  //FIXME:   array isn't avaliable on all embedded platforms
   TensorShape(array<uint16_t, 1> shape);
   TensorShape(array<uint16_t, 2> shape);
   TensorShape(array<uint16_t, 3> shape);

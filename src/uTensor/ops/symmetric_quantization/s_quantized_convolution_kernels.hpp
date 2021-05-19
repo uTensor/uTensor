@@ -1,12 +1,12 @@
 #ifndef S_QUANTIZED_CONVOLUTION_KERNELS_HPP
 #define S_QUANTIZED_CONVOLUTION_KERNELS_HPP
-#include "context.hpp"
+#include "uTensor/core/context.hpp"
 #include "symmetric_quantization_utils.hpp"
-#include "tensor.hpp"
-#include "types.hpp"
-#include "uTensor_util.hpp"
+#include "uTensor/core/tensor.hpp"
+#include "uTensor/core/types.hpp"
+#include "uTensor/core/uTensor_util.hpp"
 #include "convolution_helper.hpp"
-#include "Convolution.hpp"
+#include "uTensor/ops/Convolution.hpp"
 
 namespace uTensor {
 namespace TflmSymQuantOps {
