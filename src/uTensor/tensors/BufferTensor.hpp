@@ -1,8 +1,8 @@
 #ifndef UTENSOR_BUFFER_TENSOR_H
 #define UTENSOR_BUFFER_TENSOR_H
 
-#include "context.hpp"
-#include "tensorBase.hpp"
+#include "uTensor/core/context.hpp"
+#include "uTensor/core/tensorBase.hpp"
 
 namespace uTensor {
 class BufferTensor : public TensorInterface {

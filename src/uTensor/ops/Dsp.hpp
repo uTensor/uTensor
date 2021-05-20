@@ -1,6 +1,6 @@
 #ifndef UTENSOR_DSP_OPS_H
 #define UTENSOR_DSP_OPS_H
-#include "operatorBase.hpp"
+#include "uTensor/core/operatorBase.hpp"
 
 // Based on MFCC op from
 // https://github.com/ARM-software/ML-KWS-for-MCU/blob/master/Deployment/Source/MFCC/mfcc.h

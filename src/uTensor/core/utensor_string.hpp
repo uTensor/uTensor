@@ -12,7 +12,7 @@ class string {
 
   uint32_t hash(const char* c) {
     int v = 7;
-    for (int i = 0; i < strlen(c); i++) {
+    for (uint32_t i = 0; i < strlen(c); i++) {
       v = v * 31 + c[i];
     }
 

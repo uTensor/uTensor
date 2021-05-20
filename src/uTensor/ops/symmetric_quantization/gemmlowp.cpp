@@ -1,8 +1,6 @@
-#include "gemmlowp.hpp"
-
 #include <limits>
-
-#include "context.hpp"
+#include "uTensor/core/context.hpp"
+#include "gemmlowp.hpp"
 
 using namespace std;
 

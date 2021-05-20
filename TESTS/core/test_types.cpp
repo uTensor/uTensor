@@ -1,5 +1,5 @@
 #include "gtest/gtest.h"
-#include "types.hpp"
+#include "uTensor/core/types.hpp"
 
 
 TEST(Shapes, test_1) {

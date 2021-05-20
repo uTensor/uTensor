@@ -23,6 +23,11 @@ if(EXISTS "${LOC_PATH}")
     message(FATAL_ERROR "You cannot build in a source directory (or any directory with a CMakeLists.txt file). Please make a build subdirectory. Feel free to remove CMakeCache.txt and CMakeFiles.")
 endif()
 
+if(ARM_PROJECT)
+include_directories(extern/CMSIS_5)
+endif()
+
+include_directories(src)
 add_subdirectory(src)
 # Testing only available if this is the main app # Emergency override MODERN_CMAKE_BUILD_TESTING provided as well i
 option(PACKAGE_TESTS "Build the tests" OFF)
@@ -42,3 +47,4 @@ if(PACKAGE_TUTORIALS)
   add_subdirectory(tutorials/custom_operator)
 endif()
 
+add_subdirectory(tanh_model)

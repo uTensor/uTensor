@@ -1,7 +1,11 @@
 #ifndef __UTENSOR_TYPES_H
 #define __UTENSOR_TYPES_H
+
+// https://www.arduinolibraries.info/libraries/avr_stl
 #include <array>
-#include <cstdint>
+// check if the follow modificiation affect other builds
+//#include <cstdint>
+#include <stdint.h>
 
 using std::array;
 
@@ -12,6 +16,8 @@ class TensorShape {
   TensorShape(uint16_t shape1, uint16_t shape2, uint16_t shape3);
   TensorShape(uint16_t shape1, uint16_t shape2, uint16_t shape3,
               uint16_t shape4);
+
+  //FIXME:   array isn't avaliable on all embedded platforms
   TensorShape(array<uint16_t, 1> shape);
   TensorShape(array<uint16_t, 2> shape);
   TensorShape(array<uint16_t, 3> shape);
@@ -19,8 +25,8 @@ class TensorShape {
 
   uint16_t operator[](int i) const;
   uint16_t& operator[](int i);
-  bool operator == (const TensorShape& other);
-  bool operator != (const TensorShape& other);
+  bool operator==(const TensorShape& other);
+  bool operator!=(const TensorShape& other);
   void update_dims();
   uint32_t get_linear_size() const;
   uint8_t num_dims() const;
@@ -29,6 +35,18 @@ class TensorShape {
 
  private:
   uint16_t _shape[4];
+  uint8_t _num_dims;
+};
+
+class TensorStrides {
+ public:
+  TensorStrides(TensorShape& shape);
+  uint8_t num_dims();
+  uint32_t operator[](size_t i) const;
+  uint32_t& operator[](size_t i);
+
+ private:
+  uint32_t _strides[4];
   uint8_t _num_dims;
 };
 // Do something to remember current type

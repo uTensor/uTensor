@@ -1,6 +1,6 @@
 #include <cstdio>
 
-#include "context.hpp"
+#include "uTensor/core/context.hpp"
 #include "errorHandler.hpp"
 
 using namespace std;

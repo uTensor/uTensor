@@ -1,11 +1,12 @@
 #ifndef UTENSOR_TENSOR_MAP
 #define UTENSOR_TENSOR_MAP
 
-#include <algorithm>
+// #include <algorithm>
+// https://github.com/mike-matera/ArduinoSTL/issues/15
 #include <initializer_list>
 
-#include "tensor.hpp"
-#include "uTensor_util.hpp"
+#include "uTensor/core/tensor.hpp"
+#include "uTensor/core/uTensor_util.hpp"
 #include "utensor_string.hpp"
 
 using std::initializer_list;
@@ -38,10 +39,8 @@ class FixedTensorMap : public TensorMapInterface {
       // TODO THROW ERROR
       uTensor_printf("[Warning] Element number mismatch in TensorMap construction\n");
     }
-    int i = 0;
     for (auto thing = l.begin(); thing != l.end(); thing++) {
       _map[thing->name->get_value()] = *thing;
-      //i++;
     }
     //std::sort(std::begin(_map), std::end(_map), compare_named_tensors);
   }
@@ -84,7 +83,7 @@ class FixedTensorMap : public TensorMapInterface {
   FixedTensorMap(const FixedTensorMap<size>& that) { _map = that._map; }
   FixedTensorMap& operator=(const FixedTensorMap<size>& that) {
     //_map = that._map;
-    for (int i = 0; i < size; i++) _map[i] = that._map[i];
+    for (size_t i = 0; i < size; i++) _map[i] = that._map[i];
     return *this;
   }
   virtual bool has(const uTensor::string& name) const override {

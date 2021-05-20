@@ -1,4 +1,4 @@
-#include "uTensor_util.hpp"
+#include "uTensor/core/uTensor_util.hpp"
 #if !(defined(TARGET_MBED) || defined(ARDUINO))
 //#include <dirent.h>
 //#include <sys/stat.h>

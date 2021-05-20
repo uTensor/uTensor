@@ -10,6 +10,7 @@ DEFINE_ERROR(SymmetricQuantizationFixedPointError);
 DEFINE_ERROR(SymmetricQuantizationFixedPointRangeError);
 DEFINE_ERROR(InvalidFCQuantizationScalesError);
 DEFINE_ERROR(FCQuantizationScaleMultipleLTzeroError);
+DEFINE_ERROR(InvalidQuantizationSchemeError);
 
 namespace TFLM {
 

@@ -2,7 +2,7 @@
 #define _UTENSOR_GEMMLOWP
 #include <cstdint>
 
-#include "errorHandler.hpp"
+#include "uTensor/core/errorHandler.hpp"
 
 namespace uTensor {
 namespace gemmlowp {

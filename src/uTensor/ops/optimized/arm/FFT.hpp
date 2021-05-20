@@ -1,8 +1,11 @@
+#include "uTensor/core/uPAL.hpp"
+#if UT_ARCH(UT_ARCH_ARM) && USE_OPTIMIZED
+
 #ifndef UTENSOR_FFT_HPP
 #define UTENSOR_FFT_HPP
 
 #include "arm_math.h"
-#include "operatorBase.hpp"
+#include "uTensor/core/operatorBase.hpp"
 
 namespace uTensor {
 // fftw_plan fftw_plan_dft_r2c_1d(int n, double *in, fftw_complex *out, unsigned
@@ -16,7 +19,7 @@ class PowerSpectrum : public OperatorInterface<1, 1>, FastOperator {
 
  protected:
   virtual void compute();
-  void power_spectrum_kernel(Tensor& power, const Tensor& input, int N);
+  void power_spectrum_kernel(Tensor& power, const Tensor& input, uint32_t N);
 
  private:
   int N;
@@ -24,3 +27,4 @@ class PowerSpectrum : public OperatorInterface<1, 1>, FastOperator {
 };
 }  // namespace uTensor
 #endif
+#endif //platform guard

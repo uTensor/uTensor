@@ -1,14 +1,13 @@
 #ifndef UTENSOR_S_QUANTIZED_DWS_OPS_H
 #define UTENSOR_S_QUANTIZED_DWS_OPS_H
-#include "Convolution.hpp"
-#include "context.hpp"
+#include "uTensor/ops/Convolution.hpp"
+#include "uTensor/core/context.hpp"
+#include "uTensor/core/operatorBase.hpp"
 #include "depthwise_separable_convolution_kernels.hpp"
-#include "operatorBase.hpp"
 #include "symmetric_quantization_utils.hpp"
 
 namespace uTensor {
 DECLARE_ERROR(qDwsConvPerChannelMismatchError);
-DECLARE_ERROR(InvalidQuantizationSchemeError);
 
 namespace TflmSymQuantOps {
 
@@ -112,7 +111,7 @@ void DepthwiseSeparableConvOperator<Tout>::calculateOpData(
     int32_t& padding_height, int32_t& padding_width, int32_t& output_multiplier,
     int32_t& output_activation_min, int32_t& output_activation_max,
     TFLM::TfLiteFusedActivation activation) {
-  const int channels_out = filter->get_shape()[3];
+//   const int channels_out = filter->get_shape()[3];
   const int width = input->get_shape()[2];
   const int height = input->get_shape()[1];
   const int filter_width = filter->get_shape()[2];
@@ -183,10 +182,10 @@ template <typename Tout>
 void DepthwiseSeparableConvOperator<Tout>::compute() {
   AllocatorInterface* ram_allocator =
       Context::get_default_context()->get_ram_data_allocator();
-  const TensorShape& in_shape = inputs[in].tensor()->get_shape();
-  const TensorShape& df_shape = inputs[filter].tensor()->get_shape();
-  const TensorShape& bias_shape = inputs[bias].tensor()->get_shape();
-  const TensorShape& out_shape = outputs[out].tensor()->get_shape();
+//   const TensorShape& in_shape = inputs[in].tensor()->get_shape();
+//   const TensorShape& df_shape = inputs[filter].tensor()->get_shape();
+//   const TensorShape& bias_shape = inputs[bias].tensor()->get_shape();
+//   const TensorShape& out_shape = outputs[out].tensor()->get_shape();
 
   /* These are not correct
   if (in_shape[3] != df_shape[2]) {
@@ -242,10 +241,11 @@ void DepthwiseSeparableConvOperator<Tout>::compute() {
   op_params.weights_offset = 0;
   op_params.output_offset =
       outputs[out].tensor()->get_quantization_params().get_zeroP_for_channel(0);
-  op_params.quantized_activation_min = std::numeric_limits<int8_t>::min();
-  op_params.quantized_activation_max = std::numeric_limits<int8_t>::max();
 
-  TFLM::DepthwiseConvPerChannel(
+  op_params.quantized_activation_min = output_activation_min;
+  op_params.quantized_activation_max = output_activation_max;
+
+  TFLM::DepthwiseConvPerChannel<Tout>(
       op_params, per_channel_output_multiplier, per_channel_output_shift,
       inputs[in].tensor(), inputs[filter].tensor(), inputs[bias].tensor(),
       outputs[out].tensor());

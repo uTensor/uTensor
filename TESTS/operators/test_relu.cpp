@@ -8,7 +8,7 @@
 #include "RomTensor.hpp"
 #include "arenaAllocator.hpp"
 #include "constants_relu.hpp"
-#include "context.hpp"
+#include "uTensor/core/context.hpp"
 #include "gtest/gtest.h"
 using std::cout;
 using std::endl;

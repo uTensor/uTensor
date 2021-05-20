@@ -1,8 +1,8 @@
 #ifndef UTENSOR_RAM_TENSOR
 #define UTENSOR_RAM_TENSOR
 
-#include "memoryManagementInterface.hpp"
-#include "tensorBase.hpp"
+#include "uTensor/core/memoryManagementInterface.hpp"
+#include "uTensor/core/tensorBase.hpp"
 
 namespace uTensor {
 

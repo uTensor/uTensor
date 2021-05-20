@@ -1,7 +1,7 @@
 #include "test_helper.h"
 #include "src/uTensor/loaders/tensorIdxImporter.hpp"
-#include "tensor.hpp"
-#include "context.hpp"
+#include "uTensor/core/tensor.hpp"
+#include "uTensor/core/context.hpp"
 #include "MatrixOps.hpp"
 #include "MathOps.hpp"
 

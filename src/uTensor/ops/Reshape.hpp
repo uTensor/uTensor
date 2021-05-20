@@ -1,11 +1,11 @@
 #ifndef UTENSOR_RESHAPE_H
 #define UTENSOR_RESHAPE_H
 
-#include "context.hpp"
-#include "types.hpp"
-#include "tensor.hpp"
-#include "uTensor_util.hpp"
-#include "operatorBase.hpp"
+#include "uTensor/core/context.hpp"
+#include "uTensor/core/types.hpp"
+#include "uTensor/core/tensor.hpp"
+#include "uTensor/core/uTensor_util.hpp"
+#include "uTensor/core/operatorBase.hpp"
 
 using std::array;
 

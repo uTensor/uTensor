@@ -1,5 +1,8 @@
+#include "uTensor/core/uPAL.hpp"
+#if UT_ARCH(UT_ARCH_ARM) && USE_OPTIMIZED
+
 #include "FFT.hpp"
-#include "context.hpp"
+#include "uTensor/core/context.hpp"
 
 // fftw_plan fftw_plan_dft_r2c_1d(int n, double *in, fftw_complex *out, unsigned
 // flags);
@@ -12,13 +15,13 @@ PowerSpectrum::~PowerSpectrum() {
   delete rfft;
 }
 void PowerSpectrum::compute() {
-  power_spectrum_kernel(*outputs[power].tensor, *inputs[input].tensor, N);
+  power_spectrum_kernel(outputs[power].tensor(), inputs[input].tensor(), N);
 }
 
 // TODO move the plan bits out
 // Potential recreate plan if needed
 void PowerSpectrum::power_spectrum_kernel(Tensor& power, const Tensor& input,
-                                          int N) {
+                                          uint32_t N) {
   if (power->get_shape().get_linear_size() < N) {
     Context::get_default_context()->throwError(new InvalidTensorOutputError);
   }
@@ -26,12 +29,12 @@ void PowerSpectrum::power_spectrum_kernel(Tensor& power, const Tensor& input,
     Context::get_default_context()->throwError(new InvalidTensorInputError);
   }
 
-  float *inputf, *output;
+  // float *inputf, *output;
 
-  uint32_t num_elems = (N / 2 + 1);
+  // uint32_t num_elems = (N / 2 + 1);
   // Tensor tmp = new RamTensor({num_elems*2}, flt);
   // size_t size = get_writeable_block(tmp, tmpc, (uint16_t) num_elems*2, 0);
-  size_t size;
+  // size_t size;
   float* tmpc = reinterpret_cast<float*>(
       Context::get_default_context()->get_ram_data_allocator()->allocate(
           N * sizeof(float)));
@@ -65,3 +68,5 @@ void PowerSpectrum::power_spectrum_kernel(Tensor& power, const Tensor& input,
 }
 
 }  // namespace uTensor
+
+#endif //platform guard

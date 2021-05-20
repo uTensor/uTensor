@@ -3,8 +3,8 @@
 #include <cmath>
 #include <limits>
 
-#include "context.hpp"
-#include "tensor.hpp"
+#include "uTensor/core/context.hpp"
+#include "uTensor/core/tensor.hpp"
 #include "tflm_defs.hpp"
 
 namespace uTensor {
@@ -13,6 +13,7 @@ DECLARE_ERROR(SymmetricQuantizationFixedPointError);
 DECLARE_ERROR(SymmetricQuantizationFixedPointRangeError);
 DECLARE_ERROR(InvalidFCQuantizationScalesError);
 DECLARE_ERROR(FCQuantizationScaleMultipleLTzeroError);
+DECLARE_ERROR(InvalidQuantizationSchemeError);
 
 namespace TFLM {
 

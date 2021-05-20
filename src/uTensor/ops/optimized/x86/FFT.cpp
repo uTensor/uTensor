@@ -1,5 +1,8 @@
+#include "uTensor/core/uPAL.hpp"
+#if UT_ARCH(UT_ARCH_X86)
+
 #include "FFT.hpp"
-#include "context.hpp"
+#include "uTensor/core/context.hpp"
 
 // fftw_plan fftw_plan_dft_r2c_1d(int n, double *in, fftw_complex *out, unsigned
 // flags);
@@ -53,3 +56,5 @@ void PowerSpectrum::power_spectrum_kernel(Tensor& power, const Tensor& input,
 }
 
 }  // namespace uTensor
+
+#endif //Platform Guard

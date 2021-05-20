@@ -1,5 +1,5 @@
-#include "context.hpp"
-#include "arenaAllocator.hpp"
+#include "uTensor/core/context.hpp"
+#include "uTensor/allocators/arenaAllocator.hpp"
 namespace uTensor {
 
 //  static localCircularArenaAllocator<256> ram_allocator;

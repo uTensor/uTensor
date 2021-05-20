@@ -88,7 +88,7 @@ Create a main.cpp file at the project root, and fill it with the following code:
 #include "models/deep_mlp.hpp"
 #include "SDBlockDevice.h"
 #include "tensorIdxImporter.hpp"
-#include "tensor.hpp"
+#include "uTensor/core/tensor.hpp"
 #include "FATFileSystem.h"
 #include "mbed.h"
 

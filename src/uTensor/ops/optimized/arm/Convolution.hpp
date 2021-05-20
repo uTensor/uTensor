@@ -5,7 +5,7 @@
 #include <limits>
 
 #include "Convolution_kernels.hpp"
-#include "operatorBase.hpp"
+ #include "uTensor/core/operatorBase.hpp"
 
 namespace uTensor {
 
