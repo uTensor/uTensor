@@ -103,7 +103,6 @@ void my_concat_kernel(const Tensor &a, const Tensor &b, const Tensor &axis,
         new InvalidMatrixMultIndicesError);
   }
   cout << "Start my_concat_kernel" << endl;
-
   for (uint32_t i = 0; i < a_shape.num_dims(); ++i) {
     cout << "a_shape[" << i << "]: " << a_shape[i] << endl;
   }
@@ -116,51 +115,11 @@ void my_concat_kernel(const Tensor &a, const Tensor &b, const Tensor &axis,
     cout << "c_shape[" << i << "]: " << c_shape[i] << endl;
   }
 
-  // /*
-  // python stype psudo code
-  // */
-
-  // if axis == 0:
-  //   for i in range():
-  //     if i < a.shape[0]:
-  //       for j in range():
-  //         for k in range():
-  //           tmp = a[i,j,k]
-  //     else:
-  //       new_i = i-a.shape[0]
-  //       for j in range():
-  //         for k in range():
-  //           tmp = b[new_i,j,k]
-  // elif axis == 1:
-  //   for j in range():
-  //     if j < a.shape[1]:
-  //       for i in range():
-  //         for k in range():
-  //           tmp = a[i,j,k]
-  //     else:
-  //       new_j = j-a.shape[1]
-  //       for i in range():
-  //         for k in range():
-  //           tmp = b[i,new_j,k]
-  // elif axis == 2:
-  //   for k in range():
-  //     if k < a.shape[2]:
-  //       for i in range():
-  //         for j in range():
-  //           tmp = a[i,j,k]
-  //     else:
-  //       new_k = k-a.shape[2]
-  //       for i in range():
-  //         for j in range():
-  //           tmp = b[i,j,new_k]
-  // else:
-  //   print("axis is invalid!!")
-
   /*
   C++ implementation
   */
-  cout << "c_shape.num_dims():" << static_cast<char>(c_shape.num_dims())
-       << "????" << endl;
+  uint8_t c_ndims = c_shape.num_dims();
+  printf("c_shape.num_dims(): %u\n", c_ndims);
   uint32_t int_axis = axis(0);
   switch (c_shape.num_dims()) {
     /*
@@ -421,9 +380,9 @@ int main(int argc, const char **argv) {
 
   op.set_inputs({{MyConcatOperator<float>::a, tensor_a},
                  {MyConcatOperator<float>::b, tensor_b},
-                 {MyConcatOperator<float>::axis, axis}});
-  op.set_outputs({{MyConcatOperator<float>::out, tensor_out}});
-  op.eval();
+                 {MyConcatOperator<float>::axis, axis}})
+      .set_outputs({{MyConcatOperator<float>::out, tensor_out}})
+      .eval();
 
   // after eval(), you can read the output with () operator
   for (uint32_t i = 0; i < tensor_out->num_elems(); ++i) {
