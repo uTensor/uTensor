@@ -3,4 +3,4 @@
 {% for constant_snippet in constants %}
 {{ constant_snippet }}
 {% endfor %}
-#endif
+#endif // {{ constants_header | replace(".", "_") }} 

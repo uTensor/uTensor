@@ -2,6 +2,8 @@
 
 #include <cstring>
 
+#include "uTensor_util.hpp"
+
 uint8_t type_size(ttype t) {
   switch (t) {
     case i8:
@@ -143,6 +145,17 @@ uint32_t TensorShape::num_elems() const {
     num *= _shape[dim_idx];
   }
   return num;
+}
+void TensorShape::print(bool new_line) const {
+  uTensor_printf("{");
+  for (int i = 0; i < _num_dims - 1; ++i) {
+    uTensor_printf("%u, ", this->operator[](i));
+  }
+  uTensor_printf("%u}", this->operator[](_num_dims - 1));
+  if (new_line) {
+    uTensor_printf("\n");
+  }
+  return;
 }
 
 TensorStrides::TensorStrides(TensorShape& shape) {
