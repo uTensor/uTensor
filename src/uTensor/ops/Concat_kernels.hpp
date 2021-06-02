@@ -68,7 +68,7 @@ void concat_kernel(const Tensor &a, const Tensor &b, const Tensor &axis,
   for (uint32_t i = axis_idx + 1; i < num_dims; ++i) {
     inner_size *= c_shape[i];
   }
-  // copy a
+  // copy a then b
   uint32_t a_axis_size = a_shape[axis_idx];
   uint32_t b_axis_size = b_shape[axis_idx];
   uint32_t out_axis_size = a_axis_size + b_axis_size;

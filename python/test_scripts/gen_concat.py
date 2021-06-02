@@ -30,7 +30,7 @@ def gen_test(test_group, test_id):
     ref_out_tensor = Tensor("ref_out", tf_out.numpy(), f"ref_out_{test_id:02d}")
     out_tensor = Tensor("out", tf_out.numpy())
 
-    op = Operator("ConcatOperator", name="concat_op")
+    op = Operator("ConcatOperator", name="concat_op", dtypes=[tensor_a.get_dtype])
     op.set_namespace("ReferenceOperators::")
     op.set_inputs({"a": tensor_a, "b": tensor_b, "axis": tensor_axis}).set_outputs(
         {"out": out_tensor}
