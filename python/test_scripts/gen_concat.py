@@ -49,21 +49,21 @@ def main(test_group="ReferenceConcat", num_tests=5):
         tr, const_snps = gen_test(test_group, i)
         tests.append(tr)
         const_snippets.extend(const_snps)
-    output_file = str(Path("../../TESTS/operators/test_concat.cpp").resolve())
-    const_file = str(Path("../../TESTS/operators/constants_concat.hpp").resolve())
-    with open(const_file, "w") as fid:
+    output_path = Path("../../TESTS/operators/test_concat.cpp").resolve()
+    const_path = Path("../../TESTS/operators/constants_concat.hpp").resolve()
+    with const_path.open("w") as fid:
         fid.write(
             env2.get_template("const_container.hpp").render(
                 constants=const_snippets, constants_header="TEST_CONST_CONCAT_H"
             )
         )
-    with open(output_file, "w") as fid:
+    with output_path.open("w") as fid:
         fid.write(
             env2.get_template("gtest_container.cpp").render(
-                constants_header=const_file, using_directives=[], tests=tests
+                constants_header=const_path.name, using_directives=[], tests=tests
             )
         )
-    print(f"test files generated: {output_file}, {const_file}")
+    print(f"test files generated: {output_path}, {const_path}")
 
 
 if __name__ == "__main__":
