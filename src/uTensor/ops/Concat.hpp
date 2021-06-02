@@ -3,6 +3,7 @@
 namespace uTensor {
 namespace ReferenceOperators {
 
+template <typename T>
 class ConcatOperator : public OperatorInterface<3, 1> {
  public:
   // identifiers for setting up the input tensors
@@ -13,8 +14,8 @@ class ConcatOperator : public OperatorInterface<3, 1> {
  protected:
   void compute() {
     // you can retrieve input/output tensors by its identifier
-    concat_kernel(inputs[a].tensor(), inputs[b].tensor(), inputs[axis].tensor(),
-                  outputs[out].tensor());
+    concat_kernel<T>(inputs[a].tensor(), inputs[b].tensor(),
+                     inputs[axis].tensor(), outputs[out].tensor());
   }
 };
 

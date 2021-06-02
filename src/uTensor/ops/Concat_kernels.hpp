@@ -6,6 +6,7 @@
 namespace uTensor {
 namespace ReferenceOperators {
 
+template <typename T>
 void concat_kernel(const Tensor &a, const Tensor &b, const Tensor &axis,
                    Tensor &c) {
   TensorShape a_shape = a->get_shape();
@@ -58,9 +59,7 @@ void concat_kernel(const Tensor &a, const Tensor &b, const Tensor &axis,
   b_shape.print(true);
   uTensor_printf("c_shape: ");
   c_shape.print(true);
-  /*
-  C++ implementation
-  */
+
   uint32_t outer_size = 1;
   for (uint32_t i = 0; i < axis_idx; ++i) {
     outer_size *= c_shape[i];
@@ -71,20 +70,22 @@ void concat_kernel(const Tensor &a, const Tensor &b, const Tensor &axis,
   }
   // copy a
   uint32_t a_axis_size = a_shape[axis_idx];
+  uint32_t b_axis_size = b_shape[axis_idx];
+  uint32_t out_axis_size = a_axis_size + b_axis_size;
   for (uint32_t outer = 0; outer < outer_size; ++outer) {
     for (uint32_t inner = 0; inner < inner_size; ++inner) {
-      uint32_t axis_size = a_shape[axis_idx];
       // copy a
-      for (uint32_t i = 0; i < axis_size; ++i) {
-        uint32_t offset = (outer * axis_size + i) * inner_size + inner;
-        c(offset) = a(offset);
+      for (uint32_t i = 0; i < a_axis_size; ++i) {
+        uint32_t src_offset = (outer * a_axis_size + i) * inner_size + inner;
+        uint32_t dest_offset = (outer * out_axis_size + i) * inner_size + inner;
+        c(dest_offset) = static_cast<T>(a(src_offset));
       }
       // copy b
-      uint32_t a_axis_size = axis_size;
-      axis_size = b_shape[axis_idx];
-      for (uint32_t i = 0; i < axis_size; ++i) {
-        uint32_t offset = (outer * axis_size + i) * inner_size + inner;
-        c(offset + a_axis_size * inner_size) = b(offset);
+      for (uint32_t i = 0; i < b_axis_size; ++i) {
+        uint32_t src_offset = (outer * b_axis_size + i) * inner_size + inner;
+        uint32_t dest_offset =
+            (outer * out_axis_size + a_axis_size + i) * inner_size + inner;
+        c(dest_offset) = static_cast<T>(b(src_offset));
       }
     }
   }
