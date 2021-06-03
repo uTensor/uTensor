@@ -16,6 +16,9 @@ using namespace uTensor;
 SimpleErrorHandler mErrHandler(10);
 
 {% for test in tests %}
+/***************************************
+ * Generated Test {{loop.index}}
+ ***************************************/
 {{ test }}
 
 {% endfor %}

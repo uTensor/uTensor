@@ -18,6 +18,7 @@ set(src_utensor_ops
     ops/Matrix.cpp
     ops/Convolution.cpp
     ops/Matrix_kernels.cpp
+    ops/StridedSlice_kernels.cpp
    )
 set(src_utensor_errhndl
   errorHandlers/SimpleErrorHandler.cpp
@@ -45,7 +46,7 @@ add_subdirectory(ops/optimized)
 add_library(utensor  ${src_utensor_alloc} ${src_utensor_tensors} ${src_utensor_ops} ${src_utensor_errhndl} contexts/default_context.cpp ${src_utensor_legacy_ops} ${src_utensor_sq_ops} )
 #target_link_libraries(utensor utensor_core optimized_ops)
 target_link_libraries(utensor PUBLIC utensor_core )
-target_include_directories(utensor PUBLIC allocators tensors ops ops/legacy ops/symmetric_quantization errorHandlers)
+target_include_directories(utensor PUBLIC allocators tensors ops ops/symmetric_quantization errorHandlers)
 #target_include_directories(utensor PUBLIC 
 #  $<BUILD_INTERFACE: allocators tensors ops>
 #  $<INSTALL_INTERFACE: ${CMAKE_CURRENT_SOURCE_DIR}/allocators ${CMAKE_CURRENT_SOURCE_DIR}/tensors ${CMAKE_CURRENT_SOURCE_DIR}/ops>

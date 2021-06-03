@@ -66,10 +66,43 @@ struct SimpleNamedTensor {
   SimpleNamedTensor();
   SimpleNamedTensor(const uTensor::string& name, Tensor& tensor);
   Tensor& tensor();
+
  public:
   const uTensor::string* name;  // Fixed
  private:
-  Tensor* _tensor;               // Modifiable
+  Tensor* _tensor;  // Modifiable
 };
+
+class StridedIterator {
+  /*
+  https://gist.github.com/dboyliao/d4a72cbbd3f3e62517865519b4c1e9c6
+  */
+ public:
+  /*
+    [NOTE] flat_*: ellipse, new axis and shrink masks are expanded
+  */
+  StridedIterator(const Tensor& flat_input, const Tensor& flat_begin_tensor,
+                  const Tensor& flat_end_tensor,
+                  const Tensor& flat_strides_tensor, int32_t begin_mask = 0,
+                  int32_t end_mask = 0);
+
+  int32_t next();
+  uint32_t num_elems() const;
+
+ private:
+  bool _hit_last;
+  uint8_t _num_dims;
+  uint32_t _num_elems;
+  int32_t _idx_cnt[UTENSOR_MAX_NDIMS];
+  int32_t _begin[UTENSOR_MAX_NDIMS];
+  int32_t _end[UTENSOR_MAX_NDIMS];
+  int32_t _strides[UTENSOR_MAX_NDIMS];
+  uint32_t _in_strides[UTENSOR_MAX_NDIMS];
+  int32_t _begin_mask;
+  int32_t _end_mask;
+  bool _is_done();
+  void _reset();
+};
+
 }  // namespace uTensor
 #endif

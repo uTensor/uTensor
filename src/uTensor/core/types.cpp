@@ -158,7 +158,7 @@ void TensorShape::print(bool new_line) const {
   return;
 }
 
-TensorStrides::TensorStrides(TensorShape& shape) {
+TensorStrides::TensorStrides(const TensorShape& shape) {
   _num_dims = shape.num_dims();
   size_t last_idx = _num_dims - 1;
   for (size_t i = last_idx + 1; i < 3; ++i) {

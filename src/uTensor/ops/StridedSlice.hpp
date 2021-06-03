@@ -1,5 +1,5 @@
-#ifndef UTENSOR_ARITHMETIC_OPS_H
-#define UTENSOR_ARITHMETIC_OPS_H
+#ifndef UTENSOR_STRIDED_SLICE_OPS_H
+#define UTENSOR_STRIDED_SLICE_OPS_H
 #include <algorithm>
 #include <limits>
 
@@ -11,19 +11,30 @@ namespace ReferenceOperators {
 
 template <typename T>
 class StridedSliceOperator : public OperatorInterface<9, 1> {
+ private:
+  int begin_mask, ellipsis_mask, end_mask, new_axis_mask, shrink_axis_mask;
+
  public:
-  enum names_in : uint8_t { i, b, e, s, b_m, ell_m, e_m, n_a_m, s_a_m };
-  enum names_out : uint8_t { o };
+  enum names_in : uint8_t { input, begin, end, strides };
+  enum names_out : uint8_t { output };
+
+  StridedSliceOperator(int begin_mask_, int end_mask_, int ellipsis_mask_,
+                       int new_axis_mask_, int shrink_axis_mask_)
+      : begin_mask(begin_mask_),
+        end_mask(end_mask_),
+        ellipsis_mask(ellipsis_mask_),
+        new_axis_mask(new_axis_mask_),
+        shrink_axis_mask(shrink_axis_mask_) {}
 
  protected:
   virtual void compute() {
-    stridedslice_kernel<T>(inputs[i].tensor(), inputs[b].tensor(),
-                           inputs[e].tensor(), inputs[s].tensor(),
-                           outputs[o].tensor(), inputs[b_m].tensor(),
-                           inputs[ell_m].tensor(), inputs[e_m].tensor(),
-                           inputs[n_a_m].tensor(), inputs[s_a_m].tensor());
+    stridedslice_kernel<T>(inputs[input].tensor(), inputs[begin].tensor(),
+                           inputs[end].tensor(), inputs[strides].tensor(),
+                           outputs[output].tensor(), begin_mask, end_mask,
+                           ellipsis_mask, new_axis_mask, shrink_axis_mask);
   }
 };
+
 }  // namespace ReferenceOperators
 }  // namespace uTensor
-#endif
+#endif  // UTENSOR_STRIDED_SLICE_OPS_H

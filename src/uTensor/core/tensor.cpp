@@ -175,4 +175,108 @@ SimpleNamedTensor::SimpleNamedTensor(const uTensor::string& name,
 SimpleNamedTensor::SimpleNamedTensor() : name(nullptr), _tensor(nullptr) {}
 Tensor& SimpleNamedTensor::tensor() { return *_tensor; }
 
+StridedIterator::StridedIterator(const Tensor& flat_input,
+                                 const Tensor& flat_begin_tensor,
+                                 const Tensor& flat_end_tensor,
+                                 const Tensor& flat_strides_tensor,
+                                 int32_t begin_mask, int32_t end_mask)
+    : _hit_last(false),
+      _num_elems(1),
+      _begin_mask(begin_mask),
+      _end_mask(end_mask) {
+  /*
+    IMPORTANT: StridedIterator handels only flat inputs, i.e, no new axis, no
+    ellipse and no shrink
+   */
+  // TODO: add runtime checks on flat inputs
+  _num_dims = flat_input.get_shape().num_dims();
+  uint32_t idx_num = flat_begin_tensor.get_shape().num_elems();
+  TensorStrides in_strides(flat_input.get_shape());
+  const TensorShape& in_shape = flat_input.get_shape();
+  for (uint32_t i = 0; i < idx_num; ++i) {
+    uint16_t dim_size = in_shape[i];
+    int32_t begin_idx = flat_begin_tensor(i);
+    if (begin_idx < 0) begin_idx += dim_size;
+    if ((1 << i) & _begin_mask) begin_idx = 0;
+    int32_t end_idx = flat_end_tensor(i);
+    if (end_idx < 0) end_idx += dim_size;
+    if ((1 << i) & _end_mask) end_idx = dim_size;
+    int32_t stride = flat_strides_tensor(i);
+    _idx_cnt[i] = begin_idx;
+    _begin[i] = begin_idx;
+    _end[i] = end_idx;
+    _strides[i] = stride;
+    _in_strides[i] = in_strides[i];
+  }
+  for (uint32_t i = idx_num; i < _num_dims; ++i) {
+    _idx_cnt[i] = 0;
+    _begin[i] = 0;
+    _end[i] = in_shape[i];
+    _strides[i] = 1;
+  }
+
+  for (size_t i = 0; i < _num_dims; ++i) {
+    int32_t e = _end[i];
+    int32_t s = _strides[i];
+    int32_t cnt = 1;
+    int32_t acc = _begin[i] + s;
+    while (acc < e) {
+      cnt += 1;
+      acc += s;
+    }
+    _num_elems *= cnt;
+  }
+}
+
+bool StridedIterator::_is_done() {
+  bool done = true;
+  size_t i = 0;
+  for (size_t i = 0; i < _num_dims; ++i) {
+    if (_idx_cnt[i] < _end[i]) {
+      done = false;
+    }
+  }
+  return done;
+}
+
+void StridedIterator::_reset() {
+  _hit_last = false;
+  for (size_t i = 0; i < _num_dims; ++i) {
+    _idx_cnt[i] = _begin[i];
+  }
+}
+
+int32_t StridedIterator::next() {
+  // compute linear offset at the moment
+  int32_t linear_offset = 0;
+  for (size_t i = 0; i < _num_dims; ++i) {
+    linear_offset += _idx_cnt[i] * _in_strides[i];
+  }
+  // update indices
+  _idx_cnt[_num_dims - 1] += _strides[_num_dims - 1];
+  for (int i = _num_dims - 2; i >= 0; --i) {
+    if (_idx_cnt[i + 1] >= _end[i + 1]) {
+      _idx_cnt[i] += _strides[i];
+    }
+  }
+  // check if it's done
+  bool done = _is_done();
+  if (_hit_last || done) {
+    if (_hit_last) {
+      _reset();
+      return -1;
+    } else {
+      _hit_last = true;
+    }
+  };
+  // check if the idx exceed end
+  for (size_t i = 0; i < _num_dims; ++i) {
+    if (_idx_cnt[i] >= _end[i]) {
+      _idx_cnt[i] = _begin[i];
+    }
+  }
+  return linear_offset;
+}
+
+uint32_t StridedIterator::num_elems() const { return _num_elems; }
 }  // namespace uTensor

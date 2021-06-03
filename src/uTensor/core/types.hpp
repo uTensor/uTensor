@@ -7,6 +7,8 @@
 //#include <cstdint>
 #include <stdint.h>
 
+#define UTENSOR_MAX_NDIMS 4
+
 using std::array;
 
 class TensorShape {
@@ -41,7 +43,7 @@ class TensorShape {
 
 class TensorStrides {
  public:
-  TensorStrides(TensorShape& shape);
+  TensorStrides(const TensorShape& shape);
   uint8_t num_dims();
   uint32_t operator[](size_t i) const;
   uint32_t& operator[](size_t i);
