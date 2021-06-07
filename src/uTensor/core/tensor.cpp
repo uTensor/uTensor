@@ -175,7 +175,7 @@ SimpleNamedTensor::SimpleNamedTensor(const uTensor::string& name,
 SimpleNamedTensor::SimpleNamedTensor() : name(nullptr), _tensor(nullptr) {}
 Tensor& SimpleNamedTensor::tensor() { return *_tensor; }
 
-StridedIterator::StridedIterator(const Tensor& flat_input,
+StridedIterator::StridedIterator(const Tensor& input,
                                  const Tensor& flat_begin_tensor,
                                  const Tensor& flat_end_tensor,
                                  const Tensor& flat_strides_tensor,
@@ -189,10 +189,10 @@ StridedIterator::StridedIterator(const Tensor& flat_input,
     ellipse and no shrink
    */
   // TODO: add runtime checks on flat inputs
-  _num_dims = flat_input.get_shape().num_dims();
+  _num_dims = input.get_shape().num_dims();
   uint32_t idx_num = flat_begin_tensor.get_shape().num_elems();
-  TensorStrides in_strides(flat_input.get_shape());
-  const TensorShape& in_shape = flat_input.get_shape();
+  TensorStrides in_strides(input.get_shape());
+  const TensorShape& in_shape = input.get_shape();
   for (uint32_t i = 0; i < idx_num; ++i) {
     uint16_t dim_size = in_shape[i];
     int32_t begin_idx = flat_begin_tensor(i);
