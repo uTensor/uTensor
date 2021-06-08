@@ -51,6 +51,18 @@ class MulOperator : public OperatorInterface<2, 1> {
   }
 };
 
+template <typename T>
+class DivOperator : public OperatorInterface<2, 1> {
+ public:
+  enum names_in : uint8_t { a, b };
+  enum names_out : uint8_t { c };
+
+ protected:
+  virtual void compute() {
+    div_kernel<T>(outputs[c].tensor(), inputs[a].tensor(), inputs[b].tensor());
+  }
+};
+
 }  // namespace ReferenceOperators
 }  // namespace uTensor
 #endif
