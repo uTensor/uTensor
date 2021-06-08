@@ -24,20 +24,20 @@ def gen_test(test_group, test_id):
 
     tensor_a = Tensor("a", tf_a.numpy(), ref_name=f"ref_in_a_{test_id:02d}")
     tensor_b = Tensor("b", tf_b.numpy(), ref_name=f"ref_in_b_{test_id:02d}")
-    tensor_axis = Tensor(
-        "axis", np.array([cat_axis], dtype=np.int32), ref_name=f"ref_axis_{test_id:02d}"
-    )
     ref_out_tensor = Tensor("ref_out", tf_out.numpy(), f"ref_out_{test_id:02d}")
     out_tensor = Tensor("out", tf_out.numpy())
 
-    op = Operator("ConcatOperator", name="concat_op", dtypes=[tensor_a.get_dtype])
-    op.set_namespace("ReferenceOperators::")
-    op.set_inputs({"a": tensor_a, "b": tensor_b, "axis": tensor_axis}).set_outputs(
-        {"out": out_tensor}
+    op = Operator(
+        "ConcatOperator",
+        name="concat_op",
+        dtypes=[tensor_a.get_dtype],
+        param_str=f"{cat_axis}",
     )
+    op.set_namespace("ReferenceOperators::")
+    op.set_inputs({"a": tensor_a, "b": tensor_b}).set_outputs({"out": out_tensor})
 
     test = SingleOpTest(test_group, test_name, op)
-    test.add_tensor_comparison(out_tensor, ref_out_tensor, 1e-7)
+    test.add_tensor_comparison(out_tensor, ref_out_tensor, None)
     test_rendered, const_snippets = test.render()
     return test_rendered, const_snippets
 

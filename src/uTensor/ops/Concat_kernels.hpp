@@ -7,13 +7,12 @@ namespace uTensor {
 namespace ReferenceOperators {
 
 template <typename T>
-void concat_kernel(const Tensor &a, const Tensor &b, const Tensor &axis,
+void concat_kernel(const Tensor &a, const Tensor &b, int32_t axis_idx,
                    Tensor &c) {
   TensorShape a_shape = a->get_shape();
   TensorShape b_shape = b->get_shape();
   TensorShape c_shape = c->get_shape();
   uint32_t num_dims = a_shape.num_dims();
-  int32_t axis_idx = axis(0);
   if (axis_idx < 0) {
     axis_idx += num_dims;
   }
