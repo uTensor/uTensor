@@ -19,6 +19,7 @@ set(src_utensor_ops
     ops/Convolution.cpp
     ops/Matrix_kernels.cpp
     ops/StridedSlice_kernels.cpp
+    ops/trigonometric.cpp
    )
 set(src_utensor_errhndl
   errorHandlers/SimpleErrorHandler.cpp

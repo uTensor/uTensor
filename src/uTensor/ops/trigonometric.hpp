@@ -1,10 +1,13 @@
 #ifndef UTENSOR_TRIGONOMETRIC_H
 #define UTENSOR_TRIGONOMETRIC_H
-#include <math.h>
+#include <cmath>
 
 #include "uTensor/core/context.hpp"
- #include "uTensor/core/operatorBase.hpp"
+#include "uTensor/core/operatorBase.hpp"
 // #include "ActivationFncs.hpp"  //in-plcae interface
+
+using std::sin;
+using std::tanh;
 
 namespace uTensor {
 namespace ReferenceOperators {
@@ -75,6 +78,26 @@ class SinOperator : public OperatorInterface<1, 1> {
       out(i) = result;
     }
   }
+};
+
+template <>
+class TanhOperator<float, float> : public OperatorInterface<1, 1> {
+ public:
+  enum names_in : uint8_t { act_in };
+  enum names_out : uint8_t { act_out };
+
+ protected:
+  virtual void compute();
+};
+
+template <>
+class SinOperator<float, float> : public OperatorInterface<1, 1> {
+ public:
+  enum names_in : uint8_t { act_in };
+  enum names_out : uint8_t { act_out };
+
+ protected:
+  virtual void compute();
 };
 
 }  // namespace ReferenceOperators
