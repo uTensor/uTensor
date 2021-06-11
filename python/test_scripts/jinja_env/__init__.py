@@ -356,7 +356,10 @@ class SingleOpTest:
         for tensor in target_op.output_map:
             self.tensor_set.add(target_op.output_map[tensor])
 
-    def add_tensor_comparison(self, a, b, threshold):
+    def add_tensor_comparison(self, a, b, threshold=0.0):
+        """
+        if threshold is zero, expect to be exact equal
+        """
         self.compare_tensors.append((a, b))
         self.tensor_set.add(a)
         self.tensor_set.add(b)

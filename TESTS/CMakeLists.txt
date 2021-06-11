@@ -54,7 +54,7 @@ package_add_test_with_libraries(test_dequantize operators/test_dequantize.cpp ut
 package_add_test_with_libraries(test_quantize operators/test_quantize utensor operators "${PROJECT_DIR}/test-data/")
 package_add_test_with_libraries(test_quant_dws_conv operators/test_quantized_dws_conv utensor operators "${PROJECT_DIR}/test-data/")
 package_add_test_with_libraries(test_quant_fully_connect_2 operators/test_quant_fully_connect_2 utensor operators "${PROJECT_DIR}/test-data/")
-package_add_test_with_libraries(test_fully_connect operators/test_fully_connected utensor operators "${PROJECT_DIR}/test-data/")
+package_add_test_with_libraries(test_float_fully_connect operators/test_float_fully_connected utensor operators "${PROJECT_DIR}/test-data/")
 package_add_test_with_libraries(test_sq_conv2d operators/test_sq_conv2d utensor operators "${PROJECT_DIR}/test-data/")
 package_add_test_with_libraries(test_sq_softmax operators/test_sq_softmax utensor operators "${PROJECT_DIR}/test-data/")
 package_add_test_with_libraries(test_sq_logistic operators/test_sq_logistic utensor operators "${PROJECT_DIR}/test-data/")
