@@ -1,4 +1,5 @@
 import argparse
+import os
 from pathlib import Path
 
 import numpy as np
@@ -62,7 +63,7 @@ def gen_fc_tests(num_tests):
             constants=const_snippets, constants_header="TEST_FLOAT_FULLYCONNECT_H"
         )
         fp.write(c_r)
-        header_fname = fp.name
+        header_fname = os.path.basename(fp.name)
         print(f"{fp.name} saved")
     with (test_dir_path / "test_float_fully_connected.cpp").open("w") as fp:
         gt_r = env2.get_template("gtest_container.cpp").render(
