@@ -316,6 +316,7 @@ class Operator:
 
     def set_namespace(self, namespace_str):
         self.ns = namespace_str
+        return self
 
     def set_inputs(self, input_map):
         self.input_map = input_map
