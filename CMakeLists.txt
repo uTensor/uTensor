@@ -47,4 +47,10 @@ if(PACKAGE_TUTORIALS)
   add_subdirectory(tutorials/custom_operator)
 endif()
 
+option(UTENSOR_BOUNDARY_CHECK "enable boundary checks in uTensor" OFF)
+if (UTENSOR_BOUNDARY_CHECK)
+  target_compile_definitions(utensor PUBLIC UTENSOR_BOUNDARY_CHECK)
+  target_compile_definitions(utensor_core PUBLIC UTENSOR_BOUNDARY_CHECK)
+endif()
+
 add_subdirectory(tanh_model)
