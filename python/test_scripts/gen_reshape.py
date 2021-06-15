@@ -37,7 +37,7 @@ def gen_test(test_id, old_shape, new_shape):
     return test_rendered, const_snippets
 
 
-def gen_float_tanh():
+def gen_reshape():
     tests = []
     const_snippets = []
     test_dir_path = (
@@ -72,4 +72,4 @@ def gen_float_tanh():
 
 
 if __name__ == "__main__":
-    gen_float_tanh()
+    gen_reshape()
