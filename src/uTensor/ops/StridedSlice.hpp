@@ -10,7 +10,7 @@ namespace uTensor {
 namespace ReferenceOperators {
 
 template <typename T>
-class StridedSliceOperator : public OperatorInterface<9, 1> {
+class StridedSliceOperator : public OperatorInterface<4, 1> {
  private:
   int begin_mask, ellipsis_mask, end_mask, new_axis_mask, shrink_axis_mask;
 
