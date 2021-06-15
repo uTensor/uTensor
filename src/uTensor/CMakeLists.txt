@@ -36,6 +36,9 @@ set(src_utensor_sq_ops
     ops/symmetric_quantization/convolution2d.cpp
     ops/symmetric_quantization/QuantizeOps.cpp
    )
+set(src_utensor_util
+   util/broadcast_utils.cpp
+   )
 
 if(X86_PROJECT)
 add_definitions( -DX86_PROJECT=1 )
@@ -45,10 +48,26 @@ add_definitions( -DARM_PROJECT=1 )
 endif()
 add_subdirectory(ops/optimized)
 
-add_library(utensor  ${src_utensor_alloc} ${src_utensor_tensors} ${src_utensor_ops} ${src_utensor_errhndl} contexts/default_context.cpp ${src_utensor_legacy_ops} ${src_utensor_sq_ops} )
+add_library(utensor 
+   ${src_utensor_alloc}
+   ${src_utensor_tensors}
+   ${src_utensor_ops}
+   ${src_utensor_errhndl}
+   contexts/default_context.cpp
+   ${src_utensor_legacy_ops}
+   ${src_utensor_sq_ops}
+   ${src_utensor_util}
+   )
 #target_link_libraries(utensor utensor_core optimized_ops)
 target_link_libraries(utensor PUBLIC utensor_core )
-target_include_directories(utensor PUBLIC allocators tensors ops ops/symmetric_quantization errorHandlers)
+target_include_directories(utensor PUBLIC 
+  allocators
+  tensors
+  ops
+  ops/symmetric_quantization
+  errorHandlers
+  util
+  )
 #target_include_directories(utensor PUBLIC 
 #  $<BUILD_INTERFACE: allocators tensors ops>
 #  $<INSTALL_INTERFACE: ${CMAKE_CURRENT_SOURCE_DIR}/allocators ${CMAKE_CURRENT_SOURCE_DIR}/tensors ${CMAKE_CURRENT_SOURCE_DIR}/ops>

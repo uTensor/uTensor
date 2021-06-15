@@ -83,3 +83,5 @@ package_add_test_with_libraries(integration_test model/integration_test utensor 
 #Error Handlers
 package_add_test_with_libraries(test_simple_error_handler error_handlers/test_errorhandler utensor error_handlers "${PROJECT_DIR}/test-data/")
 
+# Util
+package_add_test_with_libraries(test_broadcaster util/test_broadcaster utensor util "${PROJECT_DIR}/test-data/")

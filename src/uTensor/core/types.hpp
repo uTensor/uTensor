@@ -25,10 +25,16 @@ class TensorShape {
   TensorShape(array<uint16_t, 3> shape);
   TensorShape(array<uint16_t, 4> shape);
 
+  // alternative to array constructors?
+  TensorShape(const uint16_t* shape, uint8_t ndims);
+
+  // copy constructor
+  TensorShape(const TensorShape& other);
+
   uint16_t operator[](int i) const;
   uint16_t& operator[](int i);
-  bool operator==(const TensorShape& other);
-  bool operator!=(const TensorShape& other);
+  bool operator==(const TensorShape& other) const;
+  bool operator!=(const TensorShape& other) const;
   void update_dims();
   uint32_t get_linear_size() const;
   uint8_t num_dims() const;

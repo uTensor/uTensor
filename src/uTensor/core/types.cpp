@@ -76,6 +76,19 @@ TensorShape::TensorShape(uint16_t shape0, uint16_t shape1, uint16_t shape2,
   _shape[2] = shape2;
   _shape[3] = shape3;
 }
+TensorShape::TensorShape(const uint16_t* shape, uint8_t ndims)
+    : _num_dims(ndims) {
+  for (size_t i = 0; i < ndims; ++i) {
+    _shape[i] = *(shape + i);
+  }
+}
+TensorShape::TensorShape(const TensorShape& other) {
+  _num_dims = other.num_dims();
+  _shape[0] = other[0];
+  _shape[1] = other[1];
+  _shape[2] = other[2];
+  _shape[3] = other[3];
+}
 
 uint16_t TensorShape::operator[](int i) const {
   return _shape[i]; /* Do additional checks*/
@@ -89,7 +102,7 @@ void TensorShape::update_dims() {
     if (_shape[i] > 0) _num_dims = i + 1;
   }
 }
-bool TensorShape::operator==(const TensorShape& other) {
+bool TensorShape::operator==(const TensorShape& other) const {
   if (_num_dims != other.num_dims()) {
     return false;
   }
@@ -99,7 +112,7 @@ bool TensorShape::operator==(const TensorShape& other) {
   }
   return all_eq;
 }
-bool TensorShape::operator!=(const TensorShape& other) {
+bool TensorShape::operator!=(const TensorShape& other) const {
   return !(*this == other);
 }
 uint32_t TensorShape::get_linear_size() const {

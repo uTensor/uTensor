@@ -234,6 +234,7 @@ bool StridedIterator::_is_done() {
   for (size_t i = 0; i < _num_dims; ++i) {
     if (_idx_cnt[i] < _end[i]) {
       done = false;
+      break;
     }
   }
   return done;

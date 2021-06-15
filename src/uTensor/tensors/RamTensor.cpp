@@ -12,6 +12,13 @@ size_t calc_required_space(const TensorShape& new_shape, uint8_t _type_size) {
 RamTensor::RamTensor() {}
 void* RamTensor::read(uint32_t linear_index) const {
   if (_ram_region) {
+#ifdef UTENSOR_BOUNDARY_CHECK
+    uint32_t num_elems = _shape.num_elems();
+    if (linear_index >= num_elems) {
+      uTensor_printf("reading elements out of the boundary of the buffer\n");
+      Context::get_default_context()->throwError(new OutOfTensorBoundsError);
+    }
+#endif
     uint8_t* d = reinterpret_cast<uint8_t*>(*_ram_region);
     return reinterpret_cast<void*>(d + linear_index * _type_size);
   }
@@ -19,13 +26,21 @@ void* RamTensor::read(uint32_t linear_index) const {
 }
 void* RamTensor::write(uint32_t linear_index) {
   if (_ram_region) {
+#ifdef UTENSOR_BOUNDARY_CHECK
+    uint32_t num_elems = _shape.num_elems();
+    if (linear_index >= num_elems) {
+      uTensor_printf("reading elements out of the boundary of the buffer\n");
+      Context::get_default_context()->throwError(new OutOfTensorBoundsError);
+    }
+#endif
     uint8_t* d = reinterpret_cast<uint8_t*>(*_ram_region);
     return reinterpret_cast<void*>(d + linear_index * _type_size);
   }
   return nullptr;
 }
 
-size_t RamTensor::_get_readable_block(const void*& buffer, uint16_t req_read_size,
+size_t RamTensor::_get_readable_block(const void*& buffer,
+                                      uint16_t req_read_size,
                                       uint32_t linear_index) const {
   if (req_read_size + linear_index > _type_size * _shape.get_linear_size()) {
     Context::get_default_context()->throwError(new InvalidMemAccessError());
@@ -60,25 +75,26 @@ RamTensor::RamTensor(const TensorShape& _shape, ttype _type)
 }
 
 RamTensor::~RamTensor() {
-  AllocatorInterface* alloc = Context::get_default_context()->get_ram_data_allocator();
-  //alloc->unbind_and_deallocate(&_ram_region);
+  AllocatorInterface* alloc =
+      Context::get_default_context()->get_ram_data_allocator();
+  // alloc->unbind_and_deallocate(&_ram_region);
   void* ptr_t = *_ram_region;
-    if (alloc->is_bound(*_ram_region, &_ram_region)) {
-      alloc->unbind(*_ram_region, &_ram_region);
-    }
-    alloc->deallocate(ptr_t);
+  if (alloc->is_bound(*_ram_region, &_ram_region)) {
+    alloc->unbind(*_ram_region, &_ram_region);
+  }
+  alloc->deallocate(ptr_t);
 }
 
 void RamTensor::resize(const TensorShape& new_shape) {
-  AllocatorInterface* allocator = Context::get_default_context()->get_ram_data_allocator();
+  AllocatorInterface* allocator =
+      Context::get_default_context()->get_ram_data_allocator();
   // unbind handle before reallocate memory
   void* old_ptr = *_ram_region;
   if (is_bound(_ram_region, *allocator)) {
     allocator->unbind(*_ram_region, &_ram_region);
   }
-  if(old_ptr)
-    allocator->deallocate(old_ptr);
-  void* ptr = allocator->allocate(new_shape.get_linear_size()*_type_size);
+  if (old_ptr) allocator->deallocate(old_ptr);
+  void* ptr = allocator->allocate(new_shape.get_linear_size() * _type_size);
   if (!ptr) {
     uTensor_printf("OOM when resizing\n");
     Context::get_default_context()->throwError(new OutOfMemError);
@@ -90,7 +106,8 @@ void RamTensor::resize(const TensorShape& new_shape) {
 
 FutureMaxSizeRamTensor::FutureMaxSizeRamTensor(ttype _type)
     : RamTensor(_type), max_initial_size(0) {}
-FutureMaxSizeRamTensor::FutureMaxSizeRamTensor(const TensorShape& _shape, ttype _type)
+FutureMaxSizeRamTensor::FutureMaxSizeRamTensor(const TensorShape& _shape,
+                                               ttype _type)
     : RamTensor(_shape, _type) {
   max_initial_size = calc_required_space(_shape, _type_size);
 }

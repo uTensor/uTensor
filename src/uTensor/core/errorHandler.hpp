@@ -90,6 +90,7 @@ DECLARE_ERROR(InvalidTensorOutputError);
 DECLARE_ERROR(InvalidTensorDimensionsError);
 DECLARE_ERROR(InvalidTensorDataTypeError);
 DECLARE_ERROR(OutOfTensorBoundsError);
+DECLARE_ERROR(UnbroadcastableShapeError);
 
 };  // namespace uTensor
 #endif
