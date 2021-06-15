@@ -58,19 +58,19 @@ class ErrorHandler {
 
 // UID gets evaluated at compile time and can be looked up at runtime :D
 // Let's us fake RTTI for the bits we care about
-#define DECLARE_EVENT(EVT)                                   \
-  struct EVT : public Event {                                \
-    static constexpr uint16_t uid =                          \
+#define DECLARE_EVENT(EVT)                                      \
+  struct EVT : public Event {                                   \
+    static constexpr uint16_t uid =                             \
         u32toEventType(hash_32_fnv1a_const(uT_STRINGIFY(EVT))); \
-    EVT();                                                   \
+    EVT();                                                      \
   }
 #define DEFINE_EVENT(EVT) \
   EVT::EVT() : Event{uid} {}
-#define DECLARE_ERROR(EVT)                                   \
-  struct EVT : public Error {                                \
-    static constexpr uint16_t uid =                          \
+#define DECLARE_ERROR(EVT)                                      \
+  struct EVT : public Error {                                   \
+    static constexpr uint16_t uid =                             \
         u32toEventType(hash_32_fnv1a_const(uT_STRINGIFY(EVT))); \
-    EVT();                                                   \
+    EVT();                                                      \
   }
 #define DEFINE_ERROR(EVT) \
   EVT::EVT() : Error{uid} {}
@@ -89,6 +89,7 @@ DECLARE_ERROR(InvalidTensorInputError);
 DECLARE_ERROR(InvalidTensorOutputError);
 DECLARE_ERROR(InvalidTensorDimensionsError);
 DECLARE_ERROR(InvalidTensorDataTypeError);
+DECLARE_ERROR(OutOfTensorBoundsError);
 
 };  // namespace uTensor
 #endif

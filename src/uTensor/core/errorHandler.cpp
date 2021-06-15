@@ -13,6 +13,7 @@ DEFINE_ERROR(InvalidTensorInputError);
 DEFINE_ERROR(InvalidTensorOutputError);
 DEFINE_ERROR(InvalidTensorDimensionsError);
 DEFINE_ERROR(InvalidTensorDataTypeError);
+DEFINE_ERROR(OutOfTensorBoundsError);
 
 void ErrorHandler::uThrow(Error* err) {
   while (true) {
