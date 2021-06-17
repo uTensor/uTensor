@@ -13,13 +13,14 @@ from jinja_env.utensor_macros import UTENSOR_MAX_NDIMS
 
 
 def random_shapes():
-    shape1 = np.random.randint(1, 26, size=np.random.randint(3, UTENSOR_MAX_NDIMS + 1))
+    shape1 = np.random.randint(2, 26, size=np.random.randint(3, UTENSOR_MAX_NDIMS + 1))
     ndims2 = np.random.randint(1, shape1.size)
-    shape2 = shape1[-ndims2:]
+    shape2 = shape1[-ndims2:].copy()
     if shape2.size > 1:
-        num_idxs = np.random.randint(1, shape2.size)
-        idxs = np.random.randint(0, shape2.size, size=num_idxs)
-        shape2[idxs] = 1
+        num_idxs = np.random.randint(0, shape2.size)
+        if num_idxs > 0:
+            idxs = np.random.randint(0, shape2.size, size=num_idxs)
+            shape2[idxs] = 1
     return tuple(shape1), tuple(shape2)
 
 
