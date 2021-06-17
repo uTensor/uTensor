@@ -64,6 +64,7 @@ package_add_test_with_libraries(test_concat operators/test_concat utensor operat
 package_add_test_with_libraries(test_stride_iterator operators/test_stride_iterator utensor operators "${PROJECT_DIR}/test-data/")
 package_add_test_with_libraries(test_stride_slice operators/test_stride_slice utensor operators "${PROJECT_DIR}/test-data/")
 package_add_test_with_libraries(test_float_tanh operators/test_float_tanh utensor operators "${PROJECT_DIR}/test-data/")
+package_add_test_with_libraries(test_arith_broadcast operators/test_arithmetic_broadcast utensor operators "${PROJECT_DIR}/test-data/")
 
 # Includes
 package_add_test_with_libraries(test_top_include library/test_top_include utensor library "${PROJECT_DIR}/test-data/")

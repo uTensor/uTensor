@@ -9,11 +9,14 @@ from pathlib import Path
 import numpy as np
 import tensorflow as tf
 from jinja_env import Operator, SingleOpTest, Tensor, env2
+from jinja_env.utensor_macros import UTENSOR_MAX_NDIMS
 
 
 def gen_div_test(test_number):
     test_name = f"random_gen_div__{test_number:02d}"
-    in_shape = np.random.randint(1, 26, size=np.random.randint(1, 5))
+    in_shape = np.random.randint(
+        1, 26, size=np.random.randint(1, UTENSOR_MAX_NDIMS + 1)
+    )
     tf_in1 = tf.random.uniform(in_shape, dtype=tf.float32)
     tf_in2 = tf.random.uniform(in_shape, dtype=tf.float32)
     tf_out = tf.truediv(tf_in1, tf_in2)
@@ -44,7 +47,9 @@ def gen_div_test(test_number):
 
 def gen_mul_test(test_number):
     test_name = f"random_gen_mul__{test_number:02d}"
-    in_shape = np.random.randint(1, 26, size=np.random.randint(1, 5))
+    in_shape = np.random.randint(
+        1, 26, size=np.random.randint(1, UTENSOR_MAX_NDIMS + 1)
+    )
     tf_in1 = tf.random.uniform(in_shape, dtype=tf.float32)
     tf_in2 = tf.random.uniform(in_shape, dtype=tf.float32)
     tf_out = tf.multiply(tf_in1, tf_in2)
@@ -75,7 +80,9 @@ def gen_mul_test(test_number):
 
 def gen_add_test(test_number):
     test_name = f"random_gen_add__{test_number:02d}"
-    in_shape = np.random.randint(1, 26, size=np.random.randint(1, 5))
+    in_shape = np.random.randint(
+        1, 26, size=np.random.randint(1, UTENSOR_MAX_NDIMS + 1)
+    )
     tf_in1 = tf.random.uniform(in_shape, dtype=tf.float32)
     tf_in2 = tf.random.uniform(in_shape, dtype=tf.float32)
     tf_out = tf.add(tf_in1, tf_in2)
@@ -106,7 +113,9 @@ def gen_add_test(test_number):
 
 def gen_sub_test(test_number):
     test_name = f"random_gen_sub__{test_number:02d}"
-    in_shape = np.random.randint(1, 26, size=np.random.randint(1, 5))
+    in_shape = np.random.randint(
+        1, 26, size=np.random.randint(1, UTENSOR_MAX_NDIMS + 1)
+    )
     tf_in1 = tf.random.uniform(in_shape, dtype=tf.float32)
     tf_in2 = tf.random.uniform(in_shape, dtype=tf.float32)
     tf_out = tf.subtract(tf_in1, tf_in2)
