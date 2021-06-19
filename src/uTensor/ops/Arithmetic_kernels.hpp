@@ -10,9 +10,7 @@ void add_kernel(Tensor& c, const Tensor& a, const Tensor& b) {
   TensorShape a_shape = a->get_shape();
   TensorShape b_shape = b->get_shape();
   if (a_shape == b_shape) {
-    // Decide on c shape
-    TensorShape& c_shape = c->get_shape();
-    for (uint32_t i = 0; i < c_shape.num_elems(); i++)
+    for (uint32_t i = 0; i < a_shape.num_elems(); i++)
       c(i) = static_cast<T>(static_cast<T>(a(i)) + static_cast<T>(b(i)));
   } else {
     if (!Broadcaster::broadcastable(a_shape, b_shape)) {
@@ -36,9 +34,7 @@ void sub_kernel(Tensor& c, const Tensor& a, const Tensor& b) {
   TensorShape a_shape = a->get_shape();
   TensorShape b_shape = b->get_shape();
   if (a_shape == b_shape) {
-    // Decide on c shape
-    TensorShape c_shape = c->get_shape();
-    for (uint32_t i = 0; i < c_shape.num_elems(); i++)
+    for (uint32_t i = 0; i < a_shape.num_elems(); i++)
       c(i) = static_cast<T>(static_cast<T>(a(i)) - static_cast<T>(b(i)));
   } else {
     if (!Broadcaster::broadcastable(a_shape, b_shape)) {
@@ -62,9 +58,7 @@ void mul_kernel(Tensor& c, const Tensor& a, const Tensor& b) {
   TensorShape a_shape = a->get_shape();
   TensorShape b_shape = b->get_shape();
   if (a_shape == b_shape) {
-    // Decide on c shape
-    TensorShape c_shape = c->get_shape();
-    for (uint32_t i = 0; i < c_shape.num_elems(); i++)
+    for (uint32_t i = 0; i < a_shape.num_elems(); i++)
       c(i) = static_cast<T>(static_cast<T>(a(i)) * static_cast<T>(b(i)));
   } else {
     if (!Broadcaster::broadcastable(a_shape, b_shape)) {
@@ -88,9 +82,7 @@ void div_kernel(Tensor& c, const Tensor& a, const Tensor& b) {
   TensorShape a_shape = a->get_shape();
   TensorShape b_shape = b->get_shape();
   if (a_shape == b_shape) {
-    // Decide on c shape
-    TensorShape c_shape = c->get_shape();
-    for (uint32_t i = 0; i < c_shape.num_elems(); i++)
+    for (uint32_t i = 0; i < a_shape.num_elems(); i++)
       c(i) = static_cast<T>(static_cast<T>(a(i)) / static_cast<T>(b(i)));
   } else {
     if (!Broadcaster::broadcastable(a_shape, b_shape)) {
