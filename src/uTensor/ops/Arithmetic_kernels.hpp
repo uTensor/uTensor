@@ -16,7 +16,7 @@ void add_kernel(Tensor& c, const Tensor& a, const Tensor& b) {
       c(i) = static_cast<T>(static_cast<T>(a(i)) + static_cast<T>(b(i)));
   } else {
     if (!Broadcaster::broadcastable(a_shape, b_shape)) {
-      uTensor_printf("unprocastable inputs for elementwise add\n");
+      uTensor_printf("unbroadcastable inputs for elementwise add\n");
       Context::get_default_context()->throwError(new UnbroadcastableShapeError);
       return;
     }
@@ -42,7 +42,7 @@ void sub_kernel(Tensor& c, const Tensor& a, const Tensor& b) {
       c(i) = static_cast<T>(static_cast<T>(a(i)) - static_cast<T>(b(i)));
   } else {
     if (!Broadcaster::broadcastable(a_shape, b_shape)) {
-      uTensor_printf("unprocastable inputs for elementwise add\n");
+      uTensor_printf("unbroadcastable inputs for elementwise add\n");
       Context::get_default_context()->throwError(new UnbroadcastableShapeError);
       return;
     }
@@ -68,7 +68,7 @@ void mul_kernel(Tensor& c, const Tensor& a, const Tensor& b) {
       c(i) = static_cast<T>(static_cast<T>(a(i)) * static_cast<T>(b(i)));
   } else {
     if (!Broadcaster::broadcastable(a_shape, b_shape)) {
-      uTensor_printf("unprocastable inputs for elementwise add\n");
+      uTensor_printf("unbroadcastable inputs for elementwise add\n");
       Context::get_default_context()->throwError(new UnbroadcastableShapeError);
       return;
     }
@@ -94,7 +94,7 @@ void div_kernel(Tensor& c, const Tensor& a, const Tensor& b) {
       c(i) = static_cast<T>(static_cast<T>(a(i)) / static_cast<T>(b(i)));
   } else {
     if (!Broadcaster::broadcastable(a_shape, b_shape)) {
-      uTensor_printf("unprocastable inputs for elementwise add\n");
+      uTensor_printf("unbroadcastable inputs for elementwise add\n");
       Context::get_default_context()->throwError(new UnbroadcastableShapeError);
       return;
     }
