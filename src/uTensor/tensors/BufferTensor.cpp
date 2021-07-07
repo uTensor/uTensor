@@ -35,6 +35,13 @@ bool BufferTensor::unbind() {
 }
 
 void* BufferTensor::read(uint32_t linear_index) const {
+#ifdef UTENSOR_BOUNDARY_CHECK
+  uint32_t num_elems = _shape.num_elems();
+  if (linear_index >= num_elems) {
+    uTensor_printf("reading elements out of the boundary of the buffer\n");
+    Context::get_default_context()->throwError(new OutOfTensorBoundsError);
+  }
+#endif
   if (_buffer) {
     // uint8_t* d = reinterpret_cast<uint8_t*>(_buffer);
     return reinterpret_cast<void*>(_buffer + linear_index * _type_size);
@@ -44,6 +51,13 @@ void* BufferTensor::read(uint32_t linear_index) const {
   return nullptr;
 }
 void* BufferTensor::write(uint32_t linear_index) {
+#ifdef UTENSOR_BOUNDARY_CHECK
+  uint32_t num_elems = _shape.num_elems();
+  if (linear_index >= num_elems) {
+    uTensor_printf("writing elements out of the boundary of the buffer\n");
+    Context::get_default_context()->throwError(new OutOfTensorBoundsError);
+  }
+#endif
   if (_buffer) {
     // uint8_t* d = reinterpret_cast<uint8_t*>(*_buffer);
     return reinterpret_cast<void*>(_buffer + linear_index * _type_size);

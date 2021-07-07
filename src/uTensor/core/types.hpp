@@ -7,6 +7,8 @@
 //#include <cstdint>
 #include <stdint.h>
 
+#define UTENSOR_MAX_NDIMS 4
+
 using std::array;
 
 class TensorShape {
@@ -17,21 +19,28 @@ class TensorShape {
   TensorShape(uint16_t shape1, uint16_t shape2, uint16_t shape3,
               uint16_t shape4);
 
-  //FIXME:   array isn't avaliable on all embedded platforms
+  // FIXME:   array isn't avaliable on all embedded platforms
   TensorShape(array<uint16_t, 1> shape);
   TensorShape(array<uint16_t, 2> shape);
   TensorShape(array<uint16_t, 3> shape);
   TensorShape(array<uint16_t, 4> shape);
 
+  // alternative to array constructors?
+  TensorShape(const uint16_t* shape, uint8_t ndims);
+
+  // copy constructor
+  TensorShape(const TensorShape& other);
+
   uint16_t operator[](int i) const;
   uint16_t& operator[](int i);
-  bool operator==(const TensorShape& other);
-  bool operator!=(const TensorShape& other);
+  bool operator==(const TensorShape& other) const;
+  bool operator!=(const TensorShape& other) const;
   void update_dims();
   uint32_t get_linear_size() const;
   uint8_t num_dims() const;
   uint32_t linear_index(uint16_t i, uint16_t j, uint16_t k, uint16_t l) const;
   uint32_t num_elems() const;
+  void print(bool new_line = false) const;
 
  private:
   uint16_t _shape[4];
@@ -40,7 +49,7 @@ class TensorShape {
 
 class TensorStrides {
  public:
-  TensorStrides(TensorShape& shape);
+  TensorStrides(const TensorShape& shape);
   uint8_t num_dims();
   uint32_t operator[](size_t i) const;
   uint32_t& operator[](size_t i);

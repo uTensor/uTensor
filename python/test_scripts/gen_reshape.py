@@ -1,108 +1,75 @@
-import argparse
+import os
 from functools import reduce
+from pathlib import Path
 
 import numpy as np
 import tensorflow as tf
+from jinja_env import Operator, SingleOpTest, Tensor, env2
 
-from jinja_env import env
 
+def gen_test(test_id, old_shape, new_shape):
+    mul = lambda a, b: a * b
+    assert reduce(mul, old_shape, 1) == reduce(mul, new_shape)
+    test_name = f"random_gen_reshape__{test_id:02d}"
+    tf_in = tf.random.uniform(old_shape, dtype=tf.float32)
+    tf_out = tf.reshape(tf_in, new_shape)
 
-def main(cpp_fname, const_fname):
-    # template render variables
-    utensor_headers = set(["Reshape.hpp", "RamTensor.hpp", "RomTensor.hpp"])
-    test_headers = set([const_fname])
-    constants_map = {}
-    test_suit_name = "Reshape"
-    test_name = "reshape_test"
-    output_size = 10
-    declare_tensor_strs = []
-    op_cls = "ReshapeOperator"
-    op_type_signature = "float"
-    op_name = "op"
-    op_construct_params = []
-    inputs_str = ""
-    outputs_str = ""
-    output_names = []
-    ref_output_names = []
-    other_tests_str = []
-
-    # generate testing data
-    tensor_input = tf.random.uniform((3, 5), maxval=5, dtype=tf.float32)
-    np_input = tensor_input.numpy()
-    new_shape = [5, 3, 1]
-    op_construct_params.append("{{ {} }}".format(",".join(map(str, new_shape))))
-    tensor_output = tf.reshape(tensor_input, new_shape)
-    np_output = tensor_output.numpy()
-
-    constants_map["random_input_arr"] = (np_input.flatten().tolist(), "float")
-    constants_map["ref_output_arr"] = (np_output.flatten().tolist(), "float")
-    declare_tensor_strs.extend(
-        [
-            env.get_template("declare_rom_tensor.cpp").render(
-                tensor_name="input_tensor",
-                shape=np_input.shape,
-                tensor_type_str="float",
-                const_var_name="random_input_arr",
-            ),
-            env.get_template("declare_ram_tensor.cpp").render(
-                tensor_name="output_tensor", tensor_type_str="float",
-            ),
-        ]
+    in_ref_name = f"s_ref_in_{test_id:02d}"
+    out_ref_name = f"s_ref_out_{test_id:02d}"
+    in_t = Tensor("in", tf_in.numpy(), ref_name=in_ref_name)
+    out_ref = Tensor("out_ref", tf_out.numpy(), ref_name=out_ref_name)
+    out_t = Tensor("out", tf_out.numpy())
+    op = Operator(
+        "ReshapeOperator",
+        "reshape_op",
+        dtypes=[in_t.get_dtype],
+        param_str=f'{{{", ".join(map(str, new_shape))}}}',
     )
-    inputs_str += f"{{ {op_cls}<{op_type_signature}>::input, input_tensor }}"
-    outputs_str += f"{{ {op_cls}<{op_type_signature}>::output, output_tensor }}"
-    output_names.append("output_tensor")
-    ref_output_names.append("ref_output_arr")
-    other_tests_str.append(
-        f"TensorShape target_shape({ ','.join(map(str, new_shape)) });\n"
-        "  TensorShape output_shape = output_tensor->get_shape();\n"
-        "  EXPECT_TRUE(target_shape == output_shape);\n"
+    (
+        op.set_namespace("ReferenceOperators::")
+        .set_inputs({"input": in_t})
+        .set_outputs({"output": out_t})
     )
 
-    # render templates
-    test_template = env.get_template("test_container.cpp")
-    const_template = env.get_template("test_const.hpp")
-    with open(cpp_fname, "w") as cpp_fid, open(const_fname, "w") as header_fid:
-        cpp_fid.write(
-            test_template.render(
-                test_suit_name=test_suit_name,
-                test_name=test_name,
-                utensor_headers=utensor_headers,
-                test_headers=test_headers,
-                output_size=np_output.size,
-                declare_tensor_strs=declare_tensor_strs,
-                op_cls=op_cls,
-                op_type_signature=op_type_signature,
-                op_construct_params=op_construct_params,
-                op_name=op_name,
-                inputs_str=inputs_str,
-                outputs_str=outputs_str,
-                output_names=output_names,
-                ref_output_names=ref_output_names,
-                output_type_str="float",
-                tol=0.0001,
-                other_tests_str=other_tests_str,
-            )
+    test = SingleOpTest("ReferenceReshape", test_name, op)
+    test.add_tensor_comparison(out_t, out_ref)
+    test_rendered, const_snippets = test.render()
+    return test_rendered, const_snippets
+
+
+def gen_reshape():
+    tests = []
+    const_snippets = []
+    test_dir_path = (
+        Path(__file__).resolve().parent.parent.parent / "TESTS" / "operators"
+    )
+    cases = [
+        ((3, 5, 4), (2, 2, 3, 5)),
+        ((10, 3), (2, 5, 3)),
+        ((1, 5), (1, 1, 5)),
+        ((3, 5), (1, 3, 5)),
+        ((3, 5), (3, 1, 5)),
+        ((3, 5), (3, 5, 1)),
+    ]
+    for i, (old_shape, new_shape) in enumerate(cases):
+        tr, cs = gen_test(i, old_shape, new_shape)
+        tests.append(tr)
+        const_snippets.extend(cs)
+    with (test_dir_path / "constants_reshape.hpp").open("w") as fp:
+        c_r = env2.get_template("const_container.hpp").render(
+            constants=const_snippets, constants_header="TEST_FLOAT_TANH_H"
         )
-        header_fid.write(
-            const_template.render(constants_map=constants_map, test_name=test_name)
+        fp.write(c_r)
+        header_fname = os.path.basename(fp.name)
+        print(f"{fp.name} saved")
+    with (test_dir_path / "test_reshape.cpp").open("w") as fp:
+        gt_r = env2.get_template("gtest_container.cpp").render(
+            constants_header=header_fname,
+            tests=tests,
         )
-    print(f"generating output files: {cpp_fname}, {const_fname}")
+        fp.write(gt_r)
+        print(f"{fp.name} saved")
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser()
-    parser.add_argument(
-        "--cpp-fname",
-        help="the output cpp file name (default: %(default)s)",
-        metavar="TEST.cpp",
-        default="test_reshape.cpp",
-    )
-    parser.add_argument(
-        "--const-fname",
-        help="the header file containing constants for test (default: %(default)s)",
-        metavar="CONST.hpp",
-        default="constants_reshape.hpp",
-    )
-    args = parser.parse_args()
-    main(**vars(args))
+    gen_reshape()

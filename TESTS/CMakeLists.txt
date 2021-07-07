@@ -54,12 +54,17 @@ package_add_test_with_libraries(test_dequantize operators/test_dequantize.cpp ut
 package_add_test_with_libraries(test_quantize operators/test_quantize utensor operators "${PROJECT_DIR}/test-data/")
 package_add_test_with_libraries(test_quant_dws_conv operators/test_quantized_dws_conv utensor operators "${PROJECT_DIR}/test-data/")
 package_add_test_with_libraries(test_quant_fully_connect_2 operators/test_quant_fully_connect_2 utensor operators "${PROJECT_DIR}/test-data/")
-package_add_test_with_libraries(test_fully_connect operators/test_fully_connected utensor operators "${PROJECT_DIR}/test-data/")
+package_add_test_with_libraries(test_float_fully_connect operators/test_float_fully_connected utensor operators "${PROJECT_DIR}/test-data/")
 package_add_test_with_libraries(test_sq_conv2d operators/test_sq_conv2d utensor operators "${PROJECT_DIR}/test-data/")
 package_add_test_with_libraries(test_sq_softmax operators/test_sq_softmax utensor operators "${PROJECT_DIR}/test-data/")
 package_add_test_with_libraries(test_sq_logistic operators/test_sq_logistic utensor operators "${PROJECT_DIR}/test-data/")
 package_add_test_with_libraries(test_sq_tanh operators/test_sq_tanh.cpp utensor operators "${PROJECT_DIR}/test-data/")
 package_add_test_with_libraries(test_transpose operators/test_transpose utensor operators "${PROJECT_DIR}/test-data/")
+package_add_test_with_libraries(test_concat operators/test_concat utensor operators "${PROJECT_DIR}/test-data/")
+package_add_test_with_libraries(test_stride_iterator operators/test_stride_iterator utensor operators "${PROJECT_DIR}/test-data/")
+package_add_test_with_libraries(test_stride_slice operators/test_stride_slice utensor operators "${PROJECT_DIR}/test-data/")
+package_add_test_with_libraries(test_float_tanh operators/test_float_tanh utensor operators "${PROJECT_DIR}/test-data/")
+package_add_test_with_libraries(test_arith_broadcast operators/test_arithmetic_broadcast utensor operators "${PROJECT_DIR}/test-data/")
 
 # Includes
 package_add_test_with_libraries(test_top_include library/test_top_include utensor library "${PROJECT_DIR}/test-data/")
@@ -79,3 +84,5 @@ package_add_test_with_libraries(integration_test model/integration_test utensor 
 #Error Handlers
 package_add_test_with_libraries(test_simple_error_handler error_handlers/test_errorhandler utensor error_handlers "${PROJECT_DIR}/test-data/")
 
+# Util
+package_add_test_with_libraries(test_broadcaster util/test_broadcaster utensor util "${PROJECT_DIR}/test-data/")

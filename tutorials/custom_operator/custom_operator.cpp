@@ -4,7 +4,7 @@
 #include "RomTensor.hpp"
 #include "arenaAllocator.hpp"
 #include "uTensor/core/context.hpp"
- #include "uTensor/core/operatorBase.hpp"
+#include "uTensor/core/operatorBase.hpp"
 
 using namespace std;
 using namespace uTensor;

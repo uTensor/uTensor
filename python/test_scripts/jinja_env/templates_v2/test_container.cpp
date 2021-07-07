@@ -1,7 +1,3 @@
-/***************************************
- * Generated Test
- ***************************************/
-
 TEST({{ test_group }}, {{ test_name }}) {
   // Make sure no errors get thrown
   bool got_error = false;

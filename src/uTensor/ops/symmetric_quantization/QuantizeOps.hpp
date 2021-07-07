@@ -27,6 +27,10 @@ void dequantize_kernel(Tensor& b, const Tensor& a) {
   }
 }
 
+// dummy float-to-float dequantize
+template <>
+void dequantize_kernel<float, float>(Tensor& b, const Tensor& a);
+
 template <typename oT, typename iT>
 class DequantizeOperator : public OperatorInterface<1, 1> {
  public:
@@ -85,7 +89,7 @@ class QuantizeOperator : public OperatorInterface<1, 1> {
   }
 };
 
-}  // namespace TFLM
+}  // namespace TflmSymQuantOps
 }  // namespace uTensor
 
 #endif
