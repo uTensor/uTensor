@@ -1,4 +1,5 @@
 workspace
+.vs-build
 
 # Prerequisites
 *.d

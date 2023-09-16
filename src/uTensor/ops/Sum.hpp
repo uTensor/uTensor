@@ -38,8 +38,9 @@ class SumOperator : public OperatorInterface<2, 1> {
     for (uint32_t outer = 0; outer < outer_size; ++outer) {
       for (uint32_t inner = 0; inner < inner_size; ++inner) {
         Tin acc = 0;
-        for (uint32_t i = 1; i < axis_size; ++i) {
-          Tin elem = input_tensor((outer * axis_size + i) * inner_size + inner);
+        for (uint32_t i = 0; i < axis_size; ++i) {
+          Tin elem = static_cast<Tin>(
+              input_tensor((outer * axis_size + i) * inner_size + inner));
           acc += elem;
         }
         output_tensor(outer * inner_size + inner) = acc;
