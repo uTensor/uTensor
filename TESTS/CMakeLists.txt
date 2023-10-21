@@ -61,6 +61,7 @@ package_add_test_with_libraries(test_sq_logistic operators/test_sq_logistic.cpp 
 package_add_test_with_libraries(test_sq_tanh operators/test_sq_tanh.cpp utensor operators "${PROJECT_DIR}/test-data/")
 package_add_test_with_libraries(test_transpose operators/test_transpose.cpp utensor operators "${PROJECT_DIR}/test-data/")
 package_add_test_with_libraries(test_sum operators/test_sum.cpp utensor operators "${PROJECT_DIR}/test-data/")
+package_add_test_with_libraries(test_rsqrt operators/test_rsqrt.cpp utensor operators "${PROJECT_DIR}/test-data/")
 
 # Includes
 package_add_test_with_libraries(test_top_include library/test_top_include.cpp utensor library "${PROJECT_DIR}/test-data/")
