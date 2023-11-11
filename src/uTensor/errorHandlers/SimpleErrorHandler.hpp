@@ -2,7 +2,7 @@
 #define UTENSOR_SIMPLE_ERROR_HANDLER_HPP
 #include <deque>
 #include <functional>
-
+#include <cstddef>
 #include "uTensor/core/errorHandler.hpp"
 
 namespace uTensor {

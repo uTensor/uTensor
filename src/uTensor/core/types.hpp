@@ -5,6 +5,7 @@
 #include <array>
 // check if the follow modificiation affect other builds
 //#include <cstdint>
+#include <cstddef>
 #include <stdint.h>
 
 using std::array;
