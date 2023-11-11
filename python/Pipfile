@@ -9,7 +9,7 @@ flake8 = "*"
 isort = "*"
 
 [packages]
-tensorflow = "==2.1.0"
+tensorflow = "==2.9.3"
 torch = "*"
 torchvision = "*"
 jinja2 = "*"
