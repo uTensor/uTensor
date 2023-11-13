@@ -7,7 +7,7 @@ set(CMAKE_CXX_STANDARD 11)
 
 # TODO be smarter about code coverage bits
 # https://github.com/codecov/example-cpp11-cmake
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -fno-rtti")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
 option(ENABLE_COVERAGE "Enable code coverage" OFF)
 
 if(ENABLE_COVERAGE)
