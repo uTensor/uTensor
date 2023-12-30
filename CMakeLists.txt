@@ -5,9 +5,16 @@ project(utensor VERSION 1.0.0 LANGUAGES CXX)
 set(CMAKE_VERBOSE_MAKEFILE ON)
 set(CMAKE_CXX_STANDARD 11)
 
+option(ENABLE_RTTI "enable rtti" OFF)
+
+if(ENABLE_RTTI)
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
+else()
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -fno-rtti")
+endif()
+
 # TODO be smarter about code coverage bits
 # https://github.com/codecov/example-cpp11-cmake
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
 option(ENABLE_COVERAGE "Enable code coverage" OFF)
 
 if(ENABLE_COVERAGE)
@@ -52,6 +59,12 @@ if(PACKAGE_TUTORIALS)
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g")
   add_subdirectory(tutorials/error_handling)
   add_subdirectory(tutorials/custom_operator)
+  add_subdirectory(tanh_model)
 endif()
 
-add_subdirectory(tanh_model)
+option(PYTHON_BINDING "enable python binding" OFF)
+
+if(PYTHON_BINDING)
+  add_subdirectory(extern/pybind11)
+  add_subdirectory(python/src)
+endif(PYTHON_BINDING)
