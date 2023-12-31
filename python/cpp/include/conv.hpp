@@ -1,6 +1,6 @@
 #pragma once
 
-#include <initializer_list>
+#include <vector>
 
 #include "pybind11/numpy.h"
 #include "pybind11/stl.h"
@@ -9,7 +9,8 @@
 
 namespace py = pybind11;
 
-void conv2d_f(const py::array_t<float> &input, const py::array_t<float> &filter,
-              const py::array_t<float> &bias,
-              std::initializer_list<uint16_t> strides = {1, 1, 1, 1},
-              std::string padding = "VALID");
+py::array_t<float> conv2d_f(const py::array_t<float> &input,
+                            const py::array_t<float> &filter,
+                            const py::array_t<float> &bias,
+                            std::array<uint16_t, 4> strides = {1, 1, 1, 1},
+                            std::string padding = "VALID");

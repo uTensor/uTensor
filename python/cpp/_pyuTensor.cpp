@@ -8,6 +8,6 @@ PYBIND11_MODULE(_pyuTensor, m) {
   m.def("matmul", &matmul, "matmul", py::arg("a"), py::arg("b"));
   m.def("conv2d_f", &conv2d_f, "conv2d_f", py::arg("input"), py::arg("filter"),
         py::arg("bias"),
-        py::arg("strides") = std::initializer_list<uint16_t>({1, 1, 1, 1}),
+        py::arg("strides") = std::array<uint16_t, 4>({1, 1, 1, 1}),
         py::arg("padding") = "VALID");
 }
