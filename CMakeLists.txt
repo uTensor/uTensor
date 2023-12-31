@@ -8,6 +8,7 @@ set(CMAKE_CXX_STANDARD 11)
 option(PYTHON_BINDING "enable python binding" OFF)
 
 if(PYTHON_BINDING)
+  add_compile_definitions(PYTHON_BINDING)
   add_subdirectory(extern/pybind11)
   add_subdirectory(python)
 endif(PYTHON_BINDING)

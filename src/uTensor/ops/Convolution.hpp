@@ -200,6 +200,7 @@ class Conv2dOperator : public OperatorInterface<3, 1> {
       _stride[i++] = s;
     }
   }
+#ifdef PYTHON_BINDING
   Conv2dOperator(std::array<uint16_t, 4> strides, Padding padding)
       : _padding(padding) {
     for (int j = 0; j < 4; j++) {
@@ -220,6 +221,7 @@ class Conv2dOperator : public OperatorInterface<3, 1> {
       _stride[i++] = s;
     }
   }
+#endif
 
  protected:
   virtual void compute();
