@@ -61,6 +61,7 @@ py::array_t<float> conv2d_f(const py::array_t<float> &input,
       flt);
   Tensor tensor_bias =
       new RamTensor({static_cast<uint16_t>(info_bias.shape[0])}, flt);
+  // https://www.tensorflow.org/api_docs/python/tf/nn#notes_on_padding_2
   Tensor tensor_out =
       new RamTensor({static_cast<uint16_t>(info_input.shape[0]), 1}, flt);
   conv_op
