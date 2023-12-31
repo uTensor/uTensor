@@ -12,7 +12,8 @@ static uTensor::localCircularArenaAllocator<1024> meta_allocator;
 static uTensor::localCircularArenaAllocator<1024> ram_allocator;
 
 void conv2d_f(const py::array_t<float> &input, const py::array_t<float> &filter,
-              const py::array_t<float> &bias, std::string padding) {
+              const py::array_t<float> &bias,
+              std::initializer_list<uint16_t> strides, std::string padding) {
   Context::get_default_context()->set_ram_data_allocator(&ram_allocator);
   Context::get_default_context()->set_metadata_allocator(&meta_allocator);
   py::buffer_info info_input = input.request(), info_filter = filter.request(),
@@ -38,7 +39,7 @@ void conv2d_f(const py::array_t<float> &input, const py::array_t<float> &filter,
   }
 
   CopyOperator copy_op;
-  Conv2dOperator<float> conv_op({1, 2, 2, 1}, padding_);
+  Conv2dOperator<float> conv_op(strides, padding_);
   Tensor tensor_input = new RamTensor(
       {
           static_cast<uint16_t>(info_input.shape[0]),
@@ -58,7 +59,9 @@ void conv2d_f(const py::array_t<float> &input, const py::array_t<float> &filter,
       flt);
   Tensor tensor_bias =
       new RamTensor({static_cast<uint16_t>(info_bias.shape[0])}, flt);
-
+  conv_op.set_inputs({{Conv2dOperator<float>::in, tensor_input},
+                      {Conv2dOperator<float>::filter, tensor_filter},
+                      {Conv2dOperator<float>::bias, tensor_bias}});
   tensor_input.free();
   tensor_filter.free();
   tensor_bias.free();

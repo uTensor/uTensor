@@ -7,12 +7,13 @@ verify_ssl = true
 black = "*"
 flake8 = "*"
 isort = "*"
+ipython = "*"
 
 [packages]
-tensorflow = "==2.1.0"
-torch = "*"
+tensorflow = "==2.4.4"
+torch = "1.7.0"
 torchvision = "*"
 jinja2 = "*"
 
 [requires]
-python_version = "3.7"
+python_version = "3.8"
