@@ -1,8 +1,7 @@
-#include <cstddef>
+#include "matmul.hpp"
 
-#include "arenaAllocator.hpp"
-#include "play_fastop.hpp"
-#include "pybind11/pybind11.h"
+#include "fast_copyop.hpp"
+#include "uTensor/ops/Matrix.hpp"
 
 namespace py = pybind11;
 using uTensor::Context;
@@ -53,9 +52,4 @@ py::array_t<float> matmul(const py::array_t<float> &a,
 
   py::object base = py::cast(out_info.ptr);
   return py::array_t<float>(out_info, base);
-}
-
-PYBIND11_MODULE(_pyuTensor, m) {
-  m.doc() = "pybind11 uTensor plugin";  // optional module docstring
-  m.def("matmul", &matmul, "matmul", py::arg("a"), py::arg("b"));
 }

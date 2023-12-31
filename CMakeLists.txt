@@ -5,9 +5,17 @@ project(utensor VERSION 1.0.0 LANGUAGES CXX)
 set(CMAKE_VERBOSE_MAKEFILE ON)
 set(CMAKE_CXX_STANDARD 11)
 
+option(PYTHON_BINDING "enable python binding" OFF)
+
+if(PYTHON_BINDING)
+  add_compile_definitions(PYTHON_BINDING)
+  add_subdirectory(extern/pybind11)
+  add_subdirectory(python)
+endif(PYTHON_BINDING)
+
 option(ENABLE_RTTI "enable rtti" OFF)
 
-if(ENABLE_RTTI)
+if(PYTHON_BINDING OR ENABLE_RTTI)
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
 else()
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -fno-rtti")
@@ -61,10 +69,3 @@ if(PACKAGE_TUTORIALS)
   add_subdirectory(tutorials/custom_operator)
   add_subdirectory(tanh_model)
 endif()
-
-option(PYTHON_BINDING "enable python binding" OFF)
-
-if(PYTHON_BINDING)
-  add_subdirectory(extern/pybind11)
-  add_subdirectory(python/src)
-endif(PYTHON_BINDING)
