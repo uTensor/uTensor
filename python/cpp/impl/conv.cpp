@@ -1,5 +1,7 @@
 #include "conv.hpp"
 
+#include <cmath>
+
 #include "fast_copyop.hpp"
 #include "uTensor/ops/Convolution.hpp"
 
@@ -8,8 +10,8 @@ using uTensor::RamTensor;
 using uTensor::Tensor;
 using uTensor::ReferenceOperators::Conv2dOperator;
 
-static uTensor::localCircularArenaAllocator<1024> meta_allocator;
-static uTensor::localCircularArenaAllocator<1024> ram_allocator;
+static uTensor::localCircularArenaAllocator<32768, uint32_t> meta_allocator;
+static uTensor::localCircularArenaAllocator<32768, uint32_t> ram_allocator;
 
 py::array_t<float> conv2d_f(const py::array_t<float> &input,
                             const py::array_t<float> &filter,
@@ -61,14 +63,36 @@ py::array_t<float> conv2d_f(const py::array_t<float> &input,
       flt);
   Tensor tensor_bias =
       new RamTensor({static_cast<uint16_t>(info_bias.shape[0])}, flt);
+  copy_op.toTensor(info_input.ptr, tensor_input);
+  copy_op.toTensor(info_filter.ptr, tensor_filter);
+  copy_op.toTensor(info_bias.ptr, tensor_bias);
   // https://www.tensorflow.org/api_docs/python/tf/nn#notes_on_padding_2
+  uint16_t out_height, out_width;
+  switch (padding_) {
+    case uTensor::VALID:
+      out_height =
+          std::ceil((info_input.shape[1] - info_filter.shape[0]) / strides[1]);
+      out_width =
+          std::ceil((info_input.shape[2] - info_filter.shape[1]) / strides[2]);
+      break;
+    case uTensor::SAME:
+      out_height = std::ceil(info_input.shape[1] / strides[1]);
+      out_width = std::ceil((info_input.shape[2]) / strides[2]);
+      break;
+    default:
+      throw py::value_error(
+          "invalid padding value, support only SAME and VALID");
+  }
   Tensor tensor_out =
-      new RamTensor({static_cast<uint16_t>(info_input.shape[0]), 1}, flt);
+      new RamTensor({static_cast<uint16_t>(info_input.shape[0]), out_height,
+                     out_width, static_cast<uint16_t>(info_filter.shape[3])},
+                    flt);
   conv_op
       .set_inputs({{Conv2dOperator<float>::in, tensor_input},
                    {Conv2dOperator<float>::filter, tensor_filter},
                    {Conv2dOperator<float>::bias, tensor_bias}})
-      .set_outputs({{Conv2dOperator<float>::out, tensor_out}});
+      .set_outputs({{Conv2dOperator<float>::out, tensor_out}})
+      .eval();
   py::buffer_info info = copy_op.getInfo(tensor_out);
   tensor_input.free();
   tensor_filter.free();
