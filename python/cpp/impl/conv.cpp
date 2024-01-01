@@ -9,6 +9,7 @@ using uTensor::Context;
 using uTensor::RamTensor;
 using uTensor::Tensor;
 using uTensor::ReferenceOperators::Conv2dOperator;
+using namespace uTensor::ReferenceOperators::Conv2dConstants;
 
 static uTensor::localCircularArenaAllocator<32768, uint32_t> meta_allocator;
 static uTensor::localCircularArenaAllocator<32768, uint32_t> ram_allocator;
@@ -25,11 +26,11 @@ py::array_t<float> conv2d_f(const py::array_t<float> &input,
   if (info_input.ndim != 4 || info_filter.ndim != 4) {
     throw py::value_error("input and filter should be both 4-dims array");
   }
-  if (info_input.shape[3] != info_filter.shape[2]) {
+  if (info_input.shape[3] != info_filter.shape[filter_in_channels_dim]) {
     throw py::value_error(
         "in-channels must be the same for the input and filter");
   }
-  if (info_filter.shape[3] != info_bias.shape[0]) {
+  if (info_filter.shape[filter_out_channels_dim] != info_bias.shape[0]) {
     throw py::value_error(
         "the number of bias is not the same as filter out-channels");
   }
@@ -70,10 +71,12 @@ py::array_t<float> conv2d_f(const py::array_t<float> &input,
   uint16_t out_height, out_width;
   switch (padding_) {
     case uTensor::VALID:
-      out_height =
-          std::ceil((info_input.shape[1] - info_filter.shape[0]) / strides[1]);
-      out_width =
-          std::ceil((info_input.shape[2] - info_filter.shape[1]) / strides[2]);
+      out_height = std::ceil(
+          (info_input.shape[1] - info_filter.shape[filter_height_dim]) /
+          strides[1]);
+      out_width = std::ceil(
+          (info_input.shape[2] - info_filter.shape[filter_width_dim]) /
+          strides[2]);
       break;
     case uTensor::SAME:
       out_height = std::ceil(info_input.shape[1] / strides[1]);
@@ -83,10 +86,10 @@ py::array_t<float> conv2d_f(const py::array_t<float> &input,
       throw py::value_error(
           "invalid padding value, support only SAME and VALID");
   }
-  Tensor tensor_out =
-      new RamTensor({static_cast<uint16_t>(info_input.shape[0]), out_height,
-                     out_width, static_cast<uint16_t>(info_filter.shape[3])},
-                    flt);
+  Tensor tensor_out = new RamTensor(
+      {static_cast<uint16_t>(info_input.shape[0]), out_height, out_width,
+       static_cast<uint16_t>(info_filter.shape[filter_out_channels_dim])},
+      flt);
   conv_op
       .set_inputs({{Conv2dOperator<float>::in, tensor_input},
                    {Conv2dOperator<float>::filter, tensor_filter},
