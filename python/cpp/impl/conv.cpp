@@ -42,6 +42,31 @@ py::array_t<float> conv2d_f(const py::array_t<float> &input,
   } else {
     padding_ = uTensor::UNKNOWN;
   }
+  // https://www.tensorflow.org/api_docs/python/tf/nn#notes_on_padding_2
+  uint16_t out_height, out_width;
+  switch (padding_) {
+    case uTensor::VALID:
+      out_height = static_cast<uint16_t>(std::ceil(
+          static_cast<float>((info_input.shape[1] -
+                              info_filter.shape[filter_height_dim] + 1)) /
+          static_cast<float>(strides[1])));
+      out_width = static_cast<uint16_t>(std::ceil(
+          static_cast<float>(info_input.shape[2] -
+                             info_filter.shape[filter_width_dim] + 1) /
+          static_cast<float>(strides[2])));
+      break;
+    case uTensor::SAME:
+      out_height = static_cast<uint16_t>(
+          std::ceil(static_cast<float>(info_input.shape[1]) /
+                    static_cast<float>(strides[1])));
+      out_width = static_cast<uint16_t>(
+          std::ceil(static_cast<float>(info_input.shape[2]) /
+                    static_cast<float>(strides[2])));
+      break;
+    case uTensor::UNKNOWN:
+      throw py::value_error(
+          "invalid padding value, support only SAME and VALID");
+  }
 
   CopyOperator copy_op;
   Conv2dOperator<float> conv_op(strides, padding_);
@@ -67,25 +92,6 @@ py::array_t<float> conv2d_f(const py::array_t<float> &input,
   copy_op.toTensor(info_input.ptr, tensor_input);
   copy_op.toTensor(info_filter.ptr, tensor_filter);
   copy_op.toTensor(info_bias.ptr, tensor_bias);
-  // https://www.tensorflow.org/api_docs/python/tf/nn#notes_on_padding_2
-  uint16_t out_height, out_width;
-  switch (padding_) {
-    case uTensor::VALID:
-      out_height = std::ceil(
-          (info_input.shape[1] - info_filter.shape[filter_height_dim]) /
-          strides[1]);
-      out_width = std::ceil(
-          (info_input.shape[2] - info_filter.shape[filter_width_dim]) /
-          strides[2]);
-      break;
-    case uTensor::SAME:
-      out_height = std::ceil(info_input.shape[1] / strides[1]);
-      out_width = std::ceil((info_input.shape[2]) / strides[2]);
-      break;
-    default:
-      throw py::value_error(
-          "invalid padding value, support only SAME and VALID");
-  }
   Tensor tensor_out = new RamTensor(
       {static_cast<uint16_t>(info_input.shape[0]), out_height, out_width,
        static_cast<uint16_t>(info_filter.shape[filter_out_channels_dim])},
