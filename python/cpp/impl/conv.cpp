@@ -14,9 +14,9 @@ using namespace uTensor::ReferenceOperators::Conv2dConstants;
 static uTensor::localCircularArenaAllocator<32768, uint32_t> meta_allocator;
 static uTensor::localCircularArenaAllocator<32768, uint32_t> ram_allocator;
 
-py::array_t<float> conv2d_f(const py::array_t<float> &input,
-                            const py::array_t<float> &filter,
-                            const py::array_t<float> &bias,
+py::array_t<float> conv2d_f(const py::array_t<float, py::array::c_style> &input,
+                            const py::array_t<float, py::array::c_style> &filter,
+                            const py::array_t<float, py::array::c_style> &bias,
                             std::array<uint16_t, 4> strides,
                             std::string padding) {
   Context::get_default_context()->set_ram_data_allocator(&ram_allocator);
