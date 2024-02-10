@@ -9,8 +9,8 @@
 
 namespace py = pybind11;
 
-py::array_t<float> conv2d_f(const py::array_t<float> &input,
-                            const py::array_t<float> &filter,
-                            const py::array_t<float> &bias,
+py::array_t<float> conv2d_f(const py::array_t<float, py::array::c_style> &input,
+                            const py::array_t<float, py::array::c_style> &filter,
+                            const py::array_t<float, py::array::c_style> &bias,
                             std::array<uint16_t, 4> strides = {1, 1, 1, 1},
                             std::string padding = "VALID");
