@@ -4,6 +4,7 @@ pybind11_add_module(
     cpp/impl/fast_copyop.cpp
     cpp/impl/matmul.cpp
     cpp/impl/conv.cpp
+    cpp/impl/allocator.cpp
 )
 target_include_directories(_pyuTensor PUBLIC cpp/include)
 target_link_libraries(_pyuTensor PRIVATE utensor)
