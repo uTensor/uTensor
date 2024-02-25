@@ -8,6 +8,8 @@ black = "*"
 flake8 = "*"
 isort = "*"
 ipython = "*"
+pytest = "*"
+numpy = "*"
 
 [packages]
 jinja2 = "*"
@@ -15,3 +17,6 @@ pyutensor = {file = ".", editable = true}
 
 [requires]
 python_version = "3.8"
+
+[pipenv]
+allow_prereleases = true
