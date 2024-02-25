@@ -10,6 +10,7 @@ jobs:
           command: |
             git submodule sync
             git submodule update --init extern/googletest
+            git submodule update --init extern/pybind11
             #git submodule init
             #git submodule update --remote
       - run: mkdir -p /tmp/coverage && mkdir -p /tmp/test_results
