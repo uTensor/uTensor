@@ -21,7 +21,7 @@ jobs:
           name: "Build"
           command: |
             mkdir build && cd build
-            cmake -DPACKAGE_TESTS=ON -DENABLE_COVERAGE=ON ..
+            cmake -DPACKAGE_TESTS=ON -DENABLE_COVERAGE=ON -DPYTHON_BINDING=ON ..
             make
       - run:
           name: "Test"
@@ -30,6 +30,16 @@ jobs:
             ctest -VV -o /tmp/test_results/test-results.txt
           environment:
             GTEST_OUTPUT: xml:/tmp/test_results/
+
+      - run:
+          name: "Test(Python)"
+          command: |
+            cd python
+            python3 -m pip install pipenv
+            pipenv install -d
+            pipenv run pytest ../TESTS/pytest
+          environment:
+            PYTHONPATH: build/python
 
       - run:
           name: Generate code coverage
@@ -62,7 +72,6 @@ jobs:
           name: "Build and test"
           command: |
             mkdir build && cd build
-            cmake -DPACKAGE_TESTS=ON -DENABLE_COVERAGE=ON ..
             make
             ctest -VV -o /tmp/test_results/test-results.txt
   mbedCI:
