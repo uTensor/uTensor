@@ -28,6 +28,7 @@ jobs:
             mkdir build && cd build
             cmake -DPACKAGE_TESTS=ON -DENABLE_COVERAGE=ON -DPYTHON_BINDING=ON ..
             make
+            exit
       - run:
           name: "Test"
           command: |
