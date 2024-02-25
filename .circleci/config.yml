@@ -20,6 +20,11 @@ jobs:
       - run:
           name: "Build"
           command: |
+            cd python
+            python3 -m pip install pipenv
+            pipenv install -d
+            pipenv shell
+            cd ..
             mkdir build && cd build
             cmake -DPACKAGE_TESTS=ON -DENABLE_COVERAGE=ON -DPYTHON_BINDING=ON ..
             make
@@ -34,9 +39,6 @@ jobs:
       - run:
           name: "Test(Python)"
           command: |
-            cd python
-            python3 -m pip install pipenv
-            pipenv install -d
             pipenv run pytest ../TESTS/pytest
           environment:
             PYTHONPATH: build/python
