@@ -34,5 +34,6 @@ RUN cd /tmp/cmake/cmake-$version.$build/ && make install
 
 RUN apt-get install -y \
     python \
+    python3 \
     python-pip
 RUN pip install cpp-coveralls

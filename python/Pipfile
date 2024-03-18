@@ -8,12 +8,17 @@ black = "*"
 flake8 = "*"
 isort = "*"
 ipython = "*"
+pytest = "*"
+numpy = "*"
 
 [packages]
-tensorflow = "==2.4.4"
-torch = "1.7.0"
+tensorflow = "*"
+torch = "*"
 torchvision = "*"
 jinja2 = "*"
 
 [requires]
 python_version = "3.8"
+
+[pipenv]
+allow_prereleases = true
