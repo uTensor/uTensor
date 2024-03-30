@@ -85,8 +85,8 @@ jobs:
             make _pyuTensor
             cd ..
             cd python
-            mv .pipenv-d/Pipfile.3.8.linux-x86_64.lock Pipfile.lock
-            pipenv --python `pyenv which python3` install -d
+            mv .pipenv-d/Pipfile.3.8.linux-aarch64.lock Pipfile.lock
+            pipenv-d --python `pyenv which python3` install -d
       - run:
           name: "Test (Python)"
           command: |
