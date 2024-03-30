@@ -1,5 +1,5 @@
 FROM ubuntu
-MAINTAINER Michael Bartling "michael.bartling15@gmail.com"
+# MAINTAINER Michael Bartling "michael.bartling15@gmail.com"
 
 RUN apt-get update
 RUN apt-get install -y \
@@ -33,7 +33,6 @@ RUN cd /tmp/cmake/cmake-$version.$build/ && make install
 #RUN ln -s /usr/lib/libgtest_main.a /usr/local/lib/gtest/libgtest_main.a
 
 RUN apt-get install -y \
-    python \
     python3 \
-    python-pip
+    python3-pip
 RUN pip install cpp-coveralls

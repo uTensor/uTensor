@@ -2,7 +2,8 @@ version: 2
 jobs:
   build:
     docker:
-      - image: mbartling/utensor_ci
+      # - image: mbartling/utensor_ci
+      - image: yuanhenglee/utensor_ci
     steps:
       - checkout
       - run:
@@ -22,14 +23,12 @@ jobs:
           name: "Build"
           command: |
             cd python
-            python3 -m pip install pipenv
-            pipenv install -d
-            pipenv shell
+            pip3 install pipenv
+            pipenv --python `which python3` install -d
             cd ..
             mkdir build && cd build
-            cmake -DPACKAGE_TESTS=ON -DENABLE_COVERAGE=ON -DPYTHON_BINDING=ON ..
-            make
-            exit
+            pipenv run cmake -DPACKAGE_TESTS=ON -DENABLE_COVERAGE=ON -DPYTHON_BINDING=ON ..
+            pipenv run make
       - run:
           name: "Test"
           command: |
