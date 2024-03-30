@@ -2,7 +2,8 @@ version: 2
 jobs:
   build:
     docker:
-      - image: mbartling/utensor_ci
+      # - image: mbartling/utensor_ci
+      - image: yuanhenglee/utensor_ci
     steps:
       - checkout
       - run:
@@ -10,6 +11,7 @@ jobs:
           command: |
             git submodule sync
             git submodule update --init extern/googletest
+            git submodule update --init extern/pybind11
             #git submodule init
             #git submodule update --remote
       - run: mkdir -p /tmp/coverage && mkdir -p /tmp/test_results
@@ -20,9 +22,15 @@ jobs:
       - run:
           name: "Build"
           command: |
+            export PYENV_ROOT="/root/.pyenv"
+            export PATH="$PYENV_ROOT/bin:$PATH"
+            eval "$(pyenv init -)"
+            cd python
+            pipenv-d --python `pyenv which python3` install -d
+            cd ..
             mkdir build && cd build
-            cmake -DPACKAGE_TESTS=ON -DENABLE_COVERAGE=ON ..
-            make
+            cmake -DPACKAGE_TESTS=ON -DENABLE_COVERAGE=ON -DPYTHON_BINDING=ON ..
+            run make
       - run:
           name: "Test"
           command: |
@@ -30,6 +38,15 @@ jobs:
             ctest -VV -o /tmp/test_results/test-results.txt
           environment:
             GTEST_OUTPUT: xml:/tmp/test_results/
+
+      - run:
+          name: "Test(Python)"
+          command: |
+            export PYENV_ROOT="/root/.pyenv"
+            export PATH="$PYENV_ROOT/bin:$PATH"
+            eval "$(pyenv init -)"
+            cd python
+            pipenv run pytest ../TESTS/pytest
 
       - run:
           name: Generate code coverage
@@ -62,7 +79,6 @@ jobs:
           name: "Build and test"
           command: |
             mkdir build && cd build
-            cmake -DPACKAGE_TESTS=ON -DENABLE_COVERAGE=ON ..
             make
             ctest -VV -o /tmp/test_results/test-results.txt
   mbedCI:
