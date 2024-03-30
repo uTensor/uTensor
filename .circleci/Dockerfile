@@ -2,15 +2,28 @@ FROM ubuntu
 # MAINTAINER Michael Bartling "michael.bartling15@gmail.com"
 
 RUN apt-get update
+RUN DEBIAN_FRONTEND=noninteractive TZ=Etc/UTC apt-get -y install tzdata
 RUN apt-get install -y \
     libgtest-dev \
     git \
     cmake \
     gcc \
     wget \
-    lcov \
     libfftw3-dev \
-    g++ 
+    g++
+# python (deps and pyenv)
+RUN apt-get install -y build-essential gdb lcov pkg-config \
+    libbz2-dev libffi-dev libgdbm-dev libgdbm-compat-dev liblzma-dev \
+    libncurses5-dev libreadline6-dev libsqlite3-dev libssl-dev \
+    lzma lzma-dev tk-dev uuid-dev zlib1g-dev
+RUN git clone https://github.com/pyenv/pyenv.git ~/.pyenv
+RUN export PYENV_ROOT="$HOME/.pyenv" && \
+    command -v pyenv >/dev/null || export PATH="$PYENV_ROOT/bin:$PATH" && \
+    eval "$(pyenv init -)"
+RUN pyenv install 3.8.13 && pyenv global 3.8.13
+RUN python3 -m pip install -U pip && \
+    python3 -m pip install pipenv-d && \
+    pyenv rehash
 
 # Install latest CMAKE
 ARG version=3.14
