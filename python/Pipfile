@@ -10,10 +10,8 @@ isort = "*"
 ipython = "*"
 
 [packages]
-tensorflow = "==2.4.4"
-torch = "1.7.0"
-torchvision = "*"
 jinja2 = "*"
+pyutensor = {file = ".", editable = true}
 
 [requires]
 python_version = "3.8"

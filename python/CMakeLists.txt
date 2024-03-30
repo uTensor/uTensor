@@ -11,5 +11,5 @@ target_link_libraries(_pyuTensor PRIVATE utensor)
 set_target_properties(
     _pyuTensor
     PROPERTIES
-    LIBRARY_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
+    LIBRARY_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/src/pyuTensor
 )
