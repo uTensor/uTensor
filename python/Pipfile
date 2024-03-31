@@ -4,6 +4,9 @@ url = "https://pypi.org/simple"
 verify_ssl = true
 
 [dev-packages]
+tensorflow = "*"
+torch = "*"
+torchvision = "*"
 black = "*"
 flake8 = "*"
 isort = "*"
