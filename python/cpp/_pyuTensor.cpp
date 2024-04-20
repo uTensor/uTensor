@@ -3,6 +3,7 @@
 #include "allocator.hpp"
 #include "conv.hpp"
 #include "matmul.hpp"
+#include "arithmetic_kernels.hpp"
 
 PYBIND11_MODULE(_pyuTensor, m) {
   m.doc() = "pybind11 uTensor plugin";  // optional module docstring
@@ -14,4 +15,6 @@ PYBIND11_MODULE(_pyuTensor, m) {
         py::arg("bias"),
         py::arg("strides") = std::array<uint16_t, 4>({1, 1, 1, 1}),
         py::arg("padding") = "VALID");
+  m.def("add_kernel", &add_kernel, "add_kernel", py::arg("a"), py::arg("b"));
+  m.def("mul_kernel", &mul_kernel, "mul_kernel", py::arg("a"), py::arg("b"));
 }

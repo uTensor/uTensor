@@ -5,6 +5,7 @@ pybind11_add_module(
     cpp/impl/matmul.cpp
     cpp/impl/conv.cpp
     cpp/impl/allocator.cpp
+    cpp/impl/arithmetic_kernels.cpp
 )
 target_include_directories(_pyuTensor PUBLIC cpp/include)
 target_link_libraries(_pyuTensor PRIVATE utensor)
