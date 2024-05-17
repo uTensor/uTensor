@@ -15,6 +15,7 @@ set(src_utensor_tensors
 set(src_utensor_ops
     ops/ActivationFncs.cpp
     ops/ActivationFncs_kernels.cpp
+    ops/Broadcast.cpp
     ops/Matrix.cpp
     ops/Convolution.cpp
     ops/Matrix_kernels.cpp

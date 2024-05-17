@@ -41,6 +41,7 @@ class TensorShape {
 
 class TensorStrides {
  public:
+  TensorStrides() = default;
   TensorStrides(TensorShape& shape);
   uint8_t num_dims();
   uint32_t operator[](size_t i) const;
