@@ -28,8 +28,8 @@ py::tuple PyBroadcaster::get_linear_idx(int idx_c) const {
   return py::make_tuple(indices.first, indices.second);
 }
 
-py::tuple PyBroadcaster::get_shape_c() const {
-  TensorShape ts = _bc.get_shape_c();
+py::tuple PyBroadcaster::get_output_shape() const {
+  TensorShape ts = _bc.get_output_shape();
   py::tuple shape(ts.num_dims());
   for (int i = 0; i < ts.num_dims(); i++) shape[i] = ts[i];
   return shape;

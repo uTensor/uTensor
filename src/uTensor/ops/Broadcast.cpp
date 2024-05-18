@@ -2,26 +2,26 @@
 
 #include <stdexcept>
 
-Broadcaster::Broadcaster() : _shape_c(0) {}
+Broadcaster::Broadcaster() : _output_shape(0) {}
 
 void Broadcaster::set_shape(const TensorShape& shape_a,
                             const TensorShape& shape_b) {
-  if (!is_broadcastable(shape_a, shape_b, _shape_c)) {
+  if (!is_broadcastable(shape_a, shape_b, _output_shape)) {
     throw std::runtime_error("Shapes are not broadcastable");
   }
-  set_shape(shape_a, shape_b, _shape_c);
+  set_shape(shape_a, shape_b, _output_shape);
 }
 
 void Broadcaster::set_shape(const TensorShape& shape_a,
                             const TensorShape& shape_b,
-                            const TensorShape& shape_c) {
+                            const TensorShape& output_shape) {
   uint8_t num_dims_a = shape_a.num_dims(), num_dims_b = shape_b.num_dims(),
-          num_dims_c = shape_c.num_dims();
+          num_dims_c = output_shape.num_dims();
   for (uint8_t i = 0; i < num_dims_c; i++) {
-    _shape_c[i] = shape_c[i];
+    _output_shape[i] = output_shape[i];
   }
-  _shape_c.update_dims();
-  _strides_c = TensorStrides(_shape_c);
+  _output_shape.update_dims();
+  ouput_strides = TensorStrides(_output_shape);
   uint32_t s_a = 1, s_b = 1;
   for (uint8_t offset = 0; offset < num_dims_c; offset++) {
     int c_idx = num_dims_c - offset - 1, a_idx = num_dims_a - offset - 1,
@@ -47,20 +47,20 @@ void Broadcaster::set_shape(const TensorShape& shape_a,
 
 std::pair<uint32_t, uint32_t> Broadcaster::get_linear_idx(
     uint32_t idx_c) const {
-  if (idx_c >= _shape_c.get_linear_size()) {
+  if (idx_c >= _output_shape.get_linear_size()) {
     throw std::runtime_error("Index out of bounds");
   }
   uint32_t idx_a = 0, idx_b = 0;
-  for (uint8_t i = 0; i < _shape_c.num_dims(); i++) {
-    idx_a += (idx_c / _strides_c[i]) * _strides_a[i];
-    idx_b += (idx_c / _strides_c[i]) * _strides_b[i];
-    idx_c %= _strides_c[i];
+  for (uint8_t i = 0; i < _output_shape.num_dims(); i++) {
+    idx_a += (idx_c / ouput_strides[i]) * _strides_a[i];
+    idx_b += (idx_c / ouput_strides[i]) * _strides_b[i];
+    idx_c %= ouput_strides[i];
   }
   return std::make_pair(idx_a, idx_b);
 }
 
 bool is_broadcastable(const TensorShape& shape_a, const TensorShape& shape_b,
-                      TensorShape& shape_c) {
+                      TensorShape& output_shape) {
   uint8_t num_dims_a = shape_a.num_dims(), num_dims_b = shape_b.num_dims();
   uint8_t num_dims_c = std::max(num_dims_a, num_dims_b);
 
@@ -77,8 +77,8 @@ bool is_broadcastable(const TensorShape& shape_a, const TensorShape& shape_b,
     if (size_a != size_b && size_a != 1 && size_b != 1) {
       return false;
     }
-    shape_c[c_idx] = std::max(size_a, size_b);
+    output_shape[c_idx] = std::max(size_a, size_b);
   }
-  shape_c.update_dims();
+  output_shape.update_dims();
   return true;
 }

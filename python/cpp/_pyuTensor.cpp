@@ -20,6 +20,6 @@ PYBIND11_MODULE(_pyuTensor, m) {
   m.def("mul_kernel", &mul_kernel, "mul_kernel", py::arg("a"), py::arg("b"));
   py::class_<PyBroadcaster>(m, "Broadcaster")
       .def(py::init<const py::tuple &, const py::tuple &>())
-      .def("get_shape_c", &PyBroadcaster::get_shape_c)
+      .def("get_output_shape", &PyBroadcaster::get_output_shape)
       .def("get_linear_idx", &PyBroadcaster::get_linear_idx);
 }
