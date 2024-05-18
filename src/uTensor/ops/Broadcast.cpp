@@ -12,6 +12,12 @@ void Broadcaster::set_shape(const TensorShape& shape_a,
   set_shape(shape_a, shape_b, _output_shape);
 }
 
+/*
+! Use with caution
+This function is assuming that the shapes are broadcastable and the output
+shape is already set correctly ! In case that the output shape is not known, use
+`set_shape(const TensorShape& shape_a, const TensorShape& shape_b)` instead
+*/
 void Broadcaster::set_shape(const TensorShape& shape_a,
                             const TensorShape& shape_b,
                             const TensorShape& output_shape) {
