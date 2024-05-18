@@ -1,10 +1,10 @@
 #include <cstddef>
 
 #include "allocator.hpp"
-#include "conv.hpp"
-#include "matmul.hpp"
 #include "arithmetic_kernels.hpp"
 #include "broadcast.hpp"
+#include "conv.hpp"
+#include "matmul.hpp"
 
 PYBIND11_MODULE(_pyuTensor, m) {
   m.doc() = "pybind11 uTensor plugin";  // optional module docstring

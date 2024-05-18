@@ -1,7 +1,7 @@
 #ifndef UTENSOR_ARITH_KERNELS_H
 #define UTENSOR_ARITH_KERNELS_H
-#include "uTensor/core/operatorBase.hpp"
 #include "Broadcast.hpp"
+#include "uTensor/core/operatorBase.hpp"
 
 namespace uTensor {
 template <typename T>
@@ -18,10 +18,10 @@ void add_kernel(Tensor& c, const Tensor& a, const Tensor& b) {
     bc.set_shape(a->get_shape(), b->get_shape());
     for (uint32_t i = 0; i < c_size; i++) {
       std::pair<uint32_t, uint32_t> indices = bc.get_linear_idx(i);
-      c(i) = static_cast<T>(static_cast<T>(a(indices.first)) + static_cast<T>(b(indices.second)));
+      c(i) = static_cast<T>(static_cast<T>(a(indices.first)) +
+                            static_cast<T>(b(indices.second)));
     }
-  }
-  else {
+  } else {
     for (uint32_t i = 0; i < c_size; i++)
       c(i) = static_cast<T>(static_cast<T>(a(i)) + static_cast<T>(b(i)));
   }
