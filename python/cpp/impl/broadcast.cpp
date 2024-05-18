@@ -11,11 +11,20 @@ PyBroadcaster::PyBroadcaster(const py::tuple &shape_a,
     ts_b[i] = static_cast<uint16_t>(shape_b[i].cast<int>());
   ts_a.update_dims();
   ts_b.update_dims();
-  _bc.set_shape(ts_a, ts_b);
+  try {
+    _bc.set_shape(ts_a, ts_b);
+  } catch (const std::runtime_error &e) {
+    throw py::value_error(e.what());
+  }
 }
 
 py::tuple PyBroadcaster::get_linear_idx(int idx_c) const {
-  std::pair<uint32_t, uint32_t> indices = _bc.get_linear_idx(idx_c);
+  std::pair<uint32_t, uint32_t> indices;
+  try {
+    indices = _bc.get_linear_idx(idx_c);
+  } catch (const std::runtime_error &e) {
+    throw py::value_error(e.what());
+  }
   return py::make_tuple(indices.first, indices.second);
 }
 

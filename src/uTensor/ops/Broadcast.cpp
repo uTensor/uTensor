@@ -1,6 +1,5 @@
 #include "Broadcast.hpp"
 
-#include <iostream>
 #include <stdexcept>
 
 Broadcaster::Broadcaster() : _shape_c(0) {}
@@ -18,6 +17,10 @@ void Broadcaster::set_shape(const TensorShape& shape_a,
                             const TensorShape& shape_c) {
   uint8_t num_dims_a = shape_a.num_dims(), num_dims_b = shape_b.num_dims(),
           num_dims_c = shape_c.num_dims();
+  for (uint8_t i = 0; i < num_dims_c; i++) {
+    _shape_c[i] = shape_c[i];
+  }
+  _shape_c.update_dims();
   _strides_c = TensorStrides(_shape_c);
   uint32_t s_a = 1, s_b = 1;
   for (uint8_t offset = 0; offset < num_dims_c; offset++) {
@@ -44,7 +47,7 @@ void Broadcaster::set_shape(const TensorShape& shape_a,
 
 std::pair<uint32_t, uint32_t> Broadcaster::get_linear_idx(
     uint32_t idx_c) const {
-  if (idx_c >= _shape_c.num_elems()) {
+  if (idx_c >= _shape_c.get_linear_size()) {
     throw std::runtime_error("Index out of bounds");
   }
   uint32_t idx_a = 0, idx_b = 0;
