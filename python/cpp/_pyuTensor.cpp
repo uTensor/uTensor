@@ -18,9 +18,8 @@ PYBIND11_MODULE(_pyuTensor, m) {
         py::arg("padding") = "VALID");
   m.def("add_kernel", &add_kernel, "add_kernel", py::arg("a"), py::arg("b"));
   m.def("mul_kernel", &mul_kernel, "mul_kernel", py::arg("a"), py::arg("b"));
-  // m.def("broadcaster_init", &broadcaster_init, "broadcaster_init",
-  //       py::arg("shape_a"), py::arg("shape_b"));
   py::class_<PyBroadcaster>(m, "Broadcaster")
       .def(py::init<const py::tuple &, const py::tuple &>())
+      .def("get_shape_c", &PyBroadcaster::get_shape_c)
       .def("get_linear_idx", &PyBroadcaster::get_linear_idx);
 }
