@@ -1,5 +1,6 @@
 #include "matmul.hpp"
 
+#include "allocator.hpp"
 #include "fast_copyop.hpp"
 #include "uTensor/ops/Matrix.hpp"
 
@@ -7,15 +8,14 @@ namespace py = pybind11;
 using uTensor::Context;
 using uTensor::RamTensor;
 using uTensor::Tensor;
+using uTensor::python::get_meta_allocator;
+using uTensor::python::get_ram_allocator;
 using uTensor::ReferenceOperators::MatrixMultOperatorV2;
-
-static uTensor::localCircularArenaAllocator<1024> meta_allocator;
-static uTensor::localCircularArenaAllocator<1024> ram_allocator;
 
 py::array_t<float> matmul(const py::array_t<float> &a,
                           const py::array_t<float> &b) {
-  Context::get_default_context()->set_ram_data_allocator(&ram_allocator);
-  Context::get_default_context()->set_metadata_allocator(&meta_allocator);
+  Context::get_default_context()->set_ram_data_allocator(get_ram_allocator());
+  Context::get_default_context()->set_metadata_allocator(get_meta_allocator());
   py::buffer_info info_a = a.request();
   py::buffer_info info_b = b.request();
   if (info_a.ndim != 2 || info_b.ndim != 2) {
