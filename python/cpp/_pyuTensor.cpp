@@ -24,5 +24,4 @@ PYBIND11_MODULE(_pyuTensor, m) {
       .def("get_output_shape", &PyBroadcaster::get_output_shape)
       .def("get_linear_idx", &PyBroadcaster::get_linear_idx);
   m.def("relu_f", &relu_f, "relu_f", py::arg("input"));
-  m.def("relu_i32", &relu_i32, "relu_i32", py::arg("input"));
 }
