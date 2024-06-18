@@ -13,7 +13,6 @@ isort = "*"
 ipython = "*"
 pytest = "*"
 numpy = "*"
-zetascale = "*"
 
 [packages]
 jinja2 = "*"
