@@ -1,5 +1,9 @@
+import os
+from random import choice, randint, random
+
 import pytest
-from random import randint, random, choice
+
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 
 @pytest.fixture(scope="function")
 def random_broadcastable_shapes():

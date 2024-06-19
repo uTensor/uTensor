@@ -7,6 +7,7 @@ pybind11_add_module(
     cpp/impl/allocator.cpp
     cpp/impl/arithmetic_kernels.cpp
     cpp/impl/broadcast.cpp
+    cpp/impl/activation.cpp
 )
 target_include_directories(_pyuTensor PUBLIC cpp/include)
 target_link_libraries(_pyuTensor PRIVATE utensor)

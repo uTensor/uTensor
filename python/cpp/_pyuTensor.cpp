@@ -1,5 +1,6 @@
 #include <cstddef>
 
+#include "activation.hpp"
 #include "allocator.hpp"
 #include "arithmetic_kernels.hpp"
 #include "broadcast.hpp"
@@ -22,4 +23,5 @@ PYBIND11_MODULE(_pyuTensor, m) {
       .def(py::init<const py::tuple &, const py::tuple &>())
       .def("get_output_shape", &PyBroadcaster::get_output_shape)
       .def("get_linear_idx", &PyBroadcaster::get_linear_idx);
+  m.def("relu_f", &relu_f, "relu_f", py::arg("input"));
 }
