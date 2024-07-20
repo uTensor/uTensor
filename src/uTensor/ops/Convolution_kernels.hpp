@@ -9,7 +9,7 @@ namespace uTensor {
 enum Padding : uint8_t { UNKNOWN = 0, VALID = 1, SAME = 2 };
 
 // Matches TF's behavior, ref:
-// https://github.com/tensorflow/tensorflow/blob/master/tensorflow/core/framework/kernel_shape_util.cc#L23
+// https://github.com/tensorflow/tensorflow/blob/6ea11589562f64a404ab74b1df9eba33f1fad83f/tensorflow/core/framework/kernel_shape_util.cc#L23
 inline int get_filter_offset(const Padding padding, const int out_size,
                              const int filter_size, const int in_size,
                              const int stride) {
