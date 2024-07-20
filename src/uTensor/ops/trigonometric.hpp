@@ -12,20 +12,20 @@ namespace ReferenceOperators {
 // adapt to tanh_kernel
 
 template <typename OutputT, typename InputT>
-class TanhOperator : public OperatorInterface<1, 1> {
+class TanhOperator : public OperatorInterface<1, 1> { // suggestion: remove the FastOperatorInterface and move its functionality to other places
  public:
   enum names_in : uint8_t { act_in };
   enum names_out : uint8_t { act_out };
 
  protected:
   virtual void compute() {
-    Tensor& in = inputs[act_in].tensor();
+    Tensor& in = inputs[act_in].tensor(); // suggestion: operator[] returns pointers to tensors and allow debug hooks insertion
     Tensor& out = outputs[act_out].tensor();
 
     const uint32_t flat_size = in->get_shape().get_linear_size();
 
     int32_t in_zero_point =
-        in->get_quantization_params().get_zeroP_for_channel(0);
+        in->get_quantization_params().get_zeroP_for_channel(0); // suggestion: quantization_params as composition
     float in_scale = in->get_quantization_params().get_scale_for_channel(0);
 
     int32_t out_zero_point =

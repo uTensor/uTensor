@@ -23,7 +23,7 @@ int main(int argc, const char** argv) {
   for (size_t i = 0; i < 128; ++i) {
     inputs_data[i] = dist(rengine);
   }
-  Tensor in_tensor = new RomTensor({128}, inputs_data);
+  Tensor in_tensor = new RomTensor({128}, inputs_data); // suggestion: implement function analogous to construct_at(p, 4, 'a');
   Tensor out_tensor = new RamTensor({128}, flt);
   tanh_model.set_inputs({{TanhModel::input_0, in_tensor}})
       .set_outputs({{TanhModel::output_0, out_tensor}})
