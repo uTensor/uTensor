@@ -23,17 +23,16 @@ constexpr int filter_out_channels_dim = 0;
 
 constexpr int output_height_dim = 1;
 constexpr int output_width_dim = 2;
-}  // namespace Conv2dConstants
+} // namespace Conv2dConstants
 
 // Can use these intermediate types to make the convolution operator more
 // generic. Maxpool, conv, average pool, median etc. are all basically the same
 // operation with target functions.
-template <typename T>
-class ConvFilter {
+template <typename T> class ConvFilter {
   T tmp;
   const Tensor &filter;
 
- public:
+public:
   ConvFilter(const Tensor &filter) : tmp(0), filter(filter) {}
   inline void reset() { tmp = 0; }
   inline void PartialCompute(const T &input_value, int i, int j, int k, int l) {
@@ -56,12 +55,11 @@ class ConvFilter {
   }
 };
 // Specialization for quantization
-template <>
-class ConvFilter<int8_t> {
+template <> class ConvFilter<int8_t> {
   float tmp;
   const Tensor &filter;
 
- public:
+public:
   ConvFilter(const Tensor &filter) : tmp(0), filter(filter) {}
   inline void reset() { tmp = 0; }
   inline void PartialCompute(const float &input_value, int i, int j, int k,
@@ -90,14 +88,13 @@ class ConvFilter<int8_t> {
   }
 };
 
-template <typename T>
-class MaxFilter {
+template <typename T> class MaxFilter {
   T tmp;
   int16_t h;
   int16_t w;
   int16_t c;
 
- public:
+public:
   MaxFilter(int16_t h, int16_t w, int16_t c) : h(h), w(w), c(c) {}
   inline void reset() { tmp = std::numeric_limits<T>::lowest(); }
   inline void PartialCompute(const T &input_value, int i, int j, int k, int l) {
@@ -110,14 +107,13 @@ class MaxFilter {
   inline int16_t out_channels() const { return c; }
 };
 
-template <typename T>
-class MinFilter {
+template <typename T> class MinFilter {
   T tmp;
   int16_t h;
   int16_t w;
   int16_t c;
 
- public:
+public:
   MinFilter(int16_t h, int16_t w, int16_t c) : h(h), w(w), c(c) {}
   inline void reset() { tmp = std::numeric_limits<T>::max(); }
   inline void PartialCompute(const T &input_value, int i, int j, int k, int l) {
@@ -130,46 +126,40 @@ class MinFilter {
   inline int16_t out_channels() const { return c; }
 };
 
-template <typename T>
-class AvgFilter {
+template <typename T> class AvgFilter {
   T tmp;
   int16_t w;
   int16_t h;
   int16_t c;
 
- public:
+public:
   AvgFilter(int16_t h, int16_t w, int16_t c) : h(h), w(w), c(c) {}
   inline void reset() { tmp = 0; }
   inline void PartialCompute(const T &input_value, int i, int j, int k, int l) {
     tmp += input_value;
   }
-  inline T finalize() const {
-    return tmp / (w * h);
-  }  //(static_cast<T>(w*h)); }
+  inline T finalize() const { return tmp / (w * h); } //(static_cast<T>(w*h)); }
   inline int16_t height() const { return h; }
   inline int16_t width() const { return w; }
   inline int16_t in_channels() const { return 1; }
   inline int16_t out_channels() const { return c; }
 };
 
-template <typename T>
-class NoBias {
- public:
+template <typename T> class NoBias {
+public:
   T operator()(int32_t i) { return 0; }
 };
 
-template <typename T>
-class wBias {
- public:
+template <typename T> class wBias {
+public:
   wBias(const Tensor &t) : t(t) {}
   T operator()(int32_t i) { return static_cast<T>(t(i)); }
 
- private:
+private:
   const Tensor &t;
 };
-template <>
-class wBias<int8_t> {
- public:
+template <> class wBias<int8_t> {
+public:
   wBias(const Tensor &t) : t(t) {}
   float operator()(int32_t i) {
     const int32_t b32 = static_cast<int32_t>(t(i));
@@ -178,13 +168,12 @@ class wBias<int8_t> {
     return (b32 - zp) * scale;
   }
 
- private:
+private:
   const Tensor &t;
 };
 
-template <typename T>
-class Conv2dOperator : public OperatorInterface<3, 1> {
- public:
+template <typename T> class Conv2dOperator : public OperatorInterface<3, 1> {
+public:
   enum names_in : uint8_t { in, filter, bias };
   enum names_out : uint8_t { out };
   Conv2dOperator(std::initializer_list<uint16_t> strides, Padding padding)
@@ -194,7 +183,7 @@ class Conv2dOperator : public OperatorInterface<3, 1> {
     }
     int i = 0;
     if (strides.size() == 2) {
-      i = 1;  // Offset the stride loc
+      i = 1; // Offset the stride loc
     }
     for (auto s : strides) {
       _stride[i++] = s;
@@ -223,16 +212,15 @@ class Conv2dOperator : public OperatorInterface<3, 1> {
   }
 #endif
 
- protected:
+protected:
   virtual void compute();
 
- private:
+private:
   uint16_t _stride[4];
   Padding _padding;
 };
 
-template <typename T>
-void Conv2dOperator<T>::compute() {
+template <typename T> void Conv2dOperator<T>::compute() {
   bool have_bias = inputs.has(bias);
   ConvFilter<T> conv(inputs[filter].tensor());
   if (have_bias) {
@@ -249,12 +237,11 @@ void Conv2dOperator<T>::compute() {
 }
 
 // Specialization for symmetric quantization
-template <>
-void Conv2dOperator<int8_t>::compute();
+template <> void Conv2dOperator<int8_t>::compute();
 
 template <typename T>
 class DepthwiseSeparableConvOperator : public OperatorInterface<3, 1> {
- public:
+public:
   enum names_in : uint8_t { in, depthwise_filter, pointwise_filter };
   enum names_out : uint8_t { out };
 
@@ -268,7 +255,7 @@ class DepthwiseSeparableConvOperator : public OperatorInterface<3, 1> {
     }
   }
 
- protected:
+protected:
   virtual void compute() {
     TensorShape &in_shape = inputs[in].tensor()->get_shape();
     TensorShape &df_shape = inputs[depthwise_filter].tensor()->get_shape();
@@ -289,14 +276,14 @@ class DepthwiseSeparableConvOperator : public OperatorInterface<3, 1> {
         _padding, _stride);
   }
 
- private:
+private:
   uint16_t _stride[4];
   Padding _padding;
 };
 
 template <typename T, typename Filter>
 class GenericPoolOperator : public OperatorInterface<1, 1> {
- public:
+public:
   enum names_in : uint8_t { in };
   enum names_out : uint8_t { out };
 
@@ -314,7 +301,23 @@ class GenericPoolOperator : public OperatorInterface<1, 1> {
     }
   }
 
- protected:
+// constructor for python binding (pybind11)
+#ifdef PYTHON_BINDING
+  GenericPoolOperator(std::array<uint16_t, 2> k_size,
+                      std::array<uint16_t, 4> strides, Padding padding)
+      : _padding(padding) {
+    int i = 0;
+    for (auto s : strides) {
+      _stride[i++] = s;
+    }
+    i = 0;
+    for (auto k : k_size) {
+      _k_size[i++] = k;
+    }
+  }
+#endif
+
+protected:
   virtual void compute() {
     TensorShape &in_shape = inputs[in].tensor()->get_shape();
     Filter filter(_k_size[0], _k_size[1], in_shape[3]);
@@ -322,7 +325,7 @@ class GenericPoolOperator : public OperatorInterface<1, 1> {
         outputs[out].tensor(), inputs[in].tensor(), filter, _padding, _stride);
   }
 
- private:
+private:
   uint16_t _k_size[2];
   uint16_t _stride[4];
   Padding _padding;
@@ -337,6 +340,6 @@ using AvgPoolOperator = GenericPoolOperator<T, AvgFilter<T>>;
 template <typename T>
 using MinPoolOperator = GenericPoolOperator<T, MinFilter<T>>;
 
-}  // namespace ReferenceOperators
-}  // namespace uTensor
+} // namespace ReferenceOperators
+} // namespace uTensor
 #endif
