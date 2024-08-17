@@ -19,6 +19,8 @@ PYBIND11_MODULE(_pyuTensor, m) {
         py::arg("padding") = "VALID");
   m.def("max_pool_f", &(max_pool<float>), "max_pool_f", py::arg("input"),
         py::arg("k_size"), py::arg("strides"), py::arg("padding"));
+  m.def("max_pool_i8", &(max_pool<int8_t>), "max_pool_i8", py::arg("input"),
+        py::arg("k_size"), py::arg("strides"), py::arg("padding"));
   m.def("add_kernel", &add_kernel, "add_kernel", py::arg("a"), py::arg("b"));
   m.def("mul_kernel", &mul_kernel, "mul_kernel", py::arg("a"), py::arg("b"));
   py::class_<PyBroadcaster>(m, "Broadcaster")
