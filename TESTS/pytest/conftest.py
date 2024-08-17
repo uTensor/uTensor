@@ -51,3 +51,22 @@ def random_conv_input():
         inputs.append((input_tensor, filter_tensor, bias, strides, padding))
 
     return inputs
+
+@pytest.fixture(scope="function")
+def random_4d_input():
+    import numpy as np
+
+    inputs = []
+    rand_max = 10
+
+    for _ in range(100):
+        B, H, W, Cin = (
+            randint(1, rand_max),
+            randint(1, rand_max),
+            randint(1, rand_max),
+            randint(1, rand_max),
+        )
+        input_tensor = np.random.rand(B, H, W, Cin).astype(np.float32)
+        inputs.append(input_tensor)
+
+    return inputs
