@@ -182,3 +182,8 @@ template py::array_t<int8_t> max_pool<int8_t>(py::array_t<int8_t> input,
                                               std::array<uint16_t, 2> k_size,
                                               std::array<uint16_t, 4> strides,
                                               std::string padding);
+
+template py::array_t<uint8_t> max_pool<uint8_t>(py::array_t<uint8_t> input,
+                                                std::array<uint16_t, 2> k_size,
+                                                std::array<uint16_t, 4> strides,
+                                                std::string padding);
