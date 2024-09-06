@@ -8,7 +8,7 @@
 #include "matmul.hpp"
 
 PYBIND11_MODULE(_pyuTensor, m) {
-  m.doc() = "pybind11 uTensor plugin";  // optional module docstring
+  m.doc() = "pybind11 uTensor plugin"; // optional module docstring
   m.def("set_ram_total", &uTensor::python::set_ram_total, py::arg("capacity"));
   m.def("set_meta_total", &uTensor::python::set_meta_total,
         py::arg("capacity"));
@@ -17,6 +17,12 @@ PYBIND11_MODULE(_pyuTensor, m) {
         py::arg("bias"),
         py::arg("strides") = std::array<uint16_t, 4>({1, 1, 1, 1}),
         py::arg("padding") = "VALID");
+  m.def("max_pool_f", &(max_pool<float>), "max_pool_f", py::arg("input"),
+        py::arg("k_size"), py::arg("strides"), py::arg("padding") = "VALID");
+  m.def("max_pool_i8", &(max_pool<int8_t>), "max_pool_i8", py::arg("input"),
+        py::arg("k_size"), py::arg("strides"), py::arg("padding") = "VALID");
+  m.def("max_pool_u8", &(max_pool<uint8_t>), "max_pool_u8", py::arg("input"),
+        py::arg("k_size"), py::arg("strides"), py::arg("padding") = "VALID");
   m.def("add_kernel", &add_kernel, "add_kernel", py::arg("a"), py::arg("b"));
   m.def("mul_kernel", &mul_kernel, "mul_kernel", py::arg("a"), py::arg("b"));
   py::class_<PyBroadcaster>(m, "Broadcaster")

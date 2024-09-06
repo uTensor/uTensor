@@ -14,11 +14,38 @@ using uTensor::python::get_ram_allocator;
 using uTensor::ReferenceOperators::Conv2dOperator;
 using namespace uTensor::ReferenceOperators::Conv2dConstants;
 
-py::array_t<float> conv2d_f(
-    const py::array_t<float, py::array::c_style> &input,
-    const py::array_t<float, py::array::c_style> &filter,
-    const py::array_t<float, py::array::c_style> &bias,
-    std::array<uint16_t, 4> strides, std::string padding) {
+static void _compute_output_shape(py::buffer_info &info_input,
+                                  uTensor::Padding padding,
+                                  uint16_t kernel_height, uint16_t kernel_width,
+                                  uint16_t stride_height, uint16_t stride_width,
+                                  uint16_t &out_height, uint16_t &out_width) {
+  switch (padding) {
+  case uTensor::VALID:
+    out_height = static_cast<uint16_t>(std::ceil(
+        static_cast<float>((info_input.shape[1] - kernel_height + 1)) /
+        static_cast<float>(stride_height)));
+    out_width = static_cast<uint16_t>(
+        std::ceil(static_cast<float>(info_input.shape[2] - kernel_width + 1) /
+                  static_cast<float>(stride_width)));
+    break;
+  case uTensor::SAME:
+    out_height = static_cast<uint16_t>(
+        std::ceil(static_cast<float>(info_input.shape[1]) /
+                  static_cast<float>(stride_height)));
+    out_width = static_cast<uint16_t>(
+        std::ceil(static_cast<float>(info_input.shape[2]) /
+                  static_cast<float>(stride_width)));
+    break;
+  case uTensor::UNKNOWN:
+    throw py::value_error("invalid padding value, support only SAME and VALID");
+  }
+}
+
+py::array_t<float>
+conv2d_f(const py::array_t<float, py::array::c_style> &input,
+         const py::array_t<float, py::array::c_style> &filter,
+         const py::array_t<float, py::array::c_style> &bias,
+         std::array<uint16_t, 4> strides, std::string padding) {
   Context::get_default_context()->set_ram_data_allocator(get_ram_allocator());
   Context::get_default_context()->set_metadata_allocator(get_meta_allocator());
   py::buffer_info info_input = input.request(), info_filter = filter.request(),
@@ -44,29 +71,10 @@ py::array_t<float> conv2d_f(
   }
   // https://www.tensorflow.org/api_docs/python/tf/nn#notes_on_padding_2
   uint16_t out_height, out_width;
-  switch (padding_) {
-    case uTensor::VALID:
-      out_height = static_cast<uint16_t>(std::ceil(
-          static_cast<float>((info_input.shape[1] -
-                              info_filter.shape[filter_height_dim] + 1)) /
-          static_cast<float>(strides[1])));
-      out_width = static_cast<uint16_t>(std::ceil(
-          static_cast<float>(info_input.shape[2] -
-                             info_filter.shape[filter_width_dim] + 1) /
-          static_cast<float>(strides[2])));
-      break;
-    case uTensor::SAME:
-      out_height = static_cast<uint16_t>(
-          std::ceil(static_cast<float>(info_input.shape[1]) /
-                    static_cast<float>(strides[1])));
-      out_width = static_cast<uint16_t>(
-          std::ceil(static_cast<float>(info_input.shape[2]) /
-                    static_cast<float>(strides[2])));
-      break;
-    case uTensor::UNKNOWN:
-      throw py::value_error(
-          "invalid padding value, support only SAME and VALID");
-  }
+  _compute_output_shape(info_input, padding_,
+                        info_filter.shape[filter_height_dim],
+                        info_filter.shape[filter_width_dim], strides[1],
+                        strides[2], out_height, out_width);
 
   CopyOperator copy_op;
   Conv2dOperator<float> conv_op(strides, padding_);
@@ -111,3 +119,71 @@ py::array_t<float> conv2d_f(
   Context::get_default_context()->set_metadata_allocator(nullptr);
   return py::array_t<float>(info);
 }
+
+template <typename T>
+py::array_t<T> max_pool(py::array_t<T> input, std::array<uint16_t, 2> k_size,
+                        std::array<uint16_t, 4> strides, std::string padding) {
+  Context::get_default_context()->set_ram_data_allocator(get_ram_allocator());
+  Context::get_default_context()->set_metadata_allocator(get_meta_allocator());
+  py::buffer_info info_input = input.request();
+  uTensor::Padding padding_;
+  if (padding == "VALID") {
+    padding_ = uTensor::VALID;
+  } else if (padding == "SAME") {
+    padding_ = uTensor::SAME;
+  } else {
+    padding_ = uTensor::UNKNOWN;
+  }
+  CopyOperator copy_op;
+  uTensor::ReferenceOperators::MaxPoolOperator<T> max_pool_op(k_size, strides,
+                                                              padding_);
+  auto elem_type = ttype_from<T>::type;
+  uint16_t out_height, out_width;
+  _compute_output_shape(info_input, padding_, k_size[0], k_size[1], strides[1],
+                        strides[2], out_height, out_width);
+  Tensor tensor_out = new RamTensor(
+      {
+          static_cast<uint16_t>(info_input.shape[0]),
+          out_height,
+          out_width,
+          static_cast<uint16_t>(info_input.shape[3]),
+      },
+      elem_type);
+  Tensor tensor_input = new RamTensor(
+      {
+          static_cast<uint16_t>(info_input.shape[0]),
+          static_cast<uint16_t>(info_input.shape[1]),
+          static_cast<uint16_t>(info_input.shape[2]),
+          static_cast<uint16_t>(info_input.shape[3]),
+
+      },
+      elem_type);
+  copy_op.toTensor(info_input.ptr, tensor_input);
+  max_pool_op
+      .set_inputs(
+          {{uTensor::ReferenceOperators::MaxPoolOperator<T>::in, tensor_input}})
+      .set_outputs(
+          {{uTensor::ReferenceOperators::MaxPoolOperator<T>::out, tensor_out}})
+      .eval();
+  py::buffer_info info = copy_op.getInfo(tensor_out);
+  tensor_input.free();
+  tensor_out.free();
+  Context::get_default_context()->set_ram_data_allocator(nullptr);
+  Context::get_default_context()->set_metadata_allocator(nullptr);
+  return py::array_t<T>(info);
+}
+
+template py::array_t<float> max_pool<float>(py::array_t<float> input,
+                                            std::array<uint16_t, 2> k_size,
+                                            std::array<uint16_t, 4> strides,
+                                            std::string padding);
+
+template py::array_t<int8_t> max_pool<int8_t>(py::array_t<int8_t> input,
+                                              std::array<uint16_t, 2> k_size,
+                                              std::array<uint16_t, 4> strides,
+                                              std::string padding);
+
+template py::array_t<uint8_t> max_pool<uint8_t>(py::array_t<uint8_t> input,
+                                                std::array<uint16_t, 2> k_size,
+                                                std::array<uint16_t, 4> strides,
+                                                std::string padding);

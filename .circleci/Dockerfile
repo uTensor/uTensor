@@ -16,7 +16,7 @@ RUN apt-get install -y build-essential gdb lcov pkg-config \
     libbz2-dev libffi-dev libgdbm-dev libgdbm-compat-dev liblzma-dev \
     libncurses5-dev libreadline6-dev libsqlite3-dev libssl-dev \
     lzma lzma-dev tk-dev uuid-dev zlib1g-dev
-    
+
 RUN git clone https://github.com/pyenv/pyenv.git /root/.pyenv
 RUN echo 'export PYENV_ROOT="/root/.pyenv"' >> /root/.bashrc && \
     echo 'command -v pyenv >/dev/null || export PATH="$PYENV_ROOT/bin:$PATH"' >> /root/.bashrc && \
@@ -40,6 +40,7 @@ RUN cd /tmp/cmake && tar -xzvf cmake-$version.$build.tar.gz
 RUN cd /tmp/cmake/cmake-$version.$build/ && ./bootstrap
 RUN cd /tmp/cmake/cmake-$version.$build/ && make
 RUN cd /tmp/cmake/cmake-$version.$build/ && make install
+RUN rm -rf /var/lib/apt/lists/* /tmp/cmake
 
 # configure GTEST
 #RUN cd /usr/src/gtest && cmake CMakeLists.txt
