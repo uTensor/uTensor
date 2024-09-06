@@ -13,7 +13,7 @@
 namespace uTensor {
 
 //#define MSB_SET ~( ~( (T)0 ) >> 1 )
-#define MSB_SET (1 << (sizeof(uint32_t) * 8 - 1))
+#define MSB_SET ((uint32_t)1 << (sizeof(uint32_t) * 8 - 1))
 #define BLOCK_INACTIVE ~MSB_SET
 #define BLOCK_LENGTH_MASK ~MSB_SET
 #define BLOCK_ACTIVE MSB_SET
