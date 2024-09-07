@@ -1,8 +1,9 @@
 from typing import List
 
+
 def test_broadcast_add(random_broadcastable_shapes: List[tuple]):
-    import pyuTensor
     import numpy as np
+    import pyuTensor
     import tensorflow as tf
 
     pyuTensor.set_ram_total(100*1024)
@@ -11,7 +12,7 @@ def test_broadcast_add(random_broadcastable_shapes: List[tuple]):
         a = np.arange(np.prod(shape_a)).reshape(shape_a).astype(np.float32)
         b = np.arange(np.prod(shape_b)).reshape(shape_b).astype(np.float32)
 
-        uT_1 = pyuTensor.add_kernel(a, b)
+        uT_1 = pyuTensor.add(a, b)
         np_1 = a + b
         tf_1 = tf.add(a, b).numpy()
 
@@ -19,8 +20,8 @@ def test_broadcast_add(random_broadcastable_shapes: List[tuple]):
         assert np.allclose(uT_1, tf_1)
 
 def test_broadcast_mul(random_broadcastable_shapes: List[tuple]):
-    import pyuTensor
     import numpy as np
+    import pyuTensor
     import tensorflow as tf
 
     pyuTensor.set_ram_total(100*1024)
@@ -29,7 +30,7 @@ def test_broadcast_mul(random_broadcastable_shapes: List[tuple]):
         a = np.arange(np.prod(shape_a)).reshape(shape_a).astype(np.float32)
         b = np.arange(np.prod(shape_b)).reshape(shape_b).astype(np.float32)
 
-        uT_1 = pyuTensor.mul_kernel(a, b)
+        uT_1 = pyuTensor.matmul(a, b)
         np_1 = a * b
         tf_1 = tf.multiply(a, b).numpy()
 
@@ -37,8 +38,8 @@ def test_broadcast_mul(random_broadcastable_shapes: List[tuple]):
         assert np.allclose(uT_1, tf_1)
 
 def test_add():
-    import pyuTensor
     import numpy as np
+    import pyuTensor
     import tensorflow as tf
 
     pyuTensor.set_ram_total(4096)
@@ -49,7 +50,7 @@ def test_add():
     b_setting = a_setting
     b = np.arange(np.prod(b_setting)).reshape(b_setting).astype(np.float32)
 
-    uT_1 = pyuTensor.add_kernel(a, b)
+    uT_1 = pyuTensor.add(a, b)
     np_1 = a + b
     tf_1 = tf.add(a, b).numpy()
 
@@ -57,8 +58,8 @@ def test_add():
     assert np.allclose(uT_1, tf_1)
     
 def test_mul():
-    import pyuTensor
     import numpy as np
+    import pyuTensor
     import tensorflow as tf
 
     pyuTensor.set_ram_total(4096)
@@ -69,7 +70,7 @@ def test_mul():
     b_setting = a_setting
     b = np.arange(np.prod(b_setting)).reshape(b_setting).astype(np.float32)
 
-    uT_1 = pyuTensor.mul_kernel(a, b)
+    uT_1 = pyuTensor.matmul(a, b)
     np_1 = a * b
     tf_1 = tf.multiply(a, b).numpy()
 

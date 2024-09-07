@@ -4,8 +4,8 @@
 
 namespace py = pybind11;
 
-py::array_t<float> add_kernel(const py::array_t<float> &a,
-                          const py::array_t<float> &b);
+template <typename T>
+py::array_t<T> add_kernel(const py::array_t<T> &a, const py::array_t<T> &b);
 
 py::array_t<float> mul_kernel(const py::array_t<float> &a,
-                            const py::array_t<float> &b);
+                              const py::array_t<float> &b);

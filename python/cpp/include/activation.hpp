@@ -4,4 +4,4 @@
 
 namespace py = pybind11;
 
-py::array_t<float> relu_f(const py::array_t<float> &input);
+template <typename T> py::array_t<T> relu(const py::array_t<T> &input);

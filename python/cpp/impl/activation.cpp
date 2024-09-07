@@ -12,20 +12,21 @@ using uTensor::Tensor;
 using uTensor::python::get_meta_allocator;
 using uTensor::python::get_ram_allocator;
 
-py::array_t<float> relu_f(const py::array_t<float> &input) {
+template <typename T> py::array_t<T> relu(const py::array_t<T> &input) {
   Context::get_default_context()->set_ram_data_allocator(get_ram_allocator());
   Context::get_default_context()->set_metadata_allocator(get_meta_allocator());
   py::buffer_info info_input = input.request();
   CopyOperator copy_op;
-  uTensor::ReferenceOperators::ReLUOperator<float> relu_op;
+  uTensor::ReferenceOperators::ReLUOperator<T> relu_op;
   TensorShape in_shape(0);
 
   for (int idx = 0; idx < info_input.ndim; idx++) {
     in_shape[idx] = info_input.shape[idx];
   }
   in_shape.update_dims();
-  Tensor tensor_input = new RamTensor(in_shape, flt);
-  Tensor tensor_output = new RamTensor(in_shape, flt);
+  auto elem_type = ttype_from<T>::type;
+  Tensor tensor_input = new RamTensor(in_shape, elem_type);
+  Tensor tensor_output = new RamTensor(in_shape, elem_type);
   copy_op.toTensor(info_input.ptr, tensor_input);
   relu_op
       .set_inputs({{uTensor::ReferenceOperators::ReLUOperator<float>::in,
@@ -40,5 +41,10 @@ py::array_t<float> relu_f(const py::array_t<float> &input) {
   Context::get_default_context()->set_metadata_allocator(nullptr);
 
   py::object base = py::cast(out_info.ptr);
-  return py::array_t<float>(out_info, base);
+  return py::array_t<T>(out_info, base);
 }
+
+template py::array_t<float> relu(const py::array_t<float> &input);
+template py::array_t<int8_t> relu(const py::array_t<int8_t> &input);
+template py::array_t<int16_t> relu(const py::array_t<int16_t> &input);
+template py::array_t<int32_t> relu(const py::array_t<int32_t> &input);

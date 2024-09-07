@@ -8,7 +8,7 @@ _NUM_TESTS = 10
 @pytest.mark.parametrize("arr", [
     np.random.randn(*tuple(randint(1, 6) for _ in range(randint(1, 4)))).astype(np.float32) for _ in range(_NUM_TESTS)
 ], ids=[i for i in range(_NUM_TESTS)])
-def test_relu(arr):
+def test_relu_f(arr):
     import pyuTensor
     import tensorflow as tf
 

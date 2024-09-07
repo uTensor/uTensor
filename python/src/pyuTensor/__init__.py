@@ -1,9 +1,11 @@
-from ._pyuTensor import *
+from . import _pyuTensor as _C
 from ._version import __version__
-import numpy as np
+from .arithmetic import *
+from .conv import *
+from .relu import *
 
-def relu(arr: np.ndarray):
-    if arr.dtype in [np.float32, np.float64]:
-        return relu_f(arr.astype(np.float32))
-    raise ValueError(f"Unsupported dtype: {arr.dtype}")
+set_meta_total = _C.set_meta_total
+set_ram_total = _C.set_ram_total
+Broadcaster = _C.Broadcaster
+
     
