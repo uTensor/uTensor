@@ -12,9 +12,9 @@ using uTensor::Tensor;
 using uTensor::python::get_meta_allocator;
 using uTensor::python::get_ram_allocator;
 
-template <typename T>
+template <typename T, bool is_quantized>
 py::array_t<T> _relu(const py::array_t<T> &input, float scale,
-                     int32_t zero_point, bool is_quantized) {
+                     int32_t zero_point) {
   Context::get_default_context()->set_ram_data_allocator(get_ram_allocator());
   Context::get_default_context()->set_metadata_allocator(get_meta_allocator());
   py::buffer_info info_input = input.request();
@@ -55,11 +55,11 @@ py::array_t<T> _relu(const py::array_t<T> &input, float scale,
 template <typename T>
 py::array_t<T> relu_q(const py::array_t<T> &input, float scale,
                       int32_t zero_point) {
-  return _relu(input, scale, zero_point, true);
+  return _relu<T, true>(input, scale, zero_point);
 }
 
 py::array_t<float> relu_f(const py::array_t<float> &input) {
-  return _relu(input, 0.0, 0, false);
+  return _relu<float, false>(input, 0.0, 0);
 }
 
 template py::array_t<int8_t> relu_q(const py::array_t<int8_t> &input,
