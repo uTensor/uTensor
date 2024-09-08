@@ -42,8 +42,11 @@ PYBIND11_MODULE(_pyuTensor, m) {
       .def(py::init<const py::tuple &, const py::tuple &>())
       .def("get_output_shape", &PyBroadcaster::get_output_shape)
       .def("get_linear_idx", &PyBroadcaster::get_linear_idx);
-  m.def("relu_f", &relu<float>, "relu_f", py::arg("input"));
-  m.def("relu_i8", &relu<int8_t>, "relu_i8", py::arg("input"));
-  m.def("relu_i16", &relu<int16_t>, "relu_i16", py::arg("input"));
-  m.def("relu_i32", &relu<int32_t>, "relu_i32", py::arg("input"));
+  m.def("relu_f", &relu_f, "relu_f", py::arg("input"));
+  m.def("relu_i8", &relu_q<int8_t>, "relu_i8", py::arg("input"),
+        py::arg("scale"), py::arg("zero_point"));
+  m.def("relu_i16", &relu_q<int16_t>, "relu_i16", py::arg("input"),
+        py::arg("scale"), py::arg("zero_point"));
+  m.def("relu_i32", &relu_q<int32_t>, "relu_i32", py::arg("input"),
+        py::arg("scale"), py::arg("zero_point"));
 }
