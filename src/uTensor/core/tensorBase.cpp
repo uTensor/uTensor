@@ -1,7 +1,7 @@
 #include "tensorBase.hpp"
 
-#include "uTensor/core/context.hpp"
 #include "memoryManagementInterface.hpp"
+#include "uTensor/core/context.hpp"
 #include "uTensor/core/uTensor_util.hpp"
 
 namespace uTensor {
@@ -16,48 +16,52 @@ TensorBase::~TensorBase() {
 }
 
 // Allocate the tensor metadata on a different heap from the data scratch pads
-void* TensorBase::operator new(size_t sz) {
-  void* p =
+void *TensorBase::operator new(size_t sz) {
+  void *p =
       Context::get_default_context()->get_metadata_allocator()->allocate(sz);
   return p;
 }
 
-void TensorBase::operator delete(void* p) {
-  if(p == nullptr){
+void TensorBase::operator delete(void *p) {
+  if (p == nullptr) {
     Context::get_default_context()->throwError(new NullTensorDeleteError);
   }
   Context::get_default_context()->get_metadata_allocator()->deallocate(p);
 }
 
 ttype TensorInterface::get_type() const { return _type; }
-TensorShape& TensorInterface::get_shape() { return _shape; }
-const TensorShape& TensorInterface::get_shape() const { return _shape; }
+TensorShape &TensorInterface::get_shape() { return _shape; }
+const TensorShape &TensorInterface::get_shape() const { return _shape; }
 uint32_t TensorInterface::num_elems() const { return _shape.num_elems(); }
 
 TensorInterface::TensorInterface()
-    : TensorBase(), _shape(0), _type(undefined), _type_size(0), _qnt_params(nullptr) {}
+    : TensorBase(), _shape(0), _type(undefined), _type_size(0),
+      _qnt_params(nullptr) {}
 TensorInterface::TensorInterface(ttype _type)
     : TensorBase(), _shape(0), _type(_type), _qnt_params(nullptr) {
   _type_size = type_size(_type);
 }
-TensorInterface::TensorInterface(const TensorShape& _shape, ttype _type)
+TensorInterface::TensorInterface(const TensorShape &_shape, ttype _type)
     : TensorBase(), _shape(_shape), _type(_type), _qnt_params(nullptr) {
   _type_size = type_size(_type);
 }
-TensorInterface::~TensorInterface(){
-};
+TensorInterface::~TensorInterface(){};
 
 // Can access Tensors like
 // mTensor(1) = 5, mTensor(2,2) = 5, etc.
+uint32_t TensorInterface::compute_linear_index(uint16_t i, uint16_t j,
+                                               uint16_t k, uint16_t l) const {
+  return _shape.linear_index(i, j, k, l);
+}
 const IntegralValue TensorInterface::operator()(uint16_t i, uint16_t j,
                                                 uint16_t k, uint16_t l) const {
   // Add shape checks here
-  return read(_shape.linear_index(i, j, k, l));
+  return read(compute_linear_index(i, j, k, l));
 }
 IntegralValue TensorInterface::operator()(uint16_t i, uint16_t j, uint16_t k,
                                           uint16_t l) {
   // Add shape checks here
-  return write(_shape.linear_index(i, j, k, l));
+  return write(compute_linear_index(i, j, k, l));
 }
 const IntegralValue TensorInterface::operator()(uint32_t linear_index) const {
   // Add shape checks here
@@ -68,11 +72,11 @@ IntegralValue TensorInterface::operator()(uint32_t linear_index) {
   return write(linear_index);
 }
 
-const QuantizationParams& TensorInterface::get_quantization_params() const {
+const QuantizationParams &TensorInterface::get_quantization_params() const {
   return *(_qnt_params.operator*());
 }
 
-size_t TensorInterface::_get_readable_block(const void*& buffer,
+size_t TensorInterface::_get_readable_block(const void *&buffer,
                                             uint16_t req_read_size,
                                             uint32_t linear_index) const {
   uTensor_printf(
@@ -81,7 +85,7 @@ size_t TensorInterface::_get_readable_block(const void*& buffer,
       new InvalidOptimizableTensorError());
   return -1;
 }
-size_t TensorInterface::_get_writeable_block(void*& buffer,
+size_t TensorInterface::_get_writeable_block(void *&buffer,
                                              uint16_t req_write_size,
                                              uint32_t linear_index) {
   uTensor_printf(
@@ -90,14 +94,15 @@ size_t TensorInterface::_get_writeable_block(void*& buffer,
       new InvalidOptimizableTensorError());
   return -1;
 }
-size_t TensorInterface::get_readable_block(const void*& buffer, uint16_t req_read_size,
+size_t TensorInterface::get_readable_block(const void *&buffer,
+                                           uint16_t req_read_size,
                                            uint32_t linear_index) const {
   if (req_read_size > _type_size * _shape.get_linear_size()) {
     return -1;
   }
   return _get_readable_block(buffer, req_read_size, linear_index);
 }
-size_t TensorInterface::get_writeable_block(void*& buffer,
+size_t TensorInterface::get_writeable_block(void *&buffer,
                                             uint16_t req_write_size,
                                             uint32_t linear_index) {
   if (req_write_size > _type_size * _shape.get_linear_size()) {
@@ -106,4 +111,4 @@ size_t TensorInterface::get_writeable_block(void*& buffer,
   return _get_writeable_block(buffer, req_write_size, linear_index);
 }
 
-}  // namespace uTensor
+} // namespace uTensor
