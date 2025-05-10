@@ -7,21 +7,21 @@ namespace uTensor {
 template <typename T>
 class FastMatMulOperator : public OperatorInterface<2, 1>, FastOperator {
  public:
-  enum names : uint8_t { input1, input2, output };
+  enum names : uint8_t { filter, input, output };
 
   virtual void compute() {
-    Tensor a = inputs[input1].tensor();
-    Tensor b = inputs[input2].tensor();
-    Tensor c = outputs[output].tensor();
-    TensorShape a_shape = a->get_shape();  // M x K
-    TensorShape b_shape = b->get_shape();  // K x N
-    TensorShape c_shape = c->get_shape();  // M x N
+    Tensor w = inputs[filter].tensor();
+    Tensor in = inputs[input].tensor();
+    Tensor out = outputs[output].tensor();
+    TensorShape w_shape = w->get_shape();      // batch x M x K
+    TensorShape in_shape = in->get_shape();    // batch x K x N
+    TensorShape out_shape = out->get_shape();  // batch x M x N
 
-    T *a_ptr, *b_ptr, *c_ptr;
-    get_readable_block(a, a_ptr, a_shape.num_elems(), 0);
-    get_readable_block(b, b_ptr, b_shape.num_elems(), 0);
-    get_writeable_block(c, c_ptr, c_shape.num_elems(), 0);
-    fast_matmul_kernel<T>(a_shape, b_shape, c_shape a_ptr, b_ptr, c_ptr);
+    T *w_ptr, *in_ptr, *out_ptr;
+    get_readable_block(w, w_ptr, w_shape.num_elems(), 0);
+    get_readable_block(in, in_ptr, in_shape.num_elems(), 0);
+    get_writeable_block(out, out_ptr, out_shape.num_elems(), 0);
+    fast_matmul_kernel<T>(w_shape, in_shape, out_shape w_ptr, in_ptr, out_ptr);
   }
 };
 

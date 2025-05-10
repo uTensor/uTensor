@@ -6,29 +6,37 @@
 namespace uTensor {
 
 template <typename T>
-void fast_matmul_kernel(TensorShape a_shape, TensorShape b_shape,
-                        TensorShape c_shape, const T *ptr_a, const T *ptr_b,
-                        T *ptr_c) {
+void fast_matmul_kernel(TensorShape w_shape, TensorShape in_shape,
+                        TensorShape out_shape, const T *ptr_w, const T *ptr_in,
+                        T *ptr_out) {
   // check shapes
-  if (a_shape.num_dims() != 2 || b_shape.num_dims() != 2 ||
-      c_shape.num_dims() != 2 || a_shape[1] != b_shape[0] ||
-      a_shape[0] != c_shape[0] || b_shape[1] != c_shape[1]) {
+  if (w_shape.num_dims() != 3 || in_shape.num_dims() != 3 ||
+      out_shape.num_dims() != 3) {
+    uTensor_printf("[Error] incorrect number of dimensions\n");
+    Context::get_default_context()->throwError(
+        new InvalidMatrixMultIndicesError);
+  }
+  if (w_shape[1] != out_shape[1] || w_shape[2] != in_shape[1] ||
+      in_shape[2] != out_shape[2]) {
     uTensor_printf("[Error] Invalid matrix multiple shape mismatch\n");
     Context::get_default_context()->throwError(
         new InvalidMatrixMultIndicesError);
   }
-  uint16_t M = a_shape[0], K = a_shape[1], K = b_shape[0];
-  for (uint16_t i = 0; i < M; i++) {
-    for (uint16_t k = 0; k < K; k++) {
-      auto idx_a = a_shape.linear_index(i, k);
-      uint32_t a_ik = *ptr_a[idx_a];
-      for (uint16_t j = 0; j < N; j++) {
-        uint32_t idx_b = b_shape.linear_index(k, j),
-                 idx_c = c_shape.linear_index(i, j);
-        T b_kj = *ptr_b[idx_b];
-        T c_ij = *ptr_c[idx_c];
-        c_ij += a_ik * b_kj;
-        ptr_c[idx_c] = c_ij;
+  uint16_t batch_size = out_shape[0], M = w_shape[0], K = w_shape[1],
+           N = in_shape[2];
+  for (uint16_t b = 0; b < batch_size; b++) {
+    for (uint16_t i = 0; i < M; i++) {
+      for (uint16_t k = 0; k < K; k++) {
+        auto idx_a = w_shape.linear_index(b, i, k);
+        uint32_t a_ik = *ptr_w[idx_a];
+        for (uint16_t j = 0; j < N; j++) {
+          uint32_t idx_b = in_shape.linear_index(b, k, j),
+                   idx_c = out_shape.linear_index(b, i, j);
+          T b_kj = *ptr_in[idx_b];
+          T c_ij = *ptr_out[idx_c];
+          c_ij += a_ik * b_kj;
+          ptr_out[idx_c] = c_ij;
+        }
       }
     }
   }
